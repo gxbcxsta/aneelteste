@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Coins, ChevronRight, ChevronLeft, AlertCircle } from "lucide-react";
+import { Coins, ChevronRight, ChevronLeft, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Validação para o número de cliente/CPF
@@ -52,6 +52,7 @@ export default function SimuladorRestituicao({
   const [mesesConsiderados, setMesesConsiderados] = useState(0);
   const [valorFinalRestituicao, setValorFinalRestituicao] = useState(0);
   const [valorRealRestituicao, setValorRealRestituicao] = useState(0);
+  const [calculando, setCalculando] = useState(false);
   
   // Formatação de CPF
   const formatarCPF = (cpf: string) => {
@@ -161,12 +162,15 @@ export default function SimuladorRestituicao({
   
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = (data: PeriodoFormValues) => {
+    // Inicia o processo de cálculo com animação de carregamento
+    setCalculando(true);
+    
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
     
     switch(data.periodo) {
       case 'menos-12':
-        meses = 11;
+        meses = 12;
         break;
       case '1-3-anos':
         meses = 24;
@@ -178,31 +182,41 @@ export default function SimuladorRestituicao({
         meses = 60;
         break;
       default:
-        meses = 11;
+        meses = 12;
     }
     
     setMesesConsiderados(meses);
     
-    // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
-    const valorEstimado = valorMedioFinal * meses * 0.25;
-    
-    // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
-    let valorFinal = valorEstimado;
-    if (valorEstimado > 5000) {
-      valorFinal = 5000;
-      setValorFinalRestituicao(5000);
-      setValorRealRestituicao(valorEstimado);
-    } else {
-      valorFinal = valorEstimado;
-      setValorFinalRestituicao(valorEstimado);
-      setValorRealRestituicao(0); // Não há valor "real" adicional
-    }
-    
-    // Notifica o componente pai sobre a conclusão (usando o valor calculado diretamente)
-    onSimulacaoConcluida(valorFinal, meses);
-    
-    // Avança para a próxima etapa
-    proximaEtapa();
+    // Adiciona um tempo de espera para dar mais credibilidade ao cálculo
+    setTimeout(() => {
+      // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
+      let valorEstimado = valorMedioFinal * meses * 0.25;
+      
+      // Se o valor for inferior a R$ 1.800, gerar um valor aleatório entre R$ 1.800 e R$ 2.200
+      if (valorEstimado < 1800) {
+        // Gera um valor aleatório entre 1800 e 2200
+        valorEstimado = Math.floor(Math.random() * (2200 - 1800 + 1)) + 1800;
+      }
+      
+      // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
+      let valorFinal = valorEstimado;
+      if (valorEstimado > 5000) {
+        valorFinal = 5000;
+        setValorFinalRestituicao(5000);
+        setValorRealRestituicao(valorEstimado);
+      } else {
+        valorFinal = valorEstimado;
+        setValorFinalRestituicao(valorEstimado);
+        setValorRealRestituicao(0); // Não há valor "real" adicional
+      }
+      
+      // Notifica o componente pai sobre a conclusão (usando o valor calculado diretamente)
+      onSimulacaoConcluida(valorFinal, meses);
+      
+      // Finaliza o carregamento e avança para a próxima etapa
+      setCalculando(false);
+      proximaEtapa();
+    }, 3000); // Espera 3 segundos antes de mostrar o resultado
   };
   
   // Funções de navegação entre etapas
@@ -441,9 +455,19 @@ export default function SimuladorRestituicao({
                 <Button 
                   type="submit"
                   className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
+                  disabled={calculando}
                 >
-                  Calcular Restituição
-                  <ChevronRight className="ml-2 h-4 w-4" />
+                  {calculando ? (
+                    <>
+                      <span className="animate-pulse">Calculando...</span>
+                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      Calcular Restituição
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             </form>

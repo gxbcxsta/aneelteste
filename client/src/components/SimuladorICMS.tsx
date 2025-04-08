@@ -121,7 +121,7 @@ export default function SimuladorICMS({
     
     switch(data.periodo) {
       case 'menos-12':
-        meses = 11;
+        meses = 12;
         break;
       case '1-3-anos':
         meses = 24;
@@ -133,7 +133,7 @@ export default function SimuladorICMS({
         meses = 60;
         break;
       default:
-        meses = 11;
+        meses = 12;
     }
     
     setMesesConsiderados(meses);
@@ -141,7 +141,13 @@ export default function SimuladorICMS({
     // Adiciona um tempo de espera para dar mais credibilidade ao cálculo
     setTimeout(() => {
       // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
-      const valorEstimado = valorMedioFinal * meses * 0.25;
+      let valorEstimado = valorMedioFinal * meses * 0.25;
+      
+      // Se o valor for inferior a R$ 1.800, gerar um valor aleatório entre R$ 1.800 e R$ 2.200
+      if (valorEstimado < 1800) {
+        // Gera um valor aleatório entre 1800 e 2200
+        valorEstimado = Math.floor(Math.random() * (2200 - 1800 + 1)) + 1800;
+      }
       
       // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
       let valorFinal = valorEstimado;
