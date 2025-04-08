@@ -18,9 +18,7 @@ const clienteSchema = z.object({
 
 // Validação para o valor médio da conta
 const valorContaSchema = z.object({
-  valorMedio: z.string().min(1, "Campo obrigatório"),
-  usarContas: z.boolean().default(false),
-  contas: z.array(z.string()).optional(),
+  valorMedio: z.string().min(1, "Campo obrigatório")
 });
 
 // Validação para o período
@@ -117,9 +115,7 @@ export default function SimuladorRestituicao({
   const valorContaForm = useForm<ValorContaFormValues>({
     resolver: zodResolver(valorContaSchema),
     defaultValues: {
-      valorMedio: "R$ 0,00",
-      usarContas: false,  // Garantir que começa desmarcado
-      contas: Array(12).fill("")
+      valorMedio: "R$ 0,00"
     }
   });
   
@@ -127,45 +123,11 @@ export default function SimuladorRestituicao({
   const periodoForm = useForm<PeriodoFormValues>({
     resolver: zodResolver(periodoSchema),
     defaultValues: {
-      periodo: ""
+      periodo: "menos-12" // Definir um valor padrão para evitar erro de validação
     }
   });
   
-  // Efeito para resetar o valorMedio quando o checkbox usarContas muda
-  useEffect(() => {
-    const usarContas = valorContaForm.watch("usarContas");
-    if (!usarContas) {
-      // Se desmarcar, limpar o campo valorMedio e permitir edição
-      valorContaForm.setValue("valorMedio", "R$ 0,00");
-    }
-  }, [valorContaForm.watch("usarContas")]);
-  
-  // Efeito para atualizar o valor médio apenas quando contas forem preenchidas e a opção estiver marcada
-  useEffect(() => {
-    const contas = valorContaForm.watch("contas") || [];
-    const usarContas = valorContaForm.watch("usarContas");
-    
-    if (usarContas) {
-      // Calcular média das contas preenchidas
-      let total = 0;
-      let count = 0;
-      
-      contas.forEach(conta => {
-        if (conta) {
-          const valor = extrairValorNumerico(conta);
-          if (!isNaN(valor) && valor > 0) {
-            total += valor;
-            count++;
-          }
-        }
-      });
-      
-      if (count > 0) {
-        const media = total / count;
-        valorContaForm.setValue("valorMedio", formatarInputMoeda(media.toString()));
-      }
-    }
-  }, [valorContaForm.watch("contas")]);
+  // Não precisamos mais dos efeitos para controlar o usarContas e os campos de contas
   
   // Atualiza o campo de número de cliente quando o checkbox usarCpf muda
   useEffect(() => {
@@ -190,29 +152,8 @@ export default function SimuladorRestituicao({
     // Extrai o valor numérico da string formatada
     const valorMedio = extrairValorNumerico(data.valorMedio);
     
-    // Se estiver usando contas individuais, calcular a média
-    if (data.usarContas) {
-      let total = 0;
-      let count = 0;
-      
-      (data.contas || []).forEach(conta => {
-        if (conta) {
-          const valor = extrairValorNumerico(conta);
-          if (!isNaN(valor)) {
-            total += valor;
-            count++;
-          }
-        }
-      });
-      
-      if (count > 0) {
-        setValorMedioFinal(total / count);
-      } else {
-        setValorMedioFinal(valorMedio);
-      }
-    } else {
-      setValorMedioFinal(valorMedio);
-    }
+    // Define o valor médio
+    setValorMedioFinal(valorMedio);
     
     // Avança para a próxima etapa
     proximaEtapa();
@@ -423,74 +364,12 @@ export default function SimuladorRestituicao({
                         onChange={(e) => {
                           field.onChange(formatarInputMoeda(e.target.value));
                         }}
-                        disabled={valorContaForm.watch("usarContas")}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
-              <FormField
-                control={valorContaForm.control}
-                name="usarContas"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="text-[var(--gov-gray-dark)]">
-                        Tenho valores de contas anteriores para informar
-                      </FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              
-              {valorContaForm.watch("usarContas") && (
-                <div className="space-y-4 pt-2">
-                  <h3 className="text-sm font-medium text-[var(--gov-blue-dark)]">
-                    Informe os valores das contas (até 12 meses anteriores)
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Array.from({ length: 12 }).map((_, index) => (
-                      <FormField
-                        key={index}
-                        control={valorContaForm.control}
-                        name={`contas.${index}`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm text-[var(--gov-gray-dark)]">
-                              Conta {index + 1}
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="R$ 0,00"
-                                className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]"
-                                onChange={(e) => {
-                                  const formattedValue = formatarInputMoeda(e.target.value);
-                                  field.onChange(formattedValue);
-                                  
-                                  // Atualiza o array de contas
-                                  const contas = valorContaForm.getValues("contas") || [];
-                                  contas[index] = formattedValue;
-                                  valorContaForm.setValue("contas", contas);
-                                }}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
               
               <div className="flex justify-between pt-4">
                 <Button
