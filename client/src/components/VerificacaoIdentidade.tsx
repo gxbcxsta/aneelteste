@@ -185,39 +185,62 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
     detectarLocalizacao();
   }, []);
 
-  // Mapear estado para companhia elétrica
-  const getCompanhiaPorEstado = (estado: string): string => {
-    const mapeamentoCompanhias: Record<string, string> = {
-      "Acre": "Energisa Acre",
-      "Alagoas": "Equatorial Alagoas",
-      "Amapá": "Equatorial CEA",
-      "Amazonas": "Amazonas Energia",
-      "Bahia": "Neoenergia Coelba",
-      "Ceará": "Enel Distribuição Ceará",
-      "Distrito Federal": "Neoenergia Brasília",
-      "Espírito Santo": "EDP Espírito Santo",
-      "Goiás": "Equatorial Goiás",
-      "Maranhão": "Equatorial Maranhão",
-      "Mato Grosso": "Energisa Mato Grosso",
-      "Mato Grosso do Sul": "Energisa Mato Grosso do Sul",
-      "Minas Gerais": "CEMIG Distribuição",
-      "Pará": "Equatorial Pará",
-      "Paraíba": "Energisa Paraíba",
-      "Paraná": "COPEL Distribuição",
-      "Pernambuco": "Neoenergia Pernambuco",
-      "Piauí": "Equatorial Piauí",
-      "Rio de Janeiro": "Light S/A",
-      "Rio Grande do Norte": "Neoenergia Cosern",
-      "Rio Grande do Sul": "CPFL Rio Grande Energia (RGE)",
-      "Rondônia": "Energisa Rondônia",
-      "Roraima": "Roraima Energia",
-      "Santa Catarina": "CELESC Distribuição",
-      "São Paulo": "Enel Distribuição São Paulo",
-      "Sergipe": "Energisa Sergipe",
-      "Tocantins": "Energisa Tocantins"
+  // Mapear estados para suas concessionárias (alguns estados têm múltiplas)
+  const getCompanhiasPorEstado = (estado: string): string[] => {
+    // Mapeamento atual baseado na lista fornecida para 2025
+    const mapeamentoCompanhias: Record<string, string[]> = {
+      // Região Norte
+      "Acre": ["Energisa Acre"],
+      "Amapá": ["Equatorial CEA"],
+      "Amazonas": ["Amazonas Energia"],
+      "Pará": ["Equatorial Pará"],
+      "Rondônia": ["Energisa Rondônia"],
+      "Roraima": ["Roraima Energia"],
+      "Tocantins": ["Energisa Tocantins"],
+      
+      // Região Nordeste
+      "Alagoas": ["Equatorial Alagoas"],
+      "Bahia": ["Neoenergia Coelba"],
+      "Ceará": ["Enel Distribuição Ceará"],
+      "Maranhão": ["Equatorial Maranhão"],
+      "Paraíba": ["Energisa Paraíba"],
+      "Pernambuco": ["Neoenergia Pernambuco"],
+      "Piauí": ["Equatorial Piauí"],
+      "Rio Grande do Norte": ["Neoenergia Cosern"],
+      "Sergipe": ["Energisa Sergipe"],
+      
+      // Região Centro-Oeste
+      "Distrito Federal": ["Neoenergia Brasília"],
+      "Goiás": ["Equatorial Goiás"],
+      "Mato Grosso": ["Energisa Mato Grosso"],
+      "Mato Grosso do Sul": ["Energisa Mato Grosso do Sul"],
+      
+      // Região Sudeste
+      "Espírito Santo": ["EDP Espírito Santo"],
+      "Minas Gerais": ["CEMIG Distribuição"],
+      "Rio de Janeiro": ["Enel Distribuição Rio", "Light S/A"],
+      "São Paulo": [
+        "Enel Distribuição São Paulo", 
+        "EDP São Paulo", 
+        "CPFL Paulista", 
+        "CPFL Piratininga", 
+        "Neoenergia Elektro", 
+        "ISA Energia Brasil"
+      ],
+      
+      // Região Sul
+      "Paraná": ["COPEL Distribuição"],
+      "Rio Grande do Sul": ["CPFL Rio Grande Energia (RGE)", "Equatorial CEEE"],
+      "Santa Catarina": ["CELESC Distribuição"]
     };
     
-    return mapeamentoCompanhias[estado] || "Enel Distribuição São Paulo";
+    return mapeamentoCompanhias[estado] || ["Empresa não identificada"];
+  };
+
+  // Obter a primeira companhia elétrica para um estado (para compatibilidade)
+  const getCompanhiaPorEstado = (estado: string): string => {
+    const companhias = getCompanhiasPorEstado(estado);
+    return companhias[0];
   };
 
   // Estados brasileiros para o select
@@ -268,7 +291,23 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const novoEstado = e.target.value;
     setEstado(novoEstado);
-    setCompanhiaEletrica(getCompanhiaPorEstado(novoEstado));
+    
+    // Obter a lista de companhias para este estado
+    const companhias = getCompanhiasPorEstado(novoEstado);
+    
+    // Se há apenas uma companhia, selecioná-la automaticamente
+    if (companhias.length === 1) {
+      setCompanhiaEletrica(companhias[0]);
+    } else {
+      // Se houver múltiplas opções, seleciona a primeira por padrão
+      // O usuário pode mudar depois no dropdown
+      setCompanhiaEletrica(companhias[0]);
+    }
+  };
+  
+  // Lidar com a mudança de companhia elétrica
+  const handleCompanhiaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCompanhiaEletrica(e.target.value);
   };
 
   // Concluir a verificação
@@ -397,7 +436,21 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
                 
                 <div>
                   <label className="text-sm font-medium text-[var(--gov-gray-dark)]">Companhia Elétrica:</label>
-                  <p className="font-semibold text-[var(--gov-blue-dark)]">{companhiaEletrica}</p>
+                  {getCompanhiasPorEstado(estado).length === 1 ? (
+                    // Se há apenas uma companhia para este estado, apenas exibe o texto
+                    <p className="font-semibold text-[var(--gov-blue-dark)]">{companhiaEletrica}</p>
+                  ) : (
+                    // Se há múltiplas companhias, exibe um select para escolha
+                    <select
+                      value={companhiaEletrica}
+                      onChange={handleCompanhiaChange}
+                      className="w-full p-2 border rounded mt-1"
+                    >
+                      {getCompanhiasPorEstado(estado).map((comp) => (
+                        <option key={comp} value={comp}>{comp}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
               
