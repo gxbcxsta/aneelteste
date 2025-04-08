@@ -135,8 +135,21 @@ export default function VerificarRestituicao() {
   }, [dadosPessoais, isError, error, cpfConsultado, toast]);
 
   const handleVerificacaoConcluida = (dadosConfirmados: any) => {
+    console.log("Verificação concluída, dados recebidos:", dadosConfirmados);
+    
+    // Garantir que todos os dados necessários estão presentes
+    const nome = dadosConfirmados.nome || "";
+    const dataNasc = dadosConfirmados.dataNascimento || "";
+    const companhia = dadosConfirmados.companhia || "";
+    const estado = dadosConfirmados.estado || "";
+    
+    // Construir URL com os parâmetros
+    const url = `/resultado?cpf=${cpfConsultado}&nome=${encodeURIComponent(nome)}&nasc=${encodeURIComponent(dataNasc)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    
+    console.log("Navegando para:", url);
+    
     // Navegar para a página de resultados com os dados confirmados
-    navigate(`/resultado?cpf=${cpfConsultado}&nome=${encodeURIComponent(dadosConfirmados.nome)}&nasc=${encodeURIComponent(dadosConfirmados.dataNascimento)}&companhia=${encodeURIComponent(dadosConfirmados.companhia)}&estado=${encodeURIComponent(dadosConfirmados.estado)}`);
+    navigate(url);
   };
 
   return (

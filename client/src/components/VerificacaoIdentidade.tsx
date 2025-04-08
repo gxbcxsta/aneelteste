@@ -386,7 +386,7 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
       nome: nomeCompleto,
       dataNascimento: formatarData(dataNascimento),
       estado,
-      companhiaEletrica
+      companhia: companhiaEletrica
     });
   };
 
