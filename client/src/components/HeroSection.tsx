@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import heroBg from "../assets/hero-bg.png";
 
 export default function HeroSection() {
   return (
@@ -7,7 +8,7 @@ export default function HeroSection() {
       className="text-white py-12 md:py-16 bg-cover bg-center relative" 
       id="simular"
       style={{
-        backgroundImage: 'url("/assets/hero-bg.jpg")',
+        backgroundImage: `url(${heroBg})`,
       }}
     >
       {/* Dark overlay */}

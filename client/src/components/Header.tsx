@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Menu } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import govbrLogo from "../assets/govbr.png";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function Header() {
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
             <img 
-              src="/assets/govbr.png" 
+              src={govbrLogo} 
               alt="Gov.BR" 
               className="h-10 mr-2" 
             />
