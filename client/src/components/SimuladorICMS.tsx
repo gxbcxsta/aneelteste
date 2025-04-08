@@ -132,8 +132,8 @@ export default function SimuladorICMS({
     
     setMesesConsiderados(meses);
     
-    // Calcula o valor estimado da restituição - 0.15 é 15% (a taxa de ICMS)
-    const valorEstimado = valorMedioFinal * meses * 0.15;
+    // Calcula o valor estimado da restituição - 0.35 é 35% (a taxa de ICMS)
+    const valorEstimado = valorMedioFinal * meses * 0.35;
     
     // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
     let valorFinal = valorEstimado;
