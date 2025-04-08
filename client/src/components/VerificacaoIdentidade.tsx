@@ -32,8 +32,8 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   const [nomeSelecionado, setNomeSelecionado] = useState<string>("");
   const [opcoesAno, setOpcoesAno] = useState<string[]>([]);
   const [opcoesNome, setOpcoesNome] = useState<string[]>([]);
-  const [estado, setEstado] = useState<string>("");
-  const [companhiaEletrica, setCompanhiaEletrica] = useState<string>("");
+  const [estado, setEstado] = useState<string>("São Paulo");
+  const [companhiaEletrica, setCompanhiaEletrica] = useState<string>("Enel Distribuição São Paulo");
 
   // Extrair dados do objeto de resposta
   const nomeCompleto = dadosPessoais.Result.NomePessoaFisica;
