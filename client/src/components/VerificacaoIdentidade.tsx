@@ -34,6 +34,7 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   const [opcoesNome, setOpcoesNome] = useState<string[]>([]);
   const [estado, setEstado] = useState<string>("");
   const [companhiaEletrica, setCompanhiaEletrica] = useState<string>("");
+  const [countdown, setCountdown] = useState<number>(5);
 
   // Extrair dados do objeto de resposta
   const nomeCompleto = dadosPessoais.Result.NomePessoaFisica;
@@ -381,14 +382,42 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   };
 
   // Concluir a verificação
-  const concluirVerificacao = () => {
-    onSuccess({
-      nome: nomeCompleto,
-      dataNascimento: formatarData(dataNascimento),
-      estado,
-      companhia: companhiaEletrica
-    });
-  };
+  // Configuração do contador regressivo e redirecionamento automático
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    let countdownTimer: NodeJS.Timeout;
+    
+    if (etapaAtual === EtapaVerificacao.CONFIRMACAO) {
+      // Reset do contador quando chegar à etapa de confirmação
+      setCountdown(5);
+      
+      // Temporizador para decrementar o contador a cada segundo
+      countdownTimer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownTimer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      // Temporizador para redirecionar após 5 segundos
+      timer = setTimeout(() => {
+        onSuccess({
+          nome: nomeCompleto,
+          dataNascimento: formatarData(dataNascimento),
+          estado,
+          companhia: companhiaEletrica
+        });
+      }, 5000);
+    }
+    
+    return () => {
+      clearTimeout(timer);
+      clearInterval(countdownTimer);
+    };
+  }, [etapaAtual]);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -524,12 +553,21 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
                 </div>
               </div>
               
-              <Button 
-                onClick={concluirVerificacao} 
-                className="w-full bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold"
-              >
-                Prosseguir para Simulação
-              </Button>
+              <div className="bg-green-100 border border-green-300 rounded-md p-4 text-center">
+                <p className="text-green-700 font-semibold mb-2">
+                  <span className="inline-block animate-pulse mr-2">🔄</span>
+                  Redirecionando para a simulação...
+                </p>
+                <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-green-500 h-full rounded-full transition-all duration-1000 ease-linear"
+                    style={{ width: `${100 - (100/5) * (etapaAtual === EtapaVerificacao.CONFIRMACAO ? countdown : 0)}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-green-700 mt-2">
+                  {countdown} segundos restantes
+                </p>
+              </div>
             </>
           )}
         </CardContent>
