@@ -13,7 +13,7 @@ export default function Impostometro() {
   };
 
   useEffect(() => {
-    const incrementValue = 13000000 / 500; // Increase by 13 million over ~10 seconds
+    const incrementValue = 13623928.30 / 500; // Increase by 13.623.928,30 over ~10 seconds
     
     const updateCounter = (timestamp: number) => {
       if (!lastUpdateRef.current) lastUpdateRef.current = timestamp;

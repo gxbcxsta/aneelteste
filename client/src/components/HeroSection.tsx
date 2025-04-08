@@ -26,10 +26,10 @@ export default function HeroSection() {
           <p className="text-xl md:text-2xl font-semibold mb-8">
             Descubra em segundos se tem dinheiro a receber!
           </p>
-          <div className="flex justify-center">
+          <div className="flex justify-start">
             <Link href="/verificar">
               <button
-                className="mx-auto flex items-center justify-center gap-2 whitespace-nowrap 
+                className="flex items-center justify-center gap-2 whitespace-nowrap 
                         ring-offset-background focus-visible:outline-none focus-visible:ring-2 
                         focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none 
                         disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 
