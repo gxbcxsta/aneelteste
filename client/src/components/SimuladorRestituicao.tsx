@@ -183,22 +183,18 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Calcula o valor estimado da restituição
+    // Calcula o valor estimado da restituição - 0.15 é 15% (a taxa de ICMS)
     const valorEstimado = valorMedioFinal * meses * 0.15;
     
-    // Aplica as regras:
-    // 1. O valor nunca pode ser menor que R$ 2.000,00
-    const valorMinimo = Math.max(valorEstimado, 2000);
-    
-    // 2. Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
-    let valorFinal = valorMinimo;
-    if (valorMinimo > 5000) {
+    // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
+    let valorFinal = valorEstimado;
+    if (valorEstimado > 5000) {
       valorFinal = 5000;
       setValorFinalRestituicao(5000);
-      setValorRealRestituicao(valorMinimo);
+      setValorRealRestituicao(valorEstimado);
     } else {
-      valorFinal = valorMinimo;
-      setValorFinalRestituicao(valorMinimo);
+      valorFinal = valorEstimado;
+      setValorFinalRestituicao(valorEstimado);
       setValorRealRestituicao(0); // Não há valor "real" adicional
     }
     
