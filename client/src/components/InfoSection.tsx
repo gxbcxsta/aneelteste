@@ -32,6 +32,24 @@ export default function InfoSection() {
             
             <Card className="border-l-4 border-[var(--gov-yellow)]">
               <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-[var(--gov-blue-dark)] mb-3">Quem tem direito?</h3>
+                <p className="text-[var(--gov-gray-dark)]">
+                  Todos os consumidores de energia elétrica, sejam pessoas físicas ou jurídicas, que pagaram contas de luz nos últimos 5 anos podem ter direito à restituição.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-[var(--gov-yellow)]">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-[var(--gov-blue-dark)] mb-3">Como solicitar?</h3>
+                <p className="text-[var(--gov-gray-dark)]">
+                  Use nossa ferramenta de simulação para calcular seu valor e receba orientações passo a passo sobre como iniciar seu processo de restituição de forma segura.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-[var(--gov-blue)]">
+              <CardContent className="p-6">
                 <h3 className="text-xl font-bold text-[var(--gov-blue-dark)] mb-3">Segurança e Transparência</h3>
                 <p className="text-[var(--gov-gray-dark)]">
                   Todo o processo de restituição é supervisionado pela ANEEL e Receita Federal, com 100% de transparência e segurança para os consumidores. Todas as consultas são criptografadas.
@@ -39,7 +57,7 @@ export default function InfoSection() {
               </CardContent>
             </Card>
             
-            <Card className="border-l-4 border-[var(--gov-yellow)]">
+            <Card className="border-l-4 border-[var(--gov-blue)]">
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold text-[var(--gov-blue-dark)] mb-3">Documentos Necessários</h3>
                 <p className="text-[var(--gov-gray-dark)]">
