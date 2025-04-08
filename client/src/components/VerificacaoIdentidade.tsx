@@ -39,17 +39,37 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   const nomeCompleto = dadosPessoais.Result.NomePessoaFisica;
   const dataNascimento = dadosPessoais.Result.DataNascimento;
   
-  // Transformar data YYYY-MM-DD para DD/MM/YYYY
+  // Transformar data no formato ISO para DD/MM/YYYY
   const formatarData = (dataStr: string) => {
     if (!dataStr) return "";
+    
+    // Verificar se é uma data no formato ISO completo
+    if (dataStr.includes("T")) {
+      const dataObj = new Date(dataStr);
+      if (isNaN(dataObj.getTime())) return dataStr;
+      
+      return `${dataObj.getDate().toString().padStart(2, '0')}/${(dataObj.getMonth() + 1).toString().padStart(2, '0')}/${dataObj.getFullYear()}`;
+    }
+    
+    // Formato YYYY-MM-DD simples
     const partes = dataStr.split("-");
     if (partes.length !== 3) return dataStr;
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    
+    return `${partes[2].substring(0, 2)}/${partes[1]}/${partes[0]}`;
   };
   
   // Extrair ano da data de nascimento
   const getAnoDaNascimento = (): string => {
     if (!dataNascimento) return "";
+    
+    // Verificar se é uma data no formato ISO completo
+    if (dataNascimento.includes("T")) {
+      const dataObj = new Date(dataNascimento);
+      if (isNaN(dataObj.getTime())) return "";
+      return dataObj.getFullYear().toString();
+    }
+    
+    // Formato YYYY-MM-DD simples
     return dataNascimento.split("-")[0];
   };
 
