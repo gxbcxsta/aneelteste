@@ -234,19 +234,22 @@ export default function SimuladorRestituicao({
     const valorMinimo = Math.max(valorEstimado, 2000);
     
     // 2. Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
+    let valorFinal = valorMinimo;
     if (valorMinimo > 5000) {
+      valorFinal = 5000;
       setValorFinalRestituicao(5000);
       setValorRealRestituicao(valorMinimo);
     } else {
+      valorFinal = valorMinimo;
       setValorFinalRestituicao(valorMinimo);
       setValorRealRestituicao(0); // Não há valor "real" adicional
     }
     
+    // Notifica o componente pai sobre a conclusão (usando o valor calculado diretamente)
+    onSimulacaoConcluida(valorFinal, meses);
+    
     // Avança para a próxima etapa
     proximaEtapa();
-    
-    // Notifica o componente pai sobre a conclusão
-    onSimulacaoConcluida(valorFinalRestituicao, meses);
   };
   
   // Funções de navegação entre etapas

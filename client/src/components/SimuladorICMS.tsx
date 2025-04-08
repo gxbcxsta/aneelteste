@@ -190,21 +190,24 @@ export default function SimuladorICMS({
     const valorMinimo = Math.max(valorEstimado, 2000);
     
     // 2. Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
+    let valorFinal = valorMinimo;
     if (valorMinimo > 5000) {
+      valorFinal = 5000;
       setValorFinalRestituicao(5000);
       setValorRealRestituicao(valorMinimo);
     } else {
+      valorFinal = valorMinimo;
       setValorFinalRestituicao(valorMinimo);
       setValorRealRestituicao(0); // Não há valor "real" adicional
     }
     
-    // Avança para a próxima etapa
-    proximaEtapa();
-    
     // Notifica o componente pai sobre a conclusão (se existir callback)
     if (onSimulacaoConcluida) {
-      onSimulacaoConcluida(valorFinalRestituicao, meses);
+      onSimulacaoConcluida(valorFinal, meses);
     }
+    
+    // Avança para a próxima etapa
+    proximaEtapa();
   };
   
   // Funções de navegação entre etapas
