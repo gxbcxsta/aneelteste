@@ -32,6 +32,11 @@ export default function Header() {
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
+            <img 
+              src="/assets/govbr.png" 
+              alt="Gov.BR" 
+              className="h-10 mr-2" 
+            />
             <div className="bg-white p-1 rounded flex items-center justify-center h-10">
               <div className="text-[var(--gov-blue-dark)] font-bold text-xl">ANEEL</div>
             </div>

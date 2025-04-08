@@ -54,7 +54,7 @@ export default function InfoSection() {
               <Button 
                 className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-light)] text-white px-8 py-4 rounded-md text-lg font-bold transition-all"
               >
-                Verificar meu direito à restituição
+                🔎 Verificar meu direito à restituição
               </Button>
             </Link>
           </div>
