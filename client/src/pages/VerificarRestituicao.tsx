@@ -60,9 +60,9 @@ export default function VerificarRestituicao() {
           // Tentamos obter o corpo do erro para informações detalhadas
           const errorBody = await response.json().catch(() => ({}));
           
-          // Construímos uma mensagem de erro mais informativa
+          // Obtemos a mensagem personalizada do servidor
           const errorMessage = errorBody.error || "Erro ao consultar CPF";
-          console.error("Erro na consulta de CPF:", errorMessage, errorBody);
+          console.error("Erro na consulta de CPF:", errorMessage);
           
           throw new Error(errorMessage);
         }

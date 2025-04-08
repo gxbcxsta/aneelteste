@@ -94,8 +94,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           console.error("Erro na API Exato Digital:", errorBody);
+          
+          // Personalizar mensagem de erro baseado no código de status
+          let mensagemErro = "Erro na consulta do CPF";
+          if (response.status === 404) {
+            mensagemErro = "CPF não encontrado na base de dados. Verifique se o número foi digitado corretamente";
+          } else if (response.status === 401 || response.status === 403) {
+            mensagemErro = "Erro de autenticação ao consultar os dados";
+          } else if (response.status >= 500) {
+            mensagemErro = "Serviço de consulta temporariamente indisponível";
+          }
+          
           return res.status(response.status).json({ 
-            error: "Erro na consulta do CPF", 
+            error: mensagemErro, 
             detalhes: errorBody,
             statusCode: response.status,
             statusText: response.statusText
