@@ -7,7 +7,7 @@ export default function HeroSection() {
       className="text-white py-12 md:py-16 bg-cover bg-center relative" 
       id="simular"
       style={{
-        backgroundImage: 'url("/assets/hero-bg.png")',
+        backgroundImage: 'url("/assets/hero-bg.jpg")',
       }}
     >
       {/* Dark overlay */}
