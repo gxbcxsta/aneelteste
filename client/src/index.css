@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Cores GOV.BR */
+  --gov-blue: #1351b4;
+  --gov-blue-dark: #071d41;
+  --gov-blue-light: #2670e8;
+  --gov-yellow: #ffcd07;
+  --gov-green: #168821;
+  --gov-green-light: #3dae2b;
+  --gov-gray: #adadad;
+  --gov-gray-light: #f8f8f8;
+  --gov-gray-dark: #555555;
+  --gov-red: #e52207;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
