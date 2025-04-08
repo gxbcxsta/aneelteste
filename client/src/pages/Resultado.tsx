@@ -12,7 +12,7 @@ import SimuladorRestituicao from "@/components/SimuladorRestituicao";
 export default function Resultado() {
   const [location, navigate] = useLocation();
   // Extrair parâmetros de consulta da URL atual
-  const query = new URLSearchParams(location.split('?')[1] || '');
+  const query = new URLSearchParams(window.location.search);
   
   const [isLoading, setIsLoading] = useState(true);
   const [progresso, setProgresso] = useState(0);
