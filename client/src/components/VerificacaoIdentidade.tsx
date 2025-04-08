@@ -32,8 +32,8 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   const [nomeSelecionado, setNomeSelecionado] = useState<string>("");
   const [opcoesAno, setOpcoesAno] = useState<string[]>([]);
   const [opcoesNome, setOpcoesNome] = useState<string[]>([]);
-  const [estado, setEstado] = useState<string>("São Paulo");
-  const [companhiaEletrica, setCompanhiaEletrica] = useState<string>("Enel Distribuição São Paulo");
+  const [estado, setEstado] = useState<string>("");
+  const [companhiaEletrica, setCompanhiaEletrica] = useState<string>("");
 
   // Extrair dados do objeto de resposta
   const nomeCompleto = dadosPessoais.Result.NomePessoaFisica;
@@ -135,12 +135,76 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   useEffect(() => {
     const detectarLocalizacao = async () => {
       try {
-        // Primeiro tentamos com a API de geolocalização do navegador
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            async (position) => {
-              const { latitude, longitude } = position.coords;
-              
+        // Usar API de geolocalização por IP - mais confiável que a API do navegador
+        const response = await fetch('https://ipapi.co/json/');
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Verificar se estamos no Brasil
+          if (data.country === 'BR') {
+            // Mapeamento das siglas de estados para nomes completos
+            const mapaEstados: Record<string, string> = {
+              'AC': 'Acre',
+              'AL': 'Alagoas',
+              'AP': 'Amapá',
+              'AM': 'Amazonas',
+              'BA': 'Bahia',
+              'CE': 'Ceará',
+              'DF': 'Distrito Federal',
+              'ES': 'Espírito Santo',
+              'GO': 'Goiás',
+              'MA': 'Maranhão',
+              'MT': 'Mato Grosso',
+              'MS': 'Mato Grosso do Sul',
+              'MG': 'Minas Gerais',
+              'PA': 'Pará',
+              'PB': 'Paraíba',
+              'PR': 'Paraná',
+              'PE': 'Pernambuco',
+              'PI': 'Piauí',
+              'RJ': 'Rio de Janeiro',
+              'RN': 'Rio Grande do Norte',
+              'RS': 'Rio Grande do Sul',
+              'RO': 'Rondônia',
+              'RR': 'Roraima',
+              'SC': 'Santa Catarina',
+              'SP': 'São Paulo',
+              'SE': 'Sergipe',
+              'TO': 'Tocantins'
+            };
+            
+            // Obter o nome completo do estado a partir da sigla
+            const estadoDetectado = mapaEstados[data.region_code] || 'São Paulo';
+            console.log("Estado detectado pelo IP:", estadoDetectado);
+            
+            // Definir o estado e a companhia elétrica correspondente
+            setEstado(estadoDetectado);
+            setCompanhiaEletrica(getCompanhiaPorEstado(estadoDetectado));
+          } else {
+            // Se não estiver no Brasil, usar São Paulo como padrão
+            setEstado("São Paulo");
+            setCompanhiaEletrica("Enel Distribuição São Paulo");
+          }
+        } else {
+          // Em caso de erro na API, tentar com a geolocalização do navegador como fallback
+          usarGeolocalizacaoNavegador();
+        }
+      } catch (error) {
+        console.error("Erro ao detectar localização por IP:", error);
+        // Em caso de erro, tentar com a geolocalização do navegador
+        usarGeolocalizacaoNavegador();
+      }
+    };
+    
+    // Função para tentar usar a geolocalização do navegador como método secundário
+    const usarGeolocalizacaoNavegador = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            
+            try {
               // Usando uma API pública para reverter geocodificação
               const response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
@@ -160,28 +224,34 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
                   setEstado("São Paulo");
                   setCompanhiaEletrica("Enel Distribuição São Paulo");
                 }
+              } else {
+                // Fallback para SP como padrão
+                setEstado("São Paulo");
+                setCompanhiaEletrica("Enel Distribuição São Paulo");
               }
-            },
-            (error) => {
-              console.error("Erro ao obter localização:", error);
+            } catch (error) {
+              console.error("Erro ao reverter geocodificação:", error);
               // Fallback para SP como padrão
               setEstado("São Paulo");
               setCompanhiaEletrica("Enel Distribuição São Paulo");
             }
-          );
-        } else {
-          // Fallback para SP como padrão
-          setEstado("São Paulo");
-          setCompanhiaEletrica("Enel Distribuição São Paulo");
-        }
-      } catch (error) {
-        console.error("Erro ao detectar localização:", error);
+          },
+          (error) => {
+            console.error("Erro ao obter localização pelo navegador:", error);
+            // Fallback para SP como padrão
+            setEstado("São Paulo");
+            setCompanhiaEletrica("Enel Distribuição São Paulo");
+          }
+        );
+      } else {
+        console.log("Geolocalização não suportada pelo navegador");
         // Fallback para SP como padrão
         setEstado("São Paulo");
         setCompanhiaEletrica("Enel Distribuição São Paulo");
       }
     };
     
+    // Iniciar o processo de detecção de localização
     detectarLocalizacao();
   }, []);
 
