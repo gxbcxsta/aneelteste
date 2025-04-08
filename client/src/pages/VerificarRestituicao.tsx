@@ -136,7 +136,7 @@ export default function VerificarRestituicao() {
 
   const handleVerificacaoConcluida = (dadosConfirmados: any) => {
     // Navegar para a página de resultados com os dados confirmados
-    navigate(`/resultado?cpf=${cpfConsultado}&nome=${encodeURIComponent(dadosConfirmados.nome)}`);
+    navigate(`/resultado?cpf=${cpfConsultado}&nome=${encodeURIComponent(dadosConfirmados.nome)}&nasc=${encodeURIComponent(dadosConfirmados.dataNascimento)}&companhia=${encodeURIComponent(dadosConfirmados.companhia)}&estado=${encodeURIComponent(dadosConfirmados.estado)}`);
   };
 
   return (
