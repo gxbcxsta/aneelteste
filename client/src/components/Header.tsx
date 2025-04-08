@@ -51,11 +51,12 @@ export default function Header() {
         {/* Navigation for desktop */}
         <nav className="hidden md:flex items-center space-x-6 text-white">
           <Link href="/" className="hover:underline font-medium">Início</Link>
+          <Link href="/simulador" className="hover:underline">Simulador ICMS</Link>
           <Link href="#faq" className="hover:underline">Perguntas Frequentes</Link>
           <div className="ml-4">
             <Link href="/verificar">
               <Button className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold">
-                Simular Restituição
+                Consultar Restituição
               </Button>
             </Link>
           </div>
@@ -75,11 +76,12 @@ export default function Header() {
       <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} bg-[var(--gov-blue-dark)] border-t border-[var(--gov-blue)] px-4 pb-4`}>
         <nav className="flex flex-col text-white space-y-3 pt-2">
           <Link href="/" className="py-2 hover:bg-[var(--gov-blue-light)] px-2 rounded">Início</Link>
+          <Link href="/simulador" className="py-2 hover:bg-[var(--gov-blue-light)] px-2 rounded">Simulador ICMS</Link>
           <Link href="#faq" className="py-2 hover:bg-[var(--gov-blue-light)] px-2 rounded">Perguntas Frequentes</Link>
           <div className="pt-2">
             <Link href="/verificar">
               <Button className="w-full bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold">
-                Simular Restituição
+                Consultar Restituição
               </Button>
             </Link>
           </div>

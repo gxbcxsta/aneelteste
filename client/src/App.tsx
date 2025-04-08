@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import VerificarRestituicao from "./pages/VerificarRestituicao";
 import Resultado from "./pages/Resultado";
+import SimuladorICMS from "./pages/SimuladorICMS";
 
 function Router() {
   return (
@@ -13,6 +14,7 @@ function Router() {
       <Route path="/" component={Home}/>
       <Route path="/verificar" component={VerificarRestituicao}/>
       <Route path="/resultado" component={Resultado}/>
+      <Route path="/simulador" component={SimuladorICMS}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
