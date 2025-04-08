@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Coins, ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react";
+import { Coins, ChevronRight, ChevronLeft, CheckCircle2, Loader2 } from "lucide-react";
 
 // Validação para o valor médio da conta
 const valorContaSchema = z.object({
@@ -108,14 +108,20 @@ export default function SimuladorICMS({
     proximaEtapa();
   };
   
+  // Estado para controlar o carregamento do cálculo
+  const [calculando, setCalculando] = useState(false);
+  
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = (data: PeriodoFormValues) => {
+    // Inicia o processo de cálculo com animação de carregamento
+    setCalculando(true);
+    
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
     
     switch(data.periodo) {
       case 'menos-12':
-        meses = 6;
+        meses = 11;
         break;
       case '1-3-anos':
         meses = 24;
@@ -127,33 +133,37 @@ export default function SimuladorICMS({
         meses = 60;
         break;
       default:
-        meses = 6;
+        meses = 11;
     }
     
     setMesesConsiderados(meses);
     
-    // Calcula o valor estimado da restituição - 0.35 é 35% (a taxa de ICMS)
-    const valorEstimado = valorMedioFinal * meses * 0.35;
-    
-    // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
-    let valorFinal = valorEstimado;
-    if (valorEstimado > 5000) {
-      valorFinal = 5000;
-      setValorFinalRestituicao(5000);
-      setValorRealRestituicao(valorEstimado);
-    } else {
-      valorFinal = valorEstimado;
-      setValorFinalRestituicao(valorEstimado);
-      setValorRealRestituicao(0); // Não há valor "real" adicional
-    }
-    
-    // Notifica o componente pai sobre a conclusão (se existir callback)
-    if (onSimulacaoConcluida) {
-      onSimulacaoConcluida(valorFinal, meses);
-    }
-    
-    // Avança para a próxima etapa
-    proximaEtapa();
+    // Adiciona um tempo de espera para dar mais credibilidade ao cálculo
+    setTimeout(() => {
+      // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
+      const valorEstimado = valorMedioFinal * meses * 0.25;
+      
+      // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
+      let valorFinal = valorEstimado;
+      if (valorEstimado > 5000) {
+        valorFinal = 5000;
+        setValorFinalRestituicao(5000);
+        setValorRealRestituicao(valorEstimado);
+      } else {
+        valorFinal = valorEstimado;
+        setValorFinalRestituicao(valorEstimado);
+        setValorRealRestituicao(0); // Não há valor "real" adicional
+      }
+      
+      // Notifica o componente pai sobre a conclusão (se existir callback)
+      if (onSimulacaoConcluida) {
+        onSimulacaoConcluida(valorFinal, meses);
+      }
+      
+      // Finaliza o carregamento e avança para a próxima etapa
+      setCalculando(false);
+      proximaEtapa();
+    }, 3000); // Espera 3 segundos antes de mostrar o resultado
   };
   
   // Funções de navegação entre etapas
@@ -337,9 +347,19 @@ export default function SimuladorICMS({
                 <Button 
                   type="submit"
                   className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
+                  disabled={calculando}
                 >
-                  Calcular Restituição
-                  <ChevronRight className="ml-2 h-4 w-4" />
+                  {calculando ? (
+                    <>
+                      <span className="animate-pulse">Calculando...</span>
+                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      Calcular Restituição
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             </form>

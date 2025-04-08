@@ -166,7 +166,7 @@ export default function SimuladorRestituicao({
     
     switch(data.periodo) {
       case 'menos-12':
-        meses = 6;
+        meses = 11;
         break;
       case '1-3-anos':
         meses = 24;
@@ -178,13 +178,13 @@ export default function SimuladorRestituicao({
         meses = 60;
         break;
       default:
-        meses = 6;
+        meses = 11;
     }
     
     setMesesConsiderados(meses);
     
-    // Calcula o valor estimado da restituição - 0.35 é 35% (a taxa de ICMS)
-    const valorEstimado = valorMedioFinal * meses * 0.35;
+    // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
+    const valorEstimado = valorMedioFinal * meses * 0.25;
     
     // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
     let valorFinal = valorEstimado;
