@@ -118,7 +118,7 @@ export default function SimuladorRestituicao({
     resolver: zodResolver(valorContaSchema),
     defaultValues: {
       valorMedio: "R$ 0,00",
-      usarContas: false,
+      usarContas: false,  // Garantir que começa desmarcado
       contas: Array(12).fill("")
     }
   });
@@ -131,7 +131,16 @@ export default function SimuladorRestituicao({
     }
   });
   
-  // Efeito para atualizar o valor médio quando as contas individuais são preenchidas
+  // Efeito para resetar o valorMedio quando o checkbox usarContas muda
+  useEffect(() => {
+    const usarContas = valorContaForm.watch("usarContas");
+    if (!usarContas) {
+      // Se desmarcar, limpar o campo valorMedio e permitir edição
+      valorContaForm.setValue("valorMedio", "R$ 0,00");
+    }
+  }, [valorContaForm.watch("usarContas")]);
+  
+  // Efeito para atualizar o valor médio apenas quando contas forem preenchidas e a opção estiver marcada
   useEffect(() => {
     const contas = valorContaForm.watch("contas") || [];
     const usarContas = valorContaForm.watch("usarContas");
@@ -144,7 +153,7 @@ export default function SimuladorRestituicao({
       contas.forEach(conta => {
         if (conta) {
           const valor = extrairValorNumerico(conta);
-          if (!isNaN(valor)) {
+          if (!isNaN(valor) && valor > 0) {
             total += valor;
             count++;
           }
@@ -156,7 +165,7 @@ export default function SimuladorRestituicao({
         valorContaForm.setValue("valorMedio", formatarInputMoeda(media.toString()));
       }
     }
-  }, [valorContaForm.watch("contas"), valorContaForm.watch("usarContas")]);
+  }, [valorContaForm.watch("contas")]);
   
   // Atualiza o campo de número de cliente quando o checkbox usarCpf muda
   useEffect(() => {
