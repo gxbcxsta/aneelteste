@@ -3,7 +3,6 @@ import HeroSection from "@/components/HeroSection";
 import Impostometro from "@/components/Impostometro";
 import InfoSection from "@/components/InfoSection";
 import FaqSection from "@/components/FaqSection";
-import ContatoSection from "@/components/ContatoSection";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -15,7 +14,6 @@ export default function Home() {
         <Impostometro />
         <InfoSection />
         <FaqSection />
-        <ContatoSection />
       </main>
       <Footer />
     </div>

@@ -16,7 +16,7 @@ export default function HeroSection() {
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium leading-tight mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-normal leading-tight mb-4">
             Já pensou em receber de volta tudo que pagou a mais na conta de luz? Agora é possível.
           </h1>
           <p className="text-lg md:text-xl mb-6 leading-relaxed">

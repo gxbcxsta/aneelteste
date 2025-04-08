@@ -13,27 +13,13 @@ export default function Impostometro() {
   };
 
   useEffect(() => {
-    const incrementValue = 13623928.30 / 500; // Increase by 13.623.928,30 over ~10 seconds
-    
-    const updateCounter = (timestamp: number) => {
-      if (!lastUpdateRef.current) lastUpdateRef.current = timestamp;
-      
-      const deltaTime = timestamp - lastUpdateRef.current;
-      
-      if (deltaTime > 20) { // Update roughly 50 times per second
-        lastUpdateRef.current = timestamp;
-        setCounterValue(prev => prev + incrementValue);
-      }
-      
-      animationFrameRef.current = requestAnimationFrame(updateCounter);
-    };
-    
-    animationFrameRef.current = requestAnimationFrame(updateCounter);
+    // Incremento completo a cada 10 segundos
+    const incrementInterval = setInterval(() => {
+      setCounterValue(prev => prev + 13623928.30);
+    }, 10000);
     
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      clearInterval(incrementInterval);
     };
   }, []);
   

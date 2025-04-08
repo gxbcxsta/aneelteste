@@ -51,11 +51,9 @@ export default function Header() {
         {/* Navigation for desktop */}
         <nav className="hidden md:flex items-center space-x-6 text-white">
           <Link href="/" className="hover:underline font-medium">Início</Link>
-          <Link href="#processo" className="hover:underline">Processo de Restituição</Link>
           <Link href="#faq" className="hover:underline">Perguntas Frequentes</Link>
-          <Link href="#contato" className="hover:underline">Contato</Link>
           <div className="ml-4">
-            <Link href="#simular">
+            <Link href="/verificar">
               <Button className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold">
                 Simular Restituição
               </Button>
@@ -77,11 +75,9 @@ export default function Header() {
       <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} bg-[var(--gov-blue-dark)] border-t border-[var(--gov-blue)] px-4 pb-4`}>
         <nav className="flex flex-col text-white space-y-3 pt-2">
           <Link href="/" className="py-2 hover:bg-[var(--gov-blue-light)] px-2 rounded">Início</Link>
-          <Link href="#processo" className="py-2 hover:bg-[var(--gov-blue-light)] px-2 rounded">Processo de Restituição</Link>
           <Link href="#faq" className="py-2 hover:bg-[var(--gov-blue-light)] px-2 rounded">Perguntas Frequentes</Link>
-          <Link href="#contato" className="py-2 hover:bg-[var(--gov-blue-light)] px-2 rounded">Contato</Link>
           <div className="pt-2">
-            <Link href="#simular">
+            <Link href="/verificar">
               <Button className="w-full bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold">
                 Simular Restituição
               </Button>
