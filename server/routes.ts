@@ -67,19 +67,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       try {
         // Token da API Exato Digital
-        const apiToken = process.env.EXATO_API_TOKEN;
+        const apiToken = process.env.EXATO_API_TOKEN || "268753a9b3a24819ae0f02159dee6724"; // Valor de fallback caso não esteja no .env
         
         if (!apiToken) {
           throw new Error("Token de API não configurado");
         }
         
+        console.log("Usando token para consulta da API Exato Digital");
+        
         console.log(`Consultando API para CPF: ${cpfLimpo}`);
         
-        // Consultar a API Exato Digital
-        const response = await fetch(`https://api.exato.digital/v1/pessoal/cpf/${cpfLimpo}`, {
+        // Consultar a API Exato Digital - URL correta
+        const response = await fetch(`https://api.exato.digital/receita-federal/cpf?token=${apiToken}&cpf=${cpfLimpo}&format=json`, {
           method: "GET",
           headers: {
-            "Authorization": `Bearer ${apiToken}`,
             "Content-Type": "application/json"
           }
         });
