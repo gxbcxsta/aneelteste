@@ -26,7 +26,7 @@ export default function HeroSection() {
           <p className="text-xl md:text-2xl font-semibold mb-8">
             Descubra em segundos se tem dinheiro a receber!
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-start">
+          <div className="flex justify-start">
             <Link href="/verificar">
               <button
                 className="flex items-center justify-center gap-2 whitespace-nowrap 
@@ -37,18 +37,6 @@ export default function HeroSection() {
                         text-[var(--gov-blue-dark)] px-8 py-7 rounded-md text-lg md:text-xl 
                         font-bold shadow-lg transition-all text-center">
                 🔎 Verificar meu direito à restituição
-              </button>
-            </Link>
-            <Link href="/simulador">
-              <button
-                className="flex items-center justify-center gap-2 whitespace-nowrap 
-                        ring-offset-background focus-visible:outline-none focus-visible:ring-2 
-                        focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none 
-                        disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 
-                        h-10 bg-white hover:bg-gray-100
-                        text-[var(--gov-blue-dark)] px-8 py-7 rounded-md text-lg md:text-xl 
-                        font-bold shadow-lg transition-all text-center">
-                💰 Simular valor a receber
               </button>
             </Link>
           </div>
