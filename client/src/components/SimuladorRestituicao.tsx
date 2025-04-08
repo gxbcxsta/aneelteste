@@ -158,13 +158,20 @@ export default function SimuladorRestituicao({
     }
   }, [valorContaForm.watch("contas"), valorContaForm.watch("usarContas")]);
   
+  // Atualiza o campo de número de cliente quando o checkbox usarCpf muda
+  useEffect(() => {
+    const usarCpf = clienteForm.watch("usarCpf");
+    if (usarCpf) {
+      clienteForm.setValue("numeroCliente", formatarCPF(cpf));
+    } else {
+      // Se desmarcar, limpar o campo
+      clienteForm.setValue("numeroCliente", "");
+    }
+  }, [clienteForm.watch("usarCpf"), cpf]);
+
   // Submissão do formulário da etapa 1 (cliente)
   const onSubmitCliente = (data: ClienteFormValues) => {
-    // Se marcou para usar CPF, substitui o número do cliente pelo CPF formatado
-    if (data.usarCpf) {
-      data.numeroCliente = formatarCPF(cpf);
-    }
-    
+    // O valor do numeroCliente já está atualizado pelo useEffect
     // Avança para a próxima etapa
     proximaEtapa();
   };

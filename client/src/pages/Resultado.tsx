@@ -49,8 +49,8 @@ export default function Resultado() {
   useEffect(() => {
     if (query.get("nasc")) {
       const nascimento = query.get("nasc") || "";
-      const dataObj = new Date(nascimento);
-      setDataNascimento(dataObj.toLocaleDateString('pt-BR'));
+      // A data já vem formatada como string DD/MM/YYYY, não precisa converter
+      setDataNascimento(nascimento);
     } else {
       // Se não tiver data de nascimento na URL, usamos uma padrão para teste
       setDataNascimento("01/01/1990");
