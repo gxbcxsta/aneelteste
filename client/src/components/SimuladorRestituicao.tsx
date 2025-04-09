@@ -705,13 +705,32 @@ export default function SimuladorRestituicao({
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="11912345678"
+                          placeholder="(11)9-9999-9999"
                           className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]"
-                          maxLength={11}
+                          maxLength={15}
+                          onChange={(e) => {
+                            // Aplicar a máscara (11)9-9999-9999
+                            let value = e.target.value.replace(/\D/g, ''); // Remove todos os não-dígitos
+                            if (value.length > 0) {
+                              // Aplicar a máscara conforme o usuário digita
+                              value = value.replace(/^(\d{2})(\d)/g, '($1)$2'); // Coloca parênteses no DDD
+                              value = value.replace(/(\(\d{2}\))(\d)/, '$1$2'); // Mantém o formato após o DDD
+                              if (value.length > 4) {
+                                value = value.replace(/(\(\d{2}\))(\d)/, '$1$2-'); // Adiciona o hífen após o nono dígito
+                              }
+                              if (value.length > 9) {
+                                value = value.replace(/(\(\d{2}\))(\d)(\-\d{4})/, '$1$2-$3'); // Formata o restante
+                              }
+                              if (value.length > 14) {
+                                value = value.substring(0, 14); // Limita ao tamanho máximo
+                              }
+                            }
+                            field.onChange(value);
+                          }}
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
-                        Apenas números, incluindo o DDD. Ex: 11912345678
+                        Formato: (11)9-9999-9999
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -942,8 +961,8 @@ export default function SimuladorRestituicao({
             </div>
             
             <p className="text-[var(--gov-gray-dark)]">
-              Uma cópia destas informações foi enviada para o seu e-mail.
-              Acompanhe o status da sua solicitação e receba o valor em até 7 dias úteis.
+              Após a confirmação, uma cópia destas informações será enviada para o seu e-mail.
+              Acompanhe o status da sua solicitação e receba o valor em até 72 horas úteis.
             </p>
             
             <Button 
