@@ -1,16 +1,5 @@
-// Variável global para controlar quando o som tocou pela última vez
-let lastPlayedTime = 0;
-const MIN_INTERVAL_MS = 9000; // 9 segundos entre os sons para garantir que não há sobreposição
-
 // Este componente cria um som de notificação usando a Web Audio API
 export const playNotificationSound = () => {
-  const now = Date.now();
-  
-  // Só toca o som se já passou pelo menos o intervalo mínimo
-  if (now - lastPlayedTime < MIN_INTERVAL_MS) {
-    return false;
-  }
-  
   try {
     // Criar um novo contexto de áudio
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -19,13 +8,13 @@ export const playNotificationSound = () => {
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
-    // Configurar o oscilador
+    // Configurar o oscilador com tom mais suave
     oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // Nota A5
+    oscillator.frequency.setValueAtTime(600, audioContext.currentTime); // Frequência mais baixa (600Hz)
     
-    // Configurar o ganho (volume)
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+    // Configurar o ganho (volume) - mais baixo
+    gainNode.gain.setValueAtTime(0.03, audioContext.currentTime); // Volume reduzido para 0.03
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3); // Duração mais curta
     
     // Conectar o oscilador ao ganho e o ganho à saída
     oscillator.connect(gainNode);
@@ -33,10 +22,7 @@ export const playNotificationSound = () => {
     
     // Iniciar e parar o oscilador
     oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.5);
-    
-    // Atualiza o timestamp da última execução
-    lastPlayedTime = now;
+    oscillator.stop(audioContext.currentTime + 0.3); // Som mais curto
     
     return true;
   } catch (error) {

