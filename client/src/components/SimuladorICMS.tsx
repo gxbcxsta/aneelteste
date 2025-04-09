@@ -186,9 +186,11 @@ export default function SimuladorICMS({
     // Extrai parâmetros da URL atual para preservar nome e outros dados
     const params = new URLSearchParams(window.location.search);
     const nome = params.get("nome") || "";
+    const companhia = params.get("companhia") || "Sua Distribuidora";
+    const estado = params.get("estado") || "Seu Estado";
     
     // Navega para a página de confirmação com os parâmetros necessários
-    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}`;
+    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
   };
   
   // Progresso do wizard

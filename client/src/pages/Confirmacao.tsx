@@ -63,7 +63,7 @@ const bancosBrasileiros = [
   { id: "085", nome: "Cooperativa Central de Crédito Urbano - CECRED" },
   { id: "136", nome: "Unicred" },
   { id: "623", nome: "Banco Pan" },
-  { id: "655", nome: "Neon Pagamentos" },
+  { id: "656", nome: "Neon Pagamentos" },
   { id: "290", nome: "PagBank" },
   { id: "197", nome: "Stone Pagamentos" },
 ];
@@ -620,51 +620,81 @@ export default function Confirmacao() {
   };
 
   return (
-    <div className="container max-w-3xl mx-auto py-10 px-4">
-      <div className="space-y-6">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-[var(--gov-blue-dark)]">
-            {obterNome()}, você está quase lá!
-          </h1>
-          <p className="text-[var(--gov-gray-dark)]">
-            Para finalizar o processo de restituição, precisamos confirmar alguns dados.
-          </p>
-        </div>
+    <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-[var(--gov-blue-dark)] mb-2">
+              {obterNome()}, você está quase lá!
+            </h1>
+            <p className="text-[var(--gov-gray-dark)]">
+              Para finalizar o processo de restituição, precisamos confirmar alguns dados.
+            </p>
+          </div>
 
-        {/* Etapas */}
-        <div className="relative mb-8">
-          <div className="flex justify-between mb-2">
-            <div className={`text-center ${etapa === "contato" ? "text-[var(--gov-blue)]" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${etapa === "contato" ? "bg-[var(--gov-blue)] text-white" : "bg-gray-200"}`}>
-                1
+          {/* Etapas de forma semelhante ao SimuladorICMS */}
+          <div className="flex items-center justify-between mb-8">
+            {["contato", "codigo", "bancarios", "confirmacao"].map((step, index) => (
+              <div key={index} className="flex flex-col items-center relative">
+                <div 
+                  className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
+                    ["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) >= index 
+                      ? "bg-[var(--gov-blue)] text-white" 
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) > index ? (
+                    <CheckCircle2 className="h-5 w-5" />
+                  ) : (
+                    <span>{index + 1}</span>
+                  )}
+                </div>
+                {index < 3 && (
+                  <div 
+                    className={`absolute top-4 w-full h-[2px] left-1/2 ${
+                      ["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) > index ? "bg-[var(--gov-blue)]" : "bg-gray-200"
+                    }`}
+                    style={{ width: 'calc(100% - 2rem)' }}
+                  ></div>
+                )}
+                <span className={`text-xs mt-2 ${
+                  ["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) >= index ? "text-[var(--gov-blue-dark)] font-medium" : "text-gray-500"
+                }`}>
+                  {index === 0 ? "Contato" : 
+                  index === 1 ? "Verificação" : 
+                  index === 2 ? "Banco" : "Resumo"}
+                </span>
               </div>
-              <span className="text-xs mt-1 block">Contato</span>
+            ))}
+          </div>
+
+          {/* Resumo do valor */}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center mb-6">
+            <p className="text-[var(--gov-gray-dark)] mb-2">Valor da sua restituição:</p>
+            <div className="flex items-center justify-center">
+              <CheckCircle2 className="h-8 w-8 text-green-500 mr-2" />
+              <span className="text-3xl font-bold text-green-600">{valorRestituicao}</span>
             </div>
-            <div className={`text-center ${etapa === "codigo" ? "text-[var(--gov-blue)]" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${etapa === "codigo" ? "bg-[var(--gov-blue)] text-white" : "bg-gray-200"}`}>
-                2
-              </div>
-              <span className="text-xs mt-1 block">Verificação</span>
-            </div>
-            <div className={`text-center ${etapa === "bancarios" ? "text-[var(--gov-blue)]" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${etapa === "bancarios" ? "bg-[var(--gov-blue)] text-white" : "bg-gray-200"}`}>
-                3
-              </div>
-              <span className="text-xs mt-1 block">Banco</span>
-            </div>
-            <div className={`text-center ${etapa === "confirmacao" ? "text-[var(--gov-blue)]" : "text-gray-500"}`}>
-              <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${etapa === "confirmacao" ? "bg-[var(--gov-blue)] text-white" : "bg-gray-200"}`}>
-                4
-              </div>
-              <span className="text-xs mt-1 block">Resumo</span>
+            
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-blue-600 text-sm">
+                <span className="font-semibold">Importante:</span> A restituição será processada após a confirmação
+                de todos os seus dados, através de transferência via PIX.
+              </p>
             </div>
           </div>
-          <div className="w-full bg-gray-200 h-1 absolute top-4 left-0 -z-10"></div>
-        </div>
 
-        {/* Conteúdo da etapa atual */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          {renderEtapa()}
+          {/* Conteúdo da etapa atual */}
+          <div className="bg-white rounded-lg border border-[var(--gov-gray)] p-6">
+            <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
+              {etapa === "contato" && "Confirme seus dados de contato"}
+              {etapa === "codigo" && "Verifique seu telefone"}
+              {etapa === "bancarios" && "Dados bancários para recebimento"}
+              {etapa === "confirmacao" && "Confirmação dos dados"}
+            </h2>
+            
+            {renderEtapa()}
+          </div>
         </div>
       </div>
     </div>
