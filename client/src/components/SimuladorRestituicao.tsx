@@ -106,6 +106,11 @@ export default function SimuladorRestituicao({
   // Inicializar toast para feedback
   const { toast } = useToast();
   
+  // Formatação de CPF
+  const formatarCPF = (cpf: string) => {
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  };
+  
   // Formulários para as etapas adicionais
   const contatoForm = useForm<ContatoFormValues>({
     resolver: zodResolver(contatoSchema),
@@ -119,14 +124,9 @@ export default function SimuladorRestituicao({
     resolver: zodResolver(dadosBancariosSchema),
     defaultValues: {
       banco: "",
-      chavePix: formatarCPF(cpf), // Pré-preenchemos com o CPF formatado
+      chavePix: "", // Será configurado depois de formatarCPF estar disponível
     },
   });
-  
-  // Formatação de CPF
-  const formatarCPF = (cpf: string) => {
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  };
   
   // Formatação de valores monetários
   const formatarMoeda = (valor: number | string) => {
@@ -209,6 +209,12 @@ export default function SimuladorRestituicao({
       clienteForm.setValue("numeroCliente", "");
     }
   }, [clienteForm.watch("usarCpf"), cpf]);
+  
+  // Define o valor de chavePix formatado depois que o componente for montado
+  useEffect(() => {
+    // Atualiza o chavePix com o CPF formatado
+    dadosBancariosForm.setValue("chavePix", formatarCPF(cpf));
+  }, [cpf]);
 
   // Submissão do formulário da etapa 1 (cliente)
   const onSubmitCliente = (data: ClienteFormValues) => {
