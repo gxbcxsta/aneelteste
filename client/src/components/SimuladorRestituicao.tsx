@@ -119,7 +119,7 @@ export default function SimuladorRestituicao({
     resolver: zodResolver(dadosBancariosSchema),
     defaultValues: {
       banco: "",
-      chavePix: "",
+      chavePix: formatarCPF(cpf), // Pré-preenchemos com o CPF formatado
     },
   });
   
@@ -333,12 +333,15 @@ export default function SimuladorRestituicao({
     // Animação de transição
     setAnimacaoAtiva(true);
     
+    // Obter o nome do banco selecionado para exibição
     setBancoSelecionado(
       bancosBrasileiros.find((banco) => banco.id === data.banco)?.nome || ""
     );
+    
     // Sempre usar o CPF formatado como chave PIX
     setChavePix(formatarCPF(cpf));
     
+    // Avançar para a próxima etapa com um pequeno atraso para animação
     setTimeout(() => {
       proximaEtapa();
       setAnimacaoAtiva(false);
@@ -788,8 +791,12 @@ export default function SimuladorRestituicao({
                         Banco
                       </FormLabel>
                       <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Garantir que o valor seja registrado imediatamente
+                          dadosBancariosForm.setValue("banco", value, { shouldValidate: true });
+                        }}
+                        value={field.value || undefined}
                       >
                         <FormControl>
                           <SelectTrigger className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]">
