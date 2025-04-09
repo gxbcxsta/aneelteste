@@ -34,7 +34,6 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   const [opcoesNome, setOpcoesNome] = useState<string[]>([]);
   const [estado, setEstado] = useState<string>("");
   const [companhiaEletrica, setCompanhiaEletrica] = useState<string>("");
-  const [countdown, setCountdown] = useState<number>(5);
 
   // Extrair dados do objeto de resposta
   const nomeCompleto = dadosPessoais.Result.NomePessoaFisica;
@@ -381,46 +380,8 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
     setCompanhiaEletrica(e.target.value);
   };
 
-  // Concluir a verificação
-  // Configuração do contador regressivo e redirecionamento automático
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    let countdownTimer: NodeJS.Timeout;
-    
-    if (etapaAtual === EtapaVerificacao.CONFIRMACAO) {
-      // Verificar se é um estado com uma única companhia
-      const temUnicaCompanhia = getCompanhiasPorEstado(estado).length === 1;
-      
-      if (temUnicaCompanhia) {
-        // Reset do contador quando chegar à etapa de confirmação
-        setCountdown(5);
-        
-        // Temporizador para decrementar o contador a cada segundo
-        countdownTimer = setInterval(() => {
-          setCountdown(prev => {
-            if (prev <= 1) {
-              clearInterval(countdownTimer);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        
-        // Temporizador para redirecionar após 5 segundos
-        timer = setTimeout(() => {
-          prosseguirParaSimulacao();
-        }, 5000);
-      } else {
-        // Para estados com múltiplas companhias, não usamos o timer automático
-        setCountdown(0);
-      }
-    }
-    
-    return () => {
-      clearTimeout(timer);
-      clearInterval(countdownTimer);
-    };
-  }, [etapaAtual, estado]);
+  // Removido o redirecionamento automático e contador regressivo
+  // Agora o usuário precisa clicar no botão "Continuar" para prosseguir
   
   // Função para prosseguir para a tela de simulação
   const prosseguirParaSimulacao = () => {
@@ -566,36 +527,16 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
                 </div>
               </div>
               
-              {getCompanhiasPorEstado(estado).length === 1 ? (
-                // Para estados com uma única companhia, mostrar contador automático
-                <div className="flex items-center justify-center mt-4">
-                  <div className="flex flex-col items-center">
-                    <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center animate-pulse">
-                      <ArrowRight className="h-5 w-5 text-white" />
-                    </div>
-                    <p className="text-blue-700 font-medium text-sm mt-2">
-                      Preparando sua simulação...
-                    </p>
-                    <div className="w-32 bg-gray-200 h-1 rounded-full overflow-hidden mt-2">
-                      <div 
-                        className="bg-blue-500 h-full rounded-full transition-all duration-1000 ease-linear"
-                        style={{ width: `${100 - (100/5) * countdown}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                // Para estados com múltiplas companhias, mostrar botão explícito
-                <div className="flex items-center justify-center mt-6">
-                  <Button 
-                    onClick={prosseguirParaSimulacao}
-                    className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)] px-8 py-6 text-lg font-semibold"
-                  >
-                    Continuar
-                    <ArrowRight className="h-5 w-5 ml-2" />
-                  </Button>
-                </div>
-              )}
+              {/* Mostrar botão "Continuar" para todos os estados */}
+              <div className="flex items-center justify-center mt-6">
+                <Button 
+                  onClick={prosseguirParaSimulacao}
+                  className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)] px-8 py-6 text-lg font-semibold"
+                >
+                  Continuar
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Button>
+              </div>
             </>
           )}
         </CardContent>
