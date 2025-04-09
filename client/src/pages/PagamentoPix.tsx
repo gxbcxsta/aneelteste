@@ -296,7 +296,8 @@ export default function PagamentoPix() {
                     <div>
                       <p className="text-gray-500 text-sm">Banco Selecionado</p>
                       <p className="font-medium">{
-                        (() => {
+                        // Usar o nome completo do banco ou tentar determinar do código
+                        urlParams.get('bancoNome') || (() => {
                           const banco = urlParams.get('banco');
                           switch(banco) {
                             case 'bb': return 'Banco do Brasil';

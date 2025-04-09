@@ -302,13 +302,15 @@ export default function Resultado() {
       const estado = urlParams.get('estado') || '';
       
       // Constrói a URL com todos os dados necessários
-      const banco = bancoSelecionado.toLowerCase().includes('brasil') ? 'bb' : 
-                 bancoSelecionado.toLowerCase().includes('caixa') ? 'caixa' : 
-                 bancoSelecionado.toLowerCase().includes('itau') ? 'itau' : 
-                 bancoSelecionado.toLowerCase().includes('santander') ? 'santander' : 
-                 bancoSelecionado.toLowerCase().includes('bradesco') ? 'bradesco' : 'bb';
+      const bancoId = dadosBancariosForm.getValues().banco || 'bb';
       
-      const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}&nasc=${encodeURIComponent(nasc)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&banco=${encodeURIComponent(banco)}`;
+      // Salvar nome completo do banco para exibição na página de pagamento
+      const bancoNome = bancosBrasileiros.find((b) => b.id === bancoId)?.nome || bancoSelecionado || 'Banco do Brasil';
+      
+      // Logging para debug
+      console.log("Banco selecionado:", bancoId, bancoNome);
+      
+      const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}&nasc=${encodeURIComponent(nasc)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&banco=${encodeURIComponent(bancoId)}&bancoNome=${encodeURIComponent(bancoNome)}`;
       
       // Logging para debug
       console.log("Redirecionando para URL:", url);

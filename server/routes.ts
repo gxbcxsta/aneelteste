@@ -2,11 +2,70 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import fetch from "node-fetch";
+// Usar as funções do db-alternative para interagir com o banco de dados
+import { getValorRestituicaoByCpf, salvarValorRestituicao } from "./db-alternative";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API route for potential simulation endpoints
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'ANEEL ICMS Restituição API' });
+  });
+
+  // Rota para consultar ou salvar valor de restituição
+  app.get('/api/restituicao', async (req: Request, res: Response) => {
+    try {
+      const { cpf } = req.query;
+      
+      if (!cpf || typeof cpf !== 'string') {
+        return res.status(400).json({ error: 'CPF inválido ou não fornecido' });
+      }
+      
+      // Remover formatação do CPF
+      const cpfLimpo = cpf.replace(/\D/g, '');
+      
+      // Consultar valor no banco de dados
+      const valorRestituicao = await getValorRestituicaoByCpf(cpfLimpo);
+      
+      return res.json({ 
+        cpf: cpfLimpo,
+        valorRestituicao,
+        encontrado: valorRestituicao !== null
+      });
+    } catch (error) {
+      console.error('Erro ao processar consulta de restituição:', error);
+      res.status(500).json({ error: 'Erro interno no servidor' });
+    }
+  });
+  
+  // Rota para salvar valor de restituição
+  app.post('/api/restituicao', async (req: Request, res: Response) => {
+    try {
+      const { cpf, valor } = req.body;
+      
+      if (!cpf || typeof cpf !== 'string') {
+        return res.status(400).json({ error: 'CPF inválido ou não fornecido' });
+      }
+      
+      if (valor === undefined || isNaN(Number(valor))) {
+        return res.status(400).json({ error: 'Valor inválido ou não fornecido' });
+      }
+      
+      // Salvar no banco de dados
+      const valorNumerico = Number(valor);
+      const sucesso = await salvarValorRestituicao(cpf, valorNumerico);
+      
+      if (!sucesso) {
+        return res.status(500).json({ error: 'Erro ao salvar valor de restituição' });
+      }
+      
+      return res.json({ 
+        sucesso: true,
+        mensagem: 'Valor de restituição salvo com sucesso'
+      });
+    } catch (error) {
+      console.error('Erro ao processar salvamento de restituição:', error);
+      res.status(500).json({ error: 'Erro interno no servidor' });
+    }
   });
 
   // Rota para consulta de CPF via API Exato Digital

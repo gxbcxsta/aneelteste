@@ -236,9 +236,9 @@ export default function SimuladorRestituicao({
   };
   
   // Submissão do formulário da etapa 3 (período)
-  const onSubmitPeriodo = (data: PeriodoFormValues) => {
-    // Inicia o processo de cálculo com animação de carregamento
+  const onSubmitPeriodo = async (data: PeriodoFormValues) => {
     setCalculando(true);
+    setAnimacaoAtiva(true);
     
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
@@ -262,38 +262,95 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Adiciona um tempo de espera para dar mais credibilidade ao cálculo
-    setTimeout(() => {
-      // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
-      let valorEstimado = valorMedioFinal * meses * 0.25;
+    // Primeiro, verificar se já existe um valor de restituição para este CPF
+    try {
+      const cpfLimpo = cpf.replace(/\D/g, '');
+      const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
+      const data = await response.json();
       
-      // Se o valor for inferior a R$ 1.800, gerar um valor aleatório entre R$ 1.800 e R$ 2.200
-      if (valorEstimado < 1800) {
-        // Gera um valor aleatório entre 1800 e 2200 com centavos
-        valorEstimado = Math.random() * (2200 - 1800) + 1800;
-        // Arredonda para 2 casas decimais
-        valorEstimado = Math.round(valorEstimado * 100) / 100;
-      }
+      let valorFinal: number;
       
-      // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
-      let valorFinal = valorEstimado;
-      if (valorEstimado > 5000) {
-        valorFinal = 5000;
-        setValorFinalRestituicao(5000);
-        setValorRealRestituicao(valorEstimado);
+      if (data.encontrado && data.valorRestituicao) {
+        // Se já existe um valor no banco de dados, usar esse valor
+        console.log("Valor encontrado no banco de dados:", data.valorRestituicao);
+        valorFinal = Number(data.valorRestituicao);
+        
+        setValorFinalRestituicao(valorFinal);
+        setValorRealRestituicao(0);
       } else {
-        valorFinal = valorEstimado;
-        setValorFinalRestituicao(valorEstimado);
-        setValorRealRestituicao(0); // Não há valor "real" adicional
+        // Se não existe, calcular um novo valor
+        // Adiciona um tempo de espera para dar mais credibilidade ao cálculo
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
+        let valorEstimado = valorMedioFinal * meses * 0.25;
+        
+        // Se o valor for inferior a R$ 1.800, gerar um valor aleatório entre R$ 1.800 e R$ 2.200
+        if (valorEstimado < 1800) {
+          // Gera um valor aleatório entre 1800 e 2200 com centavos
+          valorEstimado = Math.random() * (2200 - 1800) + 1800;
+          // Arredonda para 2 casas decimais
+          valorEstimado = Math.round(valorEstimado * 100) / 100;
+        }
+        
+        // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
+        if (valorEstimado > 5000) {
+          valorFinal = 5000;
+          setValorFinalRestituicao(5000);
+          setValorRealRestituicao(valorEstimado);
+        } else {
+          valorFinal = valorEstimado;
+          setValorFinalRestituicao(valorEstimado);
+          setValorRealRestituicao(0); // Não há valor "real" adicional
+        }
+        
+        // Salvar o valor calculado no banco de dados
+        try {
+          await fetch('/api/restituicao', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cpf: cpfLimpo,
+              valor: valorFinal
+            }),
+          });
+          console.log("Valor salvo no banco de dados com sucesso");
+        } catch (error) {
+          console.error("Erro ao salvar valor no banco de dados:", error);
+        }
       }
       
-      // Notifica o componente pai sobre a conclusão (usando o valor calculado diretamente)
+      // Notifica o componente pai sobre a conclusão
       onSimulacaoConcluida(valorFinal, meses);
       
       // Finaliza o carregamento e avança para a próxima etapa
       setCalculando(false);
+      setAnimacaoAtiva(false);
       proximaEtapa();
-    }, 3000); // Espera 3 segundos antes de mostrar o resultado
+    } catch (error) {
+      console.error("Erro ao consultar/salvar valor de restituição:", error);
+      
+      // Em caso de erro, usamos o cálculo padrão
+      const valorEstimado = valorMedioFinal * meses * 0.25;
+      const valorFinal = Math.min(valorEstimado, 5000);
+      
+      setValorFinalRestituicao(valorFinal);
+      if (valorEstimado > 5000) {
+        setValorRealRestituicao(valorEstimado);
+      } else {
+        setValorRealRestituicao(0);
+      }
+      
+      // Notifica o componente pai sobre a conclusão
+      onSimulacaoConcluida(valorFinal, meses);
+      
+      // Finaliza o carregamento e avança para a próxima etapa
+      setCalculando(false);
+      setAnimacaoAtiva(false);
+      proximaEtapa();
+    }
   };
   
   // Funções de navegação entre etapas
