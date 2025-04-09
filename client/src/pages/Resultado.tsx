@@ -312,7 +312,8 @@ export default function Resultado() {
     setValorRestituicao(formatarValor(valor));
     
     setSimulacaoRealizada(true);
-    setActiveTab("dados");
+    // Não mudamos mais de aba para manter o usuário no fluxo do simulador
+    // setActiveTab("dados");
     
     // Iniciar processo de confirmação
     setEtapaConfirmacao("contato");
@@ -746,7 +747,7 @@ export default function Resultado() {
                                           onClick={finalizarProcesso}
                                           className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold py-6 px-8 text-lg rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
                                         >
-                                          <CheckCircle2 className="mr-2 h-5 w-5" />
+                                          <CheckCircle className="mr-2 h-5 w-5" />
                                           Confirmar e Finalizar
                                         </Button>
                                       </div>
