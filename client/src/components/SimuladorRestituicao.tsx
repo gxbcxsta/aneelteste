@@ -801,8 +801,13 @@ export default function SimuladorRestituicao({
                           field.onChange(value);
                           // Garantir que o valor seja registrado imediatamente
                           dadosBancariosForm.setValue("banco", value, { shouldValidate: true });
+                          // Atualizar o nome do banco imediatamente para feedback visual
+                          setBancoSelecionado(
+                            bancosBrasileiros.find((banco) => banco.id === value)?.nome || ""
+                          );
                         }}
-                        value={field.value || undefined}
+                        value={field.value}
+                        defaultValue=""
                       >
                         <FormControl>
                           <SelectTrigger className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]">
