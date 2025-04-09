@@ -302,6 +302,8 @@ export default function Confirmacao() {
                               type="tel"
                               maxLength={17}
                               className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                              {...field}
+                              value={field.value}
                               onChange={(e) => {
                                 // Aplicar a máscara (11) 9 8888 8888
                                 let value = e.target.value.replace(/\D/g, ''); // Remove todos os não-dígitos
@@ -320,7 +322,6 @@ export default function Confirmacao() {
                                 }
                                 field.onChange(value);
                               }}
-                              {...field}
                             />
                           </div>
                         </FormControl>

@@ -34,9 +34,9 @@ import { useToast } from "@/hooks/use-toast";
 const contatoSchema = z.object({
   email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
   telefone: z.string()
-    .min(11, "Telefone deve ter pelo menos 11 dígitos (DDD + número)")
-    .max(11, "Telefone deve ter no máximo 11 dígitos")
-    .regex(/^\d+$/, "Telefone deve conter apenas números"),
+    .min(10, "Telefone deve ter pelo menos 10 dígitos")
+    .max(17, "Telefone inválido")
+    .regex(/[\d\s\(\)\-]+/, "Formato inválido de telefone"),
 });
 
 const dadosBancariosSchema = z.object({
@@ -333,12 +333,21 @@ export default function Resultado() {
                 </CardDescription>
               </CardHeader>
               
-              <Tabs defaultValue="dados" value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs defaultValue="dados" value={activeTab} onValueChange={(value) => {
+                  // Previne voltar para "dados" se a simulação já foi realizada
+                  if (simulacaoRealizada && value === "dados") {
+                    return; // Não faz nada se tentar mudar para "dados" com a simulação realizada
+                  }
+                  setActiveTab(value);
+                }} className="w-full">
                 <div className="border-b px-6">
                   <TabsList className="bg-transparent border-b-0 p-0">
                     <TabsTrigger 
                       value="dados" 
-                      className="data-[state=active]:text-[var(--gov-blue)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--gov-blue)] rounded-none py-4"
+                      disabled={simulacaoRealizada}
+                      className={`data-[state=active]:text-[var(--gov-blue)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--gov-blue)] rounded-none py-4 ${
+                        simulacaoRealizada ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     >
                       Dados Pessoais
                     </TabsTrigger>
@@ -541,12 +550,29 @@ export default function Resultado() {
                                                   <div className="flex items-center border rounded-md focus-within:ring-2 focus-within:ring-[var(--gov-blue)] focus-within:border-[var(--gov-blue)] transition-all">
                                                     <Phone className="ml-3 h-4 w-4 text-gray-400" />
                                                     <Input
-                                                      placeholder="DDD + Número (ex: 11999999999)"
+                                                      placeholder="(11) 9 8888 8888"
                                                       type="tel"
-                                                      maxLength={11}
-                                                      inputMode="numeric"
+                                                      maxLength={17}
                                                       className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                                                      {...field}
+                                                      onChange={(e) => {
+                                                        // Aplicar a máscara (11) 9 8888 8888
+                                                        let value = e.target.value.replace(/\D/g, ''); // Remove todos os não-dígitos
+                                                        if (value.length > 0) {
+                                                          // Aplicar a máscara conforme o usuário digita
+                                                          value = value.replace(/^(\d{2})(\d)/g, '($1) $2'); // Coloca parênteses e espaço no DDD
+                                                          if (value.length > 3) {
+                                                            value = value.replace(/(\(\d{2}\) )(\d)/, '$1$2 '); // Adiciona espaço após o 9
+                                                          }
+                                                          if (value.length > 5) {
+                                                            value = value.replace(/(\(\d{2}\) \d )(\d{4})/, '$1$2 '); // Adiciona espaço após os primeiros 4 dígitos
+                                                          }
+                                                          if (value.length > 16) {
+                                                            value = value.substring(0, 16); // Limita ao tamanho máximo
+                                                          }
+                                                        }
+                                                        field.onChange(value);
+                                                      }}
+                                                      value={field.value}
                                                     />
                                                   </div>
                                                 </FormControl>
