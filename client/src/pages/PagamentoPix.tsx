@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { playNotificationSound } from "@/components/NotificationSound";
+// Não importar o som de notificação
 import Header from "@/components/Header";
 
 // Gerar um código PIX aleatório
@@ -186,8 +186,7 @@ export default function PagamentoPix() {
     function criarCicloNotificacoes(tempoInicial: number) {
       // 1. Agendar aparecimento da notificação
       const notificationTimeout = setTimeout(() => {
-        // Tocar o som de moedas
-        playNotificationSound();
+        // Não tocar nenhum som de notificação
         
         // Criar uma notificação
         const nomeAleatorio = nomes[Math.floor(Math.random() * nomes.length)];
