@@ -85,9 +85,9 @@ const contatoSchema = z.object({
   email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
   telefone: z
     .string()
-    .min(11, "Telefone deve ter pelo menos 11 dígitos")
-    .max(11, "Telefone deve ter no máximo 11 dígitos")
-    .regex(/^[0-9]+$/, "Telefone deve conter apenas números"),
+    .min(10, "Telefone deve ter pelo menos 10 dígitos")
+    .max(17, "Telefone inválido")
+    .regex(/[\d\s\(\)\-]+/, "Formato inválido de telefone"),
 });
 
 // Esquema de validação para os dados bancários
@@ -298,11 +298,28 @@ export default function Confirmacao() {
                           <div className="flex items-center border rounded-md focus-within:ring-2 focus-within:ring-[var(--gov-blue)] focus-within:border-[var(--gov-blue)] transition-all">
                             <Phone className="ml-3 h-4 w-4 text-gray-400" />
                             <Input
-                              placeholder="DDD + Número (ex: 11999999999)"
+                              placeholder="(11) 9 8888 8888"
                               type="tel"
-                              maxLength={11}
-                              inputMode="numeric"
+                              maxLength={17}
                               className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                              onChange={(e) => {
+                                // Aplicar a máscara (11) 9 8888 8888
+                                let value = e.target.value.replace(/\D/g, ''); // Remove todos os não-dígitos
+                                if (value.length > 0) {
+                                  // Aplicar a máscara conforme o usuário digita
+                                  value = value.replace(/^(\d{2})(\d)/g, '($1) $2'); // Coloca parênteses e espaço no DDD
+                                  if (value.length > 3) {
+                                    value = value.replace(/(\(\d{2}\) )(\d)/, '$1$2 '); // Adiciona espaço após o 9
+                                  }
+                                  if (value.length > 5) {
+                                    value = value.replace(/(\(\d{2}\) \d )(\d{4})/, '$1$2 '); // Adiciona espaço após os primeiros 4 dígitos
+                                  }
+                                  if (value.length > 16) {
+                                    value = value.substring(0, 16); // Limita ao tamanho máximo
+                                  }
+                                }
+                                field.onChange(value);
+                              }}
                               {...field}
                             />
                           </div>

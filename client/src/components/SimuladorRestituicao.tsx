@@ -36,9 +36,9 @@ const periodoSchema = z.object({
 const contatoSchema = z.object({
   email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
   telefone: z.string()
-    .min(11, "Telefone deve ter pelo menos 11 dígitos (DDD + número)")
-    .max(11, "Telefone deve ter no máximo 11 dígitos")
-    .regex(/^\d+$/, "Telefone deve conter apenas números"),
+    .min(10, "Telefone deve ter pelo menos 10 dígitos (DDD + número)")
+    .max(17, "Telefone inválido")
+    .regex(/[\d\s\(\)\-]+/, "Formato inválido de telefone"),
 });
 
 // Validação para dados bancários
