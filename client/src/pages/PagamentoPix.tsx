@@ -278,17 +278,34 @@ export default function PagamentoPix() {
 
                     <div>
                       <p className="text-gray-500 text-sm">Data de Nascimento</p>
-                      <p className="font-medium">{urlParams.get('nasc') || "01/01/1990"}</p>
+                      <p className="font-medium">{urlParams.get('nasc')}</p>
                     </div>
                     
                     <div>
                       <p className="text-gray-500 text-sm">Concessionária de Energia</p>
-                      <p className="font-medium">{urlParams.get('companhia') || "ENEL"}</p>
+                      <p className="font-medium">{urlParams.get('companhia')}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-gray-500 text-sm">Estado</p>
+                      <p className="font-medium">{urlParams.get('estado')}</p>
                     </div>
                     
                     <div>
                       <p className="text-gray-500 text-sm">Banco Selecionado</p>
-                      <p className="font-medium">{urlParams.get('banco') || "Caixa Econômica Federal"}</p>
+                      <p className="font-medium">{
+                        (() => {
+                          const banco = urlParams.get('banco');
+                          switch(banco) {
+                            case 'bb': return 'Banco do Brasil';
+                            case 'caixa': return 'Caixa Econômica Federal';
+                            case 'bradesco': return 'Bradesco';
+                            case 'santander': return 'Santander';
+                            case 'itau': return 'Itaú';
+                            default: return banco || '';
+                          }
+                        })()
+                      }</p>
                     </div>
                     
                     <div>
