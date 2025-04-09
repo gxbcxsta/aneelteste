@@ -7,7 +7,8 @@ import { Copy, CheckCircle, Info, AlertCircle, Bell } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { Toast, ToastProvider } from "@/components/ui/toast";
+import { Toast } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
 import { playNotificationSound } from "@/components/NotificationSound";
 
 // Gerar um código PIX aleatório
@@ -49,7 +50,7 @@ const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
   }, [onClose]);
   
   return (
-    <Toast className="fixed right-4 max-w-md w-full bg-white shadow-lg rounded-lg">
+    <div className="fixed right-4 max-w-md w-full bg-white shadow-lg rounded-lg">
       <div className="flex items-start p-4">
         <div className="flex-shrink-0 pt-0.5">
           <Bell className="h-5 w-5 text-blue-500" />
@@ -74,7 +75,7 @@ const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
           </button>
         </div>
       </div>
-    </Toast>
+    </div>
   );
 };
 
@@ -168,6 +169,9 @@ export default function PagamentoPix() {
   
   return (
     <main className="container mx-auto px-4 py-8">
+      {/* Este componente é necessário para o toast */}
+      <Toaster />
+      
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-[var(--gov-blue-dark)] mb-6">
           Pagamento da Taxa de Regularização Energética (TRE)
