@@ -295,7 +295,7 @@ export default function Resultado() {
     
     setTimeout(() => {
       // Redirecionar para a página de pagamento PIX com os dados necessários
-      window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}`;
+      navigate(`/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}`);
     }, 500);
   };
   
