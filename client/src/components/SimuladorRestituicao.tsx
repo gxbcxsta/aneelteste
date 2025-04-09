@@ -787,45 +787,53 @@ export default function SimuladorRestituicao({
             
             <Form {...dadosBancariosForm}>
               <form onSubmit={dadosBancariosForm.handleSubmit(onSubmitDadosBancarios)} className="space-y-6">
-                <FormField
-                  control={dadosBancariosForm.control}
-                  name="banco"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[var(--gov-blue-dark)] font-medium flex items-center">
-                        <BanknoteIcon className="h-4 w-4 mr-2" />
-                        Banco
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          // Garantir que o valor seja registrado imediatamente
-                          dadosBancariosForm.setValue("banco", value, { shouldValidate: true });
-                          // Atualizar o nome do banco imediatamente para feedback visual
-                          setBancoSelecionado(
-                            bancosBrasileiros.find((banco) => banco.id === value)?.nome || ""
-                          );
-                        }}
-                        value={field.value}
-                        defaultValue=""
-                      >
-                        <FormControl>
-                          <SelectTrigger className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]">
-                            <SelectValue placeholder="Selecione seu banco" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {bancosBrasileiros.map((banco) => (
-                            <SelectItem key={banco.id} value={banco.id}>
-                              {banco.nome}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                <div className="space-y-3">
+                  <FormField
+                    control={dadosBancariosForm.control}
+                    name="banco"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[var(--gov-blue-dark)] font-medium flex items-center">
+                          <BanknoteIcon className="h-4 w-4 mr-2" />
+                          Banco
+                        </FormLabel>
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Garantir que o valor seja registrado imediatamente
+                            dadosBancariosForm.setValue("banco", value, { shouldValidate: true });
+                            // Atualizar o nome do banco imediatamente para feedback visual
+                            const nomeBanco = bancosBrasileiros.find((banco) => banco.id === value)?.nome || "";
+                            setBancoSelecionado(nomeBanco);
+                            console.log("Banco selecionado:", value, nomeBanco);
+                          }}
+                          defaultValue=""
+                        >
+                          <FormControl>
+                            <SelectTrigger className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]">
+                              <SelectValue placeholder="Selecione seu banco" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {bancosBrasileiros.map((banco) => (
+                              <SelectItem key={banco.id} value={banco.id}>
+                                {banco.nome}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {/* Campo de exibição do banco selecionado */}
+                  {bancoSelecionado && (
+                    <div className="text-sm p-2 bg-blue-50 border border-blue-200 rounded text-blue-700">
+                      <span className="font-medium">Banco selecionado:</span> {bancoSelecionado}
+                    </div>
                   )}
-                />
+                </div>
                 
                 <FormField
                   control={dadosBancariosForm.control}
