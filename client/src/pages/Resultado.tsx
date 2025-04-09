@@ -293,9 +293,10 @@ export default function Resultado() {
     // Animação de transição
     setAnimacaoAtiva(true);
     
+    // Força a redireção para a página de pagamento após 500ms
     setTimeout(() => {
-      // Redirecionar para a página de pagamento PIX com os dados necessários
-      navigate(`/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}`);
+      const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}`;
+      window.location.href = url;
     }, 500);
   };
   
