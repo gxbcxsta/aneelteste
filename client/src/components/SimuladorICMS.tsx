@@ -183,9 +183,12 @@ export default function SimuladorICMS({
   
   // Inicia a solicitação após a simulação
   const iniciarSolicitacao = () => {
-    alert("Iniciar processo de solicitação de restituição");
-    // Aqui você pode implementar a lógica para iniciar o processo de solicitação
-    // Como por exemplo, navegar para uma nova página ou mostrar um formulário adicional
+    // Extrai parâmetros da URL atual para preservar nome e outros dados
+    const params = new URLSearchParams(window.location.search);
+    const nome = params.get("nome") || "";
+    
+    // Navega para a página de confirmação com os parâmetros necessários
+    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}`;
   };
   
   // Progresso do wizard

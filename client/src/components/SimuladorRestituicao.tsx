@@ -230,9 +230,8 @@ export default function SimuladorRestituicao({
   
   // Inicia a solicitação após a simulação
   const iniciarSolicitacao = () => {
-    alert("Iniciar processo de solicitação de restituição");
-    // Aqui você pode implementar a lógica para iniciar o processo de solicitação
-    // Como por exemplo, navegar para uma nova página ou mostrar um formulário adicional
+    // Navega para a página de confirmação com os parâmetros necessários
+    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}`;
   };
   
   // Renderiza a etapa atual do simulador
