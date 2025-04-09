@@ -525,61 +525,65 @@ export default function Confirmacao() {
             <div className="max-w-3xl mx-auto">
               {/* Informação do valor */}
               <div className="text-center mb-6">
-                <div className="inline-block bg-green-100 text-green-800 rounded-full px-4 py-1 text-sm mb-2">
-                  Restituição ICMS
-                </div>
                 <h1 className="text-2xl font-bold text-[var(--gov-blue-dark)] mb-2">
                   Olá {nomeUsuario}, você está quase lá!
                 </h1>
-                <p className="text-[var(--gov-gray-dark)]">
-                  Complete suas informações para receber sua restituição no valor de:
+                <p className="text-[var(--gov-gray-dark)] mb-2">
+                  Complete suas informações para receber sua restituição
                 </p>
-                <div className="mt-2 inline-block bg-green-50 border border-green-200 rounded-lg px-6 py-3">
-                  <span className="text-3xl font-bold text-green-600">{valorRestituicao}</span>
-                </div>
+                <div className="mb-2 text-lg text-[var(--gov-blue-dark)]">no valor de</div>
+                <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 text-transparent bg-clip-text">{valorRestituicao}</div>
               </div>
 
-              {/* Progresso visual destacado */}
-              <div className="relative mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-[var(--gov-blue-light)]/10 to-[var(--gov-yellow)]/10 rounded-lg"></div>
-                <div className="relative p-4">
-                  <div className="flex items-center justify-between">
-                    {["contato", "bancarios", "confirmacao"].map((step, index) => (
-                      <div key={index} className="flex flex-col items-center relative">
-                        <div 
-                          className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
-                            ["contato", "bancarios", "confirmacao"].indexOf(etapa) >= index 
-                              ? "bg-[var(--gov-blue)] text-white shadow-md" 
-                              : "bg-gray-200 text-gray-500"
-                          }`}
-                        >
-                          {["contato", "bancarios", "confirmacao"].indexOf(etapa) > index ? (
-                            <Check className="h-5 w-5" />
-                          ) : (
-                            <span>{index + 1}</span>
-                          )}
-                        </div>
-                        {index < 2 && (
-                          <div 
-                            className={`absolute top-5 w-full h-[2px] left-1/2 transition-all duration-500 ${
-                              ["contato", "bancarios", "confirmacao"].indexOf(etapa) > index 
-                              ? "bg-[var(--gov-blue)]" 
-                              : "bg-gray-200"
-                            }`}
-                            style={{ width: 'calc(100% - 2.5rem)' }}
-                          ></div>
-                        )}
-                        <span className={`text-sm mt-2 transition-all duration-300 ${
-                          ["contato", "bancarios", "confirmacao"].indexOf(etapa) >= index 
-                            ? "text-[var(--gov-blue-dark)] font-medium" 
-                            : "text-gray-500"
-                        }`}>
-                          {index === 0 ? "Contato" : 
-                          index === 1 ? "Dados Bancários" : "Confirmação"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+              {/* Progresso visual elegante */}
+              <div className="flex items-center justify-center mb-8">
+                <div className="flex space-x-1 w-full max-w-md">
+                  <div 
+                    className={`h-2 flex-1 rounded-l-full transition-all duration-500 ${
+                      etapa === "contato" 
+                        ? "bg-[var(--gov-blue-dark)]" 
+                        : etapa === "bancarios" || etapa === "confirmacao" 
+                          ? "bg-[var(--gov-blue)]" 
+                          : "bg-gray-200"
+                    }`}
+                  ></div>
+                  <div 
+                    className={`h-2 flex-1 transition-all duration-500 ${
+                      etapa === "bancarios" 
+                        ? "bg-[var(--gov-blue-dark)]" 
+                        : etapa === "confirmacao" 
+                          ? "bg-[var(--gov-blue)]" 
+                          : "bg-gray-200"
+                    }`}
+                  ></div>
+                  <div 
+                    className={`h-2 flex-1 rounded-r-full transition-all duration-500 ${
+                      etapa === "confirmacao" 
+                        ? "bg-[var(--gov-blue-dark)]" 
+                        : "bg-gray-200"
+                    }`}
+                  ></div>
+                </div>
+              </div>
+              
+              {/* Etapas em texto */}
+              <div className="flex justify-between mb-8 px-2 max-w-md mx-auto">
+                <div className={`text-sm font-medium transition-all duration-300 ${
+                  etapa === "contato" ? "text-[var(--gov-blue-dark)]" : 
+                  etapa === "bancarios" || etapa === "confirmacao" ? "text-[var(--gov-blue)]" : "text-gray-500"
+                }`}>
+                  Seus dados
+                </div>
+                <div className={`text-sm font-medium transition-all duration-300 ${
+                  etapa === "bancarios" ? "text-[var(--gov-blue-dark)]" : 
+                  etapa === "confirmacao" ? "text-[var(--gov-blue)]" : "text-gray-500"
+                }`}>
+                  Dados bancários
+                </div>
+                <div className={`text-sm font-medium transition-all duration-300 ${
+                  etapa === "confirmacao" ? "text-[var(--gov-blue-dark)]" : "text-gray-500"
+                }`}>
+                  Finalizar
                 </div>
               </div>
 
