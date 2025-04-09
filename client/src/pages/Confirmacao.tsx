@@ -229,37 +229,25 @@ export default function Confirmacao() {
 
   // Função para enviar o código SMS
   const enviarCodigoSMS = async (telefone: string) => {
-    console.log(`Enviando código para ${telefone}`);
+    console.log(`Simulando envio de SMS para ${telefone}`);
+
+    // Gerar um código de 6 dígitos
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
     
     try {
-      // Chamada real para API de SMS
-      const TOKEN = "eb50f988-1fa0-4982-962c-6247b89e11c3";
+      // Simulação de envio de SMS (para desenvolvimento)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      const response = await fetch(`https://sms.aresfun.com/v1/integration/${TOKEN}/send-sms`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          phone: telefone,
-          message: `Seu código de verificação para restituição de ICMS é: {{code}}`,
-          // Outros parâmetros conforme necessário pela API
-        })
-      });
+      console.log(`Código SMS gerado: ${codigo}`);
       
-      if (!response.ok) {
-        throw new Error("Falha no envio do SMS");
-      }
+      // Em um ambiente de produção, utilizaríamos uma API real de SMS
+      // Mas para fins de demonstração, apenas retornamos o código gerado
       
-      const data = await response.json();
-      const codigo = data.code || Math.floor(100000 + Math.random() * 900000).toString();
-      console.log(`Código gerado: ${codigo}`);
       return codigo;
+      
     } catch (error) {
-      console.error("Erro ao enviar SMS:", error);
-      // Fallback para código gerado localmente em caso de erro na API
-      const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log(`Código gerado localmente (fallback): ${codigo}`);
+      console.error("Erro na simulação de SMS:", error);
+      // Mesmo com erro, retornamos o código para que o usuário possa continuar o fluxo
       return codigo;
     }
   };
