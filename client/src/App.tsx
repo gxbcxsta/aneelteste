@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import VerificarRestituicao from "@/pages/VerificarRestituicao";
 import Resultado from "@/pages/Resultado";
 import Confirmacao from "@/pages/Confirmacao";
+import PagamentoPix from "@/pages/PagamentoPix";
 import Sucesso from "@/pages/Sucesso";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/verificar" component={VerificarRestituicao}/>
       <Route path="/resultado" component={Resultado}/>
       <Route path="/confirmacao" component={Confirmacao}/>
+      <Route path="/pagamento" component={PagamentoPix}/>
       <Route path="/sucesso" component={Sucesso}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
