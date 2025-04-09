@@ -18,7 +18,12 @@ const clienteSchema = z.object({
 
 // Validação para o valor médio da conta
 const valorContaSchema = z.object({
-  valorMedio: z.string().min(1, "Campo obrigatório")
+  valorMedio: z.string()
+    .min(1, "Campo obrigatório")
+    .refine((val) => {
+      const valor = parseFloat(val.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      return !isNaN(valor) && valor > 0;
+    }, "Valor incorreto. Digite um valor maior que zero."),
 });
 
 // Validação para o período
@@ -231,7 +236,7 @@ export default function SimuladorRestituicao({
   // Inicia a solicitação após a simulação
   const iniciarSolicitacao = () => {
     // Navega para a página de confirmação com os parâmetros necessários
-    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}`;
   };
   
   // Renderiza a etapa atual do simulador
