@@ -41,13 +41,8 @@ const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
     // Som de notificação
     playNotificationSound();
     
-    // Fechar automaticamente após 5 segundos
-    const timer = setTimeout(() => {
-      onClose();
-    }, 5000);
-    
-    return () => clearTimeout(timer);
-  }, [onClose]);
+    // Não fecha automaticamente aqui, pois estamos gerenciando isso no nível superior
+  }, []);
   
   return (
     <div className="max-w-sm w-full bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden">
@@ -180,32 +175,34 @@ export default function PagamentoPix() {
     // Limpar notificações anteriores
     setNotificacoes([]);
     
-    // Gerar uma notificação a cada 10 segundos
-    // Primeira notificação após 3 segundos
-    setTimeout(() => {
-      gerarNotificacao();
-    }, 3000);
+    // Sistema de notificações conforme especificado:
+    // 1. Primeira notificação após 10 segundos da abertura da página
+    // 2. Cada notificação fica visível por 5 segundos
+    // 3. Após uma notificação sumir, espera mais 10 segundos para mostrar a próxima
     
-    // Continuar gerando notificações a cada 10 segundos
-    const notificacoesInterval = setInterval(() => {
-      // Removemos notificações antigas antes de adicionar uma nova
-      // para garantir que apenas uma notificação esteja visível por vez
-      setNotificacoes(prev => {
-        // Se tiver notificações antigas, limpa todas
-        if (prev.length > 0) return [];
-        // Senão, deixa vazio para a nova notificação ser adicionada
-        return prev;
-      });
+    // Função para gerenciar o ciclo de notificações
+    const gerenciarCicloNotificacoes = () => {
+      // 1. Gera uma notificação
+      gerarNotificacao();
       
-      // Adiciona uma nova notificação após limpar
+      // 2. Programa a remoção da notificação após 5 segundos
       setTimeout(() => {
-        gerarNotificacao();
-      }, 500);
-    }, 10000);
+        // Remove todas as notificações
+        setNotificacoes([]);
+        
+        // 3. Programa a próxima notificação após 10 segundos do desaparecimento
+        setTimeout(gerenciarCicloNotificacoes, 10000);
+      }, 5000);
+    };
+    
+    // Inicia o ciclo após 10 segundos da abertura da página
+    const cicloInicial = setTimeout(gerenciarCicloNotificacoes, 10000);
     
     return () => {
       clearInterval(timerInterval);
-      clearInterval(notificacoesInterval);
+      clearTimeout(cicloInicial);
+      // Nota: não precisamos limpar os outros timeouts pois eles serão
+      // cancelados automaticamente quando o componente for desmontado
     };
   }, []);
 
