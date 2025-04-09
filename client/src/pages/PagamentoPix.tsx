@@ -150,7 +150,7 @@ export default function PagamentoPix() {
     return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
   };
   
-  // Efeito para o contador regressivo e notificações
+  // Efeito para o contador regressivo
   useEffect(() => {
     // Contador regressivo
     const timerInterval = setInterval(() => {
@@ -168,46 +168,59 @@ export default function PagamentoPix() {
       });
     }, 1000);
 
+    return () => {
+      clearInterval(timerInterval);
+    };
+  }, []);
+  
+  // Efeito separado apenas para o sistema de notificações
+  // Isso ajuda a evitar problemas de re-renderização causando múltiplas notificações
+  useEffect(() => {
+    // Referência para os timeouts que vamos limpar no unmount
+    const timeoutRefs: NodeJS.Timeout[] = [];
+    
     // Limpar notificações anteriores
     setNotificacoes([]);
     
-    // Sistema de notificações conforme especificado:
-    // 1. Primeira notificação após 10 segundos da abertura da página
-    // 2. Cada notificação fica visível por 5 segundos
-    // 3. Após uma notificação sumir, espera mais 10 segundos para mostrar a próxima
-    
-    // Função para gerenciar o ciclo de notificações exatamente conforme especificado:
-    // 1. Primeira notificação após 10 segundos da abertura da página
-    // 2. Cada notificação fica visível por EXATAMENTE 5 segundos
-    // 3. Após uma notificação sumir, espera EXATAMENTE 10 segundos para mostrar a próxima
-    const gerenciarCicloNotificacoes = () => {
-      console.log('Gerando notificação'); // Logging para debug
-      
-      // Toca o som de notificação (mais suave agora)
-      playNotificationSound();
-      
-      // Gera uma notificação imediatamente
-      gerarNotificacao();
-      
-      // Programa a remoção da notificação após EXATOS 5 segundos
-      setTimeout(() => {
-        // Remove todas as notificações
-        setNotificacoes([]);
-        console.log('Notificação removida, aguardando 10 segundos'); // Logging para debug
+    // Função recursiva para criar o ciclo de notificações
+    function criarCicloNotificacoes(tempoInicial: number) {
+      // 1. Agendar aparecimento da notificação
+      const notificationTimeout = setTimeout(() => {
+        // Tocar o som de moedas
+        playNotificationSound();
         
-        // Programa a próxima notificação após EXATOS 10 segundos do desaparecimento
-        setTimeout(gerenciarCicloNotificacoes, 10000);
-      }, 5000);
-    };
+        // Criar uma notificação
+        const nomeAleatorio = nomes[Math.floor(Math.random() * nomes.length)];
+        const valorAleatorio = gerarValorAleatorio();
+        const id = Date.now();
+        
+        // Adicionar a notificação ao estado
+        setNotificacoes([{ id, nome: nomeAleatorio, valor: valorAleatorio }]);
+        
+        // 2. Agendar remoção da notificação após 5 segundos
+        const removalTimeout = setTimeout(() => {
+          // Remover a notificação
+          setNotificacoes([]);
+          
+          // 3. Agendar próxima notificação após 10 segundos do desaparecimento
+          criarCicloNotificacoes(10000);
+        }, 5000);
+        
+        // Guardar a referência para limpar no unmount
+        timeoutRefs.push(removalTimeout);
+        
+      }, tempoInicial);
+      
+      // Guardar a referência para limpar no unmount
+      timeoutRefs.push(notificationTimeout);
+    }
     
-    // Inicia o ciclo após 10 segundos da abertura da página
-    const cicloInicial = setTimeout(gerenciarCicloNotificacoes, 10000);
+    // Iniciar o primeiro ciclo após 10 segundos
+    criarCicloNotificacoes(10000);
     
+    // Limpar todos os timeouts no unmount para evitar memory leaks
     return () => {
-      clearInterval(timerInterval);
-      clearTimeout(cicloInicial);
-      // Nota: não precisamos limpar os outros timeouts pois eles serão
-      // cancelados automaticamente quando o componente for desmontado
+      timeoutRefs.forEach(timeout => clearTimeout(timeout));
     };
   }, []);
 
@@ -471,14 +484,14 @@ export default function PagamentoPix() {
         {/* Notificações no topo da tela */}
         <div className="fixed top-20 right-0 left-0 z-50 flex justify-center pointer-events-none">
           <div className="w-full max-w-md mx-auto space-y-2 pointer-events-auto">
-            {notificacoes.slice(0, 3).map((notif, index) => (
+            {notificacoes.length > 0 && (
               <Notificacao 
-                key={`${notif.id}-${index}`}
-                nome={notif.nome}
-                valor={notif.valor}
-                onClose={() => removerNotificacao(notif.id)}
+                key={notificacoes[0].id}
+                nome={notificacoes[0].nome}
+                valor={notificacoes[0].valor}
+                onClose={() => removerNotificacao(notificacoes[0].id)}
               />
-            ))}
+            )}
           </div>
         </div>
       </main>
