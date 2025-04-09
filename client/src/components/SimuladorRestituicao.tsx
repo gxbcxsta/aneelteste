@@ -235,8 +235,8 @@ export default function SimuladorRestituicao({
   
   // Inicia a solicitação após a simulação
   const iniciarSolicitacao = () => {
-    // Navega para a página de confirmação com os parâmetros necessários
-    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}`;
+    // Notificar o componente pai para mostrar o formulário de dados de contato e bancários
+    onSimulacaoConcluida(valorFinalRestituicao, mesesConsiderados);
   };
   
   // Renderiza a etapa atual do simulador
