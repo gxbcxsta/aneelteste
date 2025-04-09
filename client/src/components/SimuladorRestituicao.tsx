@@ -365,7 +365,8 @@ export default function SimuladorRestituicao({
     setAnimacaoAtiva(true);
     
     setTimeout(() => {
-      window.location.href = "/sucesso?nome=" + encodeURIComponent(nome.split(" ")[0]);
+      // Redirecionar para a página de pagamento PIX
+      window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}`;
     }, 500);
   };
   
