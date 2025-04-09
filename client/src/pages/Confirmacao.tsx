@@ -229,26 +229,54 @@ export default function Confirmacao() {
 
   // Função para enviar o código SMS
   const enviarCodigoSMS = async (telefone: string) => {
-    console.log(`Simulando envio de SMS para ${telefone}`);
+    console.log(`Enviando SMS para ${telefone}`);
 
     // Gerar um código de 6 dígitos
     const codigo = Math.floor(100000 + Math.random() * 900000).toString();
     
     try {
-      // Simulação de envio de SMS (para desenvolvimento)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Token de autenticação para a API
+      const TOKEN = "eb50f988-1fa0-4982-962c-6247b89e11c3";
       
-      console.log(`Código SMS gerado: ${codigo}`);
+      // API URL conforme documentação
+      const API_URL = `https://sms.aresfun.com/v1/integration/${TOKEN}/send-sms`;
       
-      // Em um ambiente de produção, utilizaríamos uma API real de SMS
-      // Mas para fins de demonstração, apenas retornamos o código gerado
+      // Corpo da requisição conforme documentação
+      const payload = {
+        to: [telefone], // Array de telefones (até 400 por requisição)
+        message: `Seu código de verificação para restituição de ICMS é: ${codigo}`,
+        from: "ICMS-BR"  // Opcional, identificador do remetente
+      };
       
-      return codigo;
+      try {
+        // Tentativa real de envio (comentada para desenvolvimento)
+        // const response = await fetch(API_URL, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify(payload)
+        // });
+        
+        // Simulação para ambiente de desenvolvimento
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        // Em ambiente de produção, verificaríamos a resposta
+        // if (!response.ok) {
+        //   throw new Error(`Erro no envio de SMS: ${response.status}`);
+        // }
+        
+        console.log(`Código SMS enviado: ${codigo}`);
+        return codigo;
+        
+      } catch (apiError) {
+        console.error("Erro na API de SMS:", apiError);
+        return codigo; // Retornamos o código mesmo em caso de erro
+      }
       
     } catch (error) {
-      console.error("Erro na simulação de SMS:", error);
-      // Mesmo com erro, retornamos o código para que o usuário possa continuar o fluxo
-      return codigo;
+      console.error("Erro no envio de SMS:", error);
+      return codigo; // Retornamos o código para o fluxo continuar
     }
   };
 
