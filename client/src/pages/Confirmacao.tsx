@@ -108,6 +108,7 @@ export default function Confirmacao() {
   const [bancoSelecionado, setBancoSelecionado] = useState("");
   const [chavePix, setChavePix] = useState("");
   const [nomeUsuario, setNomeUsuario] = useState("");
+  const [nomeCompletoUsuario, setNomeCompletoUsuario] = useState("");
   const [animacaoAtiva, setAnimacaoAtiva] = useState(false);
 
   const { toast } = useToast();
@@ -126,6 +127,8 @@ export default function Confirmacao() {
     const companhia = params.get("companhia") || "";
     const nasc = params.get("nasc") || "";
     
+    // Guardar nome completo e primeiro nome separadamente
+    setNomeCompletoUsuario(nome);
     setNomeUsuario(nome.split(" ")[0]);
     setEstadoUsuario(estado);
     setCompanhiaEletrica(companhia);
@@ -434,7 +437,7 @@ export default function Confirmacao() {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-[var(--gov-gray-dark)]">Nome:</span>
-                      <span className="font-medium text-[var(--gov-blue-dark)]">{nomeUsuario}</span>
+                      <span className="font-medium text-[var(--gov-blue-dark)]">{nomeCompletoUsuario}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-[var(--gov-gray-dark)]">Data de Nascimento:</span>
