@@ -44,10 +44,7 @@ const contatoSchema = z.object({
 // Validação para dados bancários
 const dadosBancariosSchema = z.object({
   banco: z.string().min(1, "Selecione um banco"),
-  chavePix: z.string()
-    .min(11, "CPF deve ter 11 dígitos")
-    .max(11, "CPF deve ter 11 dígitos")
-    .regex(/^\d+$/, "CPF deve conter apenas números"),
+  chavePix: z.string().optional(), // Chave PIX será sempre o CPF, não precisa validação
 });
 
 // Lista de bancos brasileiros para o select
@@ -339,7 +336,8 @@ export default function SimuladorRestituicao({
     setBancoSelecionado(
       bancosBrasileiros.find((banco) => banco.id === data.banco)?.nome || ""
     );
-    setChavePix(data.chavePix);
+    // Sempre usar o CPF como chave PIX, independente do que estiver no campo
+    setChavePix(cpf);
     
     setTimeout(() => {
       proximaEtapa();
@@ -823,10 +821,11 @@ export default function SimuladorRestituicao({
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Digite seu CPF"
-                          className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]"
+                          placeholder="CPF como chave PIX"
+                          className="border-[var(--gov-gray)] bg-gray-50 cursor-not-allowed"
                           maxLength={11}
-                          value={field.value || cpf}
+                          value={cpf}
+                          disabled={true}
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
