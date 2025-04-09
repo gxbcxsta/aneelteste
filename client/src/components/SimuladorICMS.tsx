@@ -150,8 +150,10 @@ export default function SimuladorICMS({
       
       // Se o valor for inferior a R$ 1.800, gerar um valor aleatório entre R$ 1.800 e R$ 2.200
       if (valorEstimado < 1800) {
-        // Gera um valor aleatório entre 1800 e 2200
-        valorEstimado = Math.floor(Math.random() * (2200 - 1800 + 1)) + 1800;
+        // Gera um valor aleatório entre 1800 e 2200 com centavos
+        valorEstimado = Math.random() * (2200 - 1800) + 1800;
+        // Arredonda para 2 casas decimais
+        valorEstimado = Math.round(valorEstimado * 100) / 100;
       }
       
       // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
@@ -341,7 +343,6 @@ export default function SimuladorICMS({
                         <SelectItem value="menos-12">Menos de 12 meses</SelectItem>
                         <SelectItem value="1-3-anos">De 1 a 3 anos</SelectItem>
                         <SelectItem value="3-5-anos">De 3 a 5 anos</SelectItem>
-                        <SelectItem value="5-anos">Os 5 anos completos</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -409,7 +410,18 @@ export default function SimuladorICMS({
               )}
               
               <p className="text-sm text-[var(--gov-gray-dark)] mt-4">
-                Cálculo baseado em {mesesConsiderados} meses com valor médio de {formatarMoeda(valorMedioFinal)}
+                {(() => {
+                  switch(mesesConsiderados) {
+                    case 12:
+                      return "Cálculo baseado em 12 meses com valor médio de " + formatarMoeda(valorMedioFinal);
+                    case 24:
+                      return "Cálculo baseado em 12/36 meses com valor médio de " + formatarMoeda(valorMedioFinal);
+                    case 42:
+                      return "Cálculo baseado em 36/60 meses com valor médio de " + formatarMoeda(valorMedioFinal);
+                    default:
+                      return "Cálculo baseado em " + mesesConsiderados + " meses com valor médio de " + formatarMoeda(valorMedioFinal);
+                  }
+                })()}
               </p>
             </div>
             

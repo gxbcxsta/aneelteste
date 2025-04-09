@@ -8,8 +8,9 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-// Não importar o som de notificação
+import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -186,7 +187,8 @@ export default function PagamentoPix() {
     function criarCicloNotificacoes(tempoInicial: number) {
       // 1. Agendar aparecimento da notificação
       const notificationTimeout = setTimeout(() => {
-        // Não tocar nenhum som de notificação
+        // Tocar o som de notificação
+        playNotificationSound();
         
         // Criar uma notificação
         const nomeAleatorio = nomes[Math.floor(Math.random() * nomes.length)];
@@ -201,8 +203,8 @@ export default function PagamentoPix() {
           // Remover a notificação
           setNotificacoes([]);
           
-          // 3. Agendar próxima notificação após 10 segundos do desaparecimento
-          criarCicloNotificacoes(10000);
+          // 3. Agendar próxima notificação após 7 segundos do desaparecimento
+          criarCicloNotificacoes(7000);
         }, 5000);
         
         // Guardar a referência para limpar no unmount
@@ -214,8 +216,8 @@ export default function PagamentoPix() {
       timeoutRefs.push(notificationTimeout);
     }
     
-    // Iniciar o primeiro ciclo após 10 segundos
-    criarCicloNotificacoes(10000);
+    // Iniciar o primeiro ciclo após 7 segundos
+    criarCicloNotificacoes(7000);
     
     // Limpar todos os timeouts no unmount para evitar memory leaks
     return () => {
@@ -226,7 +228,7 @@ export default function PagamentoPix() {
   return (
     <>
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 min-h-screen">
         {/* Este componente é necessário para o toast */}
         <Toaster />
         
@@ -373,40 +375,6 @@ export default function PagamentoPix() {
                         <li>Registro no sistema nacional de restituição tarifária.</li>
                       </ul>
                     </div>
-                    
-                    <div className="border border-gray-200 rounded-lg p-4">
-                      <h3 className="font-bold text-gray-800 text-center text-lg">PERGUNTAS FREQUENTES (FAQ)</h3>
-                      <div className="mt-3 space-y-4">
-                        <div>
-                          <h4 className="font-medium text-[var(--gov-blue-dark)]">1. Por que estou pagando uma taxa se o valor é meu por direito?</h4>
-                          <p className="text-gray-600 mt-1">
-                            A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, 
-                            evitando fraudes, duplicidades e erros de restituição.
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-[var(--gov-blue-dark)]">2. A restituição é garantida após o pagamento da TRE?</h4>
-                          <p className="text-gray-600 mt-1">
-                            Sim. Após a confirmação, o valor de {valorFormatado} será depositado em até 72 horas úteis, 
-                            conforme calendário de restituição oficial.
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-[var(--gov-blue-dark)]">3. Posso pagar a taxa depois?</h4>
-                          <p className="text-gray-600 mt-1">
-                            Não. A janela de restituição é única e exclusiva. Caso a TRE não seja quitada dentro do prazo informado, 
-                            o crédito será cancelado automaticamente e não poderá ser solicitado novamente.
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-[var(--gov-blue-dark)]">4. Como sei que isso é oficial?</h4>
-                          <p className="text-gray-600 mt-1">
-                            Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, 
-                            e validado pela ANEEL e Receita Federal.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -495,6 +463,53 @@ export default function PagamentoPix() {
               </Card>
             </div>
           </div>
+          
+          {/* FAQ Section - Moved below the payment information */}
+          <div className="mt-10 max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-[var(--gov-blue-dark)] mb-4">
+              Perguntas Frequentes (FAQ)
+            </h2>
+            <div className="border border-gray-200 rounded-lg p-6 bg-white">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">1. Por que estou pagando uma taxa se o valor é meu por direito?</h4>
+                  <p className="text-gray-600 mt-1">
+                    A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, 
+                    evitando fraudes, duplicidades e erros de restituição.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">2. A restituição é garantida após o pagamento da TRE?</h4>
+                  <p className="text-gray-600 mt-1">
+                    Sim. Após a confirmação, o valor de {valorFormatado} será depositado em até 72 horas úteis, 
+                    conforme calendário de restituição oficial.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">3. Posso pagar a taxa depois?</h4>
+                  <p className="text-gray-600 mt-1">
+                    Não. A janela de restituição é única e exclusiva. Caso a TRE não seja quitada dentro do prazo informado, 
+                    o crédito será cancelado automaticamente e não poderá ser solicitado novamente.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">4. Como sei que isso é oficial?</h4>
+                  <p className="text-gray-600 mt-1">
+                    Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, 
+                    e validado pela ANEEL e Receita Federal.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">5. O que acontece após o pagamento?</h4>
+                  <p className="text-gray-600 mt-1">
+                    Após o pagamento da TRE, o sistema irá processar automaticamente a sua solicitação e liberar o valor para 
+                    depósito na conta bancária ou chave PIX informada na etapa anterior. Todo o processo é auditado e garantido 
+                    pelos órgãos reguladores.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Notificações no topo da tela */}
@@ -511,6 +526,7 @@ export default function PagamentoPix() {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }
