@@ -705,17 +705,23 @@ export default function SimuladorRestituicao({
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="(11)11111111"
+                          placeholder="(11) 9 8888 8888"
                           className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]"
-                          maxLength={12}
+                          maxLength={16}
                           onChange={(e) => {
-                            // Aplicar a máscara (11)11111111
+                            // Aplicar a máscara (11) 9 8888 8888
                             let value = e.target.value.replace(/\D/g, ''); // Remove todos os não-dígitos
                             if (value.length > 0) {
                               // Aplicar a máscara conforme o usuário digita
-                              value = value.replace(/^(\d{2})(\d)/g, '($1)$2'); // Coloca parênteses no DDD
-                              if (value.length > 12) {
-                                value = value.substring(0, 12); // Limita ao tamanho máximo
+                              value = value.replace(/^(\d{2})(\d)/g, '($1) $2'); // Coloca parênteses e espaço no DDD
+                              if (value.length > 3) {
+                                value = value.replace(/(\(\d{2}\) )(\d)/, '$1$2 '); // Adiciona espaço após o 9
+                              }
+                              if (value.length > 5) {
+                                value = value.replace(/(\(\d{2}\) \d )(\d{4})/, '$1$2 '); // Adiciona espaço após os primeiros 4 dígitos
+                              }
+                              if (value.length > 16) {
+                                value = value.substring(0, 16); // Limita ao tamanho máximo
                               }
                             }
                             field.onChange(value);
@@ -723,7 +729,7 @@ export default function SimuladorRestituicao({
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
-                        Formato: (11)11111111
+                        Formato: (11) 9 8888 8888
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, X } from "lucide-react";
+import { Check, X, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -553,20 +553,21 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
                 </div>
               </div>
               
-              <div className="bg-green-100 border border-green-300 rounded-md p-4 text-center">
-                <p className="text-green-700 font-semibold mb-2">
-                  <span className="inline-block animate-pulse mr-2">🔄</span>
-                  Redirecionando para a simulação...
-                </p>
-                <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                  <div 
-                    className="bg-green-500 h-full rounded-full transition-all duration-1000 ease-linear"
-                    style={{ width: `${100 - (100/5) * (etapaAtual === EtapaVerificacao.CONFIRMACAO ? countdown : 0)}%` }}
-                  ></div>
+              <div className="flex items-center justify-center mt-4">
+                <div className="flex flex-col items-center">
+                  <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center animate-pulse">
+                    <ArrowRight className="h-5 w-5 text-white" />
+                  </div>
+                  <p className="text-blue-700 font-medium text-sm mt-2">
+                    Preparando sua simulação...
+                  </p>
+                  <div className="w-32 bg-gray-200 h-1 rounded-full overflow-hidden mt-2">
+                    <div 
+                      className="bg-blue-500 h-full rounded-full transition-all duration-1000 ease-linear"
+                      style={{ width: `${100 - (100/5) * countdown}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <p className="text-sm text-green-700 mt-2">
-                  {countdown} segundos restantes
-                </p>
               </div>
             </>
           )}
