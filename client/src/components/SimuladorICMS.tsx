@@ -10,7 +10,12 @@ import { Coins, ChevronRight, ChevronLeft, CheckCircle2, Loader2 } from "lucide-
 
 // Validação para o valor médio da conta
 const valorContaSchema = z.object({
-  valorMedio: z.string().min(1, "Campo obrigatório"),
+  valorMedio: z.string()
+    .min(1, "Campo obrigatório")
+    .refine((val) => {
+      const valor = parseFloat(val.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      return !isNaN(valor) && valor > 0;
+    }, "Valor inválido. Digite um valor maior que zero."),
 });
 
 // Validação para o período
