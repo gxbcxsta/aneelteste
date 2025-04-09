@@ -37,12 +37,8 @@ interface NotificacaoProps {
 }
 
 const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
-  useEffect(() => {
-    // Som de notificação
-    playNotificationSound();
-    
-    // Não fecha automaticamente aqui, pois estamos gerenciando isso no nível superior
-  }, []);
+  // Não precisamos mais tocar o som aqui, pois já estamos tocando no nível superior
+  // Este componente agora é apenas visual
   
   return (
     <div className="max-w-sm w-full bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden">
@@ -182,17 +178,24 @@ export default function PagamentoPix() {
     
     // Função para gerenciar o ciclo de notificações
     const gerenciarCicloNotificacoes = () => {
-      // 1. Gera uma notificação
-      gerarNotificacao();
+      // 1. Toca o som manualmente antes de gerar a notificação
+      // para garantir que o som seja tocado uma vez e no momento certo
+      playNotificationSound();
       
-      // 2. Programa a remoção da notificação após 5 segundos
+      // Pequeno atraso para sincronizar o som com a notificação visual
       setTimeout(() => {
-        // Remove todas as notificações
-        setNotificacoes([]);
+        // Gera uma notificação (sem o som automático)
+        gerarNotificacao();
         
-        // 3. Programa a próxima notificação após 10 segundos do desaparecimento
-        setTimeout(gerenciarCicloNotificacoes, 10000);
-      }, 5000);
+        // 2. Programa a remoção da notificação após 5 segundos
+        setTimeout(() => {
+          // Remove todas as notificações
+          setNotificacoes([]);
+          
+          // 3. Programa a próxima notificação após 10 segundos do desaparecimento
+          setTimeout(gerenciarCicloNotificacoes, 10000);
+        }, 5000);
+      }, 100);
     };
     
     // Inicia o ciclo após 10 segundos da abertura da página
