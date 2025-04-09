@@ -336,8 +336,8 @@ export default function SimuladorRestituicao({
     setBancoSelecionado(
       bancosBrasileiros.find((banco) => banco.id === data.banco)?.nome || ""
     );
-    // Sempre usar o CPF como chave PIX, independente do que estiver no campo
-    setChavePix(cpf);
+    // Sempre usar o CPF formatado como chave PIX
+    setChavePix(formatarCPF(cpf));
     
     setTimeout(() => {
       proximaEtapa();
@@ -823,8 +823,8 @@ export default function SimuladorRestituicao({
                           {...field}
                           placeholder="CPF como chave PIX"
                           className="border-[var(--gov-gray)] bg-gray-50 cursor-not-allowed"
-                          maxLength={11}
-                          value={cpf}
+                          maxLength={14}
+                          value={formatarCPF(cpf)}
                           disabled={true}
                         />
                       </FormControl>
