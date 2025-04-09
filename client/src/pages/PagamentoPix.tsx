@@ -278,17 +278,17 @@ export default function PagamentoPix() {
 
                     <div>
                       <p className="text-gray-500 text-sm">Data de Nascimento</p>
-                      <p className="font-medium">{urlParams.get('nasc')}</p>
+                      <p className="font-medium">{urlParams.get('nasc') || "21/07/2003"}</p>
                     </div>
                     
                     <div>
                       <p className="text-gray-500 text-sm">Concessionária de Energia</p>
-                      <p className="font-medium">{urlParams.get('companhia')}</p>
+                      <p className="font-medium">{urlParams.get('companhia') || "CEMIG Distribuição"}</p>
                     </div>
                     
                     <div>
                       <p className="text-gray-500 text-sm">Estado</p>
-                      <p className="font-medium">{urlParams.get('estado')}</p>
+                      <p className="font-medium">{urlParams.get('estado') || "Minas Gerais"}</p>
                     </div>
                     
                     <div>
@@ -302,7 +302,7 @@ export default function PagamentoPix() {
                             case 'bradesco': return 'Bradesco';
                             case 'santander': return 'Santander';
                             case 'itau': return 'Itaú';
-                            default: return banco || '';
+                            default: return banco || 'Banco do Brasil';
                           }
                         })()
                       }</p>

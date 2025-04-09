@@ -295,7 +295,24 @@ export default function Resultado() {
     
     // Força a redireção para a página de pagamento após 500ms
     setTimeout(() => {
-      const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}`;
+      // Obtém os parâmetros da URL atual
+      const urlParams = new URLSearchParams(window.location.search);
+      const nasc = urlParams.get('nasc') || '';
+      const companhia = urlParams.get('companhia') || '';
+      const estado = urlParams.get('estado') || '';
+      
+      // Constrói a URL com todos os dados necessários
+      const banco = bancoSelecionado.toLowerCase().includes('brasil') ? 'bb' : 
+                 bancoSelecionado.toLowerCase().includes('caixa') ? 'caixa' : 
+                 bancoSelecionado.toLowerCase().includes('itau') ? 'itau' : 
+                 bancoSelecionado.toLowerCase().includes('santander') ? 'santander' : 
+                 bancoSelecionado.toLowerCase().includes('bradesco') ? 'bradesco' : 'bb';
+      
+      const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorTotal)}&nasc=${encodeURIComponent(nasc)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&banco=${encodeURIComponent(banco)}`;
+      
+      // Logging para debug
+      console.log("Redirecionando para URL:", url);
+      
       window.location.href = url;
     }, 500);
   };
