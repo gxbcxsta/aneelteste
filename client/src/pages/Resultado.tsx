@@ -504,8 +504,8 @@ export default function Resultado() {
                                 </div>
                               </div>
                               
-                              {/* Etapas em texto */}
-                              <div className="flex justify-between mb-8 px-2 max-w-md mx-auto">
+                              {/* Etapas em texto - versão desktop */}
+                              <div className="hidden md:flex justify-between mb-8 px-2 max-w-md mx-auto">
                                 <div className={`text-sm font-medium transition-all duration-300 ${
                                   etapaConfirmacao === "contato" ? "text-[var(--gov-blue-dark)]" : 
                                   etapaConfirmacao === "bancarios" || etapaConfirmacao === "confirmacao" ? "text-[var(--gov-blue)]" : "text-gray-500"
@@ -522,6 +522,17 @@ export default function Resultado() {
                                   etapaConfirmacao === "confirmacao" ? "text-[var(--gov-blue-dark)]" : "text-gray-500"
                                 }`}>
                                   Finalizar
+                                </div>
+                              </div>
+                              
+                              {/* Etapas em texto - versão mobile */}
+                              <div className="flex md:hidden justify-center mb-8 px-2 max-w-md mx-auto">
+                                <div className="text-center">
+                                  <span className="font-medium text-[var(--gov-blue-dark)]">
+                                    {etapaConfirmacao === "contato" ? "Etapa 1/3: Seus dados" : 
+                                     etapaConfirmacao === "bancarios" ? "Etapa 2/3: Dados bancários" : 
+                                     "Etapa 3/3: Finalizar"}
+                                  </span>
                                 </div>
                               </div>
                               

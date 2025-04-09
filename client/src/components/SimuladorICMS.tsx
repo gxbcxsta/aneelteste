@@ -203,40 +203,62 @@ export default function SimuladorICMS({
   // Progresso do wizard
   const renderProgresso = () => {
     return (
-      <div className="flex items-center justify-between mb-8">
-        {[0, 1, 2, 3].map((etapa) => (
-          <div key={etapa} className="flex flex-col items-center relative">
-            <div 
-              className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
-                etapa <= etapaAtual 
-                  ? "bg-[var(--gov-blue)] text-white" 
-                  : "bg-gray-200 text-gray-500"
-              }`}
-            >
-              {etapa < etapaAtual ? (
-                <CheckCircle2 className="h-5 w-5" />
-              ) : (
-                <span>{etapa + 1}</span>
-              )}
-            </div>
-            {etapa < 3 && (
+      <>
+        {/* Versão desktop */}
+        <div className="hidden md:flex items-center justify-between mb-8">
+          {[0, 1, 2, 3].map((etapa) => (
+            <div key={etapa} className="flex flex-col items-center relative">
               <div 
-                className={`absolute top-4 w-full h-[2px] left-1/2 ${
-                  etapa < etapaAtual ? "bg-[var(--gov-blue)]" : "bg-gray-200"
+                className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
+                  etapa <= etapaAtual 
+                    ? "bg-[var(--gov-blue)] text-white" 
+                    : "bg-gray-200 text-gray-500"
                 }`}
-                style={{ width: 'calc(100% - 2rem)' }}
-              ></div>
-            )}
-            <span className={`text-xs mt-2 ${
-              etapa <= etapaAtual ? "text-[var(--gov-blue-dark)] font-medium" : "text-gray-500"
-            }`}>
-              {etapa === 0 ? "Início" : 
-               etapa === 1 ? "Valor" : 
-               etapa === 2 ? "Período" : "Resultado"}
+              >
+                {etapa < etapaAtual ? (
+                  <CheckCircle2 className="h-5 w-5" />
+                ) : (
+                  <span>{etapa + 1}</span>
+                )}
+              </div>
+              {etapa < 3 && (
+                <div 
+                  className={`absolute top-4 w-full h-[2px] left-1/2 ${
+                    etapa < etapaAtual ? "bg-[var(--gov-blue)]" : "bg-gray-200"
+                  }`}
+                  style={{ width: 'calc(100% - 2rem)' }}
+                ></div>
+              )}
+              <span className={`text-xs mt-2 ${
+                etapa <= etapaAtual ? "text-[var(--gov-blue-dark)] font-medium" : "text-gray-500"
+              }`}>
+                {etapa === 0 ? "Início" : 
+                 etapa === 1 ? "Valor" : 
+                 etapa === 2 ? "Período" : "Resultado"}
+              </span>
+            </div>
+          ))}
+        </div>
+        
+        {/* Versão mobile - mostra apenas a etapa atual*/}
+        <div className="flex md:hidden justify-center mb-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-2">
+              <div 
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--gov-blue)] text-white"
+              >
+                <span>{etapaAtual + 1}</span>
+              </div>
+            </div>
+            <span className="font-medium text-[var(--gov-blue-dark)]">
+              Etapa {etapaAtual + 1} de 4: {" "}
+              {etapaAtual === 0 ? "Início" : 
+               etapaAtual === 1 ? "Valor" : 
+               etapaAtual === 2 ? "Período" : "Resultado"}
             </span>
           </div>
-        ))}
-      </div>
+        </div>
+      </>
     );
   };
   

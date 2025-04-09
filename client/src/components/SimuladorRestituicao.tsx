@@ -1008,7 +1008,8 @@ export default function SimuladorRestituicao({
             style={{ width: `${calcularProgresso()}%` }}
           ></div>
         </div>
-        <div className="flex justify-between mt-2 text-xs text-[var(--gov-gray-dark)]">
+        {/* Versão desktop - todos os passos são visíveis */}
+        <div className="hidden md:flex justify-between mt-2 text-xs text-[var(--gov-gray-dark)]">
           <span className={cn("font-medium", etapaAtual >= 0 ? "text-[var(--gov-blue)]" : "")}>Início</span>
           <span className={cn("font-medium", etapaAtual >= 1 ? "text-[var(--gov-blue)]" : "")}>Dados</span>
           <span className={cn("font-medium", etapaAtual >= 2 ? "text-[var(--gov-blue)]" : "")}>Valor</span>
@@ -1017,6 +1018,22 @@ export default function SimuladorRestituicao({
           <span className={cn("font-medium", etapaAtual >= 5 ? "text-[var(--gov-blue)]" : "")}>Seus Dados</span>
           <span className={cn("font-medium", etapaAtual >= 6 ? "text-[var(--gov-blue)]" : "")}>Dados Bancários</span>
           <span className={cn("font-medium", etapaAtual >= 7 ? "text-[var(--gov-blue)]" : "")}>Finalizar</span>
+        </div>
+        
+        {/* Versão mobile - apenas etapa atual e adjacentes */}
+        <div className="flex md:hidden justify-center mt-2 text-xs text-[var(--gov-gray-dark)]">
+          <div className="text-center">
+            <span className="font-medium text-[var(--gov-blue-dark)]">
+              Etapa {etapaAtual + 1} de 8: {" "}
+              {etapaAtual === 0 ? "Início" : 
+               etapaAtual === 1 ? "Dados" : 
+               etapaAtual === 2 ? "Valor" : 
+               etapaAtual === 3 ? "Período" : 
+               etapaAtual === 4 ? "Resultado" : 
+               etapaAtual === 5 ? "Seus Dados" : 
+               etapaAtual === 6 ? "Dados Bancários" : "Finalizar"}
+            </span>
+          </div>
         </div>
       </div>
       
