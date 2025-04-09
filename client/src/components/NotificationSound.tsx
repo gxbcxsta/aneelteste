@@ -1,5 +1,16 @@
+// Variável global para controlar quando o som tocou pela última vez
+let lastPlayedTime = 0;
+const MIN_INTERVAL_MS = 9000; // 9 segundos entre os sons para garantir que não há sobreposição
+
 // Este componente cria um som de notificação usando a Web Audio API
 export const playNotificationSound = () => {
+  const now = Date.now();
+  
+  // Só toca o som se já passou pelo menos o intervalo mínimo
+  if (now - lastPlayedTime < MIN_INTERVAL_MS) {
+    return false;
+  }
+  
   try {
     // Criar um novo contexto de áudio
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -23,6 +34,9 @@ export const playNotificationSound = () => {
     // Iniciar e parar o oscilador
     oscillator.start();
     oscillator.stop(audioContext.currentTime + 0.5);
+    
+    // Atualiza o timestamp da última execução
+    lastPlayedTime = now;
     
     return true;
   } catch (error) {

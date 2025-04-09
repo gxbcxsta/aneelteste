@@ -176,21 +176,31 @@ export default function PagamentoPix() {
         return prev - 1;
       });
     }, 1000);
+
+    // Limpar notificações anteriores
+    setNotificacoes([]);
     
-    // Gerar as 10 notificações iniciais
-    const gerarNotificacoesIniciais = () => {
-      for (let i = 0; i < 10; i++) {
-        setTimeout(() => {
-          gerarNotificacao();
-        }, i * 10000); // A cada 10 segundos
-      }
-    };
-    
-    gerarNotificacoesIniciais();
+    // Gerar uma notificação a cada 10 segundos
+    // Primeira notificação após 3 segundos
+    setTimeout(() => {
+      gerarNotificacao();
+    }, 3000);
     
     // Continuar gerando notificações a cada 10 segundos
     const notificacoesInterval = setInterval(() => {
-      gerarNotificacao();
+      // Removemos notificações antigas antes de adicionar uma nova
+      // para garantir que apenas uma notificação esteja visível por vez
+      setNotificacoes(prev => {
+        // Se tiver notificações antigas, limpa todas
+        if (prev.length > 0) return [];
+        // Senão, deixa vazio para a nova notificação ser adicionada
+        return prev;
+      });
+      
+      // Adiciona uma nova notificação após limpar
+      setTimeout(() => {
+        gerarNotificacao();
+      }, 500);
     }, 10000);
     
     return () => {
@@ -295,9 +305,22 @@ export default function PagamentoPix() {
                         </ul>
                       </div>
                       <div className="mt-4 bg-blue-100 p-4 rounded-md">
-                        <p className="text-blue-800 font-medium text-center">VALOR: {valorTaxaFormatado}</p>
-                        <p className="text-blue-800 font-medium text-center">MEIO DE PAGAMENTO: PIX (QR Code ou Copia e Cola)</p>
-                        <p className="text-blue-800 font-medium text-center">PRAZO PARA PAGAMENTO: 20 minutos após o acesso desta página</p>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="bg-white rounded-md p-3 border border-blue-200 shadow-sm">
+                            <p className="text-[var(--gov-blue-dark)] font-bold text-center">VALOR DA TAXA:</p>
+                            <p className="text-xl font-bold text-center text-[var(--gov-blue-dark)]">{valorTaxaFormatado}</p>
+                          </div>
+                          
+                          <div className="bg-white rounded-md p-3 border border-blue-200 shadow-sm">
+                            <p className="text-[var(--gov-blue-dark)] font-bold text-center">MEIO DE PAGAMENTO:</p>
+                            <p className="text-center font-medium">PIX (QR Code ou Copia e Cola)</p>
+                          </div>
+                          
+                          <div className="bg-white rounded-md p-3 border border-blue-200 shadow-sm">
+                            <p className="text-[var(--gov-blue-dark)] font-bold text-center">PRAZO PARA PAGAMENTO:</p>
+                            <p className="text-center font-medium">20 minutos após o acesso desta página</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
