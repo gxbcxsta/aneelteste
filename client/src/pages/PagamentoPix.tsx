@@ -50,10 +50,12 @@ const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
   }, [onClose]);
   
   return (
-    <div className="fixed right-4 max-w-md w-full bg-white shadow-lg rounded-lg">
-      <div className="flex items-start p-4">
+    <div className="max-w-sm w-full bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden">
+      <div className="flex items-start p-3">
         <div className="flex-shrink-0 pt-0.5">
-          <Bell className="h-5 w-5 text-blue-500" />
+          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+            <Bell className="h-4 w-4 text-green-600" />
+          </div>
         </div>
         <div className="ml-3 w-0 flex-1">
           <p className="text-sm font-medium text-gray-900">
@@ -123,7 +125,8 @@ export default function PagamentoPix() {
     const nomeAleatorio = nomes[Math.floor(Math.random() * nomes.length)];
     const valorAleatorio = gerarValorAleatorio();
     
-    const id = Date.now();
+    // Gera um ID único com timestamp + número aleatório para evitar colisões
+    const id = Date.now() + Math.floor(Math.random() * 10000);
     setNotificacoes(prev => [...prev, { id, nome: nomeAleatorio, valor: valorAleatorio }]);
   };
   
@@ -387,16 +390,22 @@ export default function PagamentoPix() {
                   </TabsContent>
                 </Tabs>
                 
-                <div className="mt-6">
+                <div className="mt-6 space-y-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+                    <p className="text-yellow-800 text-sm font-medium">
+                      Faça o pagamento em até <span className="font-bold">{formatarTempo(tempoRestante)}</span> para evitar o cancelamento automático da sua restituição.
+                    </p>
+                  </div>
+                  
                   <Button 
                     onClick={simularPagamento}
-                    className="w-full bg-[var(--gov-green)] hover:bg-[var(--gov-green)]/90 text-white font-bold py-3"
+                    className="w-full bg-[var(--gov-green)] hover:bg-[var(--gov-green)]/90 text-white font-bold py-4 text-lg transition-all duration-300 transform hover:scale-105"
                   >
                     Já fiz o pagamento
                   </Button>
                   
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    Clique apenas após concluir o pagamento
+                  <p className="text-xs text-gray-500 text-center">
+                    Após o pagamento, clique no botão acima para validar e liberar seu crédito de <strong>{valorFormatado}</strong>
                   </p>
                 </div>
               </CardContent>
@@ -406,10 +415,10 @@ export default function PagamentoPix() {
       </div>
       
       {/* Notificações */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col space-y-2">
-        {notificacoes.map(notif => (
+      <div className="fixed top-4 right-4 z-50 flex flex-col space-y-3 max-w-sm">
+        {notificacoes.slice(0, 3).map((notif, index) => (
           <Notificacao 
-            key={notif.id}
+            key={`${notif.id}-${index}`}
             nome={notif.nome}
             valor={notif.valor}
             onClose={() => removerNotificacao(notif.id)}
