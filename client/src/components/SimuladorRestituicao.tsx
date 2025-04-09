@@ -632,22 +632,23 @@ export default function SimuladorRestituicao({
               </p>
             </div>
             
-            <div className="pt-4">
-              <Button 
-                onClick={iniciarSolicitacao}
-                className="w-full bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold py-6 text-lg"
-              >
-                Iniciar Solicitação
-              </Button>
-              
+            <div className="flex justify-between pt-4">
               <Button
                 type="button"
                 onClick={voltarEtapa}
                 variant="outline"
-                className="w-full mt-4 border-[var(--gov-blue)] text-[var(--gov-blue)]"
+                className="border-[var(--gov-blue)] text-[var(--gov-blue)]"
               >
                 <ChevronLeft className="mr-2 h-4 w-4" />
-                Voltar e Refazer a Simulação
+                Voltar
+              </Button>
+              
+              <Button 
+                onClick={iniciarSolicitacao}
+                className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
+              >
+                Próximo
+                <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
