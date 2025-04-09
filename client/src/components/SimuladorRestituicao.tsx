@@ -5,10 +5,11 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Coins, ChevronRight, ChevronLeft, AlertCircle, Loader2 } from "lucide-react";
+import { Coins, ChevronRight, ChevronLeft, AlertCircle, Loader2, Phone, Mail, BanknoteIcon, CreditCard, CheckCircle, CircleDollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 // Validação para o número de cliente/CPF
 const clienteSchema = z.object({
@@ -31,9 +32,48 @@ const periodoSchema = z.object({
   periodo: z.string().min(1, "Selecione um período"),
 });
 
+// Validação para dados de contato
+const contatoSchema = z.object({
+  email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
+  telefone: z.string()
+    .min(11, "Telefone deve ter pelo menos 11 dígitos (DDD + número)")
+    .max(11, "Telefone deve ter no máximo 11 dígitos")
+    .regex(/^\d+$/, "Telefone deve conter apenas números"),
+});
+
+// Validação para dados bancários
+const dadosBancariosSchema = z.object({
+  banco: z.string().min(1, "Selecione um banco"),
+  chavePix: z.string()
+    .min(11, "CPF deve ter 11 dígitos")
+    .max(11, "CPF deve ter 11 dígitos")
+    .regex(/^\d+$/, "CPF deve conter apenas números"),
+});
+
+// Lista de bancos brasileiros para o select
+const bancosBrasileiros = [
+  { id: "bb", nome: "Banco do Brasil" },
+  { id: "caixa", nome: "Caixa Econômica Federal" },
+  { id: "itau", nome: "Itaú Unibanco" },
+  { id: "bradesco", nome: "Bradesco" },
+  { id: "santander", nome: "Santander" },
+  { id: "nubank", nome: "Nubank" },
+  { id: "inter", nome: "Banco Inter" },
+  { id: "c6", nome: "C6 Bank" },
+  { id: "banrisul", nome: "Banrisul" },
+  { id: "safra", nome: "Safra" },
+  { id: "original", nome: "Banco Original" },
+  { id: "bndes", nome: "BNDES" },
+  { id: "sicoob", nome: "Sicoob" },
+  { id: "sicredi", nome: "Sicredi" },
+  { id: "other", nome: "Outro" },
+];
+
 type ClienteFormValues = z.infer<typeof clienteSchema>;
 type ValorContaFormValues = z.infer<typeof valorContaSchema>;
 type PeriodoFormValues = z.infer<typeof periodoSchema>;
+type ContatoFormValues = z.infer<typeof contatoSchema>;
+type DadosBancariosFormValues = z.infer<typeof dadosBancariosSchema>;
 
 interface SimuladorRestituicaoProps {
   cpf: string;
@@ -58,6 +98,33 @@ export default function SimuladorRestituicao({
   const [valorFinalRestituicao, setValorFinalRestituicao] = useState(0);
   const [valorRealRestituicao, setValorRealRestituicao] = useState(0);
   const [calculando, setCalculando] = useState(false);
+  
+  // Estados para os dados de contato e bancários
+  const [telefoneConfirmado, setTelefoneConfirmado] = useState("");
+  const [emailConfirmado, setEmailConfirmado] = useState("");
+  const [bancoSelecionado, setBancoSelecionado] = useState("");
+  const [chavePix, setChavePix] = useState("");
+  const [animacaoAtiva, setAnimacaoAtiva] = useState(false);
+  
+  // Inicializar toast para feedback
+  const { toast } = useToast();
+  
+  // Formulários para as etapas adicionais
+  const contatoForm = useForm<ContatoFormValues>({
+    resolver: zodResolver(contatoSchema),
+    defaultValues: {
+      email: "",
+      telefone: "",
+    },
+  });
+  
+  const dadosBancariosForm = useForm<DadosBancariosFormValues>({
+    resolver: zodResolver(dadosBancariosSchema),
+    defaultValues: {
+      banco: "",
+      chavePix: "",
+    },
+  });
   
   // Formatação de CPF
   const formatarCPF = (cpf: string) => {
@@ -233,10 +300,66 @@ export default function SimuladorRestituicao({
     setEtapaAtual(etapa => etapa - 1);
   };
   
-  // Inicia a solicitação após a simulação
+  // Enviar dados de contato e ir para próxima etapa
+  const onSubmitContato = async (data: ContatoFormValues) => {
+    try {
+      // Animação de transição
+      setAnimacaoAtiva(true);
+      
+      // Atualizar estado
+      setTelefoneConfirmado(data.telefone);
+      setEmailConfirmado(data.email);
+      
+      // Ir para próxima etapa com atraso para animação
+      setTimeout(() => {
+        proximaEtapa();
+        setAnimacaoAtiva(false);
+      }, 300);
+      
+      // Mostrar toast
+      toast({
+        title: "Dados salvos com sucesso!",
+        description: "Agora vamos para os dados bancários.",
+      });
+    } catch (error) {
+      setAnimacaoAtiva(false);
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar dados",
+        description: "Não foi possível salvar seus dados. Tente novamente.",
+      });
+    }
+  };
+  
+  // Submeter dados bancários
+  const onSubmitDadosBancarios = (data: DadosBancariosFormValues) => {
+    // Animação de transição
+    setAnimacaoAtiva(true);
+    
+    setBancoSelecionado(
+      bancosBrasileiros.find((banco) => banco.id === data.banco)?.nome || ""
+    );
+    setChavePix(data.chavePix);
+    
+    setTimeout(() => {
+      proximaEtapa();
+      setAnimacaoAtiva(false);
+    }, 300);
+  };
+  
+  // Ir para etapa dos seus dados
   const iniciarSolicitacao = () => {
-    // Notificar o componente pai para mostrar o formulário de dados de contato e bancários
-    onSimulacaoConcluida(valorFinalRestituicao, mesesConsiderados);
+    proximaEtapa();
+  };
+  
+  // Finalizar processo
+  const finalizarProcesso = () => {
+    // Animação de transição
+    setAnimacaoAtiva(true);
+    
+    setTimeout(() => {
+      window.location.href = "/sucesso?nome=" + encodeURIComponent(nome.split(" ")[0]);
+    }, 500);
   };
   
   // Renderiza a etapa atual do simulador
@@ -529,6 +652,283 @@ export default function SimuladorRestituicao({
             </div>
           </div>
         );
+      
+      case 5: // Etapa de Seus Dados (Contato)
+        return (
+          <div className={cn("space-y-6 py-4", { "opacity-50 pointer-events-none": animacaoAtiva })}>
+            <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
+              Seus Dados de Contato
+            </h2>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <div className="flex items-start">
+                <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div className="ml-3">
+                  <p className="text-sm text-blue-800">
+                    <span className="font-medium">Titular:</span> {nome}
+                  </p>
+                  <p className="text-sm text-blue-800 mt-1">
+                    <span className="font-medium">CPF:</span> {formatarCPF(cpf)}
+                  </p>
+                  <p className="text-sm text-blue-800 mt-1">
+                    <span className="font-medium">Data de Nascimento:</span> {dataNascimento}
+                  </p>
+                  <p className="text-sm text-blue-800 mt-1">
+                    <span className="font-medium">Distribuidora:</span> {companhia}
+                  </p>
+                  <p className="text-sm text-blue-700 mt-2">
+                    Preencha os campos abaixo para receber atualizações sobre o processo.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <Form {...contatoForm}>
+              <form onSubmit={contatoForm.handleSubmit(onSubmitContato)} className="space-y-6">
+                <FormField
+                  control={contatoForm.control}
+                  name="telefone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[var(--gov-blue-dark)] font-medium flex items-center">
+                        <Phone className="h-4 w-4 mr-2" />
+                        Telefone celular com DDD
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="11912345678"
+                          className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]"
+                          maxLength={11}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-xs">
+                        Apenas números, incluindo o DDD. Ex: 11912345678
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={contatoForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[var(--gov-blue-dark)] font-medium flex items-center">
+                        <Mail className="h-4 w-4 mr-2" />
+                        E-mail
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="seu@email.com"
+                          className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex justify-between pt-2">
+                  <Button
+                    type="button"
+                    onClick={voltarEtapa}
+                    variant="outline"
+                    className="border-[var(--gov-blue)] text-[var(--gov-blue)]"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    Voltar
+                  </Button>
+                  
+                  <Button 
+                    type="submit"
+                    className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
+                  >
+                    Próximo
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        );
+      
+      case 6: // Etapa de Dados Bancários
+        return (
+          <div className={cn("space-y-6 py-4", { "opacity-50 pointer-events-none": animacaoAtiva })}>
+            <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
+              Dados Bancários
+            </h2>
+            
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start">
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <div className="ml-3">
+                  <p className="text-sm text-green-800 font-medium">
+                    Falta pouco para receber sua restituição de {formatarMoeda(valorFinalRestituicao)}
+                  </p>
+                  <p className="text-sm text-green-700 mt-1">
+                    Informe os dados bancários para depósito.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <Form {...dadosBancariosForm}>
+              <form onSubmit={dadosBancariosForm.handleSubmit(onSubmitDadosBancarios)} className="space-y-6">
+                <FormField
+                  control={dadosBancariosForm.control}
+                  name="banco"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[var(--gov-blue-dark)] font-medium flex items-center">
+                        <BanknoteIcon className="h-4 w-4 mr-2" />
+                        Banco
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]">
+                            <SelectValue placeholder="Selecione seu banco" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {bancosBrasileiros.map((banco) => (
+                            <SelectItem key={banco.id} value={banco.id}>
+                              {banco.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={dadosBancariosForm.control}
+                  name="chavePix"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[var(--gov-blue-dark)] font-medium flex items-center">
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        CPF (Chave PIX)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Digite seu CPF"
+                          className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]"
+                          maxLength={11}
+                          value={field.value || cpf}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-xs">
+                        Usaremos seu CPF como chave PIX para transferência
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex justify-between pt-2">
+                  <Button
+                    type="button"
+                    onClick={voltarEtapa}
+                    variant="outline"
+                    className="border-[var(--gov-blue)] text-[var(--gov-blue)]"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    Voltar
+                  </Button>
+                  
+                  <Button 
+                    type="submit"
+                    className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
+                  >
+                    Próximo
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        );
+        
+      case 7: // Etapa de Finalização
+        return (
+          <div className={cn("space-y-6 py-6 text-center", { "opacity-50 pointer-events-none": animacaoAtiva })}>
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+            
+            <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)]">
+              Solicitação Concluída!
+            </h2>
+            
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-green-800 mb-4">Resumo da solicitação</h3>
+              
+              <div className="space-y-3 text-left">
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">Titular:</span>
+                  <span className="font-medium">{nome}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">CPF:</span>
+                  <span className="font-medium">{formatarCPF(cpf)}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">Data de Nascimento:</span>
+                  <span className="font-medium">{dataNascimento}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">Companhia:</span>
+                  <span className="font-medium">{companhia}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">Telefone:</span>
+                  <span className="font-medium">{telefoneConfirmado}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">E-mail:</span>
+                  <span className="font-medium">{emailConfirmado}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">Banco:</span>
+                  <span className="font-medium">{bancoSelecionado}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-green-200 pb-2">
+                  <span className="text-green-700">Valor a receber:</span>
+                  <span className="font-medium text-green-600">{formatarMoeda(valorFinalRestituicao)}</span>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-[var(--gov-gray-dark)]">
+              Uma cópia destas informações foi enviada para o seu e-mail.
+              Acompanhe o status da sua solicitação e receba o valor em até 7 dias úteis.
+            </p>
+            
+            <Button 
+              onClick={finalizarProcesso}
+              className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 font-bold py-6 text-lg w-full"
+            >
+              Finalizar
+              <CheckCircle className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        );
         
       default:
         return null;
@@ -537,7 +937,7 @@ export default function SimuladorRestituicao({
   
   // Calcula a porcentagem de progresso baseado na etapa atual
   const calcularProgresso = () => {
-    const totalEtapas = 4; // 0 (inicial), 1, 2, 3 e 4 (resultado)
+    const totalEtapas = 7; // Total de 8 etapas (0 a 7)
     return ((etapaAtual) / totalEtapas) * 100;
   };
   
@@ -557,6 +957,9 @@ export default function SimuladorRestituicao({
           <span className={cn("font-medium", etapaAtual >= 2 ? "text-[var(--gov-blue)]" : "")}>Valor</span>
           <span className={cn("font-medium", etapaAtual >= 3 ? "text-[var(--gov-blue)]" : "")}>Período</span>
           <span className={cn("font-medium", etapaAtual >= 4 ? "text-[var(--gov-blue)]" : "")}>Resultado</span>
+          <span className={cn("font-medium", etapaAtual >= 5 ? "text-[var(--gov-blue)]" : "")}>Seus Dados</span>
+          <span className={cn("font-medium", etapaAtual >= 6 ? "text-[var(--gov-blue)]" : "")}>Dados Bancários</span>
+          <span className={cn("font-medium", etapaAtual >= 7 ? "text-[var(--gov-blue)]" : "")}>Finalizar</span>
         </div>
       </div>
       

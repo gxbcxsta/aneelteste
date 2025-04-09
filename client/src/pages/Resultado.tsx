@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Download, AlertTriangle, CalendarClock, ChevronRight, Phone, Mail, BanknoteIcon, CheckCircle2, CreditCard, ChevronLeft, CircleDollarSign } from "lucide-react";
+import { CheckCircle, Download, AlertTriangle, AlertCircle, CalendarClock, ChevronRight, Phone, Mail, BanknoteIcon, CreditCard, ChevronLeft, CircleDollarSign } from "lucide-react";
 import SimuladorRestituicao from "@/components/SimuladorRestituicao";
 import { Input } from "@/components/ui/input";
 import {
