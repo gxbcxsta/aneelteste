@@ -42,7 +42,7 @@ export default function Header() {
               <div className="text-[var(--gov-blue-dark)] font-bold text-xl">ANEEL</div>
             </div>
             <div className="text-white text-sm md:text-base ml-2 font-semibold">
-              Restituição ICMS<br />
+              ANEEL Consumidor - Restituição ICMS<br />
               <span className="text-xs font-normal">Agência Nacional de Energia Elétrica</span>
             </div>
           </Link>
