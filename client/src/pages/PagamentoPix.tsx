@@ -250,23 +250,28 @@ export default function PagamentoPix() {
                   
                   <div className="space-y-4">
                     <div>
-                      <p className="text-gray-500 text-sm">CPF</p>
-                      <p className="font-medium">{cpf}</p>
-                    </div>
-                    
-                    <div>
                       <p className="text-gray-500 text-sm">Nome</p>
                       <p className="font-medium">{nome}</p>
                     </div>
+                    
+                    <div>
+                      <p className="text-gray-500 text-sm">CPF</p>
+                      <p className="font-medium">{cpf}</p>
+                    </div>
 
                     <div>
-                      <p className="text-gray-500 text-sm">Estado</p>
-                      <p className="font-medium">{urlParams.get('estado') || "São Paulo"}</p>
+                      <p className="text-gray-500 text-sm">Data de Nascimento</p>
+                      <p className="font-medium">{urlParams.get('nasc') || "01/01/1990"}</p>
                     </div>
                     
                     <div>
                       <p className="text-gray-500 text-sm">Concessionária de Energia</p>
                       <p className="font-medium">{urlParams.get('companhia') || "ENEL"}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-gray-500 text-sm">Banco Selecionado</p>
+                      <p className="font-medium">{urlParams.get('banco') || "Caixa Econômica Federal"}</p>
                     </div>
                     
                     <div>
