@@ -247,9 +247,6 @@ export default function SimuladorRestituicao({
   
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = async (data: PeriodoFormValues) => {
-    setCalculando(true);
-    setAnimacaoAtiva(true);
-    
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
     
@@ -270,37 +267,8 @@ export default function SimuladorRestituicao({
         meses = 12;
     }
     
-    setMesesConsiderados(meses);
-    
-    // Ativar a tela de loading com uma sequência de mensagens antes de redirecionar
-    // Isso evita a tela branca durante o redirecionamento
-    setMostrarTelaLoading(true);
-    
-    // Sequência de mensagens para exibir durante o carregamento
-    const mensagens = [
-      "Verificando seus dados...",
-      "Consultando histórico de pagamentos...",
-      "Calculando valor da restituição...",
-    ];
-    
-    // Iniciar a sequência de mensagens que serão exibidas antes do redirecionamento
-    let indice = 0;
-    setMensagemCarregamento(mensagens[0]);
-    setProgressoCarregamento(25);
-    
-    const intervalId = setInterval(() => {
-      indice++;
-      
-      if (indice < mensagens.length) {
-        setMensagemCarregamento(mensagens[indice]);
-        setProgressoCarregamento((indice + 1) * 25);
-      } else {
-        clearInterval(intervalId);
-        
-        // Após mostrar todas as mensagens, redirecionar para a página de resultado
-        window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
-      }
-    }, 800); // Um tempo mais curto para não demorar muito na página atual
+    // Redirecionar DIRETAMENTE para a página de resultado-calculo
+    window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(meses)}`;
   };
   
   // Funções de navegação entre etapas
@@ -654,10 +622,20 @@ export default function SimuladorRestituicao({
                 )}
               </div>
               
-              <div className="flex-col space-y-4 pt-4">
+              <div className="flex justify-between pt-4">
+                <Button
+                  type="button"
+                  onClick={voltarEtapa}
+                  variant="outline"
+                  className="border-[var(--gov-blue)] text-[var(--gov-blue)]"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Voltar
+                </Button>
+                
                 <Button 
                   type="submit"
-                  className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full md:w-full md:px-8 md:py-6 md:text-lg"
+                  className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
                   disabled={calculando}
                 >
                   {calculando ? (
@@ -668,18 +646,9 @@ export default function SimuladorRestituicao({
                   ) : (
                     <>
                       Calcular
+                      <ChevronRight className="ml-2 h-4 w-4" />
                     </>
                   )}
-                </Button>
-                
-                <Button
-                  type="button"
-                  onClick={voltarEtapa}
-                  variant="outline"
-                  className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full md:w-full h-10 text-sm md:text-base"
-                >
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  Voltar
                 </Button>
               </div>
             </form>
@@ -728,23 +697,23 @@ export default function SimuladorRestituicao({
               </p>
             </div>
             
-            <div className="flex-col space-y-4 pt-4">
-              <Button 
-                onClick={finalizarProcesso} // Vamos redirecionar diretamente para a página de pagamento
-                className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full md:w-full md:px-8 md:py-6 md:text-lg"
-              >
-                Prosseguir para pagamento
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-              
+            <div className="flex justify-between pt-4">
               <Button
                 type="button"
                 onClick={voltarEtapa}
                 variant="outline"
-                className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full md:w-full h-10 text-sm md:text-base"
+                className="border-[var(--gov-blue)] text-[var(--gov-blue)]"
               >
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Voltar
+              </Button>
+              
+              <Button 
+                onClick={finalizarProcesso} // Vamos redirecionar diretamente para a página de pagamento
+                className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
+              >
+                Prosseguir para pagamento
+                <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
