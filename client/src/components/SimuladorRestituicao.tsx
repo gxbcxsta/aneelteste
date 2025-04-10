@@ -624,9 +624,9 @@ export default function SimuladorRestituicao({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="menos-12">Menos de 12 meses</SelectItem>
-                        <SelectItem value="1-3-anos">De 1 a 3 anos</SelectItem>
-                        <SelectItem value="3-5-anos">De 3 a 5 anos</SelectItem>
+                        <SelectItem value="menos-12">1 a 11 Meses</SelectItem>
+                        <SelectItem value="1-3-anos">1 a 3 anos</SelectItem>
+                        <SelectItem value="3-5-anos">4 a 5 anos</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -657,7 +657,7 @@ export default function SimuladorRestituicao({
                     </>
                   ) : (
                     <>
-                      Calcular Restituição
+                      INICIAR CÁLCULO
                       <ChevronRight className="ml-2 h-4 w-4" />
                     </>
                   )}
