@@ -345,7 +345,7 @@ export default function SimuladorRestituicao({
     
     // Independente do resultado, redirecionamos para a página de loading
     setTimeout(() => {
-      // Redirecionar para a nova página de loading (CalculoLoading)
+      // Redirecionar para a página dedicada de loading (CalculoLoading) que mostrará a barra de progresso
       window.location.href = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
     }, 500);
   };
