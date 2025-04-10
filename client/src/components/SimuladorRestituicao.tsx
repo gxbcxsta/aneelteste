@@ -250,9 +250,6 @@ export default function SimuladorRestituicao({
     setCalculando(true);
     setAnimacaoAtiva(true);
     
-    // Mostrar tela de loading interna
-    setMostrarTelaLoading(true);
-    
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
     
@@ -275,94 +272,8 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Sequência de mensagens de carregamento
-    const mensagens = [
-      'Estamos calculando sua restituição...',
-      'Verificando os dados da sua conta de energia...',
-      'Analisando o histórico de cobranças...',
-      'Calculando os valores de ICMS pagos...',
-      'Conferindo os valores de restituição disponíveis...',
-      'Finalizando seu cálculo...'
-    ];
-    
-    // Função para mostrar mensagens sequencialmente com progresso
-    const mostrarMensagens = async () => {
-      for (let i = 0; i < mensagens.length; i++) {
-        setMensagemCarregamento(mensagens[i]);
-        setProgressoCarregamento(((i + 1) / mensagens.length) * 100);
-        
-        // Esperar 1.5 segundos antes de mostrar a próxima mensagem
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      }
-    };
-    
-    // Iniciar a animação de mensagens
-    mostrarMensagens();
-    
-    // Realizar o cálculo em paralelo com a animação
-    try {
-      const cpfLimpo = cpf.replace(/\D/g, '');
-      const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
-      const responseData = await response.json();
-      
-      let valorFinal: number;
-      
-      if (responseData.encontrado && responseData.valorRestituicao) {
-        // Se já existe um valor no banco de dados, usar esse valor
-        console.log("Valor encontrado no banco de dados:", responseData.valorRestituicao);
-        valorFinal = Number(responseData.valorRestituicao);
-        
-        setValorFinalRestituicao(valorFinal);
-        setValorRealRestituicao(0);
-      } else {
-        // Se não existe, calcular um novo valor
-        
-        // Gerar um valor aleatório entre 1.800 e 3.600 com centavos
-        const valorMinimo = 1800;
-        const valorMaximo = 3600;
-        let valorEstimado = Math.random() * (valorMaximo - valorMinimo) + valorMinimo;
-        // Arredonda para 2 casas decimais
-        valorEstimado = Math.round(valorEstimado * 100) / 100;
-        
-        valorFinal = valorEstimado;
-        setValorFinalRestituicao(valorEstimado);
-        
-        // Salvar o valor calculado no banco de dados
-        try {
-          await fetch('/api/restituicao', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              cpf: cpfLimpo,
-              valor: valorFinal
-            }),
-          });
-          console.log("Valor salvo no banco de dados com sucesso");
-        } catch (error) {
-          console.error("Erro ao salvar valor no banco de dados:", error);
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao consultar/salvar valor de restituição:", error);
-      
-      // Em caso de erro, geramos um valor aleatório
-      const valorMinimo = 1800;
-      const valorMaximo = 3600;
-      const valorEstimado = Math.random() * (valorMaximo - valorMinimo) + valorMinimo;
-      const valorFinal = Math.round(valorEstimado * 100) / 100;
-      
-      setValorFinalRestituicao(valorFinal);
-    }
-    
-    // Garantir que a tela de loading seja exibida por pelo menos 8 segundos
-    setTimeout(() => {
-      // Esconder tela de loading
-      setMostrarTelaLoading(false);
-      // Redirecionar para a página de resultado
-      window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
-    }, 8000);
+    // Redirecionar para a página de loading (usando mesma página que já existe)
+    window.location.href = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
   };
   
   // Funções de navegação entre etapas

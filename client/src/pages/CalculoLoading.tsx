@@ -9,6 +9,7 @@ export default function CalculoLoading() {
   const [, setLocation] = useLocation();
   const [message, setMessage] = useState('Estamos calculando sua restituição...');
   const [progresso, setProgresso] = useState(10);
+  const [isLoaded, setIsLoaded] = useState(false);
   
   // Recupera parâmetros da URL
   const searchParams = new URLSearchParams(window.location.search);
@@ -30,7 +31,11 @@ export default function CalculoLoading() {
     'Finalizando seu cálculo...'
   ];
   
+  // Efeito que é executado apenas uma vez ao carregar a página
   useEffect(() => {
+    // Marca a página como carregada imediatamente para evitar tela branca
+    setIsLoaded(true);
+    
     let currentIndex = 0;
     let timer: NodeJS.Timeout;
     
@@ -44,21 +49,68 @@ export default function CalculoLoading() {
         // Quando terminar as mensagens, redirecionar para o resultado
         clearInterval(timer);
         
-        // Gerar um valor aleatório entre 1.800,00 e 3.600,00 com centavos
-        const valorMinimo = 180000; // R$ 1.800,00 em centavos
-        const valorMaximo = 360000; // R$ 3.600,00 em centavos
-        const valorAleatorio = Math.floor(Math.random() * (valorMaximo - valorMinimo + 1)) + valorMinimo;
-        
-        // Redirecionar para o resultado com todos os dados necessários
-        setTimeout(() => {
-          setLocation(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`);
-        }, 1000);
+        // Realizar consulta à API para obter ou criar um valor no banco de dados
+        fetch(`/api/restituicao?cpf=${cpf.replace(/\D/g, '')}`)
+          .then(response => response.json())
+          .then(data => {
+            // Se já existe um valor, usamos ele
+            if (data.encontrado && data.valorRestituicao) {
+              console.log("Valor encontrado no banco de dados:", data.valorRestituicao);
+              
+              // Redirecionar para o resultado com todos os dados necessários
+              setTimeout(() => {
+                setLocation(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`);
+              }, 1000);
+            } else {
+              // Se não existe, geramos um valor aleatório e salvamos
+              const valorMinimo = 1800;
+              const valorMaximo = 3600;
+              const valorAleatorio = Math.random() * (valorMaximo - valorMinimo) + valorMinimo;
+              const valorFinal = Math.round(valorAleatorio * 100) / 100;
+              
+              // Salvar o valor calculado no banco de dados
+              fetch('/api/restituicao', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  cpf: cpf.replace(/\D/g, ''),
+                  valor: valorFinal
+                }),
+              })
+              .then(() => {
+                console.log("Valor salvo no banco de dados com sucesso");
+                
+                // Redirecionar para o resultado com todos os dados necessários
+                setTimeout(() => {
+                  setLocation(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`);
+                }, 1000);
+              })
+              .catch(error => {
+                console.error("Erro ao salvar valor no banco de dados:", error);
+                
+                // Mesmo com erro, redirecionamos para o resultado
+                setTimeout(() => {
+                  setLocation(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`);
+                }, 1000);
+              });
+            }
+          })
+          .catch(error => {
+            console.error("Erro ao consultar valor de restituição:", error);
+            
+            // Mesmo com erro, redirecionamos para o resultado
+            setTimeout(() => {
+              setLocation(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`);
+            }, 1000);
+          });
       }
     };
     
-    // Exibir a primeira mensagem imediatamente
+    // Garantir que a primeira mensagem é exibida imediatamente
     setMessage(messages[0]);
-    setProgresso(1 / messages.length * 100);
+    setProgresso((1 / messages.length) * 100);
     
     // Configurar o temporizador para trocar as mensagens
     timer = setInterval(showNextMessage, 1500);
@@ -67,6 +119,8 @@ export default function CalculoLoading() {
     return () => clearInterval(timer);
   }, []);
   
+  // Aplicar classe CSS para evitar que o conteúdo seja exibido muito tarde
+  // e causar a impressão de tela branca antes do carregamento
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

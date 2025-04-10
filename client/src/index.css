@@ -16,6 +16,37 @@
   --gov-red: #e52207;
 }
 
+/* Estilos especiais para evitar tela branca durante navegação */
+html, body {
+  background-color: #f0f2f5; /* Cor de fundo padrão usada na maioria das páginas */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  display: block;
+}
+
+/* Estilo para pré-carregamento de página - evita tela branca */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 9999;
+  background: linear-gradient(90deg, var(--gov-blue), var(--gov-blue-light), var(--gov-yellow));
+  background-size: 200% auto;
+  animation: progressAnimation 1.5s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Mostrar animação durante carregamento */
+body.loading::before {
+  opacity: 1;
+}
+
 @layer base {
   * {
     @apply border-border;

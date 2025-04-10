@@ -42,4 +42,48 @@ styleElement.textContent = `
 `;
 document.head.appendChild(styleElement);
 
+// Adicionar script para gerenciar a indicação de carregamento de página
+// e evitar que telas brancas apareçam entre transições
+const handlePageTransitions = () => {
+  // Indicar carregamento quando a página inicia
+  document.body.classList.add('loading');
+  
+  // Quando a página estiver totalmente carregada, remover indicador
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.body.classList.remove('loading');
+    }, 300);
+  });
+  
+  // Interceptar cliques em links para mostrar animação durante navegação
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const link = target.closest('a');
+    
+    if (link && link.href && !link.href.startsWith('javascript:') && !link.href.includes('#') && !e.ctrlKey && !e.metaKey) {
+      document.body.classList.add('loading');
+    }
+  });
+  
+  // Interceptar envios de formulário para mostrar animação
+  document.addEventListener('submit', () => {
+    document.body.classList.add('loading');
+  });
+  
+  // Adicionar indicador de carregamento durante navegação por JS
+  const originalPushState = history.pushState;
+  history.pushState = function() {
+    document.body.classList.add('loading');
+    originalPushState.apply(this, arguments as any);
+    
+    // Remover classe após a transição
+    setTimeout(() => {
+      document.body.classList.remove('loading');
+    }, 800);
+  };
+};
+
+// Executar script de transições
+handlePageTransitions();
+
 createRoot(document.getElementById("root")!).render(<App />);
