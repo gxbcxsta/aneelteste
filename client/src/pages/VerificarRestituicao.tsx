@@ -269,12 +269,20 @@ export default function VerificarRestituicao() {
         </div>
       </main>
       
-      {/* Popup de verificação de identidade */}
+      {/* Popup de verificação de identidade - desativado */}
       {showVerificacao && dadosPessoais && (
         <VerificacaoIdentidade 
           dadosPessoais={dadosPessoais} 
           onClose={() => setShowVerificacao(false)} 
           onSuccess={handleVerificacaoConcluida}
+        />
+      )}
+      
+      {/* Popup de carregamento */}
+      {showLoading && (
+        <LoadingPopup 
+          message="Validando seus dados" 
+          subMessage="Aguarde enquanto verificamos as informações do CPF"
         />
       )}
       
