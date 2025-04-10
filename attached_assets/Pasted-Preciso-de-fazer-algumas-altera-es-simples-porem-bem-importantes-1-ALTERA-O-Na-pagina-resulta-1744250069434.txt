@@ -1,0 +1,19 @@
+Preciso de fazer algumas alterações simples porem bem importantes.
+1° ALTERAÇÃO: Na pagina /resulta na etapa do SIMULADOR DE RESTITUIÇÃO, a parte VALOR da navegação/barra de progresso. Nessa parte a pesso digita o VALOR MÉDIO MENSAL DA CONTA DE LUZ, está ate formatado corretamente mas tem uma certa dificuldade na hora de isnerir o valor, porque a pessoa tem que clicar na frente do numero para digitar, então eu gostaria que o valor que aparece no caso R$ 0,00 fosse apenas um PLACEHOLDER, de modo que não interfira quando a pessoa digitar. Então ela vai digitar 200 e vai formatar para R$200,00. Ela vai digitar 256,60 e vai formatar para R$ 256,60 ou ela pode digitar tambem com ponto, exemplo: 260.50 e vai formatar para R$260,50 então tem que ter esse manejo mas de modo que não interfira na digitação da pessoa como esta agora.
+2° ALTERAÇÃO: Eu gostaria de modificar a ordem dessa barra de progresso. Atualmente está:
+INCIO - DADOS - VALOR - PERÍDO - RESUTLADO - SEUS DADOS - DADOS BANCÁRIOS - FINALIZAR
+
+Mas eu quero que seja:
+INICIO - DADOS - VALOR - PERIODO - SEUS DADOS - RESULTADO - DADOS BANCARIOS - FINALIZAR
+
+3° ALTERAÇÃO: Na ultima etapa da pagina /resulta que se chama FINALIZAR essa etapa preciso de uma alteração. Atualmente ao chegar nela aparece escrito SOLICITAÇÃO CONCLUIDA! E abaixo o resumo da solicitação com os dados coletados ate o momento, mas eu quero modificar isso. Ao inves de aparecer SOLICITAÇÃO CONCLUÍDA de verde, eu quero que apareça algo como VOCÊ ESTÁ QUASE LA, OU ESTAMOS QUASE LÁ só que de amarelo ou azul você que sabe qual a cor pmelhor, e o icone tem que compacturar com isso e não um icone de CHECKED verde como esta agora. E o resumo da solicitação pode manter quase como está agora mas pode modificar da maneira que você preferir mas tem que ter todos os dados coletados. que são:
+TITULAR
+CPF
+DATA DE NASCIMENTO
+COMPANHIA ELÉTRICA
+TELEFONE
+EMAIL
+BANCO
+VALOR A RECEBER
+
+4° ALTERAÇÃO: Nessa navegação da 3° ALTERAÇÃO tem a parte de DADOS BANCARIOS como você ja viu, e nessa parte a pessoa escolhe o banco que ela vai receber, e esse banco também aparece na parte de RESUMO DA SOLICITAÇÃO. Bom, esse banco também tem que aparecer na página de pagamento, assim como os depmais dados, e atualmente quase todos os dados ja estao funcionando perfeitamente na pagina de pagamento, mas tem um dado que ainda nao esta mostrando corretamente, que é o dado do banco, o nome do banco. Atualmente na pagina de pagamento está aparecendo o BANCO DO BRASIL independentemente do banco que a pessoa escolheu, então arrume isso, vai ter que aparecer o banco que a pessoa escolheu.
