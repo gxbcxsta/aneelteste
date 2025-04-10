@@ -1,0 +1,28 @@
+Tenho algumas alterações para serem feitas:
+1° - Na pagina /verificar quando a pessoa digita seu CPF eu quero que apareça escrito acima do campos CPF:
+-> Para verificar se você tem direito à restituição informe os dados abaixo e clique em enviar:
+
+CPF: (Icone vermelho de INFORMAÇÃO) como esse: <span class="ml-1 text-red-500">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+
+Abaixo do campos CPF quero que tenha escrito: Clique abaixo, na figura do RAIO: 
+Aqui vai ter 5 figuras dessa forma abaixo, so que no lugar da FOLHA vai ser um RAIO:
+<div class="grid grid-cols-5 gap-1 border-4 border-[#D8E8E8] p-1 bg-[#D8E8E8]">
+                                <div class="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option" onclick="selectImage(this, 0)">
+                                    <img alt="Globe icon showing Earth" class="w-6 h-6" src="assets/img/download-6.png">
+                                </div>
+                                <div class="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option" onclick="selectImage(this, 1)">
+                                    <img alt="Magnifying glass search icon" class="w-6 h-6" src="assets/img/download-5.png">
+                                </div>
+                                <div class="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option" onclick="selectImage(this, 2)">
+                                    <img alt="Footprint icon" class="w-6 h-6" src="assets/img/download-4.png">
+                                </div>
+                                <div class="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option" onclick="selectImage(this, 3)">
+                                    <img alt="Padlock or lock icon" class="w-6 h-6" src="assets/img/download-3.png">
+                                </div>
+                                <div class="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option" onclick="selectImage(this, 4)">
+                                    <img alt="Leaf icon representing nature" class="w-6 h-6" src="assets/img/leaf.png" onerror="this.src=&quot;https://ibb.co/7JtPJ1Rp&quot;">
+                                </div>
+                            </div>
+

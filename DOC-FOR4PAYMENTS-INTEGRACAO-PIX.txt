@@ -1,26 +1,4 @@
-# GUIA DE INTEGRAÇÃO COM FOR4PAYMENTS PIX - TUDO QUE VOCÊ PRECISA SABER
-
-## PONTOS CRÍTICOS PARA FUNCIONAMENTO
-
-1. **FORMATO DOS DADOS**
-   - Os dados do cliente precisam estar no formato exato exigido pela API
-   - Não coloque o cliente em um objeto separado "customer"
-   - Envie os dados diretamente no objeto principal
-
-2. **PRESERVAÇÃO DO CÓDIGO PIX**
-   - Nunca modifique o código PIX retornado pela API
-   - Não remova espaços ou qualquer outra formatação
-   - O formato EMV é sensível e qualquer alteração causa erro de leitura
-
-3. **VERIFICAÇÃO DE STATUS**
-   - Use o endpoint correto: `/api/pagamentos/{id}/status`
-   - Adicione tratamento de erros para quando o status não puder ser verificado
-   - Implemente polling a cada 10 segundos
-
-## IMPLEMENTAÇÃO SERVIDOR
-
-```javascript
-// Classe de integração com For4Payments
+ntegração com For4Payments
 class For4PaymentsAPI {
   private API_URL = "https://app.for4payments.com.br/api/v1";
   private secretKey: string;
