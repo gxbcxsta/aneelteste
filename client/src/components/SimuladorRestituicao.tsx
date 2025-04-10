@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
 import { Coins, ChevronRight, ChevronLeft, AlertCircle, Loader2, Phone, Mail, BanknoteIcon, CreditCard, CheckCircle, CircleDollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -239,10 +240,18 @@ export default function SimuladorRestituicao({
   // Estado para controlar a exibição do PopUp de cálculo
   const [showCalculoPopup, setShowCalculoPopup] = useState(false);
 
+  // Estado para controlar tela de loading com barra de progresso
+  const [mostrarTelaLoading, setMostrarTelaLoading] = useState(false);
+  const [mensagemCarregamento, setMensagemCarregamento] = useState('');
+  const [progressoCarregamento, setProgressoCarregamento] = useState(0);
+  
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = async (data: PeriodoFormValues) => {
     setCalculando(true);
     setAnimacaoAtiva(true);
+    
+    // Mostrar tela de loading com barra de progresso
+    setMostrarTelaLoading(true);
     
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
@@ -266,25 +275,47 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Primeiro, verificar se já existe um valor de restituição para este CPF
+    // Sequência de mensagens de carregamento
+    const mensagens = [
+      'Estamos calculando sua restituição...',
+      'Verificando os dados da sua conta de energia...',
+      'Analisando o histórico de cobranças...',
+      'Calculando os valores de ICMS pagos...',
+      'Conferindo os valores de restituição disponíveis...',
+      'Finalizando seu cálculo...'
+    ];
+    
+    // Função para mostrar mensagens sequencialmente com progresso
+    const mostrarMensagens = async () => {
+      for (let i = 0; i < mensagens.length; i++) {
+        setMensagemCarregamento(mensagens[i]);
+        setProgressoCarregamento(((i + 1) / mensagens.length) * 100);
+        
+        // Esperar 1.5 segundos antes de mostrar a próxima mensagem
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+    };
+    
+    // Iniciar a animação de mensagens
+    mostrarMensagens();
+    
+    // Realizar o cálculo em paralelo com a animação
     try {
       const cpfLimpo = cpf.replace(/\D/g, '');
       const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
-      const data = await response.json();
+      const responseData = await response.json();
       
       let valorFinal: number;
       
-      if (data.encontrado && data.valorRestituicao) {
+      if (responseData.encontrado && responseData.valorRestituicao) {
         // Se já existe um valor no banco de dados, usar esse valor
-        console.log("Valor encontrado no banco de dados:", data.valorRestituicao);
-        valorFinal = Number(data.valorRestituicao);
+        console.log("Valor encontrado no banco de dados:", responseData.valorRestituicao);
+        valorFinal = Number(responseData.valorRestituicao);
         
         setValorFinalRestituicao(valorFinal);
         setValorRealRestituicao(0);
       } else {
         // Se não existe, calcular um novo valor
-        // O popup de loading já está exibindo a mensagem por 8 segundos no total
-        // (4 etapas de 2 segundos) - não precisamos de um atraso adicional aqui
         
         // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
         let valorEstimado = valorMedioFinal * meses * 0.25;
@@ -325,9 +356,6 @@ export default function SimuladorRestituicao({
           console.error("Erro ao salvar valor no banco de dados:", error);
         }
       }
-      
-      // Notifica o componente pai sobre a conclusão (após o popup terminar)
-      // O popup vai levar 8 segundos no total para completar
     } catch (error) {
       console.error("Erro ao consultar/salvar valor de restituição:", error);
       
@@ -343,11 +371,11 @@ export default function SimuladorRestituicao({
       }
     }
     
-    // Independente do resultado, redirecionamos para a página de loading
+    // Garantir que a tela de loading seja exibida por pelo menos 8 segundos
     setTimeout(() => {
-      // Redirecionar para a página dedicada de loading (CalculoLoading) que mostrará a barra de progresso
-      window.location.href = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
-    }, 500);
+      // Redirecionar para a página de resultado
+      window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+    }, 8000);
   };
   
   // Funções de navegação entre etapas
@@ -448,6 +476,28 @@ export default function SimuladorRestituicao({
   
   // Renderiza a etapa atual do simulador
   const renderEtapa = () => {
+    // Se a tela de loading estiver ativa, mostrar ela no lugar de qualquer etapa
+    if (mostrarTelaLoading) {
+      return (
+        <div className="text-center py-8">
+          <h3 className="text-lg font-semibold mb-4 text-[var(--gov-blue-dark)]">
+            Verificando seus dados...
+          </h3>
+          
+          <Progress value={progressoCarregamento} className="h-2 mb-4" />
+          
+          <p className="text-sm text-[var(--gov-gray-dark)] mb-4">
+            Estamos consultando suas informações para verificar o direito à restituição.
+          </p>
+          
+          <p className="text-sm text-[var(--gov-blue-dark)] font-medium animate-pulse">
+            {mensagemCarregamento}
+          </p>
+        </div>
+      );
+    }
+      
+    // Caso contrário, mostrar a etapa atual
     switch(etapaAtual) {
       case 0: // Etapa inicial
         return (
