@@ -11,6 +11,8 @@ import PaginaSimuladorICMS from "@/pages/SimuladorICMS";
 import Confirmacao from "@/pages/Confirmacao";
 import PagamentoPix from "@/pages/PagamentoPix";
 import Sucesso from "@/pages/Sucesso";
+import CalculoLoading from "@/pages/CalculoLoading";
+import ResultadoCalculo from "@/pages/ResultadoCalculo";
 
 function Router() {
   return (
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/confirmacao" component={Confirmacao}/>
       <Route path="/pagamento" component={PagamentoPix}/>
       <Route path="/sucesso" component={Sucesso}/>
+      <Route path="/calculo-loading" component={CalculoLoading}/>
+      <Route path="/resultado-calculo" component={ResultadoCalculo}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

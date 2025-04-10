@@ -243,7 +243,6 @@ export default function SimuladorRestituicao({
   const onSubmitPeriodo = async (data: PeriodoFormValues) => {
     setCalculando(true);
     setAnimacaoAtiva(true);
-    setShowCalculoPopup(true); // Mostrar o popup de loading
     
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
@@ -343,6 +342,12 @@ export default function SimuladorRestituicao({
         setValorRealRestituicao(0);
       }
     }
+    
+    // Independente do resultado, redirecionamos para a página de loading
+    setTimeout(() => {
+      // Redirecionar para a nova página de loading (CalculoLoading)
+      window.location.href = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+    }, 500);
   };
   
   // Funções de navegação entre etapas
@@ -351,6 +356,12 @@ export default function SimuladorRestituicao({
   };
   
   const voltarEtapa = () => {
+    // Se estiver na primeira etapa, não podemos voltar mais
+    if (etapaAtual === 0) {
+      return;
+    }
+    
+    // Caso contrário, voltar uma etapa
     setEtapaAtual(etapa => etapa - 1);
   };
   
@@ -617,46 +628,46 @@ export default function SimuladorRestituicao({
                   Por quanto tempo você pagou essa média nos últimos 5 anos?
                 </FormLabel>
                 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div 
-                    className={`border rounded-md p-4 cursor-pointer ${periodoForm.watch("periodo") === "menos-12" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
+                    className={`border rounded-md p-3 cursor-pointer ${periodoForm.watch("periodo") === "menos-12" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
                     onClick={() => periodoForm.setValue("periodo", "menos-12")}
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-5 h-5 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "menos-12" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-4 h-4 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "menos-12" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
                         {periodoForm.watch("periodo") === "menos-12" && (
-                          <div className="w-3 h-3 rounded-full bg-[var(--gov-blue)]"></div>
+                          <div className="w-2 h-2 rounded-full bg-[var(--gov-blue)]"></div>
                         )}
                       </div>
-                      <span className="font-medium">1 a 11 Meses</span>
+                      <span className="font-medium text-sm">1 a 11 Meses</span>
                     </div>
                   </div>
                   
                   <div 
-                    className={`border rounded-md p-4 cursor-pointer ${periodoForm.watch("periodo") === "1-3-anos" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
+                    className={`border rounded-md p-3 cursor-pointer ${periodoForm.watch("periodo") === "1-3-anos" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
                     onClick={() => periodoForm.setValue("periodo", "1-3-anos")}
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-5 h-5 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "1-3-anos" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-4 h-4 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "1-3-anos" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
                         {periodoForm.watch("periodo") === "1-3-anos" && (
-                          <div className="w-3 h-3 rounded-full bg-[var(--gov-blue)]"></div>
+                          <div className="w-2 h-2 rounded-full bg-[var(--gov-blue)]"></div>
                         )}
                       </div>
-                      <span className="font-medium">1 a 3 anos</span>
+                      <span className="font-medium text-sm">1 a 3 anos</span>
                     </div>
                   </div>
                   
                   <div 
-                    className={`border rounded-md p-4 cursor-pointer ${periodoForm.watch("periodo") === "3-5-anos" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
+                    className={`border rounded-md p-3 cursor-pointer ${periodoForm.watch("periodo") === "3-5-anos" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
                     onClick={() => periodoForm.setValue("periodo", "3-5-anos")}
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-5 h-5 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "3-5-anos" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-4 h-4 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "3-5-anos" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
                         {periodoForm.watch("periodo") === "3-5-anos" && (
-                          <div className="w-3 h-3 rounded-full bg-[var(--gov-blue)]"></div>
+                          <div className="w-2 h-2 rounded-full bg-[var(--gov-blue)]"></div>
                         )}
                       </div>
-                      <span className="font-medium">4 a 5 anos</span>
+                      <span className="font-medium text-sm">4 a 5 anos</span>
                     </div>
                   </div>
                 </div>
@@ -671,7 +682,7 @@ export default function SimuladorRestituicao({
               <div className="flex-col space-y-4 pt-4">
                 <Button 
                   type="submit"
-                  className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full"
+                  className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full md:w-full md:px-8 md:py-6 md:text-lg"
                   disabled={calculando}
                 >
                   {calculando ? (
@@ -690,7 +701,7 @@ export default function SimuladorRestituicao({
                   type="button"
                   onClick={voltarEtapa}
                   variant="outline"
-                  className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full"
+                  className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full md:w-full h-10 text-sm md:text-base"
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" />
                   Voltar
@@ -745,7 +756,7 @@ export default function SimuladorRestituicao({
             <div className="flex-col space-y-4 pt-4">
               <Button 
                 onClick={finalizarProcesso} // Vamos redirecionar diretamente para a página de pagamento
-                className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full"
+                className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full md:w-full md:px-8 md:py-6 md:text-lg"
               >
                 Prosseguir para pagamento
                 <ChevronRight className="ml-2 h-4 w-4" />
@@ -755,7 +766,7 @@ export default function SimuladorRestituicao({
                 type="button"
                 onClick={voltarEtapa}
                 variant="outline"
-                className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full"
+                className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full md:w-full h-10 text-sm md:text-base"
               >
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Voltar
@@ -1088,21 +1099,17 @@ export default function SimuladorRestituicao({
     return ((etapaAtual) / totalEtapas) * 100;
   };
   
-  // Callback quando o popup de cálculo completar
-  const onCalculoComplete = () => {
-    // Esconder o popup
-    setShowCalculoPopup(false);
-    
+  // Função para redirecionar para página de loading
+  const redirecionarParaCalculo = () => {
     // Finaliza o carregamento
     setCalculando(false);
     setAnimacaoAtiva(false);
     
-    // Avança diretamente para a etapa 4 (Resultado)
-    setEtapaAtual(4);
+    // Construir URL com os parâmetros necessários
+    const url = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
     
-    // Apenas para log, não precisamos mais chamar o callback do componente pai
-    // pois permaneceremos na mesma página
-    console.log("Cálculo concluído");
+    // Redirecionar para a página de loading
+    window.location.href = url;
   };
   
   return (
@@ -1143,13 +1150,7 @@ export default function SimuladorRestituicao({
       {/* Conteúdo da etapa atual */}
       {renderEtapa()}
       
-      {/* Popup de loading de cálculo */}
-      {showCalculoPopup && (
-        <CalculoLoadingPopup 
-          companhia={companhia} 
-          onComplete={onCalculoComplete} 
-        />
-      )}
+      {/* Removemos o popup de carregamento, vamos usar a página dedicada */}
     </div>
   );
 }
