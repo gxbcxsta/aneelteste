@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { Loader2 } from 'lucide-react';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 export default function CalculoLoading() {
   const [, setLocation] = useLocation();
   const [message, setMessage] = useState('Estamos calculando sua restituição...');
-  const [progress, setProgress] = useState(0);
+  const [progresso, setProgresso] = useState(10);
   
   // Recupera parâmetros da URL
   const searchParams = new URLSearchParams(window.location.search);
@@ -36,7 +39,7 @@ export default function CalculoLoading() {
       if (currentIndex < messages.length - 1) {
         currentIndex++;
         setMessage(messages[currentIndex]);
-        setProgress((currentIndex + 1) / messages.length * 100);
+        setProgresso((currentIndex + 1) / messages.length * 100);
       } else {
         // Quando terminar as mensagens, redirecionar para o resultado
         clearInterval(timer);
@@ -53,7 +56,7 @@ export default function CalculoLoading() {
     
     // Exibir a primeira mensagem imediatamente
     setMessage(messages[0]);
-    setProgress(1 / messages.length * 100);
+    setProgresso(1 / messages.length * 100);
     
     // Configurar o temporizador para trocar as mensagens
     timer = setInterval(showNextMessage, 1500);
@@ -63,35 +66,40 @@ export default function CalculoLoading() {
   }, []);
   
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8f9fa]">
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-6 md:p-8">
-          <div className="text-center space-y-6">
-            <Loader2 className="h-16 w-16 text-[var(--gov-blue)] mx-auto animate-spin" />
-            
-            <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)]">
-              Verificando seus dados...
-            </h2>
-            
-            <p className="text-[var(--gov-gray-dark)]">
-              Estamos consultando suas informações para verificar o direito à restituição.
-            </p>
-            
-            <div className="relative pt-4">
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-[var(--gov-blue)] rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-1 bg-[#f0f2f5] py-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <Card className="shadow-md">
+              <CardHeader className="bg-[var(--gov-blue)] text-white text-center py-6">
+                <CardTitle className="text-2xl font-bold">Cálculo da Restituição</CardTitle>
+                <CardDescription className="text-gray-100 mt-2">
+                  Estamos processando os dados para calcular sua restituição
+                </CardDescription>
+              </CardHeader>
               
-              <p className="mt-4 text-[var(--gov-blue-dark)] font-medium animate-pulse">
-                {message}
-              </p>
-            </div>
+              <CardContent className="p-6">
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-semibold mb-4 text-[var(--gov-blue-dark)]">
+                    Verificando seus dados...
+                  </h3>
+                  <Progress value={progresso} className="h-2 mb-4" />
+                  <p className="text-sm text-[var(--gov-gray-dark)] mb-4">
+                    Estamos consultando suas informações para verificar o direito à restituição.
+                  </p>
+                  <p className="text-sm text-[var(--gov-blue-dark)] font-medium animate-pulse">
+                    {message}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }
