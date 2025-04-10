@@ -272,8 +272,9 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Redirecionar para a página de loading (usando mesma página que já existe)
-    window.location.href = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+    // Redirecionar para a página de resultado-calculo diretamente
+    // A animação de loading está dentro da própria página
+    window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
   };
   
   // Funções de navegação entre etapas
