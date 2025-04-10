@@ -14,7 +14,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { FaInfoCircle } from "react-icons/fa";
 import ImageVerification from "../components/ImageVerification";
-import { LoadingPopup } from "../components/LoadingPopup";
 
 // Validação de CPF
 const cpfSchema = z.object({
@@ -110,13 +109,8 @@ export default function VerificarRestituicao() {
     const cpfLimpo = data.cpf.replace(/\D/g, "");
     setCpfConsultado(cpfLimpo);
     
-    // Exibir o popup de carregamento
-    setShowLoading(true);
-    
-    // Redirecionar para a página de confirmação sem verificar os dados
-    setTimeout(() => {
-      navigate(`/confirmar-identidade/${cpfLimpo}`);
-    }, 5000);
+    // Ir diretamente para a página de confirmação de identidade sem mostrar popup
+    navigate(`/confirmar-identidade/${cpfLimpo}`);
   };
 
   const { toast } = useToast();
@@ -270,13 +264,7 @@ export default function VerificarRestituicao() {
       
       {/* Popup de verificação de identidade - totalmente removido */}
       
-      {/* Popup de carregamento */}
-      {showLoading && (
-        <LoadingPopup 
-          message="Validando seus dados" 
-          subMessage="Aguarde enquanto verificamos as informações do CPF"
-        />
-      )}
+      {/* O popup de carregamento foi removido */}
       
       <Footer />
     </div>
