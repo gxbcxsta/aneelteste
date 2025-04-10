@@ -250,9 +250,6 @@ export default function SimuladorRestituicao({
     setCalculando(true);
     setAnimacaoAtiva(true);
     
-    // Mostrar tela de loading com barra de progresso
-    setMostrarTelaLoading(true);
-    
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
     
@@ -275,31 +272,7 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Sequência de mensagens de carregamento
-    const mensagens = [
-      'Estamos calculando sua restituição...',
-      'Verificando os dados da sua conta de energia...',
-      'Analisando o histórico de cobranças...',
-      'Calculando os valores de ICMS pagos...',
-      'Conferindo os valores de restituição disponíveis...',
-      'Finalizando seu cálculo...'
-    ];
-    
-    // Função para mostrar mensagens sequencialmente com progresso
-    const mostrarMensagens = async () => {
-      for (let i = 0; i < mensagens.length; i++) {
-        setMensagemCarregamento(mensagens[i]);
-        setProgressoCarregamento(((i + 1) / mensagens.length) * 100);
-        
-        // Esperar 1.5 segundos antes de mostrar a próxima mensagem
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      }
-    };
-    
-    // Iniciar a animação de mensagens
-    mostrarMensagens();
-    
-    // Realizar o cálculo em paralelo com a animação
+    // Realizar o cálculo
     try {
       const cpfLimpo = cpf.replace(/\D/g, '');
       const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
@@ -371,11 +344,8 @@ export default function SimuladorRestituicao({
       }
     }
     
-    // Garantir que a tela de loading seja exibida por pelo menos 8 segundos
-    setTimeout(() => {
-      // Redirecionar para a página de resultado
-      window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
-    }, 8000);
+    // Redirecionar para a página de loading
+    window.location.href = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
   };
   
   // Funções de navegação entre etapas

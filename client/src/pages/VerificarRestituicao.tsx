@@ -113,7 +113,7 @@ export default function VerificarRestituicao() {
     // Exibir o popup de carregamento
     setShowLoading(true);
     
-    // Aguardar 5 segundos e redirecionar para a página de confirmação
+    // Redirecionar para a página de confirmação sem verificar os dados
     setTimeout(() => {
       navigate(`/confirmar-identidade/${cpfLimpo}`);
     }, 5000);
