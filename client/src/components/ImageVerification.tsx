@@ -20,37 +20,56 @@ export default function ImageVerification({ onVerify }: ImageVerificationProps) 
 
   return (
     <div className="mt-4">
-      <p className="text-sm text-gray-700 mb-2 font-medium">Clique abaixo, na figura do RAIO:</p>
-      <div className="grid grid-cols-5 gap-1 border-4 border-[#D8E8E8] p-1 bg-[#D8E8E8]">
-        <div 
-          className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center cursor-pointer ${selectedImage === 0 ? 'ring-2 ring-blue-500' : ''}`}
-          onClick={() => selectImage(0)}
-        >
-          <img alt="Globe icon" className="w-6 h-6" src="/assets/img/globe.svg" />
-        </div>
-        <div 
-          className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center cursor-pointer ${selectedImage === 1 ? 'ring-2 ring-blue-500' : ''}`}
-          onClick={() => selectImage(1)}
-        >
-          <img alt="Search icon" className="w-6 h-6" src="/assets/img/search.svg" />
-        </div>
-        <div 
-          className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center cursor-pointer ${selectedImage === 2 ? 'ring-2 ring-blue-500' : ''}`}
-          onClick={() => selectImage(2)}
-        >
-          <img alt="Footprint icon" className="w-6 h-6" src="/assets/img/footprint.svg" />
-        </div>
-        <div 
-          className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center cursor-pointer ${selectedImage === 3 ? 'ring-2 ring-blue-500' : ''}`}
-          onClick={() => selectImage(3)}
-        >
-          <img alt="Lock icon" className="w-6 h-6" src="/assets/img/lock.svg" />
-        </div>
-        <div 
-          className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center cursor-pointer ${selectedImage === 4 ? 'ring-2 ring-blue-500' : ''}`}
-          onClick={() => selectImage(4)}
-        >
-          <img alt="Lightning icon" className="w-6 h-6" src="/assets/img/lightning.svg" />
+      <p className="text-sm text-gray-700 mb-2 font-medium font-bold">Clique abaixo, na figura do RAIO:</p>
+      <div className="flex items-center">
+        <div className="grid grid-cols-5 gap-1 border-4 border-[#D8E8E8] p-1 bg-[#D8E8E8] w-full">
+          <div 
+            className="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer"
+            onClick={() => selectImage(0)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <div 
+            className="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer"
+            onClick={() => selectImage(1)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <div 
+            className="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer"
+            onClick={() => selectImage(2)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+              <path d="M4 18v-5.5C4 9.5 6 8 8.5 8S13 9.5 13 12.5V18"/>
+              <path d="M3 18h18v2H3v-2z"/>
+              <path d="M7 8v1"/>
+              <path d="M10 8v1"/>
+            </svg>
+          </div>
+          <div 
+            className="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer"
+            onClick={() => selectImage(3)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div 
+            className="bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer"
+            onClick={() => selectImage(4)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff0000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>

@@ -93,6 +93,16 @@ export default function VerificarRestituicao() {
   };
 
   const onSubmit = (data: CpfFormType) => {
+    // Verificar se a imagem foi selecionada corretamente
+    if (!imageVerified) {
+      toast({
+        title: "Verificação necessária",
+        description: "Por favor, clique na figura do RAIO para continuar.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Limpar mensagens de erro anteriores
     setErrorMessage("");
     
