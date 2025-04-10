@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import VerificarRestituicao from "@/pages/VerificarRestituicao";
+import ConfirmarIdentidade from "@/pages/ConfirmarIdentidade";
 import Resultado from "@/pages/Resultado";
 import Confirmacao from "@/pages/Confirmacao";
 import PagamentoPix from "@/pages/PagamentoPix";
@@ -15,6 +16,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home}/>
       <Route path="/verificar" component={VerificarRestituicao}/>
+      <Route path="/confirmar-identidade/:cpf" component={ConfirmarIdentidade}/>
       <Route path="/resultado" component={Resultado}/>
       <Route path="/confirmacao" component={Confirmacao}/>
       <Route path="/pagamento" component={PagamentoPix}/>
