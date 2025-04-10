@@ -1097,12 +1097,12 @@ export default function SimuladorRestituicao({
     setCalculando(false);
     setAnimacaoAtiva(false);
     
-    // Avança para a próxima etapa
-    proximaEtapa();
+    // Avança diretamente para a etapa 4 (Resultado)
+    setEtapaAtual(4);
     
-    // Notifica o componente pai sobre a conclusão
-    const valorFinal = valorFinalRestituicao || 0;
-    onSimulacaoConcluida(valorFinal, mesesConsiderados);
+    // Apenas para log, não precisamos mais chamar o callback do componente pai
+    // pois permaneceremos na mesma página
+    console.log("Cálculo concluído");
   };
   
   return (
@@ -1115,15 +1115,13 @@ export default function SimuladorRestituicao({
             style={{ width: `${calcularProgresso()}%` }}
           ></div>
         </div>
-        {/* Versão desktop - todos os passos são visíveis */}
+        {/* Versão desktop - apenas as etapas necessárias são visíveis */}
         <div className="hidden md:flex justify-between mt-2 text-xs text-[var(--gov-gray-dark)]">
           <span className={cn("font-medium", etapaAtual >= 0 ? "text-[var(--gov-blue)]" : "")}>Início</span>
           <span className={cn("font-medium", etapaAtual >= 1 ? "text-[var(--gov-blue)]" : "")}>Dados</span>
           <span className={cn("font-medium", etapaAtual >= 2 ? "text-[var(--gov-blue)]" : "")}>Valor</span>
           <span className={cn("font-medium", etapaAtual >= 3 ? "text-[var(--gov-blue)]" : "")}>Período</span>
-          <span className={cn("font-medium", etapaAtual >= 5 ? "text-[var(--gov-blue)]" : "")}>Seus Dados</span>
           <span className={cn("font-medium", etapaAtual >= 4 ? "text-[var(--gov-blue)]" : "")}>Resultado</span>
-          <span className={cn("font-medium", etapaAtual >= 6 ? "text-[var(--gov-blue)]" : "")}>Dados Bancários</span>
           <span className={cn("font-medium", etapaAtual >= 7 ? "text-[var(--gov-blue)]" : "")}>Finalizar</span>
         </div>
         
@@ -1131,14 +1129,12 @@ export default function SimuladorRestituicao({
         <div className="flex md:hidden justify-center mt-2 text-xs text-[var(--gov-gray-dark)]">
           <div className="text-center">
             <span className="font-medium text-[var(--gov-blue-dark)]">
-              Etapa {etapaAtual + 1} de 8: {" "}
+              Etapa {etapaAtual + 1} de 6: {" "}
               {etapaAtual === 0 ? "Início" : 
                etapaAtual === 1 ? "Dados" : 
                etapaAtual === 2 ? "Valor" : 
                etapaAtual === 3 ? "Período" : 
-               etapaAtual === 5 ? "Seus Dados" : 
-               etapaAtual === 4 ? "Resultado" : 
-               etapaAtual === 6 ? "Dados Bancários" : "Finalizar"}
+               etapaAtual === 4 ? "Resultado" : "Finalizar"}
             </span>
           </div>
         </div>
