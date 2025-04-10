@@ -462,20 +462,10 @@ export default function Resultado() {
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="text-sm text-[var(--gov-gray-dark)]">Companhia Elétrica:</p>
-                                {!editandoCompanhia ? (
-                                  <div className="flex items-center">
-                                    <p className="font-medium">{companhia}</p>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="ml-2 text-[var(--gov-blue)]"
-                                      onClick={() => setEditandoCompanhia(true)}
-                                    >
-                                      <Pencil className="h-4 w-4" />
-                                      <span className="ml-1 text-xs">Editar</span>
-                                    </Button>
-                                  </div>
-                                ) : (
+                                <div>
+                                  <p className="font-medium">{companhia}</p>
+                                </div>
+                                {false && (
                                   <Form {...companhiaForm}>
                                     <form onSubmit={companhiaForm.handleSubmit(onSubmitCompanhia)} className="space-y-2">
                                       <div className="flex items-center space-x-2">

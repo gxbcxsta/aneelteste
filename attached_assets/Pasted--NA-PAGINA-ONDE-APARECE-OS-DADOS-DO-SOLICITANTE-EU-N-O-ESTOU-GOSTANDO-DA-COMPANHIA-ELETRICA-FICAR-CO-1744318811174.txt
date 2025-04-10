@@ -1,0 +1,41 @@
+
+NA PAGINA ONDE APARECE OS DADOS DO SOLICITANTE EU NÃO ESTOU GOSTANDO DA COMPANHIA ELETRICA FICAR COM OPÇÃO DE EDITAR ENTÃO VAMOS FAZER UMA MODIFICAÇÃO QUE VAI SER ADICIONAR MAIS UMA ETAPA NA PAGINA /CONFIRMAR-IDENTIDADE
+
+ATUALMENTE TEM A PRIMEIRA PARTE QUE DIZ: SELECIONE O SEU NOME COMPLETO ENTRE AS OPÇÕES ABAIXO, E AO CLICAR EM PROSSEGUIR VAI PARA A SEGUNDA PARTE QUE DIZ: AGORA, SELECIONE O ANO DO SEU NASCIMENTO ENTRE AS OPÇÕES ABAIXO: E AO CLICAR EM PROSSEGUIR QUERO QUE APAREÇA Agora, selecione a sua companhia elétrica entre as opções abaixo:
+
+E a logica vai ser o seguinte:
+Tem estados que tem mais de uma companhia, como é o caso de 
+
+São Paulo:
+Enel Distribuição São Paulo 
+EDP São Paulo  
+CPFL Paulista  
+CPFL Piratininga  
+Neoenergia Elektro  
+ISA Energia Brasil (anteriormente conhecida como ISA Cteep)
+
+Rio de Janeiro:
+Enel Distribuição Rio 
+Light S/A
+
+Rio Grande do Sul:
+CPFL Rio Grande Energia (RGE)  
+Equatorial CEEE 
+
+Então vai ser o seguinte, voce sabe que ja tinhamos a logica antes que detectava pelo IP e baseado na Geolocalização, pegava o estado da geolocalização e aparecia automaticamente a Companhia eletrica da pessoa, mas isso iria ficar feio e complicado depois das alterações que fizemos, então vai ser o seguinte:
+
+PARA OS ESTADOS SAO PAULO, RIO GRANDE DO SUL E RIO DE JANEIRO VAI TER UMA LOGICA DIFERENTE PARA ELES.
+
+PARA O ESTADO DE SAO PAULO VAI TER 6 OPÇÕES PARA A PESSOA MARCAR ASSIM COMO ELA MARCVA NOME COMPLETO E ANO DE NASCIMENTO, VAI TER 6 OPCOES PARA A PESSOA MARCAR, MAS ESSAS OPÇÕES NAO SERAO ALEATORIAS, MAS SIM 6 OPCOES BASEADAS NO ESTADO DE SAO PAULO, NAS COMPANHIAS DE SAO PAULO.
+
+PARA O ESTADO DE RIO GRANDE DO SUL VAI TER 3 OPÇÕES, SENDO DUAS DO RIO GRANDE DO SUL, E UMA ALEATORIA DE ALGUM ESTADO.
+
+PARA O ESTADO DE RIO DE JANEIRO, VAI TEER 3 OPÇÕES, SENDO DUAS DO RIO DE JANEIRO, E UMA ALEATORIA DE ALGUM ESTADO.
+
+PARA OS DEMAIS ESTADOS QUE SO TEM UMA COMPANHIA ELETRICA, VAI TER 3 OPÇÕES, SENDO DUAS ALEATORIAS, E UMA DO ESTADO MESMO, POR EXEMPLO SE A PESSOA FOR DE MINAS GERAIS, VAI VER AS OPCOES:
+
+Enel Distribuição Rio
+Neoenergia Elektro
+CEMIG Distribuição
+
+Sendo CEMIG Distribuição a correta.
