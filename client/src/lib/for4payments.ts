@@ -140,6 +140,6 @@ export class For4PaymentsAPI {
 
 // Inicialização da API com as chaves fornecidas
 export const paymentApi = new For4PaymentsAPI(
-  "b5b6ac73-07a8-48d5-acf1-b75d76b4e8d4", // Secret Key
-  "9df1f7ae-e78f-4fdf-bb31-e24003b9d106"  // Public Key
+  "ad6ab253-8ae1-454c-91f3-8ccb18933065", // Secret Key atualizada
+  "6d485c73-303b-466c-9344-d7b017dd1ecc"  // Public Key atualizada
 );

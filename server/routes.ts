@@ -59,12 +59,10 @@ class For4PaymentsAPI {
 
       // Formatar os dados conforme especificação
       const paymentData = {
-        "customer": {
-          "name": data.name,
-          "email": data.email,
-          "taxId": cpfLimpo,
-          "phone": telefoneLimpo
-        },
+        "name": data.name,
+        "email": data.email,
+        "cpf": cpfLimpo,
+        "phone": telefoneLimpo,
         "paymentMethod": "PIX",
         "amount": valorCentavos,
         "items": [
