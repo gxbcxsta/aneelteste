@@ -185,7 +185,7 @@ export default function SimuladorRestituicao({
   const valorContaForm = useForm<ValorContaFormValues>({
     resolver: zodResolver(valorContaSchema),
     defaultValues: {
-      valorMedio: "R$ 0,00"
+      valorMedio: ""
     }
   });
   
@@ -977,14 +977,14 @@ export default function SimuladorRestituicao({
       case 7: // Etapa de Finalização
         return (
           <div className={cn("space-y-6 py-6 text-center", { "opacity-50 pointer-events-none": animacaoAtiva })}>
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+            <AlertCircle className="h-16 w-16 text-amber-500 mx-auto" />
             
-            <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)]">
-              Solicitação Concluída!
+            <h2 className="text-xl font-semibold text-amber-600">
+              Você Está Quase Lá!
             </h2>
             
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-green-800 mb-4">Resumo da solicitação</h3>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-amber-800 mb-4">Resumo da solicitação</h3>
               
               <div className="space-y-3 text-left">
                 <div className="flex justify-between border-b border-green-200 pb-2">
@@ -1071,8 +1071,8 @@ export default function SimuladorRestituicao({
           <span className={cn("font-medium", etapaAtual >= 1 ? "text-[var(--gov-blue)]" : "")}>Dados</span>
           <span className={cn("font-medium", etapaAtual >= 2 ? "text-[var(--gov-blue)]" : "")}>Valor</span>
           <span className={cn("font-medium", etapaAtual >= 3 ? "text-[var(--gov-blue)]" : "")}>Período</span>
-          <span className={cn("font-medium", etapaAtual >= 4 ? "text-[var(--gov-blue)]" : "")}>Resultado</span>
           <span className={cn("font-medium", etapaAtual >= 5 ? "text-[var(--gov-blue)]" : "")}>Seus Dados</span>
+          <span className={cn("font-medium", etapaAtual >= 4 ? "text-[var(--gov-blue)]" : "")}>Resultado</span>
           <span className={cn("font-medium", etapaAtual >= 6 ? "text-[var(--gov-blue)]" : "")}>Dados Bancários</span>
           <span className={cn("font-medium", etapaAtual >= 7 ? "text-[var(--gov-blue)]" : "")}>Finalizar</span>
         </div>
@@ -1086,8 +1086,8 @@ export default function SimuladorRestituicao({
                etapaAtual === 1 ? "Dados" : 
                etapaAtual === 2 ? "Valor" : 
                etapaAtual === 3 ? "Período" : 
-               etapaAtual === 4 ? "Resultado" : 
                etapaAtual === 5 ? "Seus Dados" : 
+               etapaAtual === 4 ? "Resultado" : 
                etapaAtual === 6 ? "Dados Bancários" : "Finalizar"}
             </span>
           </div>
