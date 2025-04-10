@@ -127,7 +127,11 @@ class For4PaymentsAPI {
     try {
       console.log("[For4Payments] Verificando status do pagamento:", paymentId);
       
-      const response = await fetch(`${this.API_URL}/transaction/${paymentId}/status`, {
+      // Construa a URL com o parâmetro id como parâmetro de consulta
+      const url = new URL(`${this.API_URL}/transaction.getPayment`);
+      url.searchParams.append('id', paymentId);
+      
+      const response = await fetch(url.toString(), {
         method: "GET",
         headers: this.getHeaders()
       });
@@ -135,14 +139,38 @@ class For4PaymentsAPI {
       if (!response.ok) {
         const errorText = await response.text();
         console.log("[For4Payments] Erro ao verificar status:", errorText);
+        
+        // Para não interromper a experiência do usuário, vamos retornar pending em caso de erro
+        if (response.status === 404) {
+          console.log("[For4Payments] Pagamento ainda não encontrado, retornando status 'pending'");
+          return { status: "pending" };
+        }
+        
         throw new Error(`Erro ao verificar status do pagamento (${response.status})`);
       }
 
       const responseData = await response.json();
-      return { status: responseData.status };
+      console.log("[For4Payments] Resposta do status:", responseData);
+      
+      // Mapear os status da API para nossos status internos
+      const statusMapping: Record<string, string> = {
+        'PENDING': 'pending',
+        'PROCESSING': 'pending',
+        'APPROVED': 'completed',
+        'COMPLETED': 'completed',
+        'PAID': 'completed',
+        'EXPIRED': 'failed',
+        'FAILED': 'failed',
+        'CANCELED': 'cancelled',
+        'CANCELLED': 'cancelled'
+      };
+      
+      const currentStatus = responseData.status || "PENDING";
+      return { status: statusMapping[currentStatus] || "pending" };
     } catch (error) {
       console.log("[For4Payments] Erro ao verificar status:", error);
-      throw error;
+      // Em caso de erro, não interrompa a experiência do usuário
+      return { status: "pending" };
     }
   }
 }
@@ -274,11 +302,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'ID do pagamento não fornecido' });
       }
       
-      const status = await paymentApi.checkPaymentStatus(id);
-      return res.json(status);
+      try {
+        const status = await paymentApi.checkPaymentStatus(id);
+        return res.json(status);
+      } catch (statusError) {
+        console.error("Erro ao verificar status do pagamento:", statusError);
+        // Fallback para não interromper a experiência do usuário
+        return res.json({ status: "pending" });
+      }
     } catch (error) {
-      console.error("Erro ao verificar status do pagamento:", error);
-      res.status(500).json({ error: "Erro ao verificar status" });
+      console.error("Erro no servidor ao verificar status do pagamento:", error);
+      // Fallback para não interromper a experiência do usuário
+      return res.json({ status: "pending" });
     }
   });
 

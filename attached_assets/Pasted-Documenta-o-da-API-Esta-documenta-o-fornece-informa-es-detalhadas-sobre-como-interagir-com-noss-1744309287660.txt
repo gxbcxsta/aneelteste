@@ -1,0 +1,661 @@
+Documentação da API
+ Esta documentação fornece informações detalhadas sobre como interagir com nossos
+ endpoints de API para criar tokens de cartão, processar transações de compra (via
+ Cartão de Crédito, Boleto e PIX), recuperar detalhes de pagamentos e configurar
+ webhooks.
+ Índice
+ Autenticação e Configuração
+ Obtenção das Chaves de API
+ Configuração de Webhooks
+ Endpoints
+ 1. Criar Token de Cartão
+ 2. Criar Transação de Compra
+ Transação com Cartão de Crédito
+ Transação com Boleto
+ Transação com PIX
+ 3. Obter Detalhes do Pagamento
+ Webhooks
+ Estrutura do Webhook
+ Exemplo de Payload do Webhook
+ Eventos e Condições de Envio
+ Notas
+ Autenticação e Configuração
+ Para utilizar a API, é necessário autenticar todas as requisições e configurar
+ webhooks para receber notificações sobre o status das transações.
+ Obtenção das Chaves de API
+ 1. Criação de Conta: Primeiro, crie uma conta em nossa plataforma acessando
+ /platform/api-keys .
+ 2. Geração das Chaves: Após o login, acesse a seção Chaves de API para gerar suas
+ chaves:
+ Public Key: Chave pública utilizada em algumas requisições.
+ Secret Key: Chave secreta que deve ser mantida em segurança e é usada
+ para autenticação nas requisições.
+ Importante: Nunca compartilhe sua 
+deve permanecer confidencial.
+ Configuração de Webhooks
+ Secret Key . Ela é necessária para autenticação e
+ 1. Acesso à Configuração: Após criar sua conta, acesse 
+configurar seus webhooks.
+ /platform/webhooks para
+ 2. Registro do Webhook: Forneça a URL do seu endpoint que receberá as
+ notificações.
+3. Seleção de Eventos: Escolha os eventos que deseja receber notificações:
+ onPixCreated : Notificação quando um PIX é criado.
+ onBuyApproved : Notificação quando uma compra é aprovada.
+ onChargeback : Notificação em caso de chargeback.
+ onRefund : Notificação quando um reembolso é processado.
+ 4. Salvamento: Após configurar, salve as alterações para ativar os webhooks.
+ Endpoints
+ 1. Criar Token de Cartão
+ Crie um token para um cartão de crédito que será usado em transações subsequentes.
+ Endpoint: 
+POST /transaction.createCardToken
+ URL: 
+https://example.com.br/api/v1/transaction.createCardToken
+ Requisição
+ Cabeçalhos:
+ Content-Type: application/json
+ Authorization: <secretKey>
+ Parâmetros do Corpo:
+ Parâmetro
+ cardNumber
+ Tipo
+ string
+ Obrigatório
+ Sim
+ Descrição
+ Número do cartão de crédito.
+ cardCvv
+ string
+ Sim
+ Código CVV do cartão de crédito.
+ cardExpirationMonth
+ cardExpirationYear
+ string
+ string
+ Sim
+ Sim
+ Mês de expiração (2 dígitos).
+ Ano de expiração (2 dígitos).
+ holderName
+ holderDocument
+ string
+ string
+ Exemplo de Requisição
+ Sim
+ Sim
+ Nome do titular do cartão.
+ Documento (CPF) do titular do cartão.
+ curl -X POST "https://example.com.br/api/v1/transaction.createCardToken" \ -H "Content-Type: application/json" \ -H "Authorization: <secretKey>" \ -d '{ 
+"cardNumber": "4000000000000010", 
+"cardCvv": "123", 
+"cardExpirationMonth": "10", 
+"cardExpirationYear": "30", 
+"holderName": "João Silva", 
+"holderDocument": "01234567890" 
+}'
+ Resposta
+Sucesso (200 OK)
+ { 
+  "token": "abcd1234efgh5678ijkl9012" 
+}
+ Parâmetros da Resposta:
+ Parâmetro Tipo Descrição
+ token string Token representando o cartão de crédito
+ 2. Criar Transação de Compra
+ Crie uma transação de compra usando um dos métodos de pagamento: Cartão de Crédito,
+ Boleto ou PIX.
+ Endpoint: POST /transaction.purchase
+ URL: https://example.com.br/api/v1/transaction.purchase
+ Requisição
+ Cabeçalhos:
+ Content-Type: application/json
+ Authorization: <secretKey>
+ Parâmetros do Corpo:
+ Parâmetro Tipo Obrigatório Descrição
+ name string Sim Nome completo do cliente.
+ email string Sim Endereço de email do cliente.
+ cpf string Sim CPF do cliente (11 dígitos).
+ phone string Sim Número de telefone do cliente (8-12
+ dígitos).
+ paymentMethod string Sim Método de pagamento: "PIX", "CREDIT_CARD" ou
+ "BILLET".
+ creditCard objeto Condicional Detalhes do cartão de crédito (obrigatório
+ se paymentMethod for "CREDIT_CARD").
+ cep string Não CEP do endereço.
+ complement string Não Complemento do endereço.
+ number string Não Número do endereço.
+ street string Não Rua do endereço.
+ district string Não Bairro do endereço.
+ city string Não Cidade do endereço.
+ state string Não Estado (UF) do endereço.
+utmQuery
+ checkoutUrl
+ referrerUrl
+ string
+ string
+ string
+ Não
+ Não
+ Não
+ Parâmetros UTM para rastreamento.
+ URL de checkout.
+ URL de referência.
+ externalId
+ postbackUrl
+ string
+ string
+ Não
+ Não
+ Identificador externo para a transação.
+ URL para receber notificações de postback.
+ amount
+ traceable
+ number
+ boolean
+ Sim
+ Sim
+ Valor total em centavos (mínimo 500).
+ Indica se a transação é rastreável.
+ items
+ array
+ Sim
+ Parâmetros do Objeto 
+Lista de itens incluídos na transação.
+ creditCard (obrigatório se 
+Parâmetro
+ token
+ installments
+ Tipo
+ string
+ number
+ Obrigatório
+ Sim
+ Sim
+ Parâmetros do Objeto 
+items :
+ Parâmetro
+ unitPrice
+ title
+ quantity
+ tangible
+ Tipo
+ number
+ string
+ number
+ boolean
+ Obrigatório
+ Sim
+ Sim
+ Sim
+ Sim
+ Exemplos por Método de Pagamento
+ Transação com Cartão de Crédito
+ Descrição
+ Token obtido em transaction.createCardToken.
+ Número de parcelas (entre 1 e 12).
+ paymentMethod for 
+Descrição
+ Preço unitário em centavos.
+ Título ou descrição do item.
+ Quantidade do item.
+ Indica se o item é tangível.
+ curl -X POST "https://example.com.br/api/v1/transaction.purchase" \ -H "Content-Type: application/json" \ -H "Authorization: <secretKey>" \ -d '{ 
+"name": "João Silva", 
+"email": "joao.silva@example.com", 
+"cpf": "01234567890", 
+"phone": "16999999999", 
+"paymentMethod": "CREDIT_CARD", 
+"creditCard": { 
+"token": "abcd1234efgh5678ijkl9012", 
+"installments": 3 
+}, 
+"amount": 5000, 
+"traceable": true, 
+"items": [ 
+{ 
+"unitPrice": 5000, 
+"CREDIT_CARD" ):
+        "title": "Assinatura Premium", 
+        "quantity": 1, 
+        "tangible": false 
+      } 
+    ] 
+  }'
+ Transação com Boleto
+ curl -X POST "https://example.com.br/api/v1/transaction.purchase" \ 
+  -H "Content-Type: application/json" \ 
+  -H "Authorization: <secretKey>" \ 
+  -d '{ 
+    "name": "Maria Souza", 
+    "email": "maria.souza@example.com", 
+    "cpf": "09876543210", 
+    "phone": "16988888888", 
+    "paymentMethod": "BILLET", 
+    "amount": 7500, 
+    "traceable": true, 
+    "items": [ 
+      { 
+        "unitPrice": 7500, 
+        "title": "Compra de E-book", 
+        "quantity": 1, 
+        "tangible": false 
+      } 
+    ] 
+  }'
+ Transação com PIX
+ curl -X POST "https://example.com.br/api/v1/transaction.purchase" \ 
+  -H "Content-Type: application/json" \ 
+  -H "Authorization: <secretKey>" \ 
+  -d '{ 
+    "name": "Ana Pereira", 
+    "email": "ana.pereira@example.com", 
+    "cpf": "12345678901", 
+    "phone": "16977777777", 
+    "paymentMethod": "PIX", 
+    "amount": 10000, 
+    "traceable": true, 
+    "items": [ 
+      { 
+        "unitPrice": 10000, 
+        "title": "Acesso a Curso Online", 
+        "quantity": 1, 
+        "tangible": false 
+      } 
+    ] 
+  }'
+Resposta
+ Sucesso (200 OK)
+ { 
+  "id": "txn_123456789", 
+  "customId": "cust_987654321", 
+  "installments": 3, 
+  "transactionId": "tran_123456789", 
+  "chargeId": null, 
+  "expiresAt": "2024-12-31T23:59:59Z", 
+  "dueAt": null, 
+  "approvedAt": null, 
+  "refundedAt": null, 
+  "rejectedAt": null, 
+  "chargebackAt": null, 
+  "paymentProvider": "GatewayDePagamento", 
+  "availableAt": null, 
+  "pixQrCode": null, 
+  "pixCode": null, 
+  "billetUrl": null, 
+  "billetCode": null, 
+  "customerId": "cust_123456789", 
+  "status": "PENDING", 
+  "address": null, 
+  "district": null, 
+  "number": null, 
+  "complement": null, 
+  "city": null, 
+  "state": null, 
+  "zipCode": null, 
+  "amount": 5000, 
+  "transactionFee": 150, 
+  "taxSeller": 50, 
+  "taxPlatform": 100, 
+  "amountSeller": 4850, 
+  "amountPlatform": 100, 
+  "amountMaster": 0, 
+  "amountGarantee": 0, 
+  "taxGarantee": 0, 
+  "garanteeReleaseAt": null, 
+  "approvedEmailSentAt": null, 
+  "traceable": true, 
+  "method": "CREDIT_CARD", 
+  "deliveryStatus": null, 
+  "createdAt": "2023-12-04T12:34:56Z", 
+  "updatedAt": "2023-12-04T12:34:56Z", 
+  "utmQuery": null, 
+  "checkoutUrl": null, 
+  "referrerUrl": null, 
+  "externalId": null, 
+  "postbackUrl": null 
+}
+Parâmetros da Resposta:
+ Parâmetro
+ id
+ customId
+ installments
+ transactionId
+ chargeId
+ expiresAt
+ dueAt
+ status
+ amount
+ method
+ traceable
+ createdAt
+ updatedAt
+ Outros campos
+ Tipo
+ string
+ string
+ number
+ string
+ string
+ datetime
+ datetime
+ string
+ number
+ string
+ boolean
+ datetime
+ datetime
+ vários
+ 3. Obter Detalhes do Pagamento
+ Recupere detalhes de uma transação específica.
+ Endpoint: 
+Descrição
+ Identificador único da transação.
+ Identificador personalizado da transação.
+ Número de parcelas (se aplicável).
+ Identificador do provedor de pagamento.
+ Identificador da cobrança (se aplicável).
+ Data de expiração da transação.
+ Data de vencimento (para boletos).
+ Status da transação ("PENDING", "APPROVED", etc.).
+ Valor da transação em centavos.
+ Método de pagamento utilizado.
+ Indica se a transação é rastreável.
+ Data e hora de criação da transação.
+ Data e hora da última atualização da transação.
+ Detalhes adicionais dependendo do status da transação.
+ GET /transaction.getPayment
+ URL: 
+https://example.com.br/api/v1/transaction.getPayment
+ Requisição
+ Cabeçalhos:
+ Authorization: <secretKey>
+ Parâmetros de Consulta:
+ Parâmetro
+ id
+ Tipo
+ string
+ Exemplo de Requisição
+ Obrigatório
+ Sim
+ Descrição
+ Identificador único da transação.
+ curl -X GET "https://example.com.br/api/v1/transaction.getPayment?id=txn_123456789" \ -H "Authorization: <secretKey>"
+ Resposta
+ Sucesso (200 OK)
+{ 
+}
+ "id": "txn_123456789", 
+"amount": 5000, 
+"status": "APPROVED", 
+"method": "CREDIT_CARD", 
+"billetCode": null, 
+"billetUrl": null, 
+"pixCode": null, 
+"pixQrCode": null, 
+"customId": "cust_987654321", 
+"dueAt": null, 
+"expiresAt": "2024-12-31T23:59:59Z", 
+"installments": 3, 
+"items": [ 
+{ 
+"id": "item_123456789", 
+"unitPrice": 5000, 
+"quantity": 1, 
+"title": "Assinatura Premium" 
+} 
+], 
+"customer": { 
+"name": "João Silva", 
+"email": "joao.silva@example.com", 
+"cpf": "01234567890", 
+"phone": "16999999999" 
+}, 
+"deliveryStatus": null, 
+"trackingCode": null, 
+"createdAt": "2023-12-04T12:34:56Z", 
+"updatedAt": "2023-12-04T12:34:56Z" 
+Parâmetros da Resposta:
+ Parâmetro
+ id
+ amount
+ status
+ method
+ billetCode
+ billetUrl
+ pixCode
+ pixQrCode
+ Tipo
+ string
+ number
+ Descrição
+ Identificador único da transação.
+ Valor da transação em centavos.
+ string
+ string
+ string
+ string
+ string
+ string
+ customId
+ dueAt
+ string
+ datetime
+ Status da transação ("PENDING", "APPROVED", etc.).
+ Método de pagamento utilizado.
+ Código do boleto (se aplicável).
+ URL do boleto (se aplicável).
+ Código PIX (se aplicável).
+ QR Code PIX (se aplicável).
+ Identificador personalizado da transação.
+ Data de vencimento (se aplicável).
+expiresAt datetime Data de expiração da transação.
+ installments number Número de parcelas (se aplicável).
+ items array Lista de itens na transação.
+ customer objeto Detalhes do cliente.
+ createdAt datetime Data e hora de criação da transação.
+ updatedAt datetime Data e hora da última atualização da transação.
+ Outros campos vários Detalhes adicionais dependendo do tipo de transação.
+ Webhooks
+ Os webhooks permitem que sua aplicação receba notificações em tempo real sobre eventos
+ relacionados às transações, como aprovações, recusas e criação de PIX.
+ Estrutura do Webhook
+ Quando um evento configurado ocorre, enviaremos uma requisição POST para a URL que
+ você forneceu ao configurar o webhook. O payload (corpo) dessa requisição terá a
+ seguinte estrutura:
+ Parâmetros do Payload:
+ Parâmetro Tipo Descrição
+ paymentId string Identificador único do pagamento.
+ externalId string Identificador externo da transação (se fornecido).
+ checkoutUrl string URL do checkout (se aplicável).
+ referrerUrl string URL de referência (se aplicável).
+ customId string Identificador personalizado da transação.
+ status string Status atual da transação ("PENDING", "APPROVED", etc.).
+ paymentMethod string Método de pagamento utilizado.
+ deliveryStatus string Status da entrega (se aplicável).
+ totalValue number Valor total da transação em centavos.
+ netValue number Valor líquido para o vendedor em centavos.
+ pixQrCode string QR Code PIX (se aplicável).
+ pixCode string Código PIX (se aplicável).
+ billetUrl string URL do boleto (se aplicável).
+ billetCode string Código do boleto (se aplicável).
+ expiresAt datetime Data de expiração da transação.
+dueAt
+ installments
+ utm
+ datetime
+ number
+ string
+ Data de vencimento (para boletos).
+ Número de parcelas (se aplicável).
+ Parâmetros UTM para rastreamento (se aplicável).
+ items
+ customer
+ array
+ objeto
+ Lista de itens incluídos na transação.
+ Detalhes do cliente.
+ createdAt
+ updatedAt
+ datetime
+ datetime
+ Data e hora de criação da transação.
+ Data e hora da última atualização da transação.
+ approvedAt
+ refundedAt
+ datetime
+ datetime
+ Data e hora de aprovação da transação (se aplicável).
+ Data e hora de reembolso da transação (se aplicável).
+ chargebackAt
+ rejectedAt
+ datetime
+ datetime
+ Data e hora de chargeback da transação (se aplicável).
+ Data e hora de rejeição da transação (se aplicável).
+ Parâmetros do Objeto 
+customer :
+ Parâmetro
+ id
+ Tipo
+ string
+ Descrição
+ Identificador único do cliente.
+ name
+ email
+ cpf
+ cep
+ phone
+ complement
+ number
+ street
+ city
+ state
+ district
+ createdAt
+ updatedAt
+ string
+ string
+ string
+ string
+ string
+ string
+ string
+ string
+ string
+ string
+ string
+ datetime
+ datetime
+ Nome do cliente.
+ Email do cliente.
+ CPF do cliente.
+ CEP do cliente.
+ Telefone do cliente (com DDI).
+ Complemento do endereço.
+ Número do endereço.
+ Rua do endereço.
+ Cidade do endereço.
+ Estado (UF) do endereço.
+ Bairro do endereço.
+ Data de criação do cadastro.
+ Data da última atualização.
+ Exemplo de Payload do Webhook
+ { 
+"paymentId": "txn_123456789", 
+"externalId": null, 
+"checkoutUrl": null, 
+  "referrerUrl": null, 
+  "customId": "cust_987654321", 
+  "status": "APPROVED", 
+  "paymentMethod": "CREDIT_CARD", 
+  "deliveryStatus": null, 
+  "totalValue": 5000, 
+  "netValue": 4850, 
+  "pixQrCode": null, 
+  "pixCode": null, 
+  "billetUrl": null, 
+  "billetCode": null, 
+  "expiresAt": "2024-12-31T23:59:59Z", 
+  "dueAt": null, 
+  "installments": 3, 
+  "utm": null, 
+  "items": [ 
+    { 
+      "id": "item_123456789", 
+      "unitPrice": 5000, 
+      "quantity": 1, 
+      "title": "Assinatura Premium", 
+      "tangible": false 
+    } 
+  ], 
+  "customer": { 
+    "id": "cust_123456789", 
+    "name": "João Silva", 
+    "email": "joao.silva@example.com", 
+    "cpf": "01234567890", 
+    "cep": "01001000", 
+    "phone": "+5516999999999", 
+    "complement": null, 
+    "number": "123", 
+    "street": "Rua Exemplo", 
+    "city": "São Paulo", 
+    "state": "SP", 
+    "district": "Centro", 
+    "createdAt": "2023-12-04T12:34:56Z", 
+    "updatedAt": "2023-12-04T12:34:56Z" 
+  }, 
+  "createdAt": "2023-12-04T12:34:56Z", 
+  "updatedAt": "2023-12-04T12:34:56Z", 
+  "approvedAt": "2023-12-04T12:35:00Z", 
+  "refundedAt": null, 
+  "chargebackAt": null, 
+  "rejectedAt": null 
+}
+ Eventos e Condições de Envio
+ Com base no código fornecido, o webhook será acionado nas seguintes condições:
+ Transações PENDENTES:
+Se o método de pagamento for CARTÃO DE CRÉDITO e o evento 
+onPixCreated
+ estiver habilitado, o status enviado será 
+"IN_REVIEW" .
+ Se o método de pagamento for PIX e o evento 
+onPixCreated estiver
+ habilitado.
+ Transações APROVADAS:
+ Se o evento 
+onBuyApproved estiver habilitado.
+ Transações com CHARGEBACK:
+ Se o evento 
+onChargeback estiver habilitado.
+ Transações REEMBOLSADAS:
+ Se o evento 
+onRefund estiver habilitado.
+ Notas
+ YYYY-MM-DDTHH:mm:ssZ ).
+ Formatos de Data e Hora: Todos os campos de data e hora estão no formato ISO
+ 8601 (
+ Valores Monetários: Todos os valores monetários estão em centavos. Por exemplo,
+ 5000 representa 
+R$50,00 .
+ Formatos de CPF e Telefone:
+ CPF: Deve conter 11 dígitos (exemplo: 
+"01234567890" ).
+ Telefone: Deve conter entre 8 e 12 dígitos e incluir o código do país
+ (exemplo: 
+"+5516999999999" ).
+ Valor Mínimo da Transação: O valor mínimo para uma transação é de 
+(R$
+ 5,00 ).
+ Rastreabilidade: Defina 
+traceable como 
+500 centavos
+ true para habilitar o rastreamento da
+ transação.
+ Cabeçalho de Autorização: Deve ser incluído em todas as requisições para
+ autenticação.
+ Tratamento de Erros: Em caso de erros, a API retornará códigos de status HTTP
+ apropriados e mensagens detalhadas.
+ Configuração Prévia: Certifique-se de configurar os webhooks e obter as chaves
+ de API antes de iniciar a integração.
+ Obrigado por escolher nossos serviços

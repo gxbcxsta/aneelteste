@@ -144,7 +144,8 @@ export default function PagamentoPix() {
   
   // Copiar o código PIX
   const copiarCodigoPix = () => {
-    navigator.clipboard.writeText(codigoPix.replace(/\s/g, ''));
+    // Não modificar o código PIX, copiar exatamente como veio da API
+    navigator.clipboard.writeText(codigoPix);
     setCopied(true);
     toast({
       title: "Código copiado!",

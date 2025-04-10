@@ -96,9 +96,14 @@ export class For4PaymentsAPI {
 
   async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
     try {
+      console.log("[For4Payments] Verificando status do pagamento:", paymentId);
+      
+      // Construir a URL com o parâmetro id como parâmetro de consulta
       const url = new URL(`${this.API_URL}/transaction.getPayment`);
       url.searchParams.append('id', paymentId);
-
+      
+      console.log("[For4Payments] URL de verificação:", url.toString());
+      
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: this.getHeaders()
@@ -106,6 +111,7 @@ export class For4PaymentsAPI {
 
       if (response.ok) {
         const paymentData = await response.json();
+        console.log("[For4Payments] Resposta de status:", paymentData);
 
         const statusMapping: Record<string, string> = {
           'PENDING': 'pending',
@@ -122,10 +128,19 @@ export class For4PaymentsAPI {
         const currentStatus = paymentData.status || "PENDING";
         return { status: statusMapping[currentStatus] || "pending" };
       } else {
+        const errorText = await response.text();
         console.error(
           "[For4Payments] Erro ao verificar status:",
+          response.status,
           response.statusText,
+          errorText
         );
+        
+        // Para não interromper a experiência do usuário, retornamos pending em caso de erro
+        if (response.status === 404) {
+          console.log("[For4Payments] Pagamento ainda não encontrado, retornando status 'pending'");
+        }
+        
         return { status: "pending" };
       }
     } catch (error) {
