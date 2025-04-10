@@ -32,9 +32,9 @@ export default function PaginaSimuladorICMS() {
           <div className="max-w-4xl mx-auto">
             <Card className="shadow-lg overflow-hidden">
               <CardHeader className="bg-[var(--gov-blue)] text-white text-center py-8">
-                <CardTitle className="text-2xl font-bold">Simulador de Restituição</CardTitle>
+                <CardTitle className="text-2xl font-bold">Cálculo da Restituição</CardTitle>
                 <CardDescription className="text-gray-100 mt-2">
-                  Complete as informações para simular o valor da sua restituição
+                  Complete as informações para calcular o valor da sua restituição
                 </CardDescription>
               </CardHeader>
               

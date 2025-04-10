@@ -394,8 +394,8 @@ export default function Resultado() {
     params.append("estado", estado);
     params.append("companhia", companhia);
     
-    // Navegar para página de simulador
-    navigate(`/simulador?${params.toString()}`);
+    // Navegar para página de cálculo
+    navigate(`/calculo?${params.toString()}`);
   };
   
   return (

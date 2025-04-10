@@ -19,7 +19,7 @@ function Router() {
       <Route path="/verificar" component={VerificarRestituicao}/>
       <Route path="/confirmar-identidade/:cpf" component={ConfirmarIdentidade}/>
       <Route path="/resultado" component={Resultado}/>
-      <Route path="/simulador" component={PaginaSimuladorICMS}/>
+      <Route path="/calculo" component={PaginaSimuladorICMS}/>
       <Route path="/confirmacao" component={Confirmacao}/>
       <Route path="/pagamento" component={PagamentoPix}/>
       <Route path="/sucesso" component={Sucesso}/>
