@@ -74,10 +74,12 @@ class For4PaymentsAPI {
       }
 
       const paymentData = {
-        name: data.name,
-        email: data.email,
-        cpf: cleanCpf,
-        phone: phoneFormatted,
+        customer: {
+          name: data.name,
+          email: data.email,
+          taxId: cleanCpf,
+          phone: phoneFormatted
+        },
         paymentMethod: "PIX",
         amount: amountInCents,
         items: [{
@@ -85,7 +87,8 @@ class For4PaymentsAPI {
           quantity: 1,
           unitPrice: amountInCents,
           tangible: false
-        }]
+        }],
+        dueDate: new Date(Date.now() + 30 * 60 * 1000).toISOString() // 30 minutos no futuro
       };
 
       console.log("[For4Payments] Enviando dados para API:", JSON.stringify(paymentData));
@@ -231,10 +234,10 @@ class For4PaymentsAPI {
   }
 }
 
-// Inicialização da API com as chaves fornecidas
+// Inicialização da API com as novas chaves fornecidas
 const paymentApi = new For4PaymentsAPI(
-  "8cd431ca-a32b-4210-aa69-1947c4e54677", // Secret Key - Atualizada
-  "c224c86c-9395-4578-9fbd-80d71a3a2be3"  // Public Key - Atualizada
+  "b82e02cc-55f3-4e7c-85dd-ef4ae21fc035", // Secret Key - Nova
+  "9ec6bb06-4e94-4e06-ad6a-9a01ad3e15b3"  // Public Key - Nova
 );
 
 export async function registerRoutes(app: Express): Promise<Server> {
