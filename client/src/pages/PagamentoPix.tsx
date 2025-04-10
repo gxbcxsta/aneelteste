@@ -214,6 +214,8 @@ export default function PagamentoPix() {
   const verificarStatusPagamento = async () => {
     if (!paymentInfo?.id) return;
     
+    setIsLoading(true);
+    
     try {
       const response = await fetch(`/api/pagamentos/${paymentInfo.id}/status`);
       
@@ -228,14 +230,39 @@ export default function PagamentoPix() {
             variant: "default"
           });
           
+          // Redirecionar para a página de sucesso com todos os parâmetros necessários
+          const params = new URLSearchParams({
+            cpf: cpf,
+            nome: nome,
+            valor: valor.toString(),
+            pagamentoId: paymentInfo.id,
+            dataPagamento: new Date().toISOString(),
+            companhia: urlParams.get('companhia') || "CEMIG Distribuição",
+            estado: urlParams.get('estado') || "Minas Gerais",
+            nasc: urlParams.get('nasc') || "21/07/2003",
+            banco: urlParams.get('banco') || "bb",
+            bancoNome: urlParams.get('bancoNome') || "Banco do Brasil",
+            agencia: urlParams.get('agencia') || "",
+            conta: urlParams.get('conta') || "",
+            email: email,
+            telefone: telefone
+          });
+          
           // Redirecionar para a página de sucesso
           setTimeout(() => {
-            navigate("/sucesso");
-          }, 3000);
+            navigate(`/sucesso?${params.toString()}`);
+          }, 1500);
         }
       }
     } catch (error) {
       console.error('Erro ao verificar status do pagamento:', error);
+      toast({
+        title: "Erro na verificação",
+        description: "Não foi possível verificar o status do pagamento. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -248,9 +275,13 @@ export default function PagamentoPix() {
   useEffect(() => {
     if (!paymentInfo?.id) return;
     
+    // Verificação inicial
+    verificarStatusPagamento();
+    
+    // Configurar intervalo para verificar a cada 10 segundos
     const statusInterval = setInterval(() => {
       verificarStatusPagamento();
-    }, 5000); // Verificar a cada 5 segundos
+    }, 10000); // Verificar a cada 10 segundos
     
     return () => {
       clearInterval(statusInterval);

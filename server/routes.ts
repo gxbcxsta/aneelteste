@@ -43,6 +43,14 @@ class For4PaymentsAPI {
 
   async createPixPayment(data: PaymentData): Promise<PaymentResponse> {
     try {
+      console.log("[For4Payments] Iniciando criação de pagamento com os dados:", {
+        name: data.name,
+        email: data.email,
+        cpf: data.cpf,
+        phone: data.phone,
+        amount: data.amount
+      });
+      
       const amountInCents = Math.round(data.amount * 100);
       const cleanCpf = data.cpf.replace(/\D/g, "");
       const cleanPhone = data.phone.replace(/\D/g, "");
@@ -52,11 +60,24 @@ class For4PaymentsAPI {
         throw new Error("Campos obrigatórios faltando para criar pagamento");
       }
 
+      // Formatar telefone para padrão que a API aceita (apenas números, com DDD)
+      let phoneFormatted = cleanPhone;
+      if (phoneFormatted.length < 10) {
+        // Se tiver menos de 10 dígitos, adiciona DDD 11 (São Paulo)
+        phoneFormatted = "11" + phoneFormatted;
+        console.log("[For4Payments] Telefone ajustado com DDD padrão:", phoneFormatted);
+      }
+      
+      // Garantir que CPF tem 11 dígitos
+      if (cleanCpf.length !== 11) {
+        console.error("[For4Payments] CPF com formato inválido:", cleanCpf);
+      }
+
       const paymentData = {
         name: data.name,
         email: data.email,
         cpf: cleanCpf,
-        phone: cleanPhone,
+        phone: phoneFormatted,
         paymentMethod: "PIX",
         amount: amountInCents,
         items: [{
@@ -67,29 +88,58 @@ class For4PaymentsAPI {
         }]
       };
 
+      console.log("[For4Payments] Enviando dados para API:", JSON.stringify(paymentData));
+      console.log("[For4Payments] URL da API:", `${this.API_URL}/transaction.purchase`);
+      console.log("[For4Payments] Headers:", JSON.stringify(this.getHeaders()));
+
       const response = await fetch(`${this.API_URL}/transaction.purchase`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(paymentData)
       });
 
+      console.log("[For4Payments] Status da resposta:", response.status, response.statusText);
+
       if (!response.ok) {
+        // Tentar ler corpo de erro
+        let errorBody = "";
+        try {
+          errorBody = await response.text();
+          console.error("[For4Payments] Corpo do erro:", errorBody);
+        } catch (e) {
+          console.error("[For4Payments] Não foi possível ler corpo do erro");
+        }
+        
         console.error("[For4Payments] Erro na resposta:", {
           status: response.status,
           statusText: response.statusText,
+          body: errorBody
         });
         throw new Error(
           `Erro na API de pagamento (${response.status}): ${response.statusText}`
         );
       }
 
-      const responseData = await response.json() as {
-        id: string;
-        pixCode: string;
-        pixQrCode: string;
-        expiresAt: string;
-        status?: string;
-      };
+      const responseText = await response.text();
+      console.log("[For4Payments] Resposta da API (texto):", responseText);
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText) as {
+          id: string;
+          pixCode: string;
+          pixQrCode: string;
+          expiresAt: string;
+          status?: string;
+        };
+        console.log("[For4Payments] Dados do pagamento gerado:", {
+          id: responseData.id,
+          status: responseData.status
+        });
+      } catch (e) {
+        console.error("[For4Payments] Erro ao fazer parse da resposta JSON:", e);
+        throw new Error("Formato de resposta inválido da API de pagamento");
+      }
       
       return {
         id: responseData.id,
@@ -106,16 +156,33 @@ class For4PaymentsAPI {
 
   async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
     try {
+      console.log("[For4Payments] Verificando status do pagamento ID:", paymentId);
+      
       const url = new URL(`${this.API_URL}/transaction.getPayment`);
       url.searchParams.append('id', paymentId);
+      
+      console.log("[For4Payments] URL de verificação:", url.toString());
+      console.log("[For4Payments] Headers:", JSON.stringify(this.getHeaders()));
 
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: this.getHeaders()
       });
 
+      console.log("[For4Payments] Status da resposta de verificação:", response.status, response.statusText);
+
       if (response.ok) {
-        const paymentData = await response.json() as { status?: string };
+        const responseText = await response.text();
+        console.log("[For4Payments] Resposta de verificação (texto):", responseText);
+        
+        let paymentData;
+        try {
+          paymentData = JSON.parse(responseText) as { status?: string, id?: string, metadata?: any };
+          console.log("[For4Payments] Dados do status:", paymentData);
+        } catch (e) {
+          console.error("[For4Payments] Erro ao fazer parse da resposta JSON:", e);
+          return { status: "pending" };
+        }
 
         const statusMapping: Record<string, string> = {
           'PENDING': 'pending',
@@ -130,11 +197,27 @@ class For4PaymentsAPI {
         };
 
         const currentStatus = paymentData.status || "PENDING";
-        return { status: statusMapping[currentStatus] || "pending" };
+        const mappedStatus = statusMapping[currentStatus] || "pending";
+        
+        console.log(`[For4Payments] Status mapeado: ${currentStatus} -> ${mappedStatus}`);
+        return { status: mappedStatus };
       } else {
+        // Tentar ler corpo de erro
+        let errorBody = "";
+        try {
+          errorBody = await response.text();
+          console.error("[For4Payments] Corpo do erro de verificação:", errorBody);
+        } catch (e) {
+          console.error("[For4Payments] Não foi possível ler corpo do erro de verificação");
+        }
+        
         console.error(
           "[For4Payments] Erro ao verificar status:",
-          response.statusText,
+          {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorBody
+          }
         );
         return { status: "pending" };
       }
