@@ -424,8 +424,8 @@ export default function SimuladorRestituicao({
     setAnimacaoAtiva(true);
     
     setTimeout(() => {
-      // Redirecionar para a página de pagamento PIX
-      window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorFinalRestituicao)}`;
+      // Redirecionar para a página de pagamento PIX com todos os dados relevantes
+      window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorFinalRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&bancoNome=${encodeURIComponent(bancoSelecionado)}`;
     }, 500);
   };
   
@@ -987,44 +987,44 @@ export default function SimuladorRestituicao({
               <h3 className="text-lg font-semibold text-amber-800 mb-4">Resumo da solicitação</h3>
               
               <div className="space-y-3 text-left">
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">Titular:</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">Titular:</span>
                   <span className="font-medium">{nome}</span>
                 </div>
                 
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">CPF:</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">CPF:</span>
                   <span className="font-medium">{formatarCPF(cpf)}</span>
                 </div>
                 
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">Data de Nascimento:</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">Data de Nascimento:</span>
                   <span className="font-medium">{dataNascimento}</span>
                 </div>
                 
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">Companhia:</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">Companhia:</span>
                   <span className="font-medium">{companhia}</span>
                 </div>
                 
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">Telefone:</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">Telefone:</span>
                   <span className="font-medium">{telefoneConfirmado}</span>
                 </div>
                 
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">E-mail:</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">E-mail:</span>
                   <span className="font-medium">{emailConfirmado}</span>
                 </div>
                 
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">Banco:</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">Banco:</span>
                   <span className="font-medium">{bancoSelecionado}</span>
                 </div>
                 
-                <div className="flex justify-between border-b border-green-200 pb-2">
-                  <span className="text-green-700">Valor a receber:</span>
-                  <span className="font-medium text-green-600">{formatarMoeda(valorFinalRestituicao)}</span>
+                <div className="flex justify-between border-b border-amber-200 pb-2">
+                  <span className="text-amber-700">Valor a receber:</span>
+                  <span className="font-medium text-amber-600">{formatarMoeda(valorFinalRestituicao)}</span>
                 </div>
               </div>
             </div>
