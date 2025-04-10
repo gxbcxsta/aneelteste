@@ -421,6 +421,20 @@ export default function SimuladorRestituicao({
     }, 500);
   };
   
+  // Remover etapas desnecessárias do fluxo e ajustar a navegação
+  useEffect(() => {
+    // Quando o etapaAtual é atualizado e está tentando ir para etapa 5 (Seus Dados)
+    // pular diretamente para etapa 7 (Finalizar) que leva para pagamento
+    if (etapaAtual === 5) {
+      setEtapaAtual(4); // Voltar para o resultado
+    }
+    
+    // Se for para a etapa 6 (Dados Bancários), também voltar para o resultado
+    if (etapaAtual === 6) {
+      setEtapaAtual(4); // Voltar para o resultado
+    }
+  }, [etapaAtual]);
+  
   // Renderiza a etapa atual do simulador
   const renderEtapa = () => {
     switch(etapaAtual) {
@@ -437,9 +451,9 @@ export default function SimuladorRestituicao({
             </p>
             <Button 
               onClick={proximaEtapa}
-              className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-semibold px-8 py-6 text-lg"
+              className="w-full bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-semibold px-8 py-6 text-lg"
             >
-              Iniciar simulação
+              Calcular
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -598,48 +612,66 @@ export default function SimuladorRestituicao({
                 Etapa 3: Período de pagamento
               </h2>
               
-              <FormField
-                control={periodoForm.control}
-                name="periodo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">
-                      Por quanto tempo você pagou essa média nos últimos 5 anos?
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="border-[var(--gov-gray)] focus:border-[var(--gov-blue)]">
-                          <SelectValue placeholder="Selecione um período" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="menos-12">1 a 11 Meses</SelectItem>
-                        <SelectItem value="1-3-anos">1 a 3 anos</SelectItem>
-                        <SelectItem value="3-5-anos">4 a 5 anos</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="flex justify-between pt-4">
-                <Button
-                  type="button"
-                  onClick={voltarEtapa}
-                  variant="outline"
-                  className="border-[var(--gov-blue)] text-[var(--gov-blue)]"
-                >
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  Voltar
-                </Button>
+              <div className="space-y-4">
+                <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">
+                  Por quanto tempo você pagou essa média nos últimos 5 anos?
+                </FormLabel>
                 
+                <div className="space-y-3">
+                  <div 
+                    className={`border rounded-md p-4 cursor-pointer ${periodoForm.watch("periodo") === "menos-12" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
+                    onClick={() => periodoForm.setValue("periodo", "menos-12")}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-5 h-5 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "menos-12" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
+                        {periodoForm.watch("periodo") === "menos-12" && (
+                          <div className="w-3 h-3 rounded-full bg-[var(--gov-blue)]"></div>
+                        )}
+                      </div>
+                      <span className="font-medium">1 a 11 Meses</span>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`border rounded-md p-4 cursor-pointer ${periodoForm.watch("periodo") === "1-3-anos" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
+                    onClick={() => periodoForm.setValue("periodo", "1-3-anos")}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-5 h-5 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "1-3-anos" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
+                        {periodoForm.watch("periodo") === "1-3-anos" && (
+                          <div className="w-3 h-3 rounded-full bg-[var(--gov-blue)]"></div>
+                        )}
+                      </div>
+                      <span className="font-medium">1 a 3 anos</span>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`border rounded-md p-4 cursor-pointer ${periodoForm.watch("periodo") === "3-5-anos" ? "border-[var(--gov-blue)] bg-blue-50" : "border-gray-200"}`}
+                    onClick={() => periodoForm.setValue("periodo", "3-5-anos")}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-5 h-5 border rounded-full flex items-center justify-center ${periodoForm.watch("periodo") === "3-5-anos" ? "border-[var(--gov-blue)]" : "border-gray-300"}`}>
+                        {periodoForm.watch("periodo") === "3-5-anos" && (
+                          <div className="w-3 h-3 rounded-full bg-[var(--gov-blue)]"></div>
+                        )}
+                      </div>
+                      <span className="font-medium">4 a 5 anos</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {periodoForm.formState.errors.periodo && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {periodoForm.formState.errors.periodo.message}
+                  </p>
+                )}
+              </div>
+              
+              <div className="flex-col space-y-4 pt-4">
                 <Button 
                   type="submit"
-                  className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
+                  className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full"
                   disabled={calculando}
                 >
                   {calculando ? (
@@ -649,10 +681,19 @@ export default function SimuladorRestituicao({
                     </>
                   ) : (
                     <>
-                      INICIAR CÁLCULO
-                      <ChevronRight className="ml-2 h-4 w-4" />
+                      Calcular
                     </>
                   )}
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={voltarEtapa}
+                  variant="outline"
+                  className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Voltar
                 </Button>
               </div>
             </form>
@@ -701,23 +742,23 @@ export default function SimuladorRestituicao({
               </p>
             </div>
             
-            <div className="flex justify-between pt-4">
+            <div className="flex-col space-y-4 pt-4">
+              <Button 
+                onClick={finalizarProcesso} // Vamos redirecionar diretamente para a página de pagamento
+                className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 w-full"
+              >
+                Prosseguir para pagamento
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+              
               <Button
                 type="button"
                 onClick={voltarEtapa}
                 variant="outline"
-                className="border-[var(--gov-blue)] text-[var(--gov-blue)]"
+                className="border-[var(--gov-blue)] text-[var(--gov-blue)] w-full"
               >
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Voltar
-              </Button>
-              
-              <Button 
-                onClick={iniciarSolicitacao}
-                className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90"
-              >
-                Próximo
-                <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>

@@ -46,17 +46,9 @@ export default function PaginaSimuladorICMS() {
                   estado={estado}
                   dataNascimento={dataNascimento}
                   onSimulacaoConcluida={(valor, meses) => {
-                    // Após concluir a simulação, redirecionar para página de pagamento
-                    const params = new URLSearchParams();
-                    params.append("cpf", cpf);
-                    params.append("nome", nome);
-                    params.append("valor", valor.toString());
-                    params.append("nasc", dataNascimento);
-                    params.append("companhia", companhia);
-                    params.append("estado", estado);
-                    
-                    // Redirecionar para página de pagamento
-                    navigate(`/pagamento?${params.toString()}`);
+                    // Não redirecionar para outra página, o componente lidará com a exibição do resultado
+                    console.log("Cálculo concluído: valor", valor, "meses", meses);
+                    // O fluxo permance na página atual
                   }}
                 />
               </CardContent>
