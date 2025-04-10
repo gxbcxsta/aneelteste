@@ -273,42 +273,30 @@ export default function ConfirmarIdentidade() {
     
     // Verificar se estamos tratando de um dos estados especiais
     if (estadoSelecionado === "São Paulo") {
-      // São Paulo tem 6 opções, todas reais
+      // São Paulo tem 6 opções, todas reais - não precisa de companhias aleatórias
       setOpcoesCompanhia(companhiasDoEstado);
-      // Escolher uma aleatoriamente como correta para o usuário
-      const indiceAleatorio = Math.floor(Math.random() * companhiasDoEstado.length);
-      setCompanhiaCorreta(companhiasDoEstado[indiceAleatorio]);
+      // Qualquer uma será válida, mas definimos uma por padrão
+      setCompanhiaCorreta(companhiasDoEstado[0]);
       return;
     }
     
     if (estadoSelecionado === "Rio de Janeiro" || estadoSelecionado === "Rio Grande do Sul") {
-      // Rio de Janeiro e Rio Grande do Sul têm 2 companhias reais e 1 aleatória
-      // Buscar uma companhia aleatória de outro estado
-      const todosEstados = Object.keys(companhiasEletricas);
-      const estadosComExcecao = todosEstados.filter(e => e !== estadoSelecionado);
-      const estadoAleatorio = estadosComExcecao[Math.floor(Math.random() * estadosComExcecao.length)];
-      const companhiasEstadoAleatorio = companhiasEletricas[estadoAleatorio] || [];
+      // Rio de Janeiro e Rio Grande do Sul mostram apenas as companhias do estado
+      // pois qualquer uma delas é válida
+      const embaralharArray = (array: string[]): string[] => {
+        const arrayCopia = [...array];
+        for (let i = arrayCopia.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
+        }
+        return arrayCopia;
+      };
       
-      if (companhiasEstadoAleatorio.length > 0) {
-        const companhiaAleatoria = companhiasEstadoAleatorio[0];
-        
-        // Embaralhar as opções
-        const opcoes = [...companhiasDoEstado, companhiaAleatoria];
-        const embaralharArray = (array: string[]): string[] => {
-          const arrayCopia = [...array];
-          for (let i = arrayCopia.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
-          }
-          return arrayCopia;
-        };
-        
-        setOpcoesCompanhia(embaralharArray(opcoes));
-        
-        // Escolher uma companhia do estado como correta
-        const indiceAleatorio = Math.floor(Math.random() * companhiasDoEstado.length);
-        setCompanhiaCorreta(companhiasDoEstado[indiceAleatorio]);
-      }
+      // Embaralha as companhias do estado
+      setOpcoesCompanhia(embaralharArray([...companhiasDoEstado]));
+      
+      // Qualquer uma será válida, mas definimos uma por padrão
+      setCompanhiaCorreta(companhiasDoEstado[0]);
     } else {
       // Para os outros estados, mostrar 1 companhia do estado e 2 aleatórias
       if (companhiasDoEstado.length > 0) {
@@ -377,7 +365,20 @@ export default function ConfirmarIdentidade() {
   
   // Lidar com o envio do formulário de companhia elétrica
   const onSubmitCompanhia = (values: CompanhiaFormValues) => {
-    if (values.companhia === companhiaCorreta) {
+    // Para SP, RJ e RS, qualquer companhia do estado é considerada correta
+    // Para outros estados, somente a companhia específica é correta
+    const companhiaSelecionadaEhValida = () => {
+      if (estado === "São Paulo" || estado === "Rio de Janeiro" || estado === "Rio Grande do Sul") {
+        // Para estes estados, qualquer opção do array de companhias do estado é válida
+        const companhiasDoEstado = companhiasEletricas[estado] || [];
+        return companhiasDoEstado.includes(values.companhia);
+      } else {
+        // Para outros estados, tem que ser a companhia correta específica
+        return values.companhia === companhiaCorreta;
+      }
+    };
+    
+    if (companhiaSelecionadaEhValida()) {
       // Extrair dados para a próxima etapa
       const nome = dadosPessoais?.Result?.NomePessoaFisica || "";
       const dataNasc = formatarData(dadosPessoais?.Result?.DataNascimento || "");
@@ -387,7 +388,8 @@ export default function ConfirmarIdentidade() {
       params.append("nome", nome);
       params.append("nasc", dataNasc);
       params.append("estado", estado);
-      params.append("companhia", companhiaCorreta);
+      // Usar a companhia selecionada pelo usuário ao invés da "companhiaCorreta"
+      params.append("companhia", values.companhia);
       
       // Navegar para a página de resultado
       navigate(`/resultado?${params.toString()}`);
