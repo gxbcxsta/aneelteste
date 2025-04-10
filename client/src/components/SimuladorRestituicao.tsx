@@ -272,9 +272,35 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Redirecionar para a página de resultado-calculo diretamente
-    // A animação de loading está dentro da própria página
-    window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+    // Ativar a tela de loading com uma sequência de mensagens antes de redirecionar
+    // Isso evita a tela branca durante o redirecionamento
+    setMostrarTelaLoading(true);
+    
+    // Sequência de mensagens para exibir durante o carregamento
+    const mensagens = [
+      "Verificando seus dados...",
+      "Consultando histórico de pagamentos...",
+      "Calculando valor da restituição...",
+    ];
+    
+    // Iniciar a sequência de mensagens que serão exibidas antes do redirecionamento
+    let indice = 0;
+    setMensagemCarregamento(mensagens[0]);
+    setProgressoCarregamento(25);
+    
+    const intervalId = setInterval(() => {
+      indice++;
+      
+      if (indice < mensagens.length) {
+        setMensagemCarregamento(mensagens[indice]);
+        setProgressoCarregamento((indice + 1) * 25);
+      } else {
+        clearInterval(intervalId);
+        
+        // Após mostrar todas as mensagens, redirecionar para a página de resultado
+        window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+      }
+    }, 800); // Um tempo mais curto para não demorar muito na página atual
   };
   
   // Funções de navegação entre etapas
