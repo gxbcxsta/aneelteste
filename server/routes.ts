@@ -5,6 +5,155 @@ import fetch from "node-fetch";
 // Usar as funções do db-alternative para interagir com o banco de dados
 import { getValorRestituicaoByCpf, salvarValorRestituicao } from "./db-alternative";
 
+// For4Payments API
+interface PaymentResponse {
+  id: string;
+  pixCode: string;
+  pixQrCode: string;
+  expiresAt: string;
+  status: string;
+}
+
+interface PaymentData {
+  amount: number;
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+}
+
+class For4PaymentsAPI {
+  private API_URL = "https://app.for4payments.com.br/api/v1";
+  private secretKey: string;
+  private publicKey: string;
+
+  constructor(secretKey: string, publicKey: string) {
+    this.secretKey = secretKey;
+    this.publicKey = publicKey;
+  }
+
+  private getHeaders(): Record<string, string> {
+    return {
+      'Authorization': this.secretKey,
+      'X-Public-Key': this.publicKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+  }
+
+  async createPixPayment(data: PaymentData): Promise<PaymentResponse> {
+    try {
+      const amountInCents = Math.round(data.amount * 100);
+      const cleanCpf = data.cpf.replace(/\D/g, "");
+      const cleanPhone = data.phone.replace(/\D/g, "");
+
+      if (!data.name || !data.email || !cleanCpf || !cleanPhone) {
+        console.error("[For4Payments] Campos obrigatórios faltando:", { data });
+        throw new Error("Campos obrigatórios faltando para criar pagamento");
+      }
+
+      const paymentData = {
+        name: data.name,
+        email: data.email,
+        cpf: cleanCpf,
+        phone: cleanPhone,
+        paymentMethod: "PIX",
+        amount: amountInCents,
+        items: [{
+          title: "Taxa de Regularização Energética (TRE)",
+          quantity: 1,
+          unitPrice: amountInCents,
+          tangible: false
+        }]
+      };
+
+      const response = await fetch(`${this.API_URL}/transaction.purchase`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(paymentData)
+      });
+
+      if (!response.ok) {
+        console.error("[For4Payments] Erro na resposta:", {
+          status: response.status,
+          statusText: response.statusText,
+        });
+        throw new Error(
+          `Erro na API de pagamento (${response.status}): ${response.statusText}`
+        );
+      }
+
+      const responseData = await response.json() as {
+        id: string;
+        pixCode: string;
+        pixQrCode: string;
+        expiresAt: string;
+        status?: string;
+      };
+      
+      return {
+        id: responseData.id,
+        pixCode: responseData.pixCode,
+        pixQrCode: responseData.pixQrCode,
+        expiresAt: responseData.expiresAt,
+        status: responseData.status || "pending",
+      };
+    } catch (error) {
+      console.error("[For4Payments] Erro:", error);
+      throw error;
+    }
+  }
+
+  async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
+    try {
+      const url = new URL(`${this.API_URL}/transaction.getPayment`);
+      url.searchParams.append('id', paymentId);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: this.getHeaders()
+      });
+
+      if (response.ok) {
+        const paymentData = await response.json() as { status?: string };
+
+        const statusMapping: Record<string, string> = {
+          'PENDING': 'pending',
+          'PROCESSING': 'pending',
+          'APPROVED': 'completed',
+          'COMPLETED': 'completed',
+          'PAID': 'completed',
+          'EXPIRED': 'failed',
+          'FAILED': 'failed',
+          'CANCELED': 'cancelled',
+          'CANCELLED': 'cancelled'
+        };
+
+        const currentStatus = paymentData.status || "PENDING";
+        return { status: statusMapping[currentStatus] || "pending" };
+      } else {
+        console.error(
+          "[For4Payments] Erro ao verificar status:",
+          response.statusText,
+        );
+        return { status: "pending" };
+      }
+    } catch (error) {
+      console.error(
+        "[For4Payments] Erro ao verificar status do pagamento:",
+        error,
+      );
+      return { status: "pending" };
+    }
+  }
+}
+
+// Inicialização da API com as chaves fornecidas
+const paymentApi = new For4PaymentsAPI(
+  "8cd431ca-a32b-4210-aa69-1947c4e54677", // Secret Key
+  "c224c86c-9395-4578-9fbd-80d71a3a2be3"  // Public Key
+);
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // API route for potential simulation endpoints
   app.get('/api/health', (req, res) => {
@@ -65,6 +214,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Erro ao processar salvamento de restituição:', error);
       res.status(500).json({ error: 'Erro interno no servidor' });
+    }
+  });
+
+  // Rota para criar pagamento PIX
+  app.post('/api/pagamentos', async (req: Request, res: Response) => {
+    try {
+      const { nome, email, cpf, telefone } = req.body;
+      
+      // Validar dados obrigatórios
+      if (!nome || !email || !cpf || !telefone) {
+        return res.status(400).json({ 
+          error: 'Dados incompletos', 
+          message: 'Todos os campos (nome, email, cpf, telefone) são obrigatórios' 
+        });
+      }
+      
+      // Valor fixo da TRE
+      const valorTaxa = 74.90;
+      
+      try {
+        // Remover formatação dos dados
+        const cpfLimpo = cpf.replace(/\D/g, '');
+        
+        // Criar pagamento na For4Payments
+        const pagamento = await paymentApi.createPixPayment({
+          amount: valorTaxa,
+          name: nome,
+          email: email,
+          cpf: cpfLimpo,
+          phone: telefone
+        });
+        
+        return res.json({
+          id: pagamento.id,
+          pixCode: pagamento.pixCode,
+          pixQrCode: pagamento.pixQrCode,
+          expiresAt: pagamento.expiresAt,
+          status: pagamento.status
+        });
+      } catch (paymentError) {
+        console.error("Erro ao processar pagamento:", paymentError);
+        return res.status(500).json({ 
+          error: "Falha ao processar pagamento", 
+          message: paymentError instanceof Error ? paymentError.message : "Erro desconhecido no processamento do pagamento"
+        });
+      }
+    } catch (error) {
+      console.error("Erro no servidor:", error);
+      res.status(500).json({ error: "Erro interno no servidor" });
+    }
+  });
+  
+  // Rota para verificar status do pagamento
+  app.get('/api/pagamentos/:id/status', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!id) {
+        return res.status(400).json({ error: 'ID do pagamento não fornecido' });
+      }
+      
+      const status = await paymentApi.checkPaymentStatus(id);
+      return res.json(status);
+    } catch (error) {
+      console.error("Erro ao verificar status do pagamento:", error);
+      res.status(500).json({ error: "Erro ao verificar status" });
     }
   });
 
