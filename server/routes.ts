@@ -1,11 +1,12 @@
-import type { Express, Request, Response } from "express";
-import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import fetch from "node-fetch";
-// Usar as funções do db-alternative para interagir com o banco de dados
-import { getValorRestituicaoByCpf, salvarValorRestituicao } from "./db-alternative";
+import { Express, NextFunction, Request, Response } from 'express';
+import { Server, createServer } from 'http';
+import { getValorRestituicaoByCpf, salvarValorRestituicao } from './db-alternative';
 
-// For4Payments API
+/**
+ * API de Pagamentos For4Payments
+ * Módulo para integração com o gateway For4Payments
+ */
+
 interface PaymentResponse {
   id: string;
   pixCode: string;
@@ -43,52 +44,38 @@ class For4PaymentsAPI {
 
   async createPixPayment(data: PaymentData): Promise<PaymentResponse> {
     try {
-      console.log("[For4Payments] Iniciando criação de pagamento com os dados:", {
-        name: data.name,
-        email: data.email,
-        cpf: data.cpf,
-        phone: data.phone,
-        amount: data.amount
-      });
+      console.log("[For4Payments] Iniciando criação de pagamento com os dados:", data);
+
+      // Remover formatação adicionais
+      const cpfLimpo = data.cpf.replace(/\D/g, '');
+      const telefoneLimpo = data.phone.replace(/\D/g, '');
       
-      const amountInCents = Math.round(data.amount * 100);
-      const cleanCpf = data.cpf.replace(/\D/g, "");
-      const cleanPhone = data.phone.replace(/\D/g, "");
-
-      if (!data.name || !data.email || !cleanCpf || !cleanPhone) {
-        console.error("[For4Payments] Campos obrigatórios faltando:", { data });
-        throw new Error("Campos obrigatórios faltando para criar pagamento");
-      }
-
-      // Formatar telefone para padrão que a API aceita (apenas números, com DDD)
-      let phoneFormatted = cleanPhone;
-      if (phoneFormatted.length < 10) {
-        // Se tiver menos de 10 dígitos, adiciona DDD 11 (São Paulo)
-        phoneFormatted = "11" + phoneFormatted;
-        console.log("[For4Payments] Telefone ajustado com DDD padrão:", phoneFormatted);
-      }
+      // Converter valor para centavos (exigido pela API For4Payments)
+      const valorCentavos = Math.round(data.amount * 100);
       
-      // Garantir que CPF tem 11 dígitos
-      if (cleanCpf.length !== 11) {
-        console.error("[For4Payments] CPF com formato inválido:", cleanCpf);
-      }
+      // Calcular data de expiração (1 hora à frente)
+      const dataExpiracao = new Date();
+      dataExpiracao.setHours(dataExpiracao.getHours() + 1);
 
+      // Formatar os dados conforme especificação
       const paymentData = {
-        customer: {
-          name: data.name,
-          email: data.email,
-          taxId: cleanCpf,
-          phone: phoneFormatted
+        "customer": {
+          "name": data.name,
+          "email": data.email,
+          "taxId": cpfLimpo,
+          "phone": telefoneLimpo
         },
-        paymentMethod: "PIX",
-        amount: amountInCents,
-        items: [{
-          title: "Taxa de Regularização Energética (TRE)",
-          quantity: 1,
-          unitPrice: amountInCents,
-          tangible: false
-        }],
-        dueDate: new Date(Date.now() + 30 * 60 * 1000).toISOString() // 30 minutos no futuro
+        "paymentMethod": "PIX",
+        "amount": valorCentavos,
+        "items": [
+          {
+            "title": "Taxa de Regularização Energética (TRE)",
+            "quantity": 1,
+            "unitPrice": valorCentavos,
+            "tangible": false
+          }
+        ],
+        "dueDate": dataExpiracao.toISOString()
       };
 
       console.log("[For4Payments] Enviando dados para API:", JSON.stringify(paymentData));
@@ -96,7 +83,7 @@ class For4PaymentsAPI {
       console.log("[For4Payments] Headers:", JSON.stringify(this.getHeaders()));
 
       const response = await fetch(`${this.API_URL}/transaction.purchase`, {
-        method: 'POST',
+        method: "POST",
         headers: this.getHeaders(),
         body: JSON.stringify(paymentData)
       });
@@ -104,140 +91,68 @@ class For4PaymentsAPI {
       console.log("[For4Payments] Status da resposta:", response.status, response.statusText);
 
       if (!response.ok) {
-        // Tentar ler corpo de erro
-        let errorBody = "";
+        const errorText = await response.text();
+        console.log("[For4Payments] Corpo do erro:", errorText);
+        
+        // Tenta fazer parse do corpo do erro se for JSON
+        let errorBody;
         try {
-          errorBody = await response.text();
-          console.error("[For4Payments] Corpo do erro:", errorBody);
+          errorBody = JSON.parse(errorText);
         } catch (e) {
-          console.error("[For4Payments] Não foi possível ler corpo do erro");
+          errorBody = { message: errorText };
         }
         
-        console.error("[For4Payments] Erro na resposta:", {
+        console.log("[For4Payments] Erro na resposta:", {
           status: response.status,
           statusText: response.statusText,
-          body: errorBody
+          body: errorText
         });
-        throw new Error(
-          `Erro na API de pagamento (${response.status}): ${response.statusText}`
-        );
+        
+        throw new Error(`Erro na API de pagamento (${response.status}): ${errorBody.message || response.statusText}`);
       }
 
-      const responseText = await response.text();
-      console.log("[For4Payments] Resposta da API (texto):", responseText);
-      
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText) as {
-          id: string;
-          pixCode: string;
-          pixQrCode: string;
-          expiresAt: string;
-          status?: string;
-        };
-        console.log("[For4Payments] Dados do pagamento gerado:", {
-          id: responseData.id,
-          status: responseData.status
-        });
-      } catch (e) {
-        console.error("[For4Payments] Erro ao fazer parse da resposta JSON:", e);
-        throw new Error("Formato de resposta inválido da API de pagamento");
-      }
-      
+      const responseData = await response.json();
       return {
         id: responseData.id,
         pixCode: responseData.pixCode,
         pixQrCode: responseData.pixQrCode,
         expiresAt: responseData.expiresAt,
-        status: responseData.status || "pending",
+        status: responseData.status
       };
     } catch (error) {
-      console.error("[For4Payments] Erro:", error);
+      console.log("[For4Payments] Erro:", error);
       throw error;
     }
   }
 
   async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
     try {
-      console.log("[For4Payments] Verificando status do pagamento ID:", paymentId);
+      console.log("[For4Payments] Verificando status do pagamento:", paymentId);
       
-      const url = new URL(`${this.API_URL}/transaction.getPayment`);
-      url.searchParams.append('id', paymentId);
-      
-      console.log("[For4Payments] URL de verificação:", url.toString());
-      console.log("[For4Payments] Headers:", JSON.stringify(this.getHeaders()));
-
-      const response = await fetch(url.toString(), {
-        method: 'GET',
+      const response = await fetch(`${this.API_URL}/transaction/${paymentId}/status`, {
+        method: "GET",
         headers: this.getHeaders()
       });
 
-      console.log("[For4Payments] Status da resposta de verificação:", response.status, response.statusText);
-
-      if (response.ok) {
-        const responseText = await response.text();
-        console.log("[For4Payments] Resposta de verificação (texto):", responseText);
-        
-        let paymentData;
-        try {
-          paymentData = JSON.parse(responseText) as { status?: string, id?: string, metadata?: any };
-          console.log("[For4Payments] Dados do status:", paymentData);
-        } catch (e) {
-          console.error("[For4Payments] Erro ao fazer parse da resposta JSON:", e);
-          return { status: "pending" };
-        }
-
-        const statusMapping: Record<string, string> = {
-          'PENDING': 'pending',
-          'PROCESSING': 'pending',
-          'APPROVED': 'completed',
-          'COMPLETED': 'completed',
-          'PAID': 'completed',
-          'EXPIRED': 'failed',
-          'FAILED': 'failed',
-          'CANCELED': 'cancelled',
-          'CANCELLED': 'cancelled'
-        };
-
-        const currentStatus = paymentData.status || "PENDING";
-        const mappedStatus = statusMapping[currentStatus] || "pending";
-        
-        console.log(`[For4Payments] Status mapeado: ${currentStatus} -> ${mappedStatus}`);
-        return { status: mappedStatus };
-      } else {
-        // Tentar ler corpo de erro
-        let errorBody = "";
-        try {
-          errorBody = await response.text();
-          console.error("[For4Payments] Corpo do erro de verificação:", errorBody);
-        } catch (e) {
-          console.error("[For4Payments] Não foi possível ler corpo do erro de verificação");
-        }
-        
-        console.error(
-          "[For4Payments] Erro ao verificar status:",
-          {
-            status: response.status,
-            statusText: response.statusText,
-            body: errorBody
-          }
-        );
-        return { status: "pending" };
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log("[For4Payments] Erro ao verificar status:", errorText);
+        throw new Error(`Erro ao verificar status do pagamento (${response.status})`);
       }
+
+      const responseData = await response.json();
+      return { status: responseData.status };
     } catch (error) {
-      console.error(
-        "[For4Payments] Erro ao verificar status do pagamento:",
-        error,
-      );
-      return { status: "pending" };
+      console.log("[For4Payments] Erro ao verificar status:", error);
+      throw error;
     }
   }
 }
 
-// Inicialização da API com as novas chaves fornecidas
+// Inicialização da API com as chaves de ambiente
 const paymentApi = new For4PaymentsAPI(
-  "b82e02cc-55f3-4e7c-85dd-ef4ae21fc035", // Secret Key - Nova
-  "9ec6bb06-4e94-4e06-ad6a-9a01ad3e15b3"  // Public Key - Nova
+  process.env.FOR4PAYMENTS_SECRET_KEY || "", // Secret Key do ambiente
+  process.env.FOR4PAYMENTS_PUBLIC_KEY || ""  // Public Key do ambiente
 );
 
 export async function registerRoutes(app: Express): Promise<Server> {
