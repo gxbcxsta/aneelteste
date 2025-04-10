@@ -21,7 +21,7 @@ export default function ImageVerification({ onVerify }: ImageVerificationProps) 
   return (
     <div className="mb-4">
       <p className="text-[#2B4F81] text-base font-bold" style={{ fontSize: '16px' }}>
-        Clique abaixo, na figura de TESOURA <span className="text-red-700">(em vermelho)</span>:
+        Clique abaixo, na figura de TESOURA:
         <span className="text-red-700 text-lg">*</span>
         <span className="text-[#2B4F81] text-base rounded-full border border-[#2B4F81] w-5 h-5 inline-flex items-center justify-center ml-1">?</span>
       </p>
@@ -32,45 +32,31 @@ export default function ImageVerification({ onVerify }: ImageVerificationProps) 
             className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer ${selectedImage === 0 ? 'selected border-blue-500 border-2' : 'transparent'}`}
             onClick={() => selectImage(0)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-            </svg>
+            <img alt="Imagem 4" className="w-5 h-5" src="/assets/img/imagem-4.png" />
           </div>
           <div 
             className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer ${selectedImage === 1 ? 'selected border-blue-500 border-2' : 'transparent'}`}
             onClick={() => selectImage(1)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            <img alt="Imagem 5" className="w-5 h-5" src="/assets/img/imagem-5.png" />
           </div>
           <div 
             className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer ${selectedImage === 2 ? 'selected border-blue-500 border-2' : 'transparent'}`}
             onClick={() => selectImage(2)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-              <path d="M9 18l6-6-6-6"></path>
-            </svg>
+            <img alt="Imagem 1" className="w-5 h-5" src="/assets/img/imagem-1.png" />
           </div>
           <div 
             className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer ${selectedImage === 3 ? 'selected border-blue-500 border-2' : 'transparent'}`}
             onClick={() => selectImage(3)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF0000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-              <circle cx="6" cy="6" r="3"></circle>
-              <circle cx="14" cy="15" r="3"></circle>
-              <path d="M14 6l-8.5 9"></path>
-              <path d="M9 13l5-5"></path>
-            </svg>
+            <img alt="Tesoura" className="w-5 h-5" src="/assets/img/tesoura.png" />
           </div>
           <div 
             className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer ${selectedImage === 4 ? 'selected border-blue-500 border-2' : 'transparent'}`}
             onClick={() => selectImage(4)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-            </svg>
+            <img alt="Imagem 3" className="w-5 h-5" src="/assets/img/imagem-3.png" />
           </div>
         </div>
       </div>
