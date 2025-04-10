@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Coins, ChevronRight, ChevronLeft, AlertCircle, Loader2, Phone, Mail, BanknoteIcon, CreditCard, CheckCircle, CircleDollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { CalculoLoadingPopup } from "@/components/CalculoLoadingPopup";
 
 // Validação para o número de cliente/CPF
 const clienteSchema = z.object({
@@ -235,10 +236,14 @@ export default function SimuladorRestituicao({
     proximaEtapa();
   };
   
+  // Estado para controlar a exibição do PopUp de cálculo
+  const [showCalculoPopup, setShowCalculoPopup] = useState(false);
+
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = async (data: PeriodoFormValues) => {
     setCalculando(true);
     setAnimacaoAtiva(true);
+    setShowCalculoPopup(true); // Mostrar o popup de loading
     
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
@@ -279,8 +284,8 @@ export default function SimuladorRestituicao({
         setValorRealRestituicao(0);
       } else {
         // Se não existe, calcular um novo valor
-        // Adiciona um tempo de espera para dar mais credibilidade ao cálculo
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // O popup de loading já está exibindo a mensagem por 8 segundos no total
+        // (4 etapas de 2 segundos) - não precisamos de um atraso adicional aqui
         
         // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
         let valorEstimado = valorMedioFinal * meses * 0.25;
@@ -322,13 +327,8 @@ export default function SimuladorRestituicao({
         }
       }
       
-      // Notifica o componente pai sobre a conclusão
-      onSimulacaoConcluida(valorFinal, meses);
-      
-      // Finaliza o carregamento e avança para a próxima etapa
-      setCalculando(false);
-      setAnimacaoAtiva(false);
-      proximaEtapa();
+      // Notifica o componente pai sobre a conclusão (após o popup terminar)
+      // O popup vai levar 8 segundos no total para completar
     } catch (error) {
       console.error("Erro ao consultar/salvar valor de restituição:", error);
       
@@ -342,14 +342,6 @@ export default function SimuladorRestituicao({
       } else {
         setValorRealRestituicao(0);
       }
-      
-      // Notifica o componente pai sobre a conclusão
-      onSimulacaoConcluida(valorFinal, meses);
-      
-      // Finaliza o carregamento e avança para a próxima etapa
-      setCalculando(false);
-      setAnimacaoAtiva(false);
-      proximaEtapa();
     }
   };
   
@@ -1055,6 +1047,23 @@ export default function SimuladorRestituicao({
     return ((etapaAtual) / totalEtapas) * 100;
   };
   
+  // Callback quando o popup de cálculo completar
+  const onCalculoComplete = () => {
+    // Esconder o popup
+    setShowCalculoPopup(false);
+    
+    // Finaliza o carregamento
+    setCalculando(false);
+    setAnimacaoAtiva(false);
+    
+    // Avança para a próxima etapa
+    proximaEtapa();
+    
+    // Notifica o componente pai sobre a conclusão
+    const valorFinal = valorFinalRestituicao || 0;
+    onSimulacaoConcluida(valorFinal, mesesConsiderados);
+  };
+  
   return (
     <div className="bg-white rounded-lg p-6 shadow-md">
       {/* Barra de progresso */}
@@ -1096,6 +1105,14 @@ export default function SimuladorRestituicao({
       
       {/* Conteúdo da etapa atual */}
       {renderEtapa()}
+      
+      {/* Popup de loading de cálculo */}
+      {showCalculoPopup && (
+        <CalculoLoadingPopup 
+          companhia={companhia} 
+          onComplete={onCalculoComplete} 
+        />
+      )}
     </div>
   );
 }
