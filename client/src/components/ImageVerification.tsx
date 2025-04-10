@@ -21,7 +21,7 @@ export default function ImageVerification({ onVerify }: ImageVerificationProps) 
   return (
     <div className="mb-4">
       <p className="text-[#2B4F81] text-base font-bold" style={{ fontSize: '16px' }}>
-        Clique abaixo, na figura de TESOURA:
+        Clique abaixo, na figura de TESOURA <span className="text-red-700">(em vermelho)</span>:
         <span className="text-red-700 text-lg">*</span>
         <span className="text-[#2B4F81] text-base rounded-full border border-[#2B4F81] w-5 h-5 inline-flex items-center justify-center ml-1">?</span>
       </p>
@@ -57,10 +57,11 @@ export default function ImageVerification({ onVerify }: ImageVerificationProps) 
             className={`bg-[#d2d2d2] p-2 border border-white flex items-center justify-center image-option cursor-pointer ${selectedImage === 3 ? 'selected border-blue-500 border-2' : 'transparent'}`}
             onClick={() => selectImage(3)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF0000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
               <circle cx="6" cy="6" r="3"></circle>
-              <circle cx="18" cy="18" r="3"></circle>
-              <line x1="9" y1="9" x2="15" y2="15"></line>
+              <circle cx="14" cy="15" r="3"></circle>
+              <path d="M14 6l-8.5 9"></path>
+              <path d="M9 13l5-5"></path>
             </svg>
           </div>
           <div 
