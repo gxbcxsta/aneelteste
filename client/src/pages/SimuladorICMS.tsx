@@ -1,23 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import SimuladorICMS from "@/components/SimuladorICMS";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import SimuladorRestituicao from "@/components/SimuladorRestituicao";
 
 export default function PaginaSimuladorICMS() {
-  const [, navigate] = useLocation();
-  const [simulacaoConcluida, setSimulacaoConcluida] = useState(false);
-  const [valorRestituicao, setValorRestituicao] = useState(0);
-  const [mesesAvaliados, setMesesAvaliados] = useState(0);
+  const [location, navigate] = useLocation();
+  // Extrair parâmetros de consulta da URL atual
+  const query = new URLSearchParams(window.location.search);
   
-  const handleSimulacaoConcluida = (valor: number, meses: number) => {
-    setValorRestituicao(valor);
-    setMesesAvaliados(meses);
-    setSimulacaoConcluida(true);
-  };
+  // Dados do usuário da URL
+  const cpf = query.get("cpf") || "";
+  const nome = query.get("nome") || "";
+  const estado = query.get("estado") || "Minas Gerais";
+  const companhia = query.get("companhia") || "CEMIG Distribuição";
+  const dataNascimento = query.get("nasc") || "";
+  
+  // Verificar se temos dados necessários
+  useEffect(() => {
+    if (!cpf || !nome) {
+      navigate("/verificar");
+    }
+  }, [cpf, nome, navigate]);
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -25,30 +30,41 @@ export default function PaginaSimuladorICMS() {
       <main className="flex-1 bg-[var(--gov-gray-light)] py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <Button 
-              onClick={() => navigate("/")}
-              variant="outline"
-              className="mb-6 border-[var(--gov-blue)] text-[var(--gov-blue)] hover:bg-[var(--gov-blue-light)]/10"
-            >
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Voltar para a página inicial
-            </Button>
-            
             <Card className="shadow-lg overflow-hidden">
               <CardHeader className="bg-[var(--gov-blue)] text-white text-center py-8">
-                <CardTitle className="text-2xl font-bold">Simulador de Restituição de ICMS</CardTitle>
+                <CardTitle className="text-2xl font-bold">Simulador de Restituição</CardTitle>
                 <CardDescription className="text-gray-100 mt-2">
-                  Calcule o valor que você tem direito a receber de volta
+                  Complete as informações para simular o valor da sua restituição
                 </CardDescription>
               </CardHeader>
               
               <CardContent className="p-6">
-                <SimuladorICMS onSimulacaoConcluida={handleSimulacaoConcluida} />
+                <SimuladorRestituicao 
+                  cpf={cpf}
+                  nome={nome}
+                  companhia={companhia}
+                  estado={estado}
+                  dataNascimento={dataNascimento}
+                  onSimulacaoConcluida={(valor, meses) => {
+                    // Após concluir a simulação, redirecionar para página de pagamento
+                    const params = new URLSearchParams();
+                    params.append("cpf", cpf);
+                    params.append("nome", nome);
+                    params.append("valor", valor.toString());
+                    params.append("nasc", dataNascimento);
+                    params.append("companhia", companhia);
+                    params.append("estado", estado);
+                    
+                    // Redirecionar para página de pagamento
+                    navigate(`/pagamento?${params.toString()}`);
+                  }}
+                />
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
+      
       <Footer />
     </div>
   );

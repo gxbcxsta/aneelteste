@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -231,16 +231,14 @@ export default function ConfirmarIdentidade() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <Card className="shadow-md">
+              <CardHeader className="bg-[var(--gov-blue)] text-white text-center py-6">
+                <CardTitle className="text-2xl font-bold">Confirmação de Identidade</CardTitle>
+                <CardDescription className="text-gray-100 mt-2">
+                  Para confirmar sua identidade, precisamos validar alguns dados pessoais.
+                </CardDescription>
+              </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-6">
-                  <div className="text-center mb-6">
-                    <h1 className="text-2xl font-bold text-[var(--gov-blue-dark)]">
-                      Confirmação de Identidade
-                    </h1>
-                    <p className="text-[var(--gov-gray-dark)]">
-                      Para confirmar sua identidade, precisamos validar alguns dados pessoais.
-                    </p>
-                  </div>
 
                   {etapaAtual === EtapaVerificacao.NOME && (
                     <div>
