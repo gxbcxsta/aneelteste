@@ -13,7 +13,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { FaInfoCircle } from "react-icons/fa";
-import VerificacaoIdentidade from "../components/VerificacaoIdentidade";
 import ImageVerification from "../components/ImageVerification";
 import { LoadingPopup } from "../components/LoadingPopup";
 
@@ -269,14 +268,7 @@ export default function VerificarRestituicao() {
         </div>
       </main>
       
-      {/* Popup de verificação de identidade - desativado */}
-      {showVerificacao && dadosPessoais && (
-        <VerificacaoIdentidade 
-          dadosPessoais={dadosPessoais} 
-          onClose={() => setShowVerificacao(false)} 
-          onSuccess={handleVerificacaoConcluida}
-        />
-      )}
+      {/* Popup de verificação de identidade - totalmente removido */}
       
       {/* Popup de carregamento */}
       {showLoading && (

