@@ -17,7 +17,9 @@ import Sucesso from "@/pages/Sucesso";
 import ResultadoCalculo from "@/pages/ResultadoCalculo";
 import ConfirmacaoRestituicao from "@/pages/ConfirmacaoRestituicao";
 import TaxaComplementar from "@/pages/TaxaComplementar";
-import TaxaFinal from "@/pages/TaxaFinal";
+import PagamentoTCN from "@/pages/PagamentoTCN";
+import TaxaLAR from "@/pages/TaxaLAR";
+import PagamentoLAR from "@/pages/PagamentoLAR";
 
 function Router() {
   return (
@@ -32,7 +34,9 @@ function Router() {
         <Route path="/confirmacao" component={Confirmacao}/>
         <Route path="/pagamento" component={PagamentoPix}/>
         <Route path="/taxa-complementar" component={TaxaComplementar}/>
-        <Route path="/taxa-final" component={TaxaFinal}/>
+        <Route path="/pagamento-tcn" component={PagamentoTCN}/>
+        <Route path="/taxa-lar" component={TaxaLAR}/>
+        <Route path="/pagamento-lar" component={PagamentoLAR}/>
         <Route path="/sucesso" component={Sucesso}/>
         <Route path="/resultado-calculo" component={ResultadoCalculo}/>
         <Route path="/confirmacao-restituicao" component={ConfirmacaoRestituicao}/>

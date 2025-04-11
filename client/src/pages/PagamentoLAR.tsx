@@ -145,7 +145,7 @@ export default function PagamentoLAR() {
   // Estado de loading para simular o processamento do pagamento
   const [isLoading, setIsLoading] = useState(false);
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
-  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'processing' | 'completed'>('pending');
+  const [paymentStatus, setPaymentStatus] = useState<string>('pending');
   const [notificacoes, setNotificacoes] = useState<{ id: number; nome: string; valor: string }[]>([]);
   const [progress, setProgress] = useState(0);
   
