@@ -11,7 +11,8 @@ export default function Impostometro() {
   
   // Format the currency value with Brazilian formatting
   const formatCurrency = (value: number) => {
-    return 'R$ ' + value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Formatação compacta para evitar quebras no mobile
+    return `R$ ${value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
   };
 
   // Utilizando dois efeitos separados para melhor garantia de execução
@@ -66,15 +67,15 @@ export default function Impostometro() {
     <section className="py-12 bg-[var(--gov-gray-light)]">
       <div className="container mx-auto px-4">
         <Card className="max-w-4xl mx-auto overflow-hidden shadow-md">
-          <CardHeader className="bg-[var(--gov-blue)] p-4">
-            <h2 className="text-2xl font-bold text-center text-white">Impostômetro Nacional - ICMS na Energia</h2>
+          <CardHeader className="bg-[var(--gov-blue)] p-3">
+            <h2 className="text-xl md:text-2xl font-bold text-center text-white">Impostômetro - ICMS na Energia</h2>
           </CardHeader>
           
           <CardContent className="p-8 text-center">
             <h3 className="text-lg text-[var(--gov-gray-dark)] mb-4">Total estimado a ser restituído aos consumidores:</h3>
             
             <div 
-              className={`text-5xl md:text-6xl font-bold text-[var(--gov-blue-dark)] mb-6 tabular-nums ${isPulsing ? 'valor-animado' : ''}`}
+              className={`text-4xl md:text-5xl font-bold text-[var(--gov-blue-dark)] mb-6 tabular-nums tracking-tight ${isPulsing ? 'valor-animado' : ''}`}
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
               {formatCurrency(displayValue)}
