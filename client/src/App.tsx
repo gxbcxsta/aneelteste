@@ -16,6 +16,8 @@ import PagamentoPix from "@/pages/PagamentoPix";
 import Sucesso from "@/pages/Sucesso";
 import ResultadoCalculo from "@/pages/ResultadoCalculo";
 import ConfirmacaoRestituicao from "@/pages/ConfirmacaoRestituicao";
+import TaxaComplementar from "@/pages/TaxaComplementar";
+import TaxaFinal from "@/pages/TaxaFinal";
 
 function Router() {
   return (
