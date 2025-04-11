@@ -34,6 +34,9 @@ interface SimuladorICMSProps {
 export default function SimuladorICMS({
   onSimulacaoConcluida
 }: SimuladorICMSProps) {
+  // Hook de navegação do wouter
+  const [location, navigate] = useLocation();
+  
   const [etapaAtual, setEtapaAtual] = useState(0);
   const [valorMedioFinal, setValorMedioFinal] = useState(0);
   const [mesesConsiderados, setMesesConsiderados] = useState(0);
@@ -197,8 +200,8 @@ export default function SimuladorICMS({
     const companhia = params.get("companhia") || "Sua Distribuidora";
     const estado = params.get("estado") || "Seu Estado";
     
-    // Navega para a página de confirmação com os parâmetros necessários
-    window.location.href = `/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    // Navega para a página de confirmação com os parâmetros necessários usando navigate
+    navigate(`/confirmacao?nome=${encodeURIComponent(nome)}&valor=${valorFinalRestituicao}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`);
   };
   
   // Progresso do wizard

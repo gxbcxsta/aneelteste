@@ -5,6 +5,7 @@ import { Coins, User, Building, MapPin, ChevronRight, Calendar, Clock, CheckCirc
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
 export default function ResultadoCalculo() {
   // Estado para controlar loading e progresso

@@ -244,7 +244,8 @@ export default function Confirmacao() {
     setAnimacaoAtiva(true);
     
     setTimeout(() => {
-      window.location.href = "/sucesso?nome=" + encodeURIComponent(nomeUsuario);
+      // Usar navigate da wouter em vez de window.location.href
+      navigate("/sucesso?nome=" + encodeURIComponent(nomeUsuario));
     }, 500);
   };
 
