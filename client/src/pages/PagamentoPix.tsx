@@ -39,36 +39,32 @@ interface NotificacaoProps {
 }
 
 const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
-  // Não precisamos mais tocar o som aqui, pois já estamos tocando no nível superior
-  // Este componente agora é apenas visual
-  
   return (
-    <div className="max-w-sm w-full bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden">
-      <div className="flex items-start p-3">
-        <div className="flex-shrink-0 pt-0.5">
-          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-            <Bell className="h-4 w-4 text-green-600" />
+    <div className="max-w-[250px] md:max-w-sm w-full bg-white shadow-sm rounded-md border border-gray-100 overflow-hidden animate-fade-in">
+      <div className="flex items-start p-2">
+        <div className="flex-shrink-0">
+          <div className="h-6 w-6 rounded-full bg-green-50 flex items-center justify-center">
+            <CheckCircle className="h-3 w-3 text-green-600" />
           </div>
         </div>
-        <div className="ml-3 w-0 flex-1">
-          <p className="text-sm font-medium text-gray-900">
-            Nova transação
+        <div className="ml-2 w-0 flex-1">
+          <p className="text-xs font-medium text-gray-700 flex items-center">
+            <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+            Novo pagamento
           </p>
-          <p className="mt-1 text-sm text-gray-500">
-            <strong>{nome}</strong> acabou de pagar a TRE para uma restituição de <strong className="text-green-600">{valor}</strong>
+          <p className="mt-0.5 text-xs text-gray-600 leading-tight">
+            <span className="font-medium">{nome}</span> recebeu <span className="font-medium text-green-600">{valor}</span>
           </p>
         </div>
-        <div className="ml-4 flex-shrink-0 flex">
-          <button
-            className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
-            onClick={onClose}
-          >
-            <span className="sr-only">Fechar</span>
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
-        </div>
+        <button
+          className="ml-1 flex-shrink-0 text-gray-400 hover:text-gray-500 focus:outline-none"
+          onClick={onClose}
+        >
+          <span className="sr-only">Fechar</span>
+          <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -397,24 +393,24 @@ export default function PagamentoPix() {
         </div>
         
         <div className="p-6 relative bg-gray-50 rounded-lg shadow-md max-w-6xl mx-auto">
-          <div className="bg-gradient-to-r from-[#071D41] to-[#1351B4] text-white p-5 rounded-lg mb-6 shadow-sm">
-            <div className="flex justify-between items-center">
+          <div className="bg-[#1351B4] text-white p-4 rounded-md mb-5 shadow-sm">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
               <div className="text-left">
-                <div className="flex items-center mb-2">
-                  <Landmark className="mr-2 h-5 w-5 text-[#FFCD07]" />
-                  <h3 className="font-bold text-xl">Restituição de ICMS</h3>
+                <div className="flex items-center mb-1">
+                  <Landmark className="mr-2 h-5 w-5 text-white" />
+                  <h3 className="font-bold text-lg">Restituição de ICMS</h3>
                 </div>
-                <div className="bg-[#1351B4]/40 text-[#FFFFFF] text-xs px-3 py-1.5 rounded-md inline-flex items-center">
-                  <Info size={12} className="mr-1.5" />
+                <div className="bg-[#0C4DA2] text-white text-xs px-2 py-1 rounded inline-flex items-center">
+                  <Info size={12} className="mr-1" />
                   Protocolo nº {cpf.substring(0,4)}4714{cpf.substring(6,9)}
                 </div>
               </div>
-              <div className="text-right bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <p className="font-bold text-[#FFCD07] text-sm mb-1">Taxa de Regularização:</p>
-                <p className="font-bold text-xl">{valorTaxaFormatado}</p>
-                <div className="flex items-center justify-end mt-1 text-xs">
-                  <AlertCircle size={12} className="mr-1 text-[#FFCD07]" />
-                  <span>Vencimento: <span className="countdown font-medium">{formatarTempo(tempoRestante)}</span></span>
+              <div className="text-right bg-[#0C4DA2] rounded-md p-3">
+                <p className="font-medium text-white text-sm mb-1">Taxa de Regularização:</p>
+                <p className="font-bold text-lg text-white">{valorTaxaFormatado}</p>
+                <div className="flex items-center justify-end mt-1 text-xs text-white">
+                  <AlertCircle size={12} className="mr-1" />
+                  <span>Vencimento: <span className="font-medium">{formatarTempo(tempoRestante)}</span></span>
                 </div>
               </div>
             </div>
@@ -789,21 +785,19 @@ export default function PagamentoPix() {
                   )}
                 </Button>
                 
-                <div className="bg-gradient-to-r from-red-600 to-red-700 p-5 rounded-lg text-white shadow-md">
-                  <div className="flex items-center mb-3">
-                    <div className="bg-white/20 p-1.5 rounded-full mr-3">
-                      <AlertTriangle className="h-5 w-5 text-[#FFCD07]" />
-                    </div>
-                    <h3 className="font-bold text-base tracking-wide">NOTIFICAÇÃO OFICIAL</h3>
+                <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
+                  <div className="flex items-center mb-2">
+                    <AlertTriangle className="h-5 w-5 text-white mr-2" />
+                    <h3 className="font-bold text-base">NOTIFICAÇÃO OFICIAL</h3>
                   </div>
-                  <p className="mb-4 text-sm leading-relaxed">
+                  <p className="mb-3 text-sm">
                     Ao prosseguir, você concordou com o pagamento da Taxa de Regularização no valor de <strong>{valorTaxaFormatado}</strong>. 
-                    Conforme a resolução ANEEL nº 1.000/2021, o não pagamento resultará em <strong>cancelamento automático</strong> da sua solicitação de restituição.
+                    O não pagamento resultará em <strong>cancelamento automático</strong> da sua solicitação.
                   </p>
-                  <div className="bg-red-700/50 p-3 rounded-md border border-white/10">
-                    <p className="font-medium text-sm flex items-center">
-                      <span className="inline-block w-2 h-2 bg-[#FFCD07] rounded-full mr-2 animate-pulse"></span>
-                      Efetue o pagamento em até <span className="font-bold mx-1">{formatarTempo(tempoRestante)}</span> para garantir sua restituição de <strong className="ml-1">{valorFormatado}</strong>.
+                  <div className="bg-white/10 p-2 rounded-md">
+                    <p className="font-medium text-sm text-center">
+                      Efetue o pagamento em até <span className="font-bold">{formatarTempo(tempoRestante)}</span> 
+                      <br className="md:hidden" /> para garantir sua restituição de <strong>{valorFormatado}</strong>
                     </p>
                   </div>
                 </div>
@@ -811,54 +805,28 @@ export default function PagamentoPix() {
             </div>
           </div>
           
-          {/* Seção de Garantia de Segurança - Movida conforme solicitado */}
-          <div className="mb-5">
-            <div className="border border-green-200 bg-green-50 rounded-lg p-5 shadow-sm">
-              <div className="flex items-center mb-3">
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-700" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-green-800 text-xl">GARANTIA DE SEGURANÇA</h3>
+          {/* Seção de Garantia de Segurança - Simplificada */}
+          <div className="mb-4">
+            <div className="border border-green-100 bg-green-50 rounded-md p-3 shadow-sm">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-700 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <h3 className="font-semibold text-green-800">GARANTIA DE SEGURANÇA</h3>
               </div>
               
-              <p className="text-green-700 ml-2 text-lg mb-4">
-                Este procedimento é fiscalizado e regulamentado por órgãos oficiais, com garantia de:
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <p className="ml-3 text-green-800 font-medium">
-                      Conformidade com a LGPD (Lei Geral de Proteção de Dados)
-                    </p>
-                  </div>
+              <div className="text-sm text-green-700 mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Conformidade com a LGPD</span>
                 </div>
-                
-                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <p className="ml-3 text-green-800 font-medium">
-                      Consultas criptografadas com tecnologia GOV.BR
-                    </p>
-                  </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Tecnologia GOV.BR</span>
                 </div>
-                
-                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <p className="ml-3 text-green-800 font-medium">
-                      Registro no sistema nacional de restituição tarifária
-                    </p>
-                  </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Sistema nacional de restituição</span>
                 </div>
               </div>
             </div>
