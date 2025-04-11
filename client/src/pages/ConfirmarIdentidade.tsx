@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { useLocalizacao } from "@/components/LocalizacaoDetector";
 
 enum EtapaVerificacao {
   NOME = 0,

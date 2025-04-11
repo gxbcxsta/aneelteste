@@ -186,6 +186,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'ANEEL ICMS Restituição API' });
   });
+  
+  // Rota para detectar localização por IP
+  app.get('/api/detectar-estado', async (req: Request, res: Response) => {
+    try {
+      // Obter o IP real do cliente, considerando proxies
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      console.log(`Detectando estado para IP: ${ip}`);
+      
+      // Usar a API ip-api.com para obter a localização
+      const response = await fetch('https://ip-api.com/json/?fields=status,message,region,regionName,country,countryCode&lang=pt-BR');
+      
+      if (!response.ok) {
+        throw new Error(`Erro na API de geolocalização: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Dados de localização por IP:", data);
+      
+      // Verificar se a requisição foi bem-sucedida
+      if (data.status !== "success") {
+        return res.status(400).json({ 
+          error: "Não foi possível detectar um local válido",
+          defaultState: "São Paulo" // Estado padrão caso falhe
+        });
+      }
+      
+      // Mapeamento de estados (siglas e nomes) para garantir padronização
+      const mapeamentoEstados: Record<string, string> = {
+        // Norte
+        "Acre": "Acre", "AC": "Acre",
+        "Amapá": "Amapá", "Amapa": "Amapá", "AP": "Amapá",
+        "Amazonas": "Amazonas", "AM": "Amazonas",
+        "Pará": "Pará", "Para": "Pará", "PA": "Pará",
+        "Rondônia": "Rondônia", "Rondonia": "Rondônia", "RO": "Rondônia",
+        "Roraima": "Roraima", "RR": "Roraima",
+        "Tocantins": "Tocantins", "TO": "Tocantins",
+        
+        // Nordeste
+        "Alagoas": "Alagoas", "AL": "Alagoas",
+        "Bahia": "Bahia", "BA": "Bahia",
+        "Ceará": "Ceará", "Ceara": "Ceará", "CE": "Ceará",
+        "Maranhão": "Maranhão", "Maranhao": "Maranhão", "MA": "Maranhão",
+        "Paraíba": "Paraíba", "Paraiba": "Paraíba", "PB": "Paraíba",
+        "Pernambuco": "Pernambuco", "PE": "Pernambuco",
+        "Piauí": "Piauí", "Piaui": "Piauí", "PI": "Piauí",
+        "Rio Grande do Norte": "Rio Grande do Norte", "RN": "Rio Grande do Norte",
+        "Sergipe": "Sergipe", "SE": "Sergipe",
+        
+        // Centro-Oeste
+        "Distrito Federal": "Distrito Federal", "DF": "Distrito Federal",
+        "Goiás": "Goiás", "Goias": "Goiás", "GO": "Goiás",
+        "Mato Grosso": "Mato Grosso", "MT": "Mato Grosso",
+        "Mato Grosso do Sul": "Mato Grosso do Sul", "MS": "Mato Grosso do Sul",
+        
+        // Sudeste
+        "Espírito Santo": "Espírito Santo", "Espirito Santo": "Espírito Santo", "ES": "Espírito Santo",
+        "Minas Gerais": "Minas Gerais", "MG": "Minas Gerais",
+        "Rio de Janeiro": "Rio de Janeiro", "RJ": "Rio de Janeiro",
+        "São Paulo": "São Paulo", "Sao Paulo": "São Paulo", "SP": "São Paulo",
+        
+        // Sul
+        "Paraná": "Paraná", "Parana": "Paraná", "PR": "Paraná",
+        "Rio Grande do Sul": "Rio Grande do Sul", "RS": "Rio Grande do Sul",
+        "Santa Catarina": "Santa Catarina", "SC": "Santa Catarina"
+      };
+      
+      // Extrair a informação do estado
+      const regionName = data.regionName;
+      const regionCode = data.region;
+      
+      // Tentar encontrar o estado no mapeamento
+      let estadoDetectado = null;
+      
+      if (data.countryCode === "BR") {
+        // Para IPs brasileiros, tentar obter o estado exato
+        estadoDetectado = mapeamentoEstados[regionName] || mapeamentoEstados[regionCode];
+      }
+      
+      // Se não conseguiu detectar um estado brasileiro específico
+      if (!estadoDetectado) {
+        if (data.countryCode !== "BR") {
+          console.log("IP não pertence ao Brasil, usando estado padrão");
+        } else {
+          console.log("Não foi possível mapear o estado, usando estado padrão");
+        }
+        estadoDetectado = "São Paulo"; // Estado padrão para testes
+      }
+      
+      // Retornar informação do estado
+      return res.json({
+        ip: ip,
+        estado: estadoDetectado,
+        detalhes: {
+          countryCode: data.countryCode,
+          regionName: data.regionName,
+          regionCode: data.region
+        }
+      });
+    } catch (error) {
+      console.error("Erro ao detectar estado por IP:", error);
+      return res.status(500).json({
+        error: "Erro ao processar a detecção de estado",
+        defaultState: "São Paulo" // Estado padrão caso falhe
+      });
+    }
+  });
 
   // Rota para consultar ou salvar valor de restituição
   app.get('/api/restituicao', async (req: Request, res: Response) => {

@@ -1,0 +1,200 @@
+Olha, essa vai ser a última vez que eu vou tentar isso com você. Se você não conseguir, eu nunca mais assino o Replit.
+
+Eu quero que você utilize uma API que colete o IP do usuário e retorne o estado correspondente. Essa coleta do IP deve ser feita logo no primeiro acesso ao site, e nesse mesmo momento, o backend já deve consultar a API de localização por trás dos panos para obter o estado.
+
+Por quê? Porque quando o usuário chegar na página /confirmar-identidade, o IP já terá sido vinculado ao CPF digitado, assim como o estado. Isso evita lentidão ou falhas por conta de a API ainda não ter respondido. A página /confirmar-identidade não pode carregar enquanto a API não tiver retornado o estado.
+
+Na etapa em que o usuário precisa selecionar a companhia elétrica, ele verá três alternativas. Em quase todos os estados, será uma opção correta e duas erradas. A opção correta será determinada com base no estado retornado pela API. Já te mandei a lista completa de concessionárias de energia, mas vou explicar de novo com exemplos.
+
+Exemplo 1: IP do Rio de Janeiro
+O usuário acessa o site a partir do estado do Rio de Janeiro. Logo na entrada, o site coleta o IP e obtém o estado via API. Quando esse usuário chega na página /confirmar-identidade, na parte de escolher a companhia de energia, ele verá estas opções:
+
+Enel Distribuição Rio
+
+Light S/A
+
+Neoenergia Coelba
+
+Duas delas (Enel e Light) são do Rio de Janeiro. Como o estado tem duas companhias, o usuário pode escolher qualquer uma das duas. A terceira (Neoenergia Coelba) é apenas uma opção falsa para criar variação.
+
+Exemplo 2: IP do Rio Grande do Sul
+Equatorial CEEE
+
+CPFL Rio Grande Energia (RGE)
+
+Light S/A
+
+Mesma lógica: duas companhias do estado (Equatorial e CPFL), uma falsa.
+
+Exemplo 3: IP de São Paulo
+Como São Paulo tem seis companhias, o usuário verá todas elas e poderá selecionar qualquer uma. Neste caso, nenhuma das opções será falsa.
+
+Enel Distribuição São Paulo
+
+EDP São Paulo
+
+CPFL Paulista
+
+CPFL Piratininga
+
+Neoenergia Elektro
+
+ISA Energia Brasil
+
+Todos os demais estados
+Para todos os outros estados que têm apenas uma companhia elétrica, o usuário verá três opções, mas somente uma estará correta.
+
+Por exemplo:
+
+IP de Minas Gerais
+CEMIG Distribuição
+
+Energisa Sergipe
+
+Equatorial Alagoas
+
+Companhia correta: CEMIG Distribuição
+As outras são aleatórias e estão ali apenas para criar variação.
+
+Abaixo, segue a lista completa com o comportamento esperado para cada estado:
+
+(OBS: Mantenha exatamente como está abaixo, pois já está formatado para uso.)
+
+ACRE
+→ Energisa Acre
+→ Amazonas Energia
+→ Equatorial Maranhão
+
+ALAGOAS
+→ Equatorial Alagoas
+→ Neoenergia Pernambuco
+→ Energisa Mato Grosso do Sul
+
+AMAPÁ
+→ Equatorial CEA
+→ Roraima Energia
+→ Energisa Rondônia
+
+AMAZONAS
+→ Amazonas Energia
+→ Energisa Tocantins
+→ Equatorial Piauí
+
+BAHIA
+→ Neoenergia Coelba
+→ Energisa Paraíba
+→ Equatorial Pará
+
+CEARÁ
+→ Enel Distribuição Ceará
+→ Energisa Acre
+→ CPFL Piratininga
+
+DISTRITO FEDERAL
+→ Neoenergia Brasília
+→ Energisa Rondônia
+→ CPFL RGE
+
+ESPÍRITO SANTO
+→ EDP Espírito Santo
+→ Neoenergia Pernambuco
+→ CELESC Distribuição
+
+GOIÁS
+→ Equatorial Goiás
+→ Energisa Acre
+→ Light S/A
+
+MARANHÃO
+→ Equatorial Maranhão
+→ Enel Distribuição Rio
+→ Neoenergia Cosern
+
+MATO GROSSO
+→ Energisa Mato Grosso
+→ Neoenergia Coelba
+→ CPFL Piratininga
+
+MATO GROSSO DO SUL
+→ Energisa Mato Grosso do Sul
+→ Equatorial Maranhão
+→ EDP Espírito Santo
+
+MINAS GERAIS
+→ CEMIG Distribuição
+→ Energisa Sergipe
+→ Equatorial Alagoas
+
+PARÁ
+→ Equatorial Pará
+→ CELESC Distribuição
+→ Energisa Sergipe
+
+PARAÍBA
+→ Energisa Paraíba
+→ Equatorial Goiás
+→ CPFL Paulista
+
+PARANÁ
+→ COPEL Distribuição
+→ Neoenergia Coelba
+→ Amazonas Energia
+
+PERNAMBUCO
+→ Neoenergia Pernambuco
+→ Energisa Mato Grosso
+→ EDP São Paulo
+
+PIAUÍ
+→ Equatorial Piauí
+→ CELESC Distribuição
+→ Neoenergia Brasília
+
+RIO DE JANEIRO
+→ Enel Distribuição Rio
+→ Light S/A
+→ Neoenergia Coelba
+
+RIO GRANDE DO NORTE
+→ Neoenergia Cosern
+→ Energisa Sergipe
+→ CEMIG Distribuição
+
+RIO GRANDE DO SUL
+→ Equatorial CEEE
+→ CPFL Rio Grande Energia (RGE)
+→ Light S/A
+
+RONDÔNIA
+→ Energisa Rondônia
+→ Equatorial Goiás
+→ CEMIG Distribuição
+
+RORAIMA
+→ Roraima Energia
+→ Energisa Mato Grosso
+→ Enel Distribuição Ceará
+
+SANTA CATARINA
+→ CELESC Distribuição
+→ Energisa Paraíba
+→ Equatorial Pará
+
+SÃO PAULO
+→ Enel Distribuição São Paulo
+→ EDP São Paulo
+→ CPFL Paulista
+→ CPFL Piratininga
+→ Neoenergia Elektro
+→ ISA Energia Brasil
+
+SERGIPE
+→ Energisa Sergipe
+→ Enel Distribuição São Paulo
+→ Equatorial CEA
+
+TOCANTINS
+→ Energisa Tocantins
+→ EDP Espírito Santo
+→ COPEL Distribuição
+
