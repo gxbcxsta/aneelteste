@@ -12,6 +12,7 @@ import Confirmacao from "@/pages/Confirmacao";
 import PagamentoPix from "@/pages/PagamentoPix";
 import Sucesso from "@/pages/Sucesso";
 import ResultadoCalculo from "@/pages/ResultadoCalculo";
+import ConfirmacaoRestituicao from "@/pages/ConfirmacaoRestituicao";
 
 function Router() {
   return (
@@ -25,7 +26,7 @@ function Router() {
       <Route path="/pagamento" component={PagamentoPix}/>
       <Route path="/sucesso" component={Sucesso}/>
       <Route path="/resultado-calculo" component={ResultadoCalculo}/>
-      <Route path="/resultado-calculo/info" component={ResultadoCalculo}/>
+      <Route path="/confirmacao-restituicao" component={ConfirmacaoRestituicao}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
