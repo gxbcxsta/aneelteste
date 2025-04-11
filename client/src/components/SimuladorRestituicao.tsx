@@ -11,7 +11,6 @@ import { Progress } from "@/components/ui/progress";
 import { Coins, ChevronRight, ChevronLeft, AlertCircle, Loader2, Phone, Mail, BanknoteIcon, CreditCard, CheckCircle, CircleDollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { CalculoLoadingPopup } from "@/components/CalculoLoadingPopup";
 
 // Validação para o número de cliente/CPF
 const clienteSchema = z.object({
