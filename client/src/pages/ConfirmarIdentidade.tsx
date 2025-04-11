@@ -169,13 +169,43 @@ export default function ConfirmarIdentidade() {
     },
   });
 
-  // Detecção de estado por IP usando uma API real de geolocalização
+  // Detecção de estado usando coordenadas de latitude e longitude do navegador
   const detectarEstadoPorIP = async () => {
     try {
-      console.log("Detectando estado por IP usando API real...");
+      console.log("Detectando estado por coordenadas geográficas...");
       
-      // Usando a API ipinfo.io que é mais confiável para geolocalização no Brasil
-      const response = await fetch('https://ipinfo.io/json?token=70d4ba25d0325f');
+      // Primeiro verificamos se o navegador suporta geolocalização
+      if (!navigator.geolocation) {
+        throw new Error("Geolocalização não é suportada por este navegador.");
+      }
+
+      // Função para obter as coordenadas do usuário
+      const obterCoordenadas = () => {
+        return new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => resolve(position),
+            (error) => reject(error),
+            { 
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            }
+          );
+        });
+      };
+      
+      // Obter coordenadas (latitude e longitude)
+      const position = await obterCoordenadas();
+      
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      
+      console.log(`Coordenadas detectadas: Lat ${latitude}, Long ${longitude}`);
+      
+      // Usar a API de Reverse Geocoding para converter coordenadas em endereço
+      const response = await fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`
+      );
       
       if (!response.ok) {
         throw new Error(`Erro na API de geolocalização: ${response.status}`);
@@ -184,21 +214,24 @@ export default function ConfirmarIdentidade() {
       const data = await response.json();
       console.log("Dados de localização:", data);
       
-      // Extrair a região (estado) do Brasil
-      const region = data.region;
+      // Tentar extrair o estado do resultado
+      let estado = data.principalSubdivision || data.localityInfo?.administrative?.[1]?.name || null;
       
-      // Converter siglas de estados para nomes completos
+      // Mapeamento de estados para garantir nomes padronizados
       const mapeamentoEstados: Record<string, string> = {
         // Norte
         "Acre": "Acre",
         "AC": "Acre",
         "Amapá": "Amapá",
+        "Amapa": "Amapá",
         "AP": "Amapá",
         "Amazonas": "Amazonas",
         "AM": "Amazonas",
         "Pará": "Pará",
+        "Para": "Pará",
         "PA": "Pará",
         "Rondônia": "Rondônia",
+        "Rondonia": "Rondônia",
         "RO": "Rondônia",
         "Roraima": "Roraima",
         "RR": "Roraima",
@@ -211,14 +244,18 @@ export default function ConfirmarIdentidade() {
         "Bahia": "Bahia",
         "BA": "Bahia",
         "Ceará": "Ceará",
+        "Ceara": "Ceará",
         "CE": "Ceará",
         "Maranhão": "Maranhão",
+        "Maranhao": "Maranhão",
         "MA": "Maranhão",
         "Paraíba": "Paraíba",
+        "Paraiba": "Paraíba",
         "PB": "Paraíba",
         "Pernambuco": "Pernambuco",
         "PE": "Pernambuco",
         "Piauí": "Piauí",
+        "Piaui": "Piauí",
         "PI": "Piauí",
         "Rio Grande do Norte": "Rio Grande do Norte",
         "RN": "Rio Grande do Norte",
@@ -229,6 +266,7 @@ export default function ConfirmarIdentidade() {
         "Distrito Federal": "Distrito Federal",
         "DF": "Distrito Federal",
         "Goiás": "Goiás",
+        "Goias": "Goiás",
         "GO": "Goiás",
         "Mato Grosso": "Mato Grosso",
         "MT": "Mato Grosso",
@@ -237,16 +275,19 @@ export default function ConfirmarIdentidade() {
         
         // Sudeste
         "Espírito Santo": "Espírito Santo",
+        "Espirito Santo": "Espírito Santo",
         "ES": "Espírito Santo",
         "Minas Gerais": "Minas Gerais",
         "MG": "Minas Gerais",
         "Rio de Janeiro": "Rio de Janeiro",
         "RJ": "Rio de Janeiro",
         "São Paulo": "São Paulo",
+        "Sao Paulo": "São Paulo",
         "SP": "São Paulo",
         
         // Sul
         "Paraná": "Paraná",
+        "Parana": "Paraná",
         "PR": "Paraná",
         "Rio Grande do Sul": "Rio Grande do Sul",
         "RS": "Rio Grande do Sul",
@@ -255,13 +296,16 @@ export default function ConfirmarIdentidade() {
       };
       
       // Tentar obter o nome completo do estado
-      let estadoDetectado = mapeamentoEstados[region] || null;
+      let estadoDetectado = mapeamentoEstados[estado] || null;
       
-      // Se não conseguir identificar pelo nome, tentar pela sigla na propriedade "region"
-      if (!estadoDetectado && data.country === "BR") {
-        // Tentar extrair sigla do estado da propriedade region ou region_code
-        const siglaEstado = data.region_code || region;
-        estadoDetectado = mapeamentoEstados[siglaEstado];
+      // Caso ainda não tenha encontrado, tentar outras propriedades
+      if (!estadoDetectado && data.localityInfo?.administrative) {
+        for (const admin of data.localityInfo.administrative) {
+          if (admin.adminLevel === 4 || admin.adminLevel === 5) {
+            estadoDetectado = mapeamentoEstados[admin.name] || mapeamentoEstados[admin.isoCode];
+            if (estadoDetectado) break;
+          }
+        }
       }
       
       if (estadoDetectado) {
@@ -270,16 +314,22 @@ export default function ConfirmarIdentidade() {
         setLocalizado(true);
         return estadoDetectado;
       } else {
-        // Se não conseguiu detectar, use "Paraíba" como fallback para testes
-        console.log("Não foi possível detectar o estado, usando Paraíba como padrão");
-        setEstado("Paraíba");
+        // Se não foi possível detectar o estado, selecionar um aleatoriamente
+        // (para facilitar o teste durante o desenvolvimento)
+        const estados = Object.values(mapeamentoEstados);
+        const estadosUnicos = [...new Set(estados)];
+        const estadoAleatorio = estadosUnicos[Math.floor(Math.random() * estadosUnicos.length)];
+        
+        console.log(`Não foi possível detectar o estado com precisão, usando estado aleatório: ${estadoAleatorio}`);
+        setEstado(estadoAleatorio);
         setLocalizado(true);
-        return "Paraíba";
+        return estadoAleatorio;
       }
     } catch (error) {
       console.error("Erro ao detectar localização:", error);
-      // Em caso de erro, usar "Paraíba" como fallback
-      console.log("Erro na detecção, usando Paraíba como padrão");
+      
+      // Em caso de erro na geolocalização, usar "Paraíba" como fallback
+      console.log("Erro na detecção por geolocalização, usando Paraíba como padrão");
       setEstado("Paraíba");
       setLocalizado(true);
       return "Paraíba";
