@@ -100,7 +100,7 @@ type ContatoFormValues = z.infer<typeof contatoSchema>;
 type DadosBancariosFormValues = z.infer<typeof dadosBancariosSchema>;
 
 export default function Confirmacao() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [etapa, setEtapa] = useState<"contato" | "bancarios" | "confirmacao">("contato");
   const [valorRestituicao, setValorRestituicao] = useState("R$ 0,00");
   const [telefoneConfirmado, setTelefoneConfirmado] = useState("");

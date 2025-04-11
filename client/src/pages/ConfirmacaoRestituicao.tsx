@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Coins, User, Building, MapPin, ChevronRight, Calendar, Clock, CheckCircle, AlertCircle, AlertTriangle, Info, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useLocation } from "wouter";
 
 export default function ConfirmacaoRestituicao() {
   // Estados para dados do resultado

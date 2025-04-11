@@ -8,6 +8,9 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
 export default function ResultadoCalculo() {
+  // Hook de navegação do wouter
+  const [location, navigate] = useLocation();
+  
   // Estado para controlar loading e progresso
   const [isLoading, setIsLoading] = useState(true);
   const [progresso, setProgresso] = useState(10);
@@ -201,11 +204,8 @@ export default function ResultadoCalculo() {
     // Criar URL com parâmetros
     const url = `/confirmacao-restituicao?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}&data_prevista=${encodeURIComponent(dataPrevista)}`;
     
-    // Usar history.pushState para transição mais rápida (sem recarregar a página inteira)
-    window.history.pushState({}, "", url);
-    
-    // Redirecionar manualmente para garantir a navegação
-    window.location.href = url;
+    // Usar navigate da wouter para navegação mais eficiente (sem recarregar a página)
+    navigate(url);
   };
   
   return (
