@@ -251,8 +251,6 @@ export default function PagamentoPix() {
             companhia: urlParams.get('companhia') || "CEMIG Distribuição",
             estado: urlParams.get('estado') || "Minas Gerais",
             nasc: urlParams.get('nasc') || "21/07/2003",
-            banco: urlParams.get('banco') || "bb",
-            bancoNome: urlParams.get('bancoNome') || "Banco do Brasil",
             agencia: urlParams.get('agencia') || "",
             conta: urlParams.get('conta') || "",
             email: email,
@@ -441,23 +439,6 @@ export default function PagamentoPix() {
                       <p className="font-medium">{urlParams.get('estado') || "Minas Gerais"}</p>
                     </div>
                     
-                    <div>
-                      <p className="text-gray-500 text-sm">Banco Selecionado</p>
-                      <p className="font-medium">{
-                        // Usar o nome completo do banco ou tentar determinar do código
-                        urlParams.get('bancoNome') || (() => {
-                          const banco = urlParams.get('banco');
-                          switch(banco) {
-                            case 'bb': return 'Banco do Brasil';
-                            case 'caixa': return 'Caixa Econômica Federal';
-                            case 'bradesco': return 'Bradesco';
-                            case 'santander': return 'Santander';
-                            case 'itau': return 'Itaú';
-                            default: return banco || 'Banco do Brasil';
-                          }
-                        })()
-                      }</p>
-                    </div>
                     
                     <div>
                       <p className="text-gray-500 text-sm">Valor a Receber</p>
