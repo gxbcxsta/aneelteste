@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, Info, Clock, DollarSign, FileText, ReceiptText, HelpCircle } from "lucide-react";
-import { Link, useLocation, useRoute } from "wouter";
+import { AlertTriangle, CheckCircle2, Info, Clock, DollarSign, FileText, ReceiptText, HelpCircle, LockKeyhole, Timer, Shield } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ScrollToTop from "@/components/ScrollToTop";
 
 // Funções de formatação
@@ -39,9 +38,8 @@ export default function TaxaComplementar() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   
-  // Valores das taxas de conformidade
+  // Valor da Taxa de Conformidade Nacional (TCN)
   const VALOR_TAXA_CONFORMIDADE = 118;
-  const VALOR_TAXA_EMISSAO = 48.6;
   
   // Estados para armazenar dados da solicitação
   const [protocolo, setProtocolo] = useState("");
@@ -105,8 +103,8 @@ export default function TaxaComplementar() {
     });
   }, []);
   
-  // Função para prosseguir para a confirmação da taxa
-  const prosseguirParaTaxaComplementar = () => {
+  // Função para prosseguir para a página de pagamento da TCN
+  const prosseguirParaPagamentoTCN = () => {
     // Criar os parâmetros da URL para passar adiante
     const params = new URLSearchParams();
     
@@ -116,20 +114,17 @@ export default function TaxaComplementar() {
     });
     
     params.append('valorTaxaConformidade', VALOR_TAXA_CONFORMIDADE.toString());
-    params.append('valorTaxaEmissao', VALOR_TAXA_EMISSAO.toString());
     params.append('protocolo', protocolo);
     
     // Redirecionar para a página de pagamento da taxa complementar
     setTimeout(() => {
-      setLocation(`/taxa-final?${params.toString()}`);
+      setLocation(`/pagamento-tcn?${params.toString()}`);
     }, 500);
   };
   
   // Calcula valores formatados
   const valorRestituicaoFormatado = formatarMoeda(parseFloat(dadosSolicitacao.valor));
   const valorTaxaConformidadeFormatado = formatarMoeda(VALOR_TAXA_CONFORMIDADE);
-  const valorTaxaEmissaoFormatado = formatarMoeda(VALOR_TAXA_EMISSAO);
-  const valorTotalTaxasFormatado = formatarMoeda(VALOR_TAXA_CONFORMIDADE + VALOR_TAXA_EMISSAO);
   const cpfFormatado = dadosSolicitacao.cpf ? formatarCPF(dadosSolicitacao.cpf) : "";
   
   return (
@@ -169,7 +164,7 @@ export default function TaxaComplementar() {
               <AlertTitle className="font-bold text-amber-800">Status da Restituição: EM PROCESSAMENTO</AlertTitle>
               <AlertDescription className="text-amber-700">
                 Seu pagamento da Taxa de Regularização (TRE) foi confirmado. Para concluir o processo de liberação, 
-                é necessário o pagamento das taxas complementares abaixo.
+                é necessário o pagamento da Taxa de Conformidade Nacional (TCN).
               </AlertDescription>
             </Alert>
           </div>
@@ -182,14 +177,15 @@ export default function TaxaComplementar() {
             PROCESSO DE LIBERAÇÃO DA RESTITUIÇÃO
           </div>
           <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-start">
                 <div className="bg-green-500 rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
                   <CheckCircle2 className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">Taxa de Regularização Energética (TRE)</p>
+                  <p className="font-semibold text-gray-800">1ª ETAPA - Taxa de Regularização Energética (TRE)</p>
                   <p className="text-sm text-gray-600">Você já realizou o pagamento da TRE com sucesso. Seu pedido foi validado e está em processamento.</p>
+                  <Badge variant="outline" className="mt-1 bg-green-50 text-green-700 border-green-200">Concluído</Badge>
                 </div>
               </div>
               
@@ -198,121 +194,130 @@ export default function TaxaComplementar() {
                   <AlertTriangle className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">Taxa de Conformidade Nacional</p>
-                  <p className="text-sm text-gray-600">Esta taxa é necessária para validação do seu crédito no Sistema Nacional de Compensações Elétricas (SINACE).</p>
+                  <p className="font-semibold text-gray-800">2ª ETAPA - Taxa de Conformidade Nacional (TCN)</p>
+                  <p className="text-sm text-gray-600">Esta taxa é necessária para validação do seu crédito no Sistema Nacional de Compensações Elétricas (SINACE) e a liberação da sua restituição.</p>
                   <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">Pendente</Badge>
                 </div>
               </div>
               
-              <div className="flex items-start">
-                <div className="bg-amber-500 rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
-                  <AlertTriangle className="h-4 w-4" />
+              <div className="flex items-start opacity-60">
+                <div className="bg-gray-400 rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
+                  <LockKeyhole className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">Taxa de Emissão de Documento Final</p>
-                  <p className="text-sm text-gray-600">Necessária para a emissão e registro do documento oficial de restituição junto à concessionária.</p>
-                  <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">Pendente</Badge>
+                  <p className="font-semibold text-gray-600">3ª ETAPA - Liberação Acelerada de Restituição (LAR)</p>
+                  <p className="text-sm text-gray-500">Opção disponível apenas após quitação da Taxa de Conformidade Nacional (TCN).</p>
+                  <Badge variant="outline" className="mt-1 bg-gray-100 text-gray-500 border-gray-300">Bloqueado</Badge>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Detalhes das taxas */}
+          {/* Detalhes da taxa TCN */}
           <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center mb-0">
             <div className="bg-white/20 p-1.5 rounded-md mr-2">
               <DollarSign className="h-4 w-4" />
             </div>
-            TAXAS COMPLEMENTARES PARA LIBERAÇÃO
+            TAXA DE CONFORMIDADE NACIONAL (TCN)
           </div>
           <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
-            <div className="grid grid-cols-1 gap-5">
-              <Card className="border-amber-200 bg-amber-50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base text-amber-800 flex items-center">
-                    <div className="bg-amber-500 p-1.5 rounded-md mr-2 flex items-center justify-center">
-                      <ReceiptText className="h-4 w-4 text-white" />
-                    </div>
-                    Taxa de Conformidade Nacional
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-amber-700 text-sm">Valor:</span>
-                    <span className="font-bold text-lg text-amber-800">{valorTaxaConformidadeFormatado}</span>
-                  </div>
-                  
-                  <p className="text-xs text-amber-700 mt-2 border-t border-amber-200 pt-2">
-                    A Taxa de Conformidade Nacional é exigida pela Resolução ANEEL nº 1.042/2022 para validar sua 
-                    restituição no Sistema Nacional de Compensações Elétricas (SINACE) e garantir a transferência 
-                    dos valores entre a concessionária e o consumidor.
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-amber-200 bg-amber-50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base text-amber-800 flex items-center">
-                    <div className="bg-amber-500 p-1.5 rounded-md mr-2 flex items-center justify-center">
-                      <FileText className="h-4 w-4 text-white" />
-                    </div>
-                    Taxa de Emissão de Documento Final
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-amber-700 text-sm">Valor:</span>
-                    <span className="font-bold text-lg text-amber-800">{valorTaxaEmissaoFormatado}</span>
-                  </div>
-                  
-                  <p className="text-xs text-amber-700 mt-2 border-t border-amber-200 pt-2">
-                    A Taxa de Emissão de Documento Final cobre os custos administrativos para processamento, 
-                    emissão e registro da documentação oficial que comprova sua restituição junto à concessionária 
-                    de energia elétrica e órgãos reguladores.
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-start">
-                  <div className="bg-[#1351B4] rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
-                    <Info className="h-4 w-4" />
+            <div className="grid grid-cols-1 gap-6">
+              {/* Card destacado da Taxa TCN */}
+              <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200 shadow-sm">
+                <div className="flex items-center mb-3">
+                  <div className="bg-amber-500 rounded-full p-2 text-white mr-3 flex-shrink-0">
+                    <FileText className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-[#071D41] font-semibold">Valor total das taxas complementares</p>
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-sm text-gray-700">Taxa de Conformidade Nacional:</span>
-                      <span className="font-medium text-gray-800">{valorTaxaConformidadeFormatado}</span>
+                    <h3 className="font-bold text-amber-800 text-lg">Taxa de Conformidade Nacional</h3>
+                    <p className="text-amber-700 text-sm">2ª Etapa do processo de restituição</p>
+                  </div>
+                </div>
+                
+                <div className="bg-white rounded-md p-4 border border-amber-200 mb-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-gray-700 font-medium">Valor da Taxa:</span>
+                    <span className="font-bold text-xl text-amber-800">{valorTaxaConformidadeFormatado}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                    <div className="flex items-center">
+                      <Shield className="h-4 w-4 text-amber-600 mr-1.5 flex-shrink-0" />
+                      <span className="text-gray-700">Conformidade obrigatória</span>
                     </div>
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="text-sm text-gray-700">Taxa de Emissão de Documento Final:</span>
-                      <span className="font-medium text-gray-800">{valorTaxaEmissaoFormatado}</span>
+                    <div className="flex items-center">
+                      <Timer className="h-4 w-4 text-amber-600 mr-1.5 flex-shrink-0" />
+                      <span className="text-gray-700">Processamento em até 24h</span>
                     </div>
-                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-blue-200">
-                      <span className="text-sm font-bold text-gray-800">Total a pagar:</span>
-                      <span className="font-bold text-[#1351B4] text-lg">{valorTotalTaxasFormatado}</span>
+                    <div className="flex items-center">
+                      <CheckCircle2 className="h-4 w-4 text-amber-600 mr-1.5 flex-shrink-0" />
+                      <span className="text-gray-700">Validação SINACE</span>
                     </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-amber-800 flex items-center">
+                    <Info className="h-4 w-4 mr-2" />
+                    Objetivo da Taxa de Conformidade Nacional
+                  </h4>
+                  
+                  <p className="text-sm text-amber-700">
+                    A Taxa de Conformidade Nacional (TCN) é exigida pela Resolução ANEEL nº 1.042/2022 para validar sua 
+                    restituição no Sistema Nacional de Compensações Elétricas (SINACE).
+                  </p>
+                  
+                  <p className="text-sm text-amber-700">
+                    Essa taxa garante a transferência legal dos valores entre a concessionária e o consumidor, 
+                    assegurando que o crédito seja reconhecido em território nacional e que o processo 
+                    de restituição seja registrado no sistema federal.
+                  </p>
+                  
+                  <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-3">
+                    <p className="text-sm text-amber-800 font-medium">
+                      Após o pagamento da TCN, você terá acesso à etapa final do processo, que inclui a 
+                      opção de Liberação Acelerada de Restituição (LAR) para recebimento prioritário do seu crédito.
+                    </p>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Botão para prosseguir */}
-            <div className="mt-6">
-              <Button 
-                onClick={prosseguirParaTaxaComplementar}
-                className="w-full font-bold py-6 text-lg bg-green-600 hover:bg-green-700 text-white shadow-md"
-              >
-                <div className="flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Prosseguir com o Pagamento
-                </div>
-              </Button>
               
-              <p className="text-center text-xs text-gray-500 mt-3">
-                Ao prosseguir, você concorda com os termos e condições para finalização do processo de restituição.
-              </p>
+              {/* Destaque de Importância */}
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-red-700 mb-2">INFORMAÇÃO IMPORTANTE</h4>
+                    <p className="text-sm text-red-600">
+                      Sem o pagamento da Taxa de Conformidade Nacional (TCN), sua restituição não poderá ser processada 
+                      pelo Sistema Nacional de Compensações Elétricas (SINACE).
+                    </p>
+                    <p className="text-sm text-red-600 mt-2">
+                      A ausência desta taxa implica no bloqueio definitivo do crédito no sistema federal, impossibilitando 
+                      a liberação dos valores para sua conta bancária.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Botão para prosseguir */}
+              <div className="mt-4">
+                <Button 
+                  onClick={prosseguirParaPagamentoTCN}
+                  className="w-full font-bold py-6 text-lg bg-green-600 hover:bg-green-700 text-white shadow-md"
+                >
+                  <div className="flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Prosseguir com o Pagamento da TCN
+                  </div>
+                </Button>
+                
+                <p className="text-center text-xs text-gray-500 mt-3">
+                  Ao prosseguir, você será direcionado para a página de pagamento da Taxa de Conformidade Nacional.
+                </p>
+              </div>
             </div>
           </div>
           
@@ -325,37 +330,38 @@ export default function TaxaComplementar() {
             <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
               <div className="space-y-4">
                 <div className="border-b border-gray-200 pb-4">
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">1. O que são as taxas complementares?</h3>
+                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">1. O que é a Taxa de Conformidade Nacional (TCN)?</h3>
                   <p className="text-sm text-gray-600">
-                    As taxas complementares são valores necessários para a conclusão do processo de restituição, 
-                    cobrindo os custos de validação nacional e emissão de documentos oficiais conforme exigido pela 
-                    resolução ANEEL nº 1.042/2022.
+                    A TCN é uma taxa obrigatória instituída pela ANEEL para validar restituições de créditos energéticos no 
+                    Sistema Nacional de Compensações Elétricas (SINACE), garantindo a transferência legal dos valores entre 
+                    a concessionária e o consumidor.
                   </p>
                 </div>
                 
                 <div className="border-b border-gray-200 pb-4">
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">2. O que acontece se eu não pagar as taxas complementares?</h3>
+                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">2. O que acontece se eu não pagar a TCN?</h3>
                   <p className="text-sm text-gray-600">
-                    Sem o pagamento das taxas complementares, sua restituição ficará pendente no sistema e não poderá 
-                    ser finalizada. Os valores já pagos serão mantidos em seu cadastro, mas a liberação do crédito só 
-                    ocorrerá após a conclusão de todas as etapas.
+                    Sem o pagamento da TCN, sua restituição ficará permanentemente bloqueada no sistema federal. 
+                    Isso significa que, mesmo tendo pago a TRE anteriormente, seu crédito não poderá ser transferido 
+                    para sua conta bancária.
                   </p>
                 </div>
                 
                 <div className="border-b border-gray-200 pb-4">
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">3. Por que preciso pagar a Taxa de Conformidade Nacional?</h3>
+                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">3. Quanto tempo leva para o processamento após o pagamento da TCN?</h3>
                   <p className="text-sm text-gray-600">
-                    A Taxa de Conformidade Nacional é necessária para validar sua restituição no Sistema Nacional de 
-                    Compensações Elétricas (SINACE), garantindo que seu crédito seja reconhecido em território nacional 
-                    e possa ser transferido da concessionária para você.
+                    Após o pagamento da TCN, seu crédito será processado no SINACE em até 24 horas. Após esse 
+                    processamento, você terá acesso à opção de Liberação Acelerada de Restituição (LAR) para 
+                    recebimento prioritário do valor.
                   </p>
                 </div>
                 
                 <div>
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">4. Quanto tempo leva para receber minha restituição após o pagamento?</h3>
+                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">4. A TCN é obrigatória para todos os consumidores?</h3>
                   <p className="text-sm text-gray-600">
-                    Após o pagamento de todas as taxas complementares, o valor da sua restituição será depositado na 
-                    conta bancária informada em até 72 horas úteis, conforme determinado pela ANEEL.
+                    Sim, conforme a Resolução ANEEL nº 1.042/2022, a TCN é obrigatória para todos os consumidores 
+                    que solicitam restituição de valores cobrados indevidamente nas faturas de energia elétrica, 
+                    independentemente da concessionária ou estado.
                   </p>
                 </div>
               </div>
