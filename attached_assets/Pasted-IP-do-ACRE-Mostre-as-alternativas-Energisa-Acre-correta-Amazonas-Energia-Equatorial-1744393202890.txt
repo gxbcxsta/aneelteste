@@ -1,0 +1,140 @@
+IP é do ACRE? Mostre as alternativas:
+-> Energisa Acre ✅ (correta)
+-> Amazonas Energia
+-> Equatorial Maranhão
+
+IP é do AMAPÁ? Mostre as alternativas:
+-> Equatorial CEA ✅ (correta)
+-> Roraima Energia
+-> Energisa Rondônia
+
+IP é do AMAZONAS? Mostre as alternativas:
+-> Amazonas Energia ✅ (correta)
+-> Energisa Tocantins
+-> Equatorial Piauí
+
+IP é do PARÁ? Mostre as alternativas:
+-> Equatorial Pará ✅ (correta)
+-> CELESC Distribuição
+-> Energisa Sergipe
+
+IP é de RONDÔNIA? Mostre as alternativas:
+-> Energisa Rondônia ✅ (correta)
+-> Equatorial Goiás
+-> CEMIG Distribuição
+
+IP é de RORAIMA? Mostre as alternativas:
+-> Roraima Energia ✅ (correta)
+-> Energisa Mato Grosso
+-> Enel Distribuição Ceará
+
+IP é do TOCANTINS? Mostre as alternativas:
+-> Energisa Tocantins ✅ (correta)
+-> EDP Espírito Santo
+-> COPEL Distribuição
+
+IP é de ALAGOAS? Mostre as alternativas:
+-> Equatorial Alagoas ✅ (correta)
+-> Neoenergia Pernambuco
+-> Energisa Mato Grosso do Sul
+
+IP é da BAHIA? Mostre as alternativas:
+-> Neoenergia Coelba ✅ (correta)
+-> Energisa Paraíba
+-> Equatorial Pará
+
+IP é do CEARÁ? Mostre as alternativas:
+-> Enel Distribuição Ceará ✅ (correta)
+-> Energisa Acre
+-> CPFL Piratininga
+
+IP é do MARANHÃO? Mostre as alternativas:
+-> Equatorial Maranhão ✅ (correta)
+-> Enel Distribuição Rio
+-> Neoenergia Cosern
+
+IP é da PARAÍBA? Mostre as alternativas:
+-> Energisa Paraíba ✅ (correta)
+-> Equatorial Goiás
+-> CPFL Paulista
+
+IP é de PERNAMBUCO? Mostre as alternativas:
+-> Neoenergia Pernambuco ✅ (correta)
+-> Energisa Mato Grosso
+-> EDP São Paulo
+
+IP é do PIAUÍ? Mostre as alternativas:
+-> Equatorial Piauí ✅ (correta)
+-> CELESC Distribuição
+-> Neoenergia Brasília
+
+IP é do RIO GRANDE DO NORTE? Mostre as alternativas:
+-> Neoenergia Cosern ✅ (correta)
+-> Energisa Sergipe
+-> CEMIG Distribuição
+
+IP é de SERGIPE? Mostre as alternativas:
+-> Energisa Sergipe ✅ (correta)
+-> Enel Distribuição São Paulo
+-> Equatorial CEA
+
+IP é do DISTRITO FEDERAL? Mostre as alternativas:
+-> Neoenergia Brasília ✅ (correta)
+-> Energisa Rondônia
+-> CPFL RGE
+
+IP é de GOIÁS? Mostre as alternativas:
+-> Equatorial Goiás ✅ (correta)
+-> Energisa Acre
+-> Light S/A
+
+IP é do MATO GROSSO? Mostre as alternativas:
+-> Energisa Mato Grosso ✅ (correta)
+-> Neoenergia Coelba
+-> CPFL Piratininga
+
+IP é do MATO GROSSO DO SUL? Mostre as alternativas:
+-> Energisa Mato Grosso do Sul ✅ (correta)
+-> Equatorial Maranhão
+-> EDP Espírito Santo
+
+IP é do ESPÍRITO SANTO? Mostre as alternativas:
+-> EDP Espírito Santo ✅ (correta)
+-> Neoenergia Pernambuco
+-> CELESC Distribuição
+
+IP é de MINAS GERAIS? Mostre as alternativas:
+-> CEMIG Distribuição ✅ (correta)
+-> Energisa Sergipe
+-> Equatorial Alagoas
+
+IP é do PARANÁ? Mostre as alternativas:
+-> COPEL Distribuição ✅ (correta)
+-> Neoenergia Coelba
+-> Amazonas Energia
+
+IP é de SANTA CATARINA? Mostre as alternativas:
+-> CELESC Distribuição ✅ (correta)
+-> Energisa Paraíba
+-> Equatorial Pará
+
+IP é do SÃO PAULO? Mostre as alternativas:
+Enel Distribuição São Paulo
+EDP São Paulo
+CPFL Paulista
+CPFL Piratininga
+Neoenergia Elektro
+ISA Energia Brasil
+✅ ATENÇÃO: Todas serão corretas nesse caso, qualquer uma selecionada.
+
+IP é do RIO DE JANEIRO? Mostre as alternativas:
+Enel Distribuição Rio ✅ (correta)
+Light S/A ✅ (correta)
+Neoenergia Coelba ❌ (incorreta)
+⚠️ ATENÇÃO: A única incorreta nesse caso seria a Neoenergia Coelba.
+
+IP é do RIO GRANDE DO SUL? Mostre as alternativas:
+Equatorial CEEE ✅ (correta)
+CPFL Rio Grande Energia (RGE) ✅ (correta)
+Light S/A ❌ (incorreta)
+⚠️ ATENÇÃO: A única incorreta nesse caso seria a Light S/A
