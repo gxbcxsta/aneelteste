@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocation } from "wouter";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -244,6 +245,9 @@ export default function SimuladorRestituicao({
   const [mensagemCarregamento, setMensagemCarregamento] = useState('');
   const [progressoCarregamento, setProgressoCarregamento] = useState(0);
   
+  // Hook de navegação
+  const [location, navigate] = useLocation();
+  
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = async (data: PeriodoFormValues) => {
     // Define o número de meses baseado na seleção do usuário
@@ -266,8 +270,8 @@ export default function SimuladorRestituicao({
         meses = 12;
     }
     
-    // Redirecionar DIRETAMENTE para a página de resultado-calculo
-    window.location.href = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(meses)}`;
+    // Redirecionar para a página de resultado-calculo usando o navigate da wouter
+    navigate(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(meses)}`);
   };
   
   // Funções de navegação entre etapas
@@ -348,7 +352,7 @@ export default function SimuladorRestituicao({
     
     setTimeout(() => {
       // Redirecionar para a página de pagamento PIX com todos os dados relevantes
-      window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorFinalRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&bancoNome=${encodeURIComponent(bancoSelecionado)}`;
+      navigate(`/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorFinalRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&bancoNome=${encodeURIComponent(bancoSelecionado)}`);
     }, 500);
   };
   
