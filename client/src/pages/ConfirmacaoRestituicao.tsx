@@ -93,19 +93,29 @@ export default function ConfirmacaoRestituicao() {
 
   // Formatar data
   const formatarData = (data: string) => {
-    // Assumindo que a data vem no formato YYYY-MM-DD
-    if (!data || data.length < 10) return data;
+    // Verificar se a data é válida
+    if (!data) return "";
+    
+    // Remover qualquer undefined da string
+    const dataLimpa = data.replace(/undefined/g, "");
+    
+    // Se depois de limpar não sobrou nada útil
+    if (!dataLimpa || dataLimpa.trim() === "/" || dataLimpa.trim() === "//") return "";
     
     try {
-      // Se a data contém "undefined", retornar vazio
-      if (data.includes("undefined")) {
-        return "";
+      // Tentar formatar se tiver o formato YYYY-MM-DD
+      if (dataLimpa.includes("-") && dataLimpa.length >= 10) {
+        const [ano, mes, dia] = dataLimpa.substring(0, 10).split('-');
+        if (ano && mes && dia) {
+          return `${dia}/${mes}/${ano}`;
+        }
       }
       
-      const [ano, mes, dia] = data.substring(0, 10).split('-');
-      return `${dia}/${mes}/${ano}`;
+      // Se não conseguir formatar, retornar a data limpa
+      return dataLimpa;
     } catch {
-      return data;
+      // Em caso de erro, retornar string vazia
+      return "";
     }
   };
 
@@ -126,21 +136,16 @@ export default function ConfirmacaoRestituicao() {
             
             <Card className="overflow-hidden">
               <div className="bg-green-50 p-6 border-b border-green-100">
-                <div className="flex items-start mb-4">
-                  <CheckCircle className="text-green-500 mr-3 mt-1 h-5 w-5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-green-800">Restituição Disponível!</h3>
-                    <p className="text-sm text-green-700">
-                      Boa notícia! Seus dados foram analisados e você tem direito a recuperar valores de ICMS pagos indevidamente na sua conta de energia elétrica nos últimos anos.
-                    </p>
-                  </div>
+                <div className="flex flex-col items-center text-center mb-4">
+                  <CheckCircle className="text-green-500 mb-2 h-7 w-7" />
+                  <h3 className="font-bold text-green-800 text-xl mb-2">Restituição Disponível!</h3>
                 </div>
                 
-                <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mt-4 mb-2">
+                <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] text-center mb-4">
                   Valor Aprovado para Restituição
                 </h2>
                 
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <Coins className="h-8 w-8 text-green-600 mr-3" />
                   <span className="text-3xl font-bold text-green-600">
                     {formatarMoeda(valorRestituicao)}
@@ -148,58 +153,37 @@ export default function ConfirmacaoRestituicao() {
                 </div>
                 
                 {meses && (
-                  <p className="text-sm text-[var(--gov-gray-dark)] mt-4">
+                  <p className="text-sm text-[var(--gov-gray-dark)] mt-4 text-center">
                     Valor calculado com base em {meses} meses de cobranças indevidas
                   </p>
                 )}
               </div>
               
-              <CardContent className="p-6 space-y-4">
-                <h3 className="text-lg font-semibold text-[var(--gov-blue-dark)]">
-                  Dados do Solicitante
-                </h3>
-                
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="flex items-start space-x-3">
-                    <User className="h-5 w-5 text-[var(--gov-blue)] mt-0.5" />
-                    <div>
-                      <p className="text-sm text-[var(--gov-gray-dark)]">Nome Completo</p>
-                      <p className="font-medium">{nome}</p>
+              <CardContent className="p-6 space-y-6">
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-[#044785] mb-4">
+                    <AlertCircle className="inline-block mr-2 h-5 w-5" />
+                    Informações Importantes sobre a Restituição da ANEEL
+                  </h3>
+                  <div className="space-y-5">
+                    <div className="info-box pl-4 py-1">
+                      <h4 className="text-lg font-semibold text-[#2c5985]">Por que estou pagando uma taxa se o valor é meu por direito?</h4>
+                      <p className="text-gray-700 mb-2">A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, evitando fraudes, duplicidades e erros de restituição.</p>
+                    </div>
+                    <div className="info-box pl-4 py-1">
+                      <h4 className="text-lg font-semibold text-[#2c5985]">A restituição é garantida após o pagamento da TRE?</h4>
+                      <p className="text-gray-700 mb-2">Sim. Após a confirmação, o valor de {formatarMoeda(valorRestituicao)} será depositado em até 72 horas úteis, conforme calendário de restituição oficial.</p>
+                    </div>
+                    <div className="info-box pl-4 py-1">
+                      <h4 className="text-lg font-semibold text-[#2c5985]">Como sei que isso é oficial?</h4>
+                      <p className="text-gray-700 mb-2">Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, e validado pela ANEEL e Receita Federal.</p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <div className="h-5 w-5 flex items-center justify-center text-[var(--gov-blue)] mt-0.5">
-                      <span className="text-xs font-bold">CPF</span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[var(--gov-gray-dark)]">CPF</p>
-                      <p className="font-medium">{formatarCPF(cpf)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <Calendar className="h-5 w-5 text-[var(--gov-blue)] mt-0.5" />
-                    <div>
-                      <p className="text-sm text-[var(--gov-gray-dark)]">Data de Nascimento</p>
-                      <p className="font-medium">{formatarData(dataNascimento)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <Building className="h-5 w-5 text-[var(--gov-blue)] mt-0.5" />
-                    <div>
-                      <p className="text-sm text-[var(--gov-gray-dark)]">Companhia Elétrica</p>
-                      <p className="font-medium">{companhia}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <MapPin className="h-5 w-5 text-[var(--gov-blue)] mt-0.5" />
-                    <div>
-                      <p className="text-sm text-[var(--gov-gray-dark)]">Estado</p>
-                      <p className="font-medium">{estado}</p>
-                    </div>
+                  <div className="bg-red-50 p-4 rounded-md border border-red-300 text-red-800 mt-6">
+                    <p className="flex items-start">
+                      <AlertCircle className="text-red-600 mr-2 mt-1 h-5 w-5 flex-shrink-0" />
+                      <span><strong>ATENÇÃO:</strong> Sua solicitação ainda não foi confirmada devido à falta de pagamento da Taxa de Regularização Energética (TRE). Para garantir sua restituição é necessário efetuar o pagamento imediatamente.</span>
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -238,33 +222,6 @@ export default function ConfirmacaoRestituicao() {
                 </Button>
               </CardContent>
             </Card>
-            
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-[#044785] mb-4">
-                <AlertCircle className="inline-block mr-2 h-5 w-5" />
-                Informações Importantes sobre a Restituição da ANEEL
-              </h3>
-              <div className="space-y-5">
-                <div className="info-box pl-4 py-1">
-                  <h4 className="text-lg font-semibold text-[#2c5985]">Por que estou pagando uma taxa se o valor é meu por direito?</h4>
-                  <p className="text-gray-700 mb-2">A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, evitando fraudes, duplicidades e erros de restituição.</p>
-                </div>
-                <div className="info-box pl-4 py-1">
-                  <h4 className="text-lg font-semibold text-[#2c5985]">A restituição é garantida após o pagamento da TRE?</h4>
-                  <p className="text-gray-700 mb-2">Sim. Após a confirmação, o valor de {formatarMoeda(valorRestituicao)} será depositado em até 72 horas úteis, conforme calendário de restituição oficial.</p>
-                </div>
-                <div className="info-box pl-4 py-1">
-                  <h4 className="text-lg font-semibold text-[#2c5985]">Como sei que isso é oficial?</h4>
-                  <p className="text-gray-700 mb-2">Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, e validado pela ANEEL e Receita Federal.</p>
-                </div>
-              </div>
-              <div className="bg-red-50 p-4 rounded-md border border-red-300 text-red-800 mt-6">
-                <p className="flex items-start">
-                  <AlertCircle className="text-red-600 mr-2 mt-1 h-5 w-5 flex-shrink-0" />
-                  <span><strong>ATENÇÃO:</strong> Sua solicitação ainda não foi confirmada devido à falta de pagamento da Taxa de Regularização Energética (TRE). Para garantir sua restituição é necessário efetuar o pagamento imediatamente.</span>
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </main>

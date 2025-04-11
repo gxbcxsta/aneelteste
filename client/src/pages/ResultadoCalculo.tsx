@@ -148,19 +148,29 @@ export default function ResultadoCalculo() {
   
   // Formatar data
   const formatarData = (data: string) => {
-    // Assumindo que a data vem no formato YYYY-MM-DD
-    if (!data || data.length < 10) return data;
+    // Verificar se a data é válida
+    if (!data) return "";
+    
+    // Remover qualquer undefined da string
+    const dataLimpa = data.replace(/undefined/g, "");
+    
+    // Se depois de limpar não sobrou nada útil
+    if (!dataLimpa || dataLimpa.trim() === "/" || dataLimpa.trim() === "//") return "";
     
     try {
-      // Se a data contém "undefined", retornar vazio
-      if (data.includes("undefined")) {
-        return "";
+      // Tentar formatar se tiver o formato YYYY-MM-DD
+      if (dataLimpa.includes("-") && dataLimpa.length >= 10) {
+        const [ano, mes, dia] = dataLimpa.substring(0, 10).split('-');
+        if (ano && mes && dia) {
+          return `${dia}/${mes}/${ano}`;
+        }
       }
       
-      const [ano, mes, dia] = data.substring(0, 10).split('-');
-      return `${dia}/${mes}/${ano}`;
+      // Se não conseguir formatar, retornar a data limpa
+      return dataLimpa;
     } catch {
-      return data;
+      // Em caso de erro, retornar string vazia
+      return "";
     }
   };
   
@@ -237,17 +247,12 @@ export default function ResultadoCalculo() {
               
               <Card className="overflow-hidden">
                 <div className="bg-green-50 p-6 border-b border-green-100">
-                  <div className="flex items-start mb-4">
-                    <CheckCircle className="text-green-500 mr-3 mt-1 h-5 w-5 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-green-800">Restituição Disponível!</h3>
-                      <p className="text-sm text-green-700">
-                        Boa notícia! Seus dados foram analisados e você tem direito a recuperar valores de ICMS pagos indevidamente na sua conta de energia elétrica nos últimos anos.
-                      </p>
-                    </div>
+                  <div className="flex flex-col items-center text-center mb-4">
+                    <CheckCircle className="text-green-500 mb-2 h-7 w-7" />
+                    <h3 className="font-bold text-green-800 text-xl mb-2">Restituição Disponível!</h3>
                   </div>
                   
-                  <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mt-4 mb-2">
+                  <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] text-center mb-4">
                     Valor Aprovado para Restituição
                   </h2>
                   
