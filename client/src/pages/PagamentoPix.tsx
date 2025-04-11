@@ -206,18 +206,8 @@ export default function PagamentoPix() {
       const payment = await response.json();
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
-      
-      toast({
-        title: "Pagamento gerado com sucesso!",
-        description: "Use o QR code ou código PIX para efetuar o pagamento."
-      });
     } catch (error) {
       console.error('Erro ao criar pagamento:', error);
-      toast({
-        title: "Erro ao gerar pagamento",
-        description: "Não foi possível gerar o código PIX. Tente novamente.",
-        variant: "destructive"
-      });
     } finally {
       setIsLoading(false);
     }
@@ -267,11 +257,6 @@ export default function PagamentoPix() {
       }
     } catch (error) {
       console.error('Erro ao verificar status do pagamento:', error);
-      toast({
-        title: "Erro na verificação",
-        description: "Não foi possível verificar o status do pagamento. Tente novamente.",
-        variant: "destructive"
-      });
     } finally {
       setIsLoading(false);
     }
@@ -376,7 +361,7 @@ export default function PagamentoPix() {
   return (
     <>
       <Header />
-      <main className="container mx-auto px-4 py-8 min-h-screen">
+      <main className="container mx-auto px-2 py-4 min-h-screen">
         {/* Este componente é necessário para o toast */}
         <Toaster />
         
@@ -392,7 +377,7 @@ export default function PagamentoPix() {
           ))}
         </div>
         
-        <div className="p-6 relative bg-gray-50 rounded-lg shadow-md max-w-6xl mx-auto">
+        <div className="p-3 sm:p-4 relative bg-gray-50 rounded-lg shadow-md w-full mx-auto">
           <div className="bg-[#1351B4] text-white p-4 rounded-md mb-5 shadow-sm">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
               <div className="text-left">
