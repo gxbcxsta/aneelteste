@@ -107,8 +107,9 @@ export default function ConfirmarIdentidade() {
   const [opcoesAno, setOpcoesAno] = useState<string[]>([]);
   const [opcoesCompanhia, setOpcoesCompanhia] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [estado, setEstado] = useState<string>("Minas Gerais");
+  const [estado, setEstado] = useState<string>("");
   const [companhiaCorreta, setCompanhiaCorreta] = useState<string>("");
+  const [localizado, setLocalizado] = useState<boolean>(false);
 
   // Formulário para seleção de nome
   const nomeForm = useForm<NomeFormValues>({
@@ -134,11 +135,57 @@ export default function ConfirmarIdentidade() {
     },
   });
 
+  // Função para detectar o estado baseado no IP
+  const detectarEstadoPorIP = async () => {
+    try {
+      // Para fins de teste/demonstração, usamos uma API pública de geolocalização
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      
+      // Mapear o código do estado para o nome completo
+      const mapeamentoEstados: Record<string, string> = {
+        "SP": "São Paulo",
+        "RJ": "Rio de Janeiro",
+        "RS": "Rio Grande do Sul",
+        "MG": "Minas Gerais",
+        "ES": "Espírito Santo",
+        "BA": "Bahia",
+        "CE": "Ceará",
+        "PE": "Pernambuco",
+        "GO": "Goiás",
+        "MT": "Mato Grosso",
+        "MS": "Mato Grosso do Sul",
+        "SC": "Santa Catarina",
+        "PR": "Paraná",
+        "PA": "Pará",
+        "AM": "Amazonas"
+      };
+      
+      // Obter o estado
+      const estadoDetectado = mapeamentoEstados[data.region_code] || "Minas Gerais";
+      console.log("Estado detectado por IP:", estadoDetectado);
+      
+      // Definir o estado detectado
+      setEstado(estadoDetectado);
+      setLocalizado(true);
+      return estadoDetectado;
+    } catch (error) {
+      console.error("Erro ao detectar localização:", error);
+      // Por padrão, usamos Minas Gerais se houver erro
+      setEstado("Minas Gerais");
+      setLocalizado(true);
+      return "Minas Gerais";
+    }
+  };
+
   useEffect(() => {
     if (!cpf) {
       navigate("/verificar");
       return;
     }
+
+    // Detectar localização do usuário
+    detectarEstadoPorIP();
 
     // Carregar dados do CPF
     const fetchCpfData = async () => {
@@ -264,90 +311,121 @@ export default function ConfirmarIdentidade() {
     }
   };
 
+  // Função para embaralhar arrays
+  const embaralharArray = (array: string[]): string[] => {
+    const arrayCopia = [...array];
+    for (let i = arrayCopia.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
+    }
+    return arrayCopia;
+  };
+  
   // Função para gerar opções de companhia elétrica com base no estado
   const gerarOpcoesCompanhia = (estadoSelecionado: string) => {
+    console.log(`Gerando opções de companhia para: ${estadoSelecionado}`);
     setEstado(estadoSelecionado);
     
     // Buscar a(s) companhia(s) correta(s) para o estado
     const companhiasDoEstado = companhiasEletricas[estadoSelecionado] || [];
     
-    // Verificar se estamos tratando de um dos estados especiais
+    // CASO 1: SÃO PAULO - mostrar todas as 6 companhias, qualquer uma é válida
     if (estadoSelecionado === "São Paulo") {
-      // São Paulo tem 6 opções, todas reais - não precisa de companhias aleatórias
+      console.log("Caso São Paulo: 6 opções, todas válidas");
+      // São Paulo tem 6 opções, todas são corretas
       setOpcoesCompanhia(companhiasDoEstado);
       // Qualquer uma será válida, mas definimos uma por padrão
       setCompanhiaCorreta(companhiasDoEstado[0]);
       return;
     }
     
-    if (estadoSelecionado === "Rio de Janeiro" || estadoSelecionado === "Rio Grande do Sul") {
-      // Rio de Janeiro e Rio Grande do Sul mostram apenas as companhias do estado
-      // pois qualquer uma delas é válida
-      const embaralharArray = (array: string[]): string[] => {
-        const arrayCopia = [...array];
-        for (let i = arrayCopia.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
-        }
-        return arrayCopia;
-      };
+    // CASO 2: RIO DE JANEIRO - mostrar as 2 companhias do estado + 1 aleatória
+    if (estadoSelecionado === "Rio de Janeiro") {
+      console.log("Caso Rio de Janeiro: 2 opções reais + 1 aleatória");
       
-      // Embaralha as companhias do estado
-      setOpcoesCompanhia(embaralharArray([...companhiasDoEstado]));
+      // Buscar uma companhia aleatória de outro estado
+      const todosEstados = Object.keys(companhiasEletricas).filter(e => e !== "Rio de Janeiro");
+      const estadoAleatorio = todosEstados[Math.floor(Math.random() * todosEstados.length)];
+      const companhiasAleatorias = companhiasEletricas[estadoAleatorio];
+      const companhiaAleatoria = companhiasAleatorias[0];
       
-      // Qualquer uma será válida, mas definimos uma por padrão
+      // Adicionar a companhia aleatória junto com as do RJ
+      const opcoes = [...companhiasDoEstado, companhiaAleatoria];
+      
+      // Embaralhar e definir as opções
+      setOpcoesCompanhia(embaralharArray(opcoes));
+      // Qualquer companhia do RJ é válida
       setCompanhiaCorreta(companhiasDoEstado[0]);
-    } else {
-      // Para os outros estados, mostrar 1 companhia do estado e 2 aleatórias
-      if (companhiasDoEstado.length > 0) {
-        const companhiaCorretaEstado = companhiasDoEstado[0];
-        setCompanhiaCorreta(companhiaCorretaEstado);
+      return;
+    }
+    
+    // CASO 3: RIO GRANDE DO SUL - mostrar as 2 companhias do estado + 1 aleatória
+    if (estadoSelecionado === "Rio Grande do Sul") {
+      console.log("Caso Rio Grande do Sul: 2 opções reais + 1 aleatória");
+      
+      // Buscar uma companhia aleatória de outro estado
+      const todosEstados = Object.keys(companhiasEletricas).filter(e => e !== "Rio Grande do Sul");
+      const estadoAleatorio = todosEstados[Math.floor(Math.random() * todosEstados.length)];
+      const companhiasAleatorias = companhiasEletricas[estadoAleatorio];
+      const companhiaAleatoria = companhiasAleatorias[0];
+      
+      // Adicionar a companhia aleatória junto com as do RS
+      const opcoes = [...companhiasDoEstado, companhiaAleatoria];
+      
+      // Embaralhar e definir as opções
+      setOpcoesCompanhia(embaralharArray(opcoes));
+      // Qualquer companhia do RS é válida
+      setCompanhiaCorreta(companhiasDoEstado[0]);
+      return;
+    }
+    
+    // CASO 4: OUTROS ESTADOS - mostrar 1 companhia correta do estado + 2 aleatórias
+    console.log("Caso padrão: 1 opção correta + 2 aleatórias");
+    if (companhiasDoEstado.length > 0) {
+      const companhiaCorretaEstado = companhiasDoEstado[0];
+      setCompanhiaCorreta(companhiaCorretaEstado);
+      
+      // Buscar 2 companhias aleatórias de outros estados
+      const todosEstados = Object.keys(companhiasEletricas);
+      const estadosComExcecao = todosEstados.filter(e => e !== estadoSelecionado);
+      
+      const companhiasAleatorias: string[] = [];
+      while (companhiasAleatorias.length < 2 && estadosComExcecao.length > 0) {
+        const estadoAleatorioIndex = Math.floor(Math.random() * estadosComExcecao.length);
+        const estadoAleatorio = estadosComExcecao[estadoAleatorioIndex];
         
-        // Buscar 2 companhias aleatórias de outros estados
-        const todosEstados = Object.keys(companhiasEletricas);
-        const estadosComExcecao = todosEstados.filter(e => e !== estadoSelecionado);
-        
-        const companhiasAleatorias: string[] = [];
-        while (companhiasAleatorias.length < 2 && estadosComExcecao.length > 0) {
-          const estadoAleatorioIndex = Math.floor(Math.random() * estadosComExcecao.length);
-          const estadoAleatorio = estadosComExcecao[estadoAleatorioIndex];
-          
-          const companhiasEstadoAleatorio = companhiasEletricas[estadoAleatorio] || [];
-          if (companhiasEstadoAleatorio.length > 0) {
-            const companhiaAleatoria = companhiasEstadoAleatorio[0];
-            if (!companhiasAleatorias.includes(companhiaAleatoria)) {
-              companhiasAleatorias.push(companhiaAleatoria);
-            }
+        const companhiasEstadoAleatorio = companhiasEletricas[estadoAleatorio] || [];
+        if (companhiasEstadoAleatorio.length > 0) {
+          const companhiaAleatoria = companhiasEstadoAleatorio[0];
+          if (!companhiasAleatorias.includes(companhiaAleatoria)) {
+            companhiasAleatorias.push(companhiaAleatoria);
           }
-          
-          // Remover este estado para não reutilizá-lo
-          estadosComExcecao.splice(estadoAleatorioIndex, 1);
         }
         
-        // Embaralhar as opções
-        const opcoes = [companhiaCorretaEstado, ...companhiasAleatorias];
-        const embaralharArray = (array: string[]): string[] => {
-          const arrayCopia = [...array];
-          for (let i = arrayCopia.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
-          }
-          return arrayCopia;
-        };
-        
-        setOpcoesCompanhia(embaralharArray(opcoes));
+        // Remover este estado para não reutilizá-lo
+        estadosComExcecao.splice(estadoAleatorioIndex, 1);
       }
+      
+      // Embaralhar as opções
+      const opcoes = [companhiaCorretaEstado, ...companhiasAleatorias];
+      setOpcoesCompanhia(embaralharArray(opcoes));
     }
   };
 
   // Lidar com o envio do formulário de ano
-  const onSubmitAno = (values: AnoFormValues) => {
+  const onSubmitAno = async (values: AnoFormValues) => {
     const dataNascimento = dadosPessoais?.Result?.DataNascimento || "";
     const anoCorreto = getAnoNascimento(dataNascimento);
     
     if (values.ano === anoCorreto) {
-      // Detectar estado - por padrão, usamos Minas Gerais para teste
-      const estadoSelecionado = "Minas Gerais";
+      // Verificar se já temos o estado detectado ou precisamos detectar novamente
+      let estadoSelecionado = estado;
+      if (!localizado) {
+        // Se não temos o estado ainda, detectar por IP
+        estadoSelecionado = await detectarEstadoPorIP();
+      }
+      
+      console.log("Utilizando estado:", estadoSelecionado);
       
       // Gerar opções de companhia com base no estado
       gerarOpcoesCompanhia(estadoSelecionado);
