@@ -1,0 +1,22 @@
+{
+  "name": "Restituição ICMS App",
+  "description": "Aplicação para cálculo e processamento de restituições relacionadas a tarifas de energia elétrica (ICMS)",
+  "keywords": [
+    "node",
+    "express",
+    "react",
+    "typescript"
+  ],
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "description": "Ambiente da aplicação",
+      "value": "production"
+    }
+  }
+}

@@ -1,1 +1,1 @@
-web: node --experimental-specifier-resolution=node --experimental-modules server.js
+web: node server.js
