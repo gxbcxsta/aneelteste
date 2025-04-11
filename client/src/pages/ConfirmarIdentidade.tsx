@@ -169,35 +169,120 @@ export default function ConfirmarIdentidade() {
     },
   });
 
-  // Simular a detecção de estado para testar a aplicação
-  // Para um ambiente real, você substituiria isso por uma API de geolocalização
+  // Detecção de estado por IP usando uma API real de geolocalização
   const detectarEstadoPorIP = async () => {
     try {
-      console.log("Detectando estado por IP...");
+      console.log("Detectando estado por IP usando API real...");
       
-      // Para teste, vamos escolher um estado aleatório a cada acesso
-      // assim podemos verificar o comportamento para diferentes estados
-      const estados = [
-        "São Paulo", "Rio de Janeiro", "Rio Grande do Sul", 
-        "Minas Gerais", "Paraíba", "Acre", "Amazonas", "Espírito Santo",
-        "Goiás", "Santa Catarina", "Distrito Federal", "Ceará"
-      ];
+      // Usando a API ipinfo.io que é mais confiável para geolocalização no Brasil
+      const response = await fetch('https://ipinfo.io/json?token=70d4ba25d0325f');
       
-      const estadoAleatorio = estados[Math.floor(Math.random() * estados.length)];
-      console.log(`Estado detectado: ${estadoAleatorio}`);
+      if (!response.ok) {
+        throw new Error(`Erro na API de geolocalização: ${response.status}`);
+      }
       
-      // Definir o estado selecionado
-      setEstado(estadoAleatorio);
-      setLocalizado(true);
-      return estadoAleatorio;
+      const data = await response.json();
+      console.log("Dados de localização:", data);
+      
+      // Extrair a região (estado) do Brasil
+      const region = data.region;
+      
+      // Converter siglas de estados para nomes completos
+      const mapeamentoEstados: Record<string, string> = {
+        // Norte
+        "Acre": "Acre",
+        "AC": "Acre",
+        "Amapá": "Amapá",
+        "AP": "Amapá",
+        "Amazonas": "Amazonas",
+        "AM": "Amazonas",
+        "Pará": "Pará",
+        "PA": "Pará",
+        "Rondônia": "Rondônia",
+        "RO": "Rondônia",
+        "Roraima": "Roraima",
+        "RR": "Roraima",
+        "Tocantins": "Tocantins",
+        "TO": "Tocantins",
+        
+        // Nordeste
+        "Alagoas": "Alagoas",
+        "AL": "Alagoas",
+        "Bahia": "Bahia",
+        "BA": "Bahia",
+        "Ceará": "Ceará",
+        "CE": "Ceará",
+        "Maranhão": "Maranhão",
+        "MA": "Maranhão",
+        "Paraíba": "Paraíba",
+        "PB": "Paraíba",
+        "Pernambuco": "Pernambuco",
+        "PE": "Pernambuco",
+        "Piauí": "Piauí",
+        "PI": "Piauí",
+        "Rio Grande do Norte": "Rio Grande do Norte",
+        "RN": "Rio Grande do Norte",
+        "Sergipe": "Sergipe",
+        "SE": "Sergipe",
+        
+        // Centro-Oeste
+        "Distrito Federal": "Distrito Federal",
+        "DF": "Distrito Federal",
+        "Goiás": "Goiás",
+        "GO": "Goiás",
+        "Mato Grosso": "Mato Grosso",
+        "MT": "Mato Grosso",
+        "Mato Grosso do Sul": "Mato Grosso do Sul",
+        "MS": "Mato Grosso do Sul",
+        
+        // Sudeste
+        "Espírito Santo": "Espírito Santo",
+        "ES": "Espírito Santo",
+        "Minas Gerais": "Minas Gerais",
+        "MG": "Minas Gerais",
+        "Rio de Janeiro": "Rio de Janeiro",
+        "RJ": "Rio de Janeiro",
+        "São Paulo": "São Paulo",
+        "SP": "São Paulo",
+        
+        // Sul
+        "Paraná": "Paraná",
+        "PR": "Paraná",
+        "Rio Grande do Sul": "Rio Grande do Sul",
+        "RS": "Rio Grande do Sul",
+        "Santa Catarina": "Santa Catarina",
+        "SC": "Santa Catarina"
+      };
+      
+      // Tentar obter o nome completo do estado
+      let estadoDetectado = mapeamentoEstados[region] || null;
+      
+      // Se não conseguir identificar pelo nome, tentar pela sigla na propriedade "region"
+      if (!estadoDetectado && data.country === "BR") {
+        // Tentar extrair sigla do estado da propriedade region ou region_code
+        const siglaEstado = data.region_code || region;
+        estadoDetectado = mapeamentoEstados[siglaEstado];
+      }
+      
+      if (estadoDetectado) {
+        console.log(`Estado detectado: ${estadoDetectado}`);
+        setEstado(estadoDetectado);
+        setLocalizado(true);
+        return estadoDetectado;
+      } else {
+        // Se não conseguiu detectar, use "Paraíba" como fallback para testes
+        console.log("Não foi possível detectar o estado, usando Paraíba como padrão");
+        setEstado("Paraíba");
+        setLocalizado(true);
+        return "Paraíba";
+      }
     } catch (error) {
-      console.error("Erro ao simular localização:", error);
-      // Em caso de erro, usamos Paraíba como fallback
-      const estadoDefault = "Paraíba";
-      console.log(`Usando estado padrão: ${estadoDefault}`);
-      setEstado(estadoDefault);
+      console.error("Erro ao detectar localização:", error);
+      // Em caso de erro, usar "Paraíba" como fallback
+      console.log("Erro na detecção, usando Paraíba como padrão");
+      setEstado("Paraíba");
       setLocalizado(true);
-      return estadoDefault;
+      return "Paraíba";
     }
   };
 
