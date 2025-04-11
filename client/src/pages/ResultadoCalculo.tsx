@@ -252,33 +252,33 @@ export default function ResultadoCalculo() {
               </h1>
               
               <Card className="overflow-hidden">
-                <div className="bg-gradient-to-b from-green-50 to-green-100 p-8 border-b border-green-200 rounded-t-md">
-                  <div className="flex items-center justify-center mb-3">
-                    <div className="bg-green-100 p-3 rounded-full border border-green-200">
-                      <CheckCircle className="text-green-600 h-8 w-8" />
+                <div className="bg-gradient-to-b from-green-50 to-green-100 p-5 border-b border-green-200 rounded-t-md">
+                  <div className="flex items-center justify-center mb-2">
+                    <div className="bg-green-100 p-2 rounded-full border border-green-200">
+                      <CheckCircle className="text-green-600 h-6 w-6" />
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-green-800 text-2xl mb-2 text-center">
+                  <h3 className="font-bold text-green-800 text-xl mb-1 text-center">
                     Restituição Disponível!
                   </h3>
                   
-                  <div className="h-0.5 w-32 bg-green-200 mx-auto my-4"></div>
+                  <div className="h-0.5 w-24 bg-green-200 mx-auto my-2"></div>
                   
-                  <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] text-center mb-6">
+                  <h2 className="text-lg font-semibold text-[var(--gov-blue-dark)] text-center mb-3">
                     Valor Aprovado para Restituição
                   </h2>
                   
-                  <div className="bg-white p-6 rounded-md shadow-sm border border-green-200 mb-4 flex flex-col items-center">
-                    <div className="flex items-center justify-center mb-2">
-                      <Coins className="h-10 w-10 text-green-600 mr-3" />
-                      <span className="text-4xl font-bold text-green-600">
+                  <div className="bg-white p-4 rounded-md shadow-sm border border-green-200 mb-2 flex flex-col items-center">
+                    <div className="flex items-center justify-center">
+                      <Coins className="h-8 w-8 text-green-600 mr-2" />
+                      <span className="text-3xl font-bold text-green-600">
                         {formatarMoeda(valorRestituicao)}
                       </span>
                     </div>
                     
                     {meses && (
-                      <p className="text-sm text-[var(--gov-gray-dark)] mt-3 text-center">
+                      <p className="text-xs text-[var(--gov-gray-dark)] mt-2 text-center">
                         Valor calculado com base em <span className="font-semibold">{meses} meses</span> de cobranças indevidas
                       </p>
                     )}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Coins, User, Building, MapPin, ChevronRight, Calendar, Clock, CheckCircle, AlertCircle, X } from "lucide-react";
+import { Coins, User, Building, MapPin, ChevronRight, Calendar, Clock, CheckCircle, AlertCircle, AlertTriangle, Info, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -141,33 +141,33 @@ export default function ConfirmacaoRestituicao() {
             </h1>
             
             <Card className="overflow-hidden">
-              <div className="bg-gradient-to-b from-green-50 to-green-100 p-8 border-b border-green-200 rounded-t-md">
-                <div className="flex items-center justify-center mb-3">
-                  <div className="bg-green-100 p-3 rounded-full border border-green-200">
-                    <CheckCircle className="text-green-600 h-8 w-8" />
+              <div className="bg-gradient-to-b from-green-50 to-green-100 p-5 border-b border-green-200 rounded-t-md">
+                <div className="flex items-center justify-center mb-2">
+                  <div className="bg-green-100 p-2 rounded-full border border-green-200">
+                    <CheckCircle className="text-green-600 h-6 w-6" />
                   </div>
                 </div>
 
-                <h3 className="font-bold text-green-800 text-2xl mb-2 text-center">
+                <h3 className="font-bold text-green-800 text-xl mb-1 text-center">
                   Restituição Disponível!
                 </h3>
                 
-                <div className="h-0.5 w-32 bg-green-200 mx-auto my-4"></div>
+                <div className="h-0.5 w-24 bg-green-200 mx-auto my-2"></div>
                 
-                <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] text-center mb-6">
+                <h2 className="text-lg font-semibold text-[var(--gov-blue-dark)] text-center mb-3">
                   Valor Aprovado para Restituição
                 </h2>
                 
-                <div className="bg-white p-6 rounded-md shadow-sm border border-green-200 mb-4 flex flex-col items-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <Coins className="h-10 w-10 text-green-600 mr-3" />
-                    <span className="text-4xl font-bold text-green-600">
+                <div className="bg-white p-4 rounded-md shadow-sm border border-green-200 mb-2 flex flex-col items-center">
+                  <div className="flex items-center justify-center">
+                    <Coins className="h-8 w-8 text-green-600 mr-2" />
+                    <span className="text-3xl font-bold text-green-600">
                       {formatarMoeda(valorRestituicao)}
                     </span>
                   </div>
                   
                   {meses && (
-                    <p className="text-sm text-[var(--gov-gray-dark)] mt-3 text-center">
+                    <p className="text-xs text-[var(--gov-gray-dark)] mt-2 text-center">
                       Valor calculado com base em <span className="font-semibold">{meses} meses</span> de cobranças indevidas
                     </p>
                   )}
@@ -245,35 +245,57 @@ export default function ConfirmacaoRestituicao() {
       </main>
       
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="p-0 overflow-hidden max-w-[450px]">
-          <div className="bg-white rounded-md p-6 w-full">
-            <div className="mb-4 text-center">
-              <div className="bg-red-100 p-3 rounded-full inline-flex items-center justify-center mb-3">
-                <AlertCircle className="text-red-600 text-2xl" />
+        <DialogContent className="p-0 overflow-hidden max-w-[450px] border-0">
+          <div className="w-full">
+            {/* Cabeçalho */}
+            <div className="bg-gradient-to-r from-red-600 to-red-700 p-5 text-center">
+              <div className="bg-white rounded-full h-14 w-14 flex items-center justify-center mx-auto mb-3 shadow-md">
+                <AlertCircle className="text-red-600 h-8 w-8" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900">AVISO IMPORTANTE</h3>
+              <h3 className="text-xl font-bold text-white">AVISO IMPORTANTE</h3>
             </div>
-            <div className="mb-5 text-gray-700">
-              <p className="mb-3">Ao prosseguir, você autoriza a inclusão do seu CPF na lista de participantes do processo de restituição do ICMS e concorda com o pagamento obrigatório de <strong className="text-red-600">R$ 74,90</strong>.</p>
-              <p className="mb-3"><strong>ATENÇÃO:</strong> Caso o pagamento não seja efetuado até a data de vencimento, você poderá deixar de receber <strong className="text-red-600">{formatarMoeda(valorRestituicao)}</strong> em restituições. Além disso, ficará impedido de solicitar o benefício neste ano e nos próximos 5 anos.</p>
-              <div className="bg-yellow-50 p-3 border border-yellow-200 rounded-md">
-                <p className="text-yellow-800"><strong>Importante:</strong> O pagamento é obrigatório para confirmar sua solicitação de restituição.</p>
+            
+            {/* Conteúdo */}
+            <div className="p-6 bg-white">
+              <div className="space-y-4 text-gray-700">
+                <div className="bg-white p-4 border-l-4 border-blue-600 shadow-sm">
+                  <p>Ao prosseguir, você autoriza a inclusão do seu CPF na lista de participantes do processo de restituição do ICMS e concorda com o pagamento obrigatório de <strong className="text-red-600 font-bold">R$ 74,90</strong>.</p>
+                </div>
+                
+                <div className="bg-red-50 p-4 border border-red-200 rounded-md">
+                  <p className="flex items-start">
+                    <AlertTriangle className="text-red-600 mr-2 mt-1 h-5 w-5 flex-shrink-0" />
+                    <span>
+                      <strong className="text-red-700">ATENÇÃO:</strong> Caso o pagamento não seja efetuado até a data de vencimento, você poderá deixar de receber <strong className="text-red-600">{formatarMoeda(valorRestituicao)}</strong> em restituições. Além disso, ficará impedido de solicitar o benefício neste ano e nos próximos 5 anos.
+                    </span>
+                  </p>
+                </div>
+                
+                <div className="bg-yellow-50 p-4 border-l-4 border-yellow-400 rounded-md">
+                  <div className="flex">
+                    <Info className="h-5 w-5 text-yellow-600 flex-shrink-0 mr-2 mt-0.5" />
+                    <p className="text-yellow-800">
+                      <strong className="font-bold">Importante:</strong> O pagamento é obrigatório para confirmar sua solicitação de restituição.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col space-y-3">
-              <Button 
-                onClick={prosseguirParaPagamento}
-                className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors font-semibold"
-              >
-                Vou realizar o pagamento
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-                className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium"
-              >
-                Retornar ao processo
-              </Button>
+              
+              <div className="mt-6 grid grid-cols-1 gap-3">
+                <Button 
+                  onClick={prosseguirParaPagamento}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-md transition-colors font-bold text-lg shadow-sm"
+                >
+                  Vou realizar o pagamento
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Retornar ao processo
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>
