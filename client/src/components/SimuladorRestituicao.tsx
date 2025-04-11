@@ -1055,8 +1055,8 @@ export default function SimuladorRestituicao({
     // Construir URL com os parâmetros necessários e redirecionar diretamente para a página de resultado
     const url = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
     
-    // Redirecionar para a página de resultado
-    window.location.href = url;
+    // Usar navigate da wouter para navegação mais eficiente
+    navigate(url);
   };
   
   return (

@@ -8,6 +8,9 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
 
 export default function ConfirmacaoRestituicao() {
+  // Hook de navegação do wouter
+  const [location, navigate] = useLocation();
+  
   // Estados para dados do resultado
   const [valorRestituicao, setValorRestituicao] = useState(0);
   const [nome, setNome] = useState("");
@@ -123,11 +126,8 @@ export default function ConfirmacaoRestituicao() {
     // Criar URL com parâmetros
     const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
     
-    // Usar history.pushState para transição mais rápida (sem recarregar a página inteira)
-    window.history.pushState({}, "", url);
-    
-    // Redirecionar manualmente para garantir a navegação
-    window.location.href = url;
+    // Usar navigate da wouter para navegação mais eficiente
+    navigate(url);
   };
 
   return (
