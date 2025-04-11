@@ -34,18 +34,11 @@ export default function HeroSection() {
               Descubra em segundos se tem dinheiro a receber!
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex justify-center sm:justify-start">
               <Link href="/verificar">
                 <button className="flex items-center justify-center gap-2 bg-[#FFCD07] hover:bg-[#F2C200] text-[#071D41] px-8 py-4 rounded-md text-lg font-bold shadow-md transition-all duration-300 ease-in-out transform hover:translate-y-[-2px]">
                   <Search size={20} />
                   Verificar meu direito à restituição
-                </button>
-              </Link>
-              
-              <Link href="#processo">
-                <button className="flex items-center justify-center gap-2 bg-transparent border-2 border-white/60 hover:border-white text-white px-6 py-4 rounded-md text-base font-medium transition-all">
-                  Como funciona
-                  <ChevronsRight size={18} />
                 </button>
               </Link>
             </div>
