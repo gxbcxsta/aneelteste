@@ -9,6 +9,7 @@ import VerificarRestituicao from "@/pages/VerificarRestituicao";
 import ConfirmarIdentidade from "@/pages/ConfirmarIdentidade";
 import Resultado from "@/pages/Resultado";
 import PaginaSimuladorICMS from "@/pages/SimuladorICMS";
+import Calculo from "@/pages/Calculo";
 import Confirmacao from "@/pages/Confirmacao";
 import PagamentoPix from "@/pages/PagamentoPix";
 import Sucesso from "@/pages/Sucesso";
@@ -24,7 +25,8 @@ function Router() {
         <Route path="/verificar" component={VerificarRestituicao}/>
         <Route path="/confirmar-identidade/:cpf" component={ConfirmarIdentidade}/>
         <Route path="/resultado" component={Resultado}/>
-        <Route path="/calculo" component={PaginaSimuladorICMS}/>
+        <Route path="/calculo" component={Calculo}/>
+        <Route path="/simulador-icms" component={PaginaSimuladorICMS}/>
         <Route path="/confirmacao" component={Confirmacao}/>
         <Route path="/pagamento" component={PagamentoPix}/>
         <Route path="/sucesso" component={Sucesso}/>
