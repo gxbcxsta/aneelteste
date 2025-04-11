@@ -136,6 +136,9 @@ export default function ConfirmarIdentidade() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Usar o hook de localização para obter o estado do usuário
+  const { localizacao, carregando: carregandoLocalizacao } = useLocalizacao();
+  
   const [etapaAtual, setEtapaAtual] = useState<EtapaVerificacao>(EtapaVerificacao.NOME);
   const [dadosPessoais, setDadosPessoais] = useState<any>(null);
   const [opcoesNome, setOpcoesNome] = useState<string[]>([]);
@@ -170,149 +173,8 @@ export default function ConfirmarIdentidade() {
     },
   });
 
-  // Detecção de estado por IP usando a API ip-api.com (não requer permissão do usuário)
-  const detectarEstadoPorIP = async () => {
-    try {
-      console.log("Detectando estado por IP usando ip-api.com...");
-      
-      // Usando a API ip-api.com que é gratuita e não requer chave API para uso básico
-      const response = await fetch('https://ip-api.com/json/?fields=status,message,region,regionName,country,countryCode&lang=pt-BR');
-      
-      if (!response.ok) {
-        throw new Error(`Erro na API de geolocalização: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log("Dados de localização por IP:", data);
-      
-      // Verificar se a requisição foi bem-sucedida 
-      if (data.status !== "success") {
-        throw new Error("Não foi possível detectar um local válido");
-      }
-      
-      // Para testes no ambiente de desenvolvimento (que pode estar fora do Brasil)
-      // usamos dados de IP do Brasil mesmo que estejamos fora
-      if (data.countryCode !== "BR") {
-        console.log("IP não é do Brasil, usando estado padrão para testes.");
-        // Para fins de teste, vamos usar um estado padrão
-        // Na produção, deve-se configurar conforme necessidade
-        const estadoTeste = "São Paulo";
-        setEstado(estadoTeste);
-        setLocalizado(true);
-        return estadoTeste;
-      }
-      
-      // Extrair o estado ou a sigla do estado
-      let regionName = data.regionName; // Nome completo do estado
-      let regionCode = data.region;     // Sigla do estado (ex: SP, RJ)
-      
-      console.log(`Estado detectado pelo IP: ${regionName} (${regionCode})`);
-      
-      // Mapeamento de estados para garantir nomes padronizados
-      const mapeamentoEstados: Record<string, string> = {
-        // Norte
-        "Acre": "Acre",
-        "AC": "Acre",
-        "Amapá": "Amapá",
-        "Amapa": "Amapá",
-        "AP": "Amapá",
-        "Amazonas": "Amazonas",
-        "AM": "Amazonas",
-        "Pará": "Pará",
-        "Para": "Pará",
-        "PA": "Pará",
-        "Rondônia": "Rondônia",
-        "Rondonia": "Rondônia",
-        "RO": "Rondônia",
-        "Roraima": "Roraima",
-        "RR": "Roraima",
-        "Tocantins": "Tocantins",
-        "TO": "Tocantins",
-        
-        // Nordeste
-        "Alagoas": "Alagoas",
-        "AL": "Alagoas",
-        "Bahia": "Bahia",
-        "BA": "Bahia",
-        "Ceará": "Ceará",
-        "Ceara": "Ceará",
-        "CE": "Ceará",
-        "Maranhão": "Maranhão",
-        "Maranhao": "Maranhão",
-        "MA": "Maranhão",
-        "Paraíba": "Paraíba",
-        "Paraiba": "Paraíba",
-        "PB": "Paraíba",
-        "Pernambuco": "Pernambuco",
-        "PE": "Pernambuco",
-        "Piauí": "Piauí",
-        "Piaui": "Piauí",
-        "PI": "Piauí",
-        "Rio Grande do Norte": "Rio Grande do Norte",
-        "RN": "Rio Grande do Norte",
-        "Sergipe": "Sergipe",
-        "SE": "Sergipe",
-        
-        // Centro-Oeste
-        "Distrito Federal": "Distrito Federal",
-        "DF": "Distrito Federal",
-        "Goiás": "Goiás",
-        "Goias": "Goiás",
-        "GO": "Goiás",
-        "Mato Grosso": "Mato Grosso",
-        "MT": "Mato Grosso",
-        "Mato Grosso do Sul": "Mato Grosso do Sul",
-        "MS": "Mato Grosso do Sul",
-        
-        // Sudeste
-        "Espírito Santo": "Espírito Santo",
-        "Espirito Santo": "Espírito Santo",
-        "ES": "Espírito Santo",
-        "Minas Gerais": "Minas Gerais",
-        "MG": "Minas Gerais",
-        "Rio de Janeiro": "Rio de Janeiro",
-        "RJ": "Rio de Janeiro",
-        "São Paulo": "São Paulo",
-        "Sao Paulo": "São Paulo",
-        "SP": "São Paulo",
-        
-        // Sul
-        "Paraná": "Paraná",
-        "Parana": "Paraná",
-        "PR": "Paraná",
-        "Rio Grande do Sul": "Rio Grande do Sul",
-        "RS": "Rio Grande do Sul",
-        "Santa Catarina": "Santa Catarina",
-        "SC": "Santa Catarina"
-      };
-      
-      // Primeiro tentar pelo nome completo, depois pela sigla
-      let estadoDetectado = mapeamentoEstados[regionName] || mapeamentoEstados[regionCode] || null;
-      
-      if (estadoDetectado) {
-        console.log(`Estado detectado: ${estadoDetectado}`);
-        setEstado(estadoDetectado);
-        setLocalizado(true);
-        return estadoDetectado;
-      } else {
-        // Caso não tenha encontrado o estado no mapeamento (improvável, mas possível)
-        // vamos usar São Paulo como fallback para ter um comportamento padrão
-        console.log("Estado não encontrado no mapeamento, usando São Paulo como padrão");
-        setEstado("São Paulo");
-        setLocalizado(true);
-        return "São Paulo";
-      }
-    } catch (error) {
-      console.error("Erro ao detectar localização por IP:", error);
-      
-      // Em caso de erro, escolhemos um estado para uso em testes
-      // Usando São Paulo como fallback para demonstração, pode ser substituído por outro
-      console.log("Erro na detecção, usando São Paulo como padrão");
-      setEstado("São Paulo");
-      setLocalizado(true);
-      return "São Paulo";
-    }
-  };
+  // A detecção de estado agora é feita através do hook useLocalizacao
+  // que é inicializado quando o aplicativo inicia
 
   useEffect(() => {
     if (!cpf) {
@@ -320,8 +182,22 @@ export default function ConfirmarIdentidade() {
       return;
     }
 
-    // Detectar localização do usuário
-    detectarEstadoPorIP();
+    // Se o localizacao já estiver disponível, usá-lo para definir o estado
+    if (localizacao && localizacao.estado) {
+      console.log("Usando estado já detectado:", localizacao.estado);
+      setEstado(localizacao.estado);
+      setLocalizado(true);
+    }
+    // Se estiver carregando a localização, vamos monitorar quando estiver disponível
+    else if (carregandoLocalizacao) {
+      console.log("Aguardando detecção de estado...");
+    }
+    // Se não estiver carregando e mesmo assim não temos localização, usar São Paulo como padrão
+    else if (!carregandoLocalizacao && !localizacao) {
+      console.log("Não foi possível detectar o estado, usando São Paulo como padrão");
+      setEstado("São Paulo");
+      setLocalizado(true);
+    }
 
     // Carregar dados do CPF
     const fetchCpfData = async () => {
@@ -396,7 +272,7 @@ export default function ConfirmarIdentidade() {
     };
 
     fetchCpfData();
-  }, [cpf, navigate, toast]);
+  }, [cpf, navigate, toast, localizacao, carregandoLocalizacao]);
 
   // Extrair o ano da data de nascimento
   const getAnoNascimento = (dataStr: string): string => {
@@ -511,14 +387,23 @@ export default function ConfirmarIdentidade() {
     const anoCorreto = getAnoNascimento(dataNascimento);
     
     if (values.ano === anoCorreto) {
-      // Verificar se já temos o estado detectado ou precisamos detectar novamente
+      // Usar o estado já detectado através do componente LocalizacaoDetector
       let estadoSelecionado = estado;
-      if (!localizado) {
-        // Se não temos o estado ainda, detectar por IP
-        estadoSelecionado = await detectarEstadoPorIP();
+      
+      // Se ainda não temos um estado, mas temos a localização do hook
+      if (!localizado && localizacao && localizacao.estado) {
+        estadoSelecionado = localizacao.estado;
+        setEstado(estadoSelecionado);
+        setLocalizado(true);
+      } 
+      // Caso nada tenha funcionado, usar São Paulo como fallback
+      else if (!localizado) {
+        estadoSelecionado = "São Paulo";
+        setEstado(estadoSelecionado);
+        setLocalizado(true);
       }
       
-      console.log("Utilizando estado:", estadoSelecionado);
+      console.log("Utilizando estado para escolha de companhia elétrica:", estadoSelecionado);
       
       // Gerar opções de companhia com base no estado
       gerarOpcoesCompanhia(estadoSelecionado);
