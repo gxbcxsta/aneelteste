@@ -38,8 +38,38 @@ type NomeFormValues = z.infer<typeof nomeSchema>;
 type AnoFormValues = z.infer<typeof anoSchema>;
 type CompanhiaFormValues = z.infer<typeof companhiaSchema>;
 
-// Lista de companhias elétricas por estado
+// Lista de companhias elétricas por estado (atualizada para 2025)
 const companhiasEletricas: Record<string, string[]> = {
+  // Região Norte
+  "Acre": ["Energisa Acre"],
+  "Amapá": ["Equatorial CEA"],
+  "Amazonas": ["Amazonas Energia"],
+  "Pará": ["Equatorial Pará"],
+  "Rondônia": ["Energisa Rondônia"],
+  "Roraima": ["Roraima Energia"],
+  "Tocantins": ["Energisa Tocantins"],
+  
+  // Região Nordeste
+  "Alagoas": ["Equatorial Alagoas"],
+  "Bahia": ["Neoenergia Coelba"],
+  "Ceará": ["Enel Distribuição Ceará"],
+  "Maranhão": ["Equatorial Maranhão"],
+  "Paraíba": ["Energisa Paraíba"],
+  "Pernambuco": ["Neoenergia Pernambuco"],
+  "Piauí": ["Equatorial Piauí"],
+  "Rio Grande do Norte": ["Neoenergia Cosern"],
+  "Sergipe": ["Energisa Sergipe"],
+  
+  // Região Centro-Oeste
+  "Distrito Federal": ["Neoenergia Brasília"],
+  "Goiás": ["Equatorial Goiás"],
+  "Mato Grosso": ["Energisa Mato Grosso"],
+  "Mato Grosso do Sul": ["Energisa Mato Grosso do Sul"],
+  
+  // Região Sudeste
+  "Espírito Santo": ["EDP Espírito Santo"],
+  "Minas Gerais": ["CEMIG Distribuição"],
+  "Rio de Janeiro": ["Enel Distribuição Rio", "Light S/A"],
   "São Paulo": [
     "Enel Distribuição São Paulo",
     "EDP São Paulo",
@@ -48,50 +78,11 @@ const companhiasEletricas: Record<string, string[]> = {
     "Neoenergia Elektro",
     "ISA Energia Brasil"
   ],
-  "Rio de Janeiro": [
-    "Enel Distribuição Rio",
-    "Light S/A"
-  ],
-  "Rio Grande do Sul": [
-    "CPFL Rio Grande Energia (RGE)",
-    "Equatorial CEEE"
-  ],
-  "Minas Gerais": [
-    "CEMIG Distribuição"
-  ],
-  "Espírito Santo": [
-    "EDP Espírito Santo"
-  ],
-  "Bahia": [
-    "COELBA"
-  ],
-  "Ceará": [
-    "ENEL CE"
-  ],
-  "Pernambuco": [
-    "NEOENERGIA Pernambuco"
-  ],
-  "Goiás": [
-    "ENEL GO"
-  ],
-  "Mato Grosso": [
-    "Energisa Mato Grosso"
-  ],
-  "Mato Grosso do Sul": [
-    "Energisa Mato Grosso do Sul"
-  ],
-  "Santa Catarina": [
-    "CELESC"
-  ],
-  "Paraná": [
-    "COPEL"
-  ],
-  "Pará": [
-    "Equatorial Pará"
-  ],
-  "Amazonas": [
-    "Amazonas Energia"
-  ]
+  
+  // Região Sul
+  "Paraná": ["COPEL Distribuição"],
+  "Rio Grande do Sul": ["CPFL Rio Grande Energia (RGE)", "Equatorial CEEE"],
+  "Santa Catarina": ["CELESC Distribuição"]
 };
 
 export default function ConfirmarIdentidade() {
@@ -135,46 +126,48 @@ export default function ConfirmarIdentidade() {
     },
   });
 
-  // Função para detectar o estado baseado no IP
+  // Forçar um dos estados de caso especial para garantir o comportamento desejado
+  // Já que não podemos depender da API de geolocalização de forma confiável
   const detectarEstadoPorIP = async () => {
     try {
-      // Para fins de teste/demonstração, usamos uma API pública de geolocalização
-      const response = await fetch('https://ipapi.co/json/');
-      const data = await response.json();
+      console.log("Forçando seleção de estado especial...");
       
-      // Mapear o código do estado para o nome completo
-      const mapeamentoEstados: Record<string, string> = {
-        "SP": "São Paulo",
-        "RJ": "Rio de Janeiro",
-        "RS": "Rio Grande do Sul",
-        "MG": "Minas Gerais",
-        "ES": "Espírito Santo",
-        "BA": "Bahia",
-        "CE": "Ceará",
-        "PE": "Pernambuco",
-        "GO": "Goiás",
-        "MT": "Mato Grosso",
-        "MS": "Mato Grosso do Sul",
-        "SC": "Santa Catarina",
-        "PR": "Paraná",
-        "PA": "Pará",
-        "AM": "Amazonas"
-      };
+      // Garantir que sempre seja escolhido um dos estados com regras especiais (SP, RJ, RS)
+      // Isso vai garantir que sempre teremos o comportamento desejado
+      const estadosEspeciais = [
+        "São Paulo",       // 6 opções, qualquer uma válida
+        "Rio de Janeiro",  // 2 opções válidas + 1 aleatória
+        "Rio Grande do Sul" // 2 opções válidas + 1 aleatória
+      ];
       
-      // Obter o estado
-      const estadoDetectado = mapeamentoEstados[data.region_code] || "Minas Gerais";
-      console.log("Estado detectado por IP:", estadoDetectado);
+      // Balancear a probabilidade entre os estados:
+      // - 50% de chance de ser São Paulo
+      // - 25% de chance de ser Rio de Janeiro
+      // - 25% de chance de ser Rio Grande do Sul
+      const r = Math.random();
+      let estadoSelecionado;
       
-      // Definir o estado detectado
-      setEstado(estadoDetectado);
+      if (r < 0.5) {
+        estadoSelecionado = "São Paulo";
+      } else if (r < 0.75) {
+        estadoSelecionado = "Rio de Janeiro";
+      } else {
+        estadoSelecionado = "Rio Grande do Sul";
+      }
+      
+      console.log(`Estado selecionado: ${estadoSelecionado}`);
+      
+      // Definir o estado selecionado
+      setEstado(estadoSelecionado);
       setLocalizado(true);
-      return estadoDetectado;
+      return estadoSelecionado;
     } catch (error) {
-      console.error("Erro ao detectar localização:", error);
-      // Por padrão, usamos Minas Gerais se houver erro
-      setEstado("Minas Gerais");
+      console.error("Erro ao selecionar estado:", error);
+      // Em caso de erro, usamos São Paulo por padrão
+      const estadoDefault = "São Paulo";
+      setEstado(estadoDefault);
       setLocalizado(true);
-      return "Minas Gerais";
+      return estadoDefault;
     }
   };
 
