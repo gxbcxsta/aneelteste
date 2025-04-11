@@ -555,7 +555,7 @@ export default function PagamentoPix() {
             <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
               <div className="mb-5">
                 <div className="flex justify-center">
-                  <Tabs defaultValue="qrcode" className="w-full">
+                  <div className="w-full">
                     <TabsList className="w-full mb-6 bg-gray-100 p-1 rounded-lg">
                       <TabsTrigger value="qrcode" className="flex-1 data-[state=active]:bg-[#1351B4] data-[state=active]:text-white rounded-md transition-all duration-300">
                         <div className="flex items-center justify-center gap-2 py-1">

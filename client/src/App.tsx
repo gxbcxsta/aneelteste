@@ -10,7 +10,7 @@ import Resultado from "@/pages/Resultado";
 import PaginaSimuladorICMS from "@/pages/SimuladorICMS";
 import Calculo from "@/pages/Calculo";
 import Confirmacao from "@/pages/Confirmacao";
-import PagamentoPix from "@/pages/PagamentoPix";
+import PagamentoPix from "@/pages/PagamentoPix.new";
 import Sucesso from "@/pages/Sucesso";
 import ResultadoCalculo from "@/pages/ResultadoCalculo";
 import ConfirmacaoRestituicao from "@/pages/ConfirmacaoRestituicao";
