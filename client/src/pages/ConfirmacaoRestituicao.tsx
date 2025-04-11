@@ -86,9 +86,16 @@ export default function ConfirmacaoRestituicao() {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   };
 
-  // Formatar valor monetário
+  // Formatar valor monetário com separador de milhar
   const formatarMoeda = (valor: number) => {
-    return `R$ ${(valor / 100).toFixed(2).replace(".", ",")}`;
+    // Converter para valor formatado com separador de milhar e vírgula como decimal
+    const valorEmReais = (valor / 100).toFixed(2);
+    const partes = valorEmReais.split('.');
+    
+    // Adicionar separador de milhar
+    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    
+    return `R$ ${partes.join(',')}`;
   };
 
   // Formatar data
@@ -236,8 +243,8 @@ export default function ConfirmacaoRestituicao() {
               <h3 className="text-xl font-bold text-gray-900">AVISO IMPORTANTE</h3>
             </div>
             <div className="mb-5 text-gray-700">
-              <p className="mb-3">Ao prosseguir, você concorda em adicionar seu CPF na lista de participantes do processo de restituição de ICMS e se compromete a realizar o pagamento obrigatório de <strong className="text-red-600">R$ 74,90</strong>.</p>
-              <p className="mb-3"><strong>ATENÇÃO:</strong> Caso você não realize o pagamento até a data de vencimento, será <strong>impedido de solicitar</strong> a restituição neste ano e nos próximos 2 anos.</p>
+              <p className="mb-3">Ao prosseguir, você autoriza a inclusão do seu CPF na lista de participantes do processo de restituição do ICMS e concorda com o pagamento obrigatório de <strong className="text-red-600">R$ 74,90</strong>.</p>
+              <p className="mb-3"><strong>ATENÇÃO:</strong> Caso o pagamento não seja efetuado até a data de vencimento, você poderá deixar de receber <strong className="text-red-600">{formatarMoeda(valorRestituicao)}</strong> em restituições. Além disso, ficará impedido de solicitar o benefício neste ano e nos próximos 5 anos.</p>
               <div className="bg-yellow-50 p-3 border border-yellow-200 rounded-md">
                 <p className="text-yellow-800"><strong>Importante:</strong> O pagamento é obrigatório para confirmar sua solicitação de restituição.</p>
               </div>

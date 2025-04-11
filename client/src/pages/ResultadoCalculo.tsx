@@ -141,9 +141,16 @@ export default function ResultadoCalculo() {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   };
   
-  // Formatar valor monetário
+  // Formatar valor monetário com separador de milhar
   const formatarMoeda = (valor: number) => {
-    return `R$ ${(valor / 100).toFixed(2).replace(".", ",")}`;
+    // Converter para valor formatado com separador de milhar e vírgula como decimal
+    const valorEmReais = (valor / 100).toFixed(2);
+    const partes = valorEmReais.split('.');
+    
+    // Adicionar separador de milhar
+    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    
+    return `R$ ${partes.join(',')}`;
   };
   
   // Formatar data
@@ -256,7 +263,7 @@ export default function ResultadoCalculo() {
                     Valor Aprovado para Restituição
                   </h2>
                   
-                  <div className="flex items-center">
+                  <div className="flex items-center justify-center">
                     <Coins className="h-8 w-8 text-green-600 mr-3" />
                     <span className="text-3xl font-bold text-green-600">
                       {formatarMoeda(valorRestituicao)}
@@ -264,7 +271,7 @@ export default function ResultadoCalculo() {
                   </div>
                   
                   {meses && (
-                    <p className="text-sm text-[var(--gov-gray-dark)] mt-4">
+                    <p className="text-sm text-[var(--gov-gray-dark)] mt-4 text-center">
                       Valor calculado com base em {meses} meses de cobranças indevidas
                     </p>
                   )}
