@@ -651,48 +651,116 @@ export default function PagamentoPix() {
             </div>
           </div>
           
-          {/* FAQ Section - Moved below the payment information */}
-          <div className="mt-10 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-[var(--gov-blue-dark)] mb-4">
-              Perguntas Frequentes (FAQ)
-            </h2>
-            <div className="border border-gray-200 rounded-lg p-6 bg-white">
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">1. Por que estou pagando uma taxa se o valor é meu por direito?</h4>
-                  <p className="text-gray-600 mt-1">
-                    A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, 
-                    evitando fraudes, duplicidades e erros de restituição.
-                  </p>
+          {/* FAQ Section - Redesenhada para melhor apresentação */}
+          <div className="mt-12 max-w-4xl mx-auto">
+            <div className="flex items-center mb-6">
+              <div className="w-10 h-10 rounded-full bg-[var(--gov-blue-light)] flex items-center justify-center mr-3">
+                <Info className="h-6 w-6 text-[var(--gov-blue-dark)]" />
+              </div>
+              <h2 className="text-2xl font-bold text-[var(--gov-blue-dark)]">
+                Perguntas Frequentes (FAQ)
+              </h2>
+            </div>
+            
+            <div className="border border-blue-100 rounded-lg overflow-hidden bg-white shadow-sm">
+              {/* Pergunta 1 */}
+              <div className="border-b border-blue-100 hover:bg-blue-50/50 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <div className="h-7 w-7 rounded-full bg-[var(--gov-blue-light)] flex items-center justify-center">
+                        <span className="text-[var(--gov-blue-dark)] font-bold text-sm">1</span>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-bold text-[var(--gov-blue-dark)] text-lg">Por que estou pagando uma taxa se o valor é meu por direito?</h4>
+                      <p className="text-gray-700 mt-2 leading-relaxed">
+                        A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, 
+                        evitando fraudes, duplicidades e erros de restituição.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">2. A restituição é garantida após o pagamento da TRE?</h4>
-                  <p className="text-gray-600 mt-1">
-                    Sim. Após a confirmação, o valor de {valorFormatado} será depositado em até 72 horas úteis, 
-                    conforme calendário de restituição oficial.
-                  </p>
+              </div>
+              
+              {/* Pergunta 2 */}
+              <div className="border-b border-blue-100 hover:bg-blue-50/50 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <div className="h-7 w-7 rounded-full bg-[var(--gov-blue-light)] flex items-center justify-center">
+                        <span className="text-[var(--gov-blue-dark)] font-bold text-sm">2</span>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-bold text-[var(--gov-blue-dark)] text-lg">A restituição é garantida após o pagamento da TRE?</h4>
+                      <p className="text-gray-700 mt-2 leading-relaxed">
+                        Sim. Após a confirmação, o valor de {valorFormatado} será depositado em até 72 horas úteis, 
+                        conforme calendário de restituição oficial.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">3. Posso pagar a taxa depois?</h4>
-                  <p className="text-gray-600 mt-1">
-                    Não. A janela de restituição é única e exclusiva. Caso a TRE não seja quitada dentro do prazo informado, 
-                    o crédito será cancelado automaticamente e não poderá ser solicitado novamente.
-                  </p>
+              </div>
+              
+              {/* Pergunta 3 */}
+              <div className="border-b border-blue-100 hover:bg-blue-50/50 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <div className="h-7 w-7 rounded-full bg-[var(--gov-blue-light)] flex items-center justify-center">
+                        <span className="text-[var(--gov-blue-dark)] font-bold text-sm">3</span>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-bold text-[var(--gov-blue-dark)] text-lg">Posso pagar a taxa depois?</h4>
+                      <p className="text-gray-700 mt-2 leading-relaxed">
+                        Não. A janela de restituição é única e exclusiva. Caso a TRE não seja quitada dentro do prazo informado, 
+                        o crédito será cancelado automaticamente e não poderá ser solicitado novamente.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">4. Como sei que isso é oficial?</h4>
-                  <p className="text-gray-600 mt-1">
-                    Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, 
-                    e validado pela ANEEL e Receita Federal.
-                  </p>
+              </div>
+              
+              {/* Pergunta 4 */}
+              <div className="border-b border-blue-100 hover:bg-blue-50/50 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <div className="h-7 w-7 rounded-full bg-[var(--gov-blue-light)] flex items-center justify-center">
+                        <span className="text-[var(--gov-blue-dark)] font-bold text-sm">4</span>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-bold text-[var(--gov-blue-dark)] text-lg">Como sei que isso é oficial?</h4>
+                      <p className="text-gray-700 mt-2 leading-relaxed">
+                        Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, 
+                        e validado pela ANEEL e Receita Federal.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-[var(--gov-blue-dark)] text-lg">5. O que acontece após o pagamento?</h4>
-                  <p className="text-gray-600 mt-1">
-                    Após o pagamento da TRE, o sistema irá processar automaticamente a sua solicitação e liberar o valor para 
-                    depósito na conta bancária ou chave PIX informada na etapa anterior. Todo o processo é auditado e garantido 
-                    pelos órgãos reguladores.
-                  </p>
+              </div>
+              
+              {/* Pergunta 5 */}
+              <div className="hover:bg-blue-50/50 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <div className="h-7 w-7 rounded-full bg-[var(--gov-blue-light)] flex items-center justify-center">
+                        <span className="text-[var(--gov-blue-dark)] font-bold text-sm">5</span>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-bold text-[var(--gov-blue-dark)] text-lg">O que acontece após o pagamento?</h4>
+                      <p className="text-gray-700 mt-2 leading-relaxed">
+                        Após o pagamento da TRE, o sistema irá processar automaticamente a sua solicitação e liberar o valor para 
+                        depósito na conta bancária ou chave PIX informada na etapa anterior. Todo o processo é auditado e garantido 
+                        pelos órgãos reguladores.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
