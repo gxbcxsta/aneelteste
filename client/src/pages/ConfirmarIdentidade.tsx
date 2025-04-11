@@ -126,48 +126,71 @@ export default function ConfirmarIdentidade() {
     },
   });
 
-  // Forçar um dos estados de caso especial para garantir o comportamento desejado
-  // Já que não podemos depender da API de geolocalização de forma confiável
+  // Detectar estado por IP - vamos usar a API de geolocalização real
+  // E implementar um fallback mais inteligente caso não consiga detectar
   const detectarEstadoPorIP = async () => {
     try {
-      console.log("Forçando seleção de estado especial...");
+      console.log("Detectando estado por IP...");
       
-      // Garantir que sempre seja escolhido um dos estados com regras especiais (SP, RJ, RS)
-      // Isso vai garantir que sempre teremos o comportamento desejado
-      const estadosEspeciais = [
-        "São Paulo",       // 6 opções, qualquer uma válida
-        "Rio de Janeiro",  // 2 opções válidas + 1 aleatória
-        "Rio Grande do Sul" // 2 opções válidas + 1 aleatória
-      ];
+      // Tentar obter o estado real através da API de geolocalização
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
       
-      // Balancear a probabilidade entre os estados:
-      // - 50% de chance de ser São Paulo
-      // - 25% de chance de ser Rio de Janeiro
-      // - 25% de chance de ser Rio Grande do Sul
-      const r = Math.random();
-      let estadoSelecionado;
+      // Mapear o código do estado para o nome completo
+      const mapeamentoEstados: Record<string, string> = {
+        "SP": "São Paulo",
+        "RJ": "Rio de Janeiro",
+        "RS": "Rio Grande do Sul",
+        "MG": "Minas Gerais",
+        "ES": "Espírito Santo",
+        "BA": "Bahia",
+        "CE": "Ceará",
+        "PE": "Pernambuco",
+        "GO": "Goiás",
+        "MT": "Mato Grosso",
+        "MS": "Mato Grosso do Sul",
+        "SC": "Santa Catarina",
+        "PR": "Paraná",
+        "PA": "Pará",
+        "AM": "Amazonas",
+        "AC": "Acre",
+        "AP": "Amapá",
+        "RO": "Rondônia",
+        "RR": "Roraima",
+        "TO": "Tocantins",
+        "AL": "Alagoas",
+        "MA": "Maranhão",
+        "PB": "Paraíba",
+        "PI": "Piauí",
+        "RN": "Rio Grande do Norte",
+        "SE": "Sergipe",
+        "DF": "Distrito Federal"
+      };
       
-      if (r < 0.5) {
-        estadoSelecionado = "São Paulo";
-      } else if (r < 0.75) {
-        estadoSelecionado = "Rio de Janeiro";
+      // Obter o estado real com base no IP
+      const estadoSigla = data.region_code;
+      let estadoDetectado = mapeamentoEstados[estadoSigla];
+      
+      // Se temos um estado válido detectado, use-o
+      if (estadoDetectado && Object.keys(companhiasEletricas).includes(estadoDetectado)) {
+        console.log(`Estado detectado: ${estadoDetectado}`);
+        setEstado(estadoDetectado);
+        setLocalizado(true);
+        return estadoDetectado;
       } else {
-        estadoSelecionado = "Rio Grande do Sul";
+        // Se não conseguimos detectar o estado, usar Minas Gerais como fallback
+        console.log("Não foi possível detectar o estado, usando Minas Gerais como padrão");
+        setEstado("Minas Gerais");
+        setLocalizado(true);
+        return "Minas Gerais";
       }
-      
-      console.log(`Estado selecionado: ${estadoSelecionado}`);
-      
-      // Definir o estado selecionado
-      setEstado(estadoSelecionado);
-      setLocalizado(true);
-      return estadoSelecionado;
     } catch (error) {
-      console.error("Erro ao selecionar estado:", error);
-      // Em caso de erro, usamos São Paulo por padrão
-      const estadoDefault = "São Paulo";
-      setEstado(estadoDefault);
+      console.error("Erro ao detectar localização:", error);
+      // Por padrão, usamos Minas Gerais se houver erro
+      console.log("Erro na detecção, usando Minas Gerais como padrão");
+      setEstado("Minas Gerais");
       setLocalizado(true);
-      return estadoDefault;
+      return "Minas Gerais";
     }
   };
 
