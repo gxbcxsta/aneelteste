@@ -380,8 +380,8 @@ export default function PagamentoPix() {
         {/* Este componente é necessário para o toast */}
         <Toaster />
         
-        {/* Notificações flutuantes - Aparecem no canto superior direito */}
-        <div className="fixed top-4 right-4 z-50 w-full max-w-md space-y-2">
+        {/* Notificações flutuantes - Aparecem centralizadas no topo */}
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md space-y-2 flex flex-col items-center">
           {notificacoes.map((notif) => (
             <Notificacao
               key={notif.id}
