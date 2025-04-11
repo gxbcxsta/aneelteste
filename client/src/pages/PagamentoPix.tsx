@@ -493,19 +493,7 @@ export default function PagamentoPix() {
                     </div>
                   </div>
                   
-                  <div className="mt-6 space-y-4">
-                    <div className="border border-green-200 bg-green-50 rounded-lg p-4">
-                      <h3 className="font-bold text-green-800 text-center text-lg">GARANTIA DE SEGURANÇA</h3>
-                      <p className="text-green-700 mt-2 text-center">
-                        Este procedimento é fiscalizado e regulamentado por órgãos oficiais, com garantia de:
-                      </p>
-                      <ul className="list-disc pl-5 mt-3 text-green-700 space-y-1">
-                        <li>Conformidade com a LGPD (Lei Geral de Proteção de Dados);</li>
-                        <li>Consultas criptografadas com tecnologia GOV.BR;</li>
-                        <li>Registro no sistema nacional de restituição tarifária.</li>
-                      </ul>
-                    </div>
-                  </div>
+                  
                 </CardContent>
               </Card>
             </div>
@@ -648,6 +636,59 @@ export default function PagamentoPix() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+          
+          {/* Seção de Garantia de Segurança - Movida conforme solicitado */}
+          <div className="mt-8 mb-8 max-w-4xl mx-auto">
+            <div className="border border-green-200 bg-green-50 rounded-lg p-5 shadow-sm">
+              <div className="flex items-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-700" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <h3 className="font-bold text-green-800 text-xl">GARANTIA DE SEGURANÇA</h3>
+              </div>
+              
+              <p className="text-green-700 ml-2 text-lg mb-4">
+                Este procedimento é fiscalizado e regulamentado por órgãos oficiais, com garantia de:
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mt-1">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                    <p className="ml-3 text-green-800 font-medium">
+                      Conformidade com a LGPD (Lei Geral de Proteção de Dados)
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mt-1">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                    <p className="ml-3 text-green-800 font-medium">
+                      Consultas criptografadas com tecnologia GOV.BR
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mt-1">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                    <p className="ml-3 text-green-800 font-medium">
+                      Registro no sistema nacional de restituição tarifária
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
