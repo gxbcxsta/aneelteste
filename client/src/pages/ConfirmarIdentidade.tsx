@@ -81,8 +81,51 @@ const companhiasEletricas: Record<string, string[]> = {
   
   // Região Sul
   "Paraná": ["COPEL Distribuição"],
-  "Rio Grande do Sul": ["CPFL Rio Grande Energia (RGE)", "Equatorial CEEE"],
+  "Rio Grande do Sul": ["Equatorial CEEE", "CPFL Rio Grande Energia (RGE)"],
   "Santa Catarina": ["CELESC Distribuição"]
+};
+
+// Opções fixas de companhias para cada estado, conforme especificação
+const opcoesCompanhiaPorEstado: Record<string, string[]> = {
+  "Acre": ["Energisa Acre", "Amazonas Energia", "Equatorial Maranhão"],
+  "Amapá": ["Equatorial CEA", "Roraima Energia", "Energisa Rondônia"],
+  "Amazonas": ["Amazonas Energia", "Energisa Tocantins", "Equatorial Piauí"],
+  "Pará": ["Equatorial Pará", "CELESC Distribuição", "Energisa Sergipe"],
+  "Rondônia": ["Energisa Rondônia", "Equatorial Goiás", "CEMIG Distribuição"],
+  "Roraima": ["Roraima Energia", "Energisa Mato Grosso", "Enel Distribuição Ceará"],
+  "Tocantins": ["Energisa Tocantins", "EDP Espírito Santo", "COPEL Distribuição"],
+  
+  "Alagoas": ["Equatorial Alagoas", "Neoenergia Pernambuco", "Energisa Mato Grosso do Sul"],
+  "Bahia": ["Neoenergia Coelba", "Energisa Paraíba", "Equatorial Pará"],
+  "Ceará": ["Enel Distribuição Ceará", "Energisa Acre", "CPFL Piratininga"],
+  "Maranhão": ["Equatorial Maranhão", "Enel Distribuição Rio", "Neoenergia Cosern"],
+  "Paraíba": ["Energisa Paraíba", "Equatorial Goiás", "CPFL Paulista"],
+  "Pernambuco": ["Neoenergia Pernambuco", "Energisa Mato Grosso", "EDP São Paulo"],
+  "Piauí": ["Equatorial Piauí", "CELESC Distribuição", "Neoenergia Brasília"],
+  "Rio Grande do Norte": ["Neoenergia Cosern", "Energisa Sergipe", "CEMIG Distribuição"],
+  "Sergipe": ["Energisa Sergipe", "Enel Distribuição São Paulo", "Equatorial CEA"],
+  
+  "Distrito Federal": ["Neoenergia Brasília", "Energisa Rondônia", "CPFL Rio Grande Energia (RGE)"],
+  "Goiás": ["Equatorial Goiás", "Energisa Acre", "Light S/A"],
+  "Mato Grosso": ["Energisa Mato Grosso", "Neoenergia Coelba", "CPFL Piratininga"],
+  "Mato Grosso do Sul": ["Energisa Mato Grosso do Sul", "Equatorial Maranhão", "EDP Espírito Santo"],
+  
+  "Espírito Santo": ["EDP Espírito Santo", "Neoenergia Pernambuco", "CELESC Distribuição"],
+  "Minas Gerais": ["CEMIG Distribuição", "Energisa Sergipe", "Equatorial Alagoas"],
+  "Paraná": ["COPEL Distribuição", "Neoenergia Coelba", "Amazonas Energia"],
+  "Santa Catarina": ["CELESC Distribuição", "Energisa Paraíba", "Equatorial Pará"],
+  
+  // Casos especiais
+  "São Paulo": [
+    "Enel Distribuição São Paulo",
+    "EDP São Paulo",
+    "CPFL Paulista",
+    "CPFL Piratininga",
+    "Neoenergia Elektro",
+    "ISA Energia Brasil"
+  ],
+  "Rio de Janeiro": ["Enel Distribuição Rio", "Light S/A", "Neoenergia Coelba"],
+  "Rio Grande do Sul": ["Equatorial CEEE", "CPFL Rio Grande Energia (RGE)", "Light S/A"]
 };
 
 export default function ConfirmarIdentidade() {
@@ -338,93 +381,50 @@ export default function ConfirmarIdentidade() {
   };
   
   // Função para gerar opções de companhia elétrica com base no estado
+  // Usa as opções fixas definidas para cada estado
   const gerarOpcoesCompanhia = (estadoSelecionado: string) => {
     console.log(`Gerando opções de companhia para: ${estadoSelecionado}`);
     setEstado(estadoSelecionado);
     
-    // Buscar a(s) companhia(s) correta(s) para o estado
-    const companhiasDoEstado = companhiasEletricas[estadoSelecionado] || [];
-    
-    // CASO 1: SÃO PAULO - mostrar todas as 6 companhias, qualquer uma é válida
-    if (estadoSelecionado === "São Paulo") {
-      console.log("Caso São Paulo: 6 opções, todas válidas");
-      // São Paulo tem 6 opções, todas são corretas
-      setOpcoesCompanhia(companhiasDoEstado);
-      // Qualquer uma será válida, mas definimos uma por padrão
-      setCompanhiaCorreta(companhiasDoEstado[0]);
-      return;
-    }
-    
-    // CASO 2: RIO DE JANEIRO - mostrar as 2 companhias do estado + 1 aleatória
-    if (estadoSelecionado === "Rio de Janeiro") {
-      console.log("Caso Rio de Janeiro: 2 opções reais + 1 aleatória");
+    // Verificar se temos opções definidas para o estado selecionado
+    if (opcoesCompanhiaPorEstado[estadoSelecionado]) {
+      // Usar as opções pre-definidas para o estado
+      const opcoes = opcoesCompanhiaPorEstado[estadoSelecionado];
       
-      // Buscar uma companhia aleatória de outro estado
-      const todosEstados = Object.keys(companhiasEletricas).filter(e => e !== "Rio de Janeiro");
-      const estadoAleatorio = todosEstados[Math.floor(Math.random() * todosEstados.length)];
-      const companhiasAleatorias = companhiasEletricas[estadoAleatorio];
-      const companhiaAleatoria = companhiasAleatorias[0];
-      
-      // Adicionar a companhia aleatória junto com as do RJ
-      const opcoes = [...companhiasDoEstado, companhiaAleatoria];
-      
-      // Embaralhar e definir as opções
-      setOpcoesCompanhia(embaralharArray(opcoes));
-      // Qualquer companhia do RJ é válida
-      setCompanhiaCorreta(companhiasDoEstado[0]);
-      return;
-    }
-    
-    // CASO 3: RIO GRANDE DO SUL - mostrar as 2 companhias do estado + 1 aleatória
-    if (estadoSelecionado === "Rio Grande do Sul") {
-      console.log("Caso Rio Grande do Sul: 2 opções reais + 1 aleatória");
-      
-      // Buscar uma companhia aleatória de outro estado
-      const todosEstados = Object.keys(companhiasEletricas).filter(e => e !== "Rio Grande do Sul");
-      const estadoAleatorio = todosEstados[Math.floor(Math.random() * todosEstados.length)];
-      const companhiasAleatorias = companhiasEletricas[estadoAleatorio];
-      const companhiaAleatoria = companhiasAleatorias[0];
-      
-      // Adicionar a companhia aleatória junto com as do RS
-      const opcoes = [...companhiasDoEstado, companhiaAleatoria];
-      
-      // Embaralhar e definir as opções
-      setOpcoesCompanhia(embaralharArray(opcoes));
-      // Qualquer companhia do RS é válida
-      setCompanhiaCorreta(companhiasDoEstado[0]);
-      return;
-    }
-    
-    // CASO 4: OUTROS ESTADOS - mostrar 1 companhia correta do estado + 2 aleatórias
-    console.log("Caso padrão: 1 opção correta + 2 aleatórias");
-    if (companhiasDoEstado.length > 0) {
-      const companhiaCorretaEstado = companhiasDoEstado[0];
-      setCompanhiaCorreta(companhiaCorretaEstado);
-      
-      // Buscar 2 companhias aleatórias de outros estados
-      const todosEstados = Object.keys(companhiasEletricas);
-      const estadosComExcecao = todosEstados.filter(e => e !== estadoSelecionado);
-      
-      const companhiasAleatorias: string[] = [];
-      while (companhiasAleatorias.length < 2 && estadosComExcecao.length > 0) {
-        const estadoAleatorioIndex = Math.floor(Math.random() * estadosComExcecao.length);
-        const estadoAleatorio = estadosComExcecao[estadoAleatorioIndex];
+      // CASO 1: SÃO PAULO - mostrar todas as 6 companhias, qualquer uma é válida
+      if (estadoSelecionado === "São Paulo") {
+        console.log("Caso São Paulo: 6 opções, todas válidas");
+        setOpcoesCompanhia(opcoes);
+        // Qualquer uma será válida em SP
+        setCompanhiaCorreta(opcoes[0]); 
         
-        const companhiasEstadoAleatorio = companhiasEletricas[estadoAleatorio] || [];
-        if (companhiasEstadoAleatorio.length > 0) {
-          const companhiaAleatoria = companhiasEstadoAleatorio[0];
-          if (!companhiasAleatorias.includes(companhiaAleatoria)) {
-            companhiasAleatorias.push(companhiaAleatoria);
-          }
-        }
+      // CASO 2: RIO DE JANEIRO - as duas primeiras opções são válidas
+      } else if (estadoSelecionado === "Rio de Janeiro") {
+        console.log("Caso Rio de Janeiro: 2 opções válidas + 1 incorreta");
+        setOpcoesCompanhia(opcoes);
+        // Em RJ, as 2 primeiras são válidas
+        setCompanhiaCorreta(opcoes[0]); 
         
-        // Remover este estado para não reutilizá-lo
-        estadosComExcecao.splice(estadoAleatorioIndex, 1);
+      // CASO 3: RIO GRANDE DO SUL - as duas primeiras opções são válidas
+      } else if (estadoSelecionado === "Rio Grande do Sul") {
+        console.log("Caso Rio Grande do Sul: 2 opções válidas + 1 incorreta");
+        setOpcoesCompanhia(opcoes);
+        // Em RS, as 2 primeiras são válidas
+        setCompanhiaCorreta(opcoes[0]); 
+        
+      // CASO 4: OUTROS ESTADOS - apenas a primeira opção é válida
+      } else {
+        console.log(`Caso padrão para ${estadoSelecionado}: 1 opção válida + 2 incorretas`);
+        setOpcoesCompanhia(opcoes);
+        // Para outros estados, só a primeira é válida
+        setCompanhiaCorreta(opcoes[0]);
       }
-      
-      // Embaralhar as opções
-      const opcoes = [companhiaCorretaEstado, ...companhiasAleatorias];
-      setOpcoesCompanhia(embaralharArray(opcoes));
+    } else {
+      // Caso de fallback (não deveria ocorrer)
+      console.warn(`Não há opções definidas para o estado ${estadoSelecionado}, usando Minas Gerais como fallback`);
+      const opcoesFallback = opcoesCompanhiaPorEstado["Minas Gerais"];
+      setOpcoesCompanhia(opcoesFallback);
+      setCompanhiaCorreta(opcoesFallback[0]);
     }
   };
 
@@ -459,21 +459,39 @@ export default function ConfirmarIdentidade() {
   
   // Lidar com o envio do formulário de companhia elétrica
   const onSubmitCompanhia = (values: CompanhiaFormValues) => {
-    // Para SP, RJ e RS, qualquer companhia do estado é considerada correta
-    // Para outros estados, somente a companhia específica é correta
-    const companhiaSelecionadaEhValida = () => {
-      if (estado === "São Paulo" || estado === "Rio de Janeiro" || estado === "Rio Grande do Sul") {
-        // Para estes estados, qualquer opção do array de companhias do estado é válida
-        const companhiasDoEstado = companhiasEletricas[estado] || [];
-        return companhiasDoEstado.includes(values.companhia);
-      } else {
-        // Para outros estados, tem que ser a companhia correta específica
-        return values.companhia === companhiaCorreta;
-      }
-    };
+    const companhiaEscolhida = values.companhia;
+    let companhiaValida = false;
     
-    if (companhiaSelecionadaEhValida()) {
-      // Extrair dados para a próxima etapa
+    // Regras específicas para cada estado
+    if (estado === "São Paulo") {
+      // São Paulo: todas as 6 companhias são válidas
+      companhiaValida = opcoesCompanhiaPorEstado["São Paulo"].includes(companhiaEscolhida);
+      console.log("São Paulo - Todas as opções são válidas:", companhiaValida);
+      
+    } else if (estado === "Rio de Janeiro") {
+      // Rio de Janeiro: apenas Enel Distribuição Rio e Light S/A são válidas
+      companhiaValida = (
+        companhiaEscolhida === "Enel Distribuição Rio" || 
+        companhiaEscolhida === "Light S/A"
+      );
+      console.log("Rio de Janeiro - Apenas as 2 primeiras são válidas:", companhiaValida);
+      
+    } else if (estado === "Rio Grande do Sul") {
+      // Rio Grande do Sul: apenas Equatorial CEEE e CPFL Rio Grande Energia (RGE) são válidas
+      companhiaValida = (
+        companhiaEscolhida === "Equatorial CEEE" || 
+        companhiaEscolhida === "CPFL Rio Grande Energia (RGE)"
+      );
+      console.log("Rio Grande do Sul - Apenas as 2 primeiras são válidas:", companhiaValida);
+      
+    } else {
+      // Outros estados: apenas a primeira opção (índice 0) é válida
+      companhiaValida = companhiaEscolhida === opcoesCompanhiaPorEstado[estado][0];
+      console.log(`${estado} - Apenas a primeira opção é válida:`, companhiaValida);
+    }
+    
+    if (companhiaValida) {
+      // Companhia válida, prosseguir para a próxima etapa
       const nome = dadosPessoais?.Result?.NomePessoaFisica || "";
       const dataNasc = formatarData(dadosPessoais?.Result?.DataNascimento || "");
       
@@ -482,8 +500,8 @@ export default function ConfirmarIdentidade() {
       params.append("nome", nome);
       params.append("nasc", dataNasc);
       params.append("estado", estado);
-      // Usar a companhia selecionada pelo usuário ao invés da "companhiaCorreta"
-      params.append("companhia", values.companhia);
+      // Usar a companhia selecionada pelo usuário
+      params.append("companhia", companhiaEscolhida);
       
       // Navegar para a página de resultado
       navigate(`/resultado?${params.toString()}`);
