@@ -1043,16 +1043,16 @@ export default function SimuladorRestituicao({
     return ((etapaAtual) / totalEtapas) * 100;
   };
   
-  // Função para redirecionar para página de loading
+  // Função para redirecionar para página de resultado
   const redirecionarParaCalculo = () => {
     // Finaliza o carregamento
     setCalculando(false);
     setAnimacaoAtiva(false);
     
-    // Construir URL com os parâmetros necessários
-    const url = `/calculo-loading?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
+    // Construir URL com os parâmetros necessários e redirecionar diretamente para a página de resultado
+    const url = `/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(mesesConsiderados)}`;
     
-    // Redirecionar para a página de loading
+    // Redirecionar para a página de resultado
     window.location.href = url;
   };
   
