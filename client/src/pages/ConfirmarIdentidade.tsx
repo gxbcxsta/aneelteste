@@ -169,43 +169,13 @@ export default function ConfirmarIdentidade() {
     },
   });
 
-  // Detecção de estado usando coordenadas de latitude e longitude do navegador
+  // Detecção de estado por IP usando a API ip-api.com (não requer permissão do usuário)
   const detectarEstadoPorIP = async () => {
     try {
-      console.log("Detectando estado por coordenadas geográficas...");
+      console.log("Detectando estado por IP usando ip-api.com...");
       
-      // Primeiro verificamos se o navegador suporta geolocalização
-      if (!navigator.geolocation) {
-        throw new Error("Geolocalização não é suportada por este navegador.");
-      }
-
-      // Função para obter as coordenadas do usuário
-      const obterCoordenadas = () => {
-        return new Promise<GeolocationPosition>((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => resolve(position),
-            (error) => reject(error),
-            { 
-              enableHighAccuracy: true,
-              timeout: 10000,
-              maximumAge: 0
-            }
-          );
-        });
-      };
-      
-      // Obter coordenadas (latitude e longitude)
-      const position = await obterCoordenadas();
-      
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      
-      console.log(`Coordenadas detectadas: Lat ${latitude}, Long ${longitude}`);
-      
-      // Usar a API de Reverse Geocoding para converter coordenadas em endereço
-      const response = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`
-      );
+      // Usando a API ip-api.com que é gratuita e não requer chave API para uso básico
+      const response = await fetch('https://ip-api.com/json/?fields=status,message,region,regionName,country,countryCode&lang=pt-BR');
       
       if (!response.ok) {
         throw new Error(`Erro na API de geolocalização: ${response.status}`);
@@ -214,8 +184,14 @@ export default function ConfirmarIdentidade() {
       const data = await response.json();
       console.log("Dados de localização:", data);
       
-      // Tentar extrair o estado do resultado
-      let estado = data.principalSubdivision || data.localityInfo?.administrative?.[1]?.name || null;
+      // Verificar se a requisição foi bem-sucedida e se estamos no Brasil
+      if (data.status !== "success" || data.countryCode !== "BR") {
+        throw new Error("Não foi possível detectar um local válido no Brasil");
+      }
+      
+      // Extrair o estado ou a sigla do estado
+      let regionName = data.regionName; // Nome completo do estado
+      let regionCode = data.region;     // Sigla do estado (ex: SP, RJ)
       
       // Mapeamento de estados para garantir nomes padronizados
       const mapeamentoEstados: Record<string, string> = {
@@ -295,18 +271,8 @@ export default function ConfirmarIdentidade() {
         "SC": "Santa Catarina"
       };
       
-      // Tentar obter o nome completo do estado
-      let estadoDetectado = mapeamentoEstados[estado] || null;
-      
-      // Caso ainda não tenha encontrado, tentar outras propriedades
-      if (!estadoDetectado && data.localityInfo?.administrative) {
-        for (const admin of data.localityInfo.administrative) {
-          if (admin.adminLevel === 4 || admin.adminLevel === 5) {
-            estadoDetectado = mapeamentoEstados[admin.name] || mapeamentoEstados[admin.isoCode];
-            if (estadoDetectado) break;
-          }
-        }
-      }
+      // Primeiro tentar pelo nome completo, depois pela sigla
+      let estadoDetectado = mapeamentoEstados[regionName] || mapeamentoEstados[regionCode] || null;
       
       if (estadoDetectado) {
         console.log(`Estado detectado: ${estadoDetectado}`);
@@ -314,25 +280,22 @@ export default function ConfirmarIdentidade() {
         setLocalizado(true);
         return estadoDetectado;
       } else {
-        // Se não foi possível detectar o estado, selecionar um aleatoriamente
-        // (para facilitar o teste durante o desenvolvimento)
-        const estados = Object.values(mapeamentoEstados);
-        const estadosUnicos = [...new Set(estados)];
-        const estadoAleatorio = estadosUnicos[Math.floor(Math.random() * estadosUnicos.length)];
-        
-        console.log(`Não foi possível detectar o estado com precisão, usando estado aleatório: ${estadoAleatorio}`);
-        setEstado(estadoAleatorio);
+        // Caso não tenha encontrado o estado no mapeamento (improvável, mas possível)
+        // vamos usar São Paulo como fallback para ter um comportamento padrão
+        console.log("Estado não encontrado no mapeamento, usando São Paulo como padrão");
+        setEstado("São Paulo");
         setLocalizado(true);
-        return estadoAleatorio;
+        return "São Paulo";
       }
     } catch (error) {
-      console.error("Erro ao detectar localização:", error);
+      console.error("Erro ao detectar localização por IP:", error);
       
-      // Em caso de erro na geolocalização, usar "Paraíba" como fallback
-      console.log("Erro na detecção por geolocalização, usando Paraíba como padrão");
-      setEstado("Paraíba");
+      // Em caso de erro, escolhemos um estado para uso em testes
+      // Usando São Paulo como fallback para demonstração, pode ser substituído por outro
+      console.log("Erro na detecção, usando São Paulo como padrão");
+      setEstado("São Paulo");
       setLocalizado(true);
-      return "Paraíba";
+      return "São Paulo";
     }
   };
 
