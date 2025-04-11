@@ -267,7 +267,7 @@ export default function ResultadoCalculo() {
                   <div className="h-0.5 w-24 bg-green-200 mx-auto my-2"></div>
                   
                   <h2 className="text-lg font-semibold text-[var(--gov-blue-dark)] text-center mb-3">
-                    Valor Aprovado para Restituição
+                    Valor disponível para Restituição
                   </h2>
                   
                   <div className="bg-white p-4 rounded-md shadow-sm border border-green-200 mb-2 flex flex-col items-center">

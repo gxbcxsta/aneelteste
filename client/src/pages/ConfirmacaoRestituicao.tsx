@@ -156,7 +156,7 @@ export default function ConfirmacaoRestituicao() {
                 <div className="h-0.5 w-24 bg-green-200 mx-auto my-2"></div>
                 
                 <h2 className="text-lg font-semibold text-[var(--gov-blue-dark)] text-center mb-3">
-                  Valor Aprovado para Restituição
+                  Valor disponível para Restituição
                 </h2>
                 
                 <div className="bg-white p-4 rounded-md shadow-sm border border-green-200 mb-2 flex flex-col items-center">
@@ -259,27 +259,15 @@ export default function ConfirmacaoRestituicao() {
             {/* Conteúdo */}
             <div className="p-6 bg-white">
               <div className="space-y-4 text-gray-700">
-                <div className="bg-white p-4 border-l-4 border-blue-600 shadow-sm">
-                  <p>Ao prosseguir, você autoriza a inclusão do seu CPF na lista de participantes do processo de restituição do ICMS e concorda com o pagamento obrigatório de <strong className="text-red-600 font-bold">R$ 74,90</strong>.</p>
-                </div>
+                <p>Ao prosseguir, você autoriza a inclusão do seu CPF na lista de participantes do processo de restituição do ICMS e concorda com o pagamento obrigatório de <strong className="text-red-600 font-bold">R$ 74,90</strong>.</p>
                 
-                <div className="bg-red-50 p-4 border border-red-200 rounded-md">
-                  <p className="flex items-start">
-                    <AlertTriangle className="text-red-600 mr-2 mt-1 h-5 w-5 flex-shrink-0" />
-                    <span>
-                      <strong className="text-red-700">ATENÇÃO:</strong> Caso o pagamento não seja efetuado até a data de vencimento, você poderá deixar de receber <strong className="text-red-600">{formatarMoeda(valorRestituicao)}</strong> em restituições. Além disso, ficará impedido de solicitar o benefício neste ano e nos próximos 5 anos.
-                    </span>
-                  </p>
-                </div>
+                <p className="mt-4">
+                  <strong className="text-red-700">Atenção:</strong> O não pagamento até a data de vencimento poderá resultar na perda de até <strong className="text-red-600">{formatarMoeda(valorRestituicao)}</strong> em restituições e impedir novas solicitações por até 5 anos.
+                </p>
                 
-                <div className="bg-yellow-50 p-4 border-l-4 border-yellow-400 rounded-md">
-                  <div className="flex">
-                    <Info className="h-5 w-5 text-yellow-600 flex-shrink-0 mr-2 mt-0.5" />
-                    <p className="text-yellow-800">
-                      <strong className="font-bold">Importante:</strong> O pagamento é obrigatório para confirmar sua solicitação de restituição.
-                    </p>
-                  </div>
-                </div>
+                <p className="mt-4 text-sm text-gray-600">
+                  <strong>Importante:</strong> Essa taxa cobre os custos administrativos para validação e andamento do processo de restituição junto aos órgãos responsáveis.
+                </p>
               </div>
               
               <div className="mt-6 grid grid-cols-1 gap-3">
