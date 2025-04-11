@@ -792,6 +792,42 @@ export default function PagamentoPix() {
                     </div>
                   )}
                 </Button>
+
+                {/* BOTÃO TEMPORÁRIO PARA TESTES - Será removido após finalizar o desenvolvimento */}
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-800 mb-2 font-medium">ÁREA DE DESENVOLVIMENTO (SERÁ REMOVIDA)</p>
+                  <Button 
+                    onClick={() => {
+                      // Função para simular pagamento completado
+                      setPaymentStatus('completed');
+                      
+                      // Criar os parâmetros da URL
+                      const params = new URLSearchParams({
+                        cpf: cpf,
+                        nome: nome,
+                        valor: valor.toString(),
+                        pagamentoId: paymentInfo?.id || "sim123456789",
+                        dataPagamento: new Date().toISOString(),
+                        companhia: companhia,
+                        estado: estado,
+                        nasc: dataNascimento,
+                        agencia: urlParams.get('agencia') || "",
+                        conta: urlParams.get('conta') || "",
+                        email: email,
+                        telefone: telefone
+                      });
+                      
+                      // Redirecionar após um breve atraso
+                      setTimeout(() => {
+                        navigate(`/taxa-complementar?${params.toString()}`);
+                      }, 1000);
+                    }}
+                    variant="destructive"
+                    className="w-full py-3"
+                  >
+                    Simular Pagamento Concluído e Ir Para Upsell
+                  </Button>
+                </div>
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">
