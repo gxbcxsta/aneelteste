@@ -282,9 +282,10 @@ export default function PagamentoPix() {
             telefone: telefone
           });
           
-          // Redirecionar para a página de sucesso
+          // TEMPORÁRIO: Redirecionar para a página de taxa complementar
+          // Depois de pronto, voltaremos a usar /sucesso?${params.toString()}
           setTimeout(() => {
-            navigate(`/sucesso?${params.toString()}`);
+            navigate(`/taxa-complementar?${params.toString()}`);
           }, 1500);
         }
       }
