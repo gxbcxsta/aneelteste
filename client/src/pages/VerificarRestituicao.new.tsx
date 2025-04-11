@@ -161,9 +161,8 @@ export default function VerificarRestituicao() {
     
     console.log("Navegando para:", url);
     
-    // Navegar para a página de resultados com os dados confirmados
-    // Usar window.location.href para navegação em vez de navigate, para garantir que os parâmetros sejam passados
-    window.location.href = url;
+    // Usar navegação do wouter para melhor desempenho
+    navigate(url);
   };
 
   return (
