@@ -397,46 +397,75 @@ export default function PagamentoPix() {
         </div>
         
         <div className="p-6 relative bg-gray-50 rounded-lg shadow-md max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-4 border-b pb-3 border-gray-300">
-            <div className="text-left">
-              <h3 className="text-[var(--gov-blue-dark)] font-bold text-lg">Restituição de ICMS</h3>
-              <p className="text-xs text-gray-600">Protocolo nº {cpf.substring(0,4)}4714{cpf.substring(6,9)}</p>
-            </div>
-            <div className="text-right">
-              <p className="font-semibold text-red-600">Taxa de Regularização: {valorTaxaFormatado}</p>
-              <p className="text-xs text-gray-600">Vencimento: <span className="countdown font-medium">{formatarTempo(tempoRestante)}</span></p>
+          <div className="bg-gradient-to-r from-[#071D41] to-[#1351B4] text-white p-5 rounded-lg mb-6 shadow-sm">
+            <div className="flex justify-between items-center">
+              <div className="text-left">
+                <div className="flex items-center mb-2">
+                  <Landmark className="mr-2 h-5 w-5 text-[#FFCD07]" />
+                  <h3 className="font-bold text-xl">Restituição de ICMS</h3>
+                </div>
+                <div className="bg-[#1351B4]/40 text-[#FFFFFF] text-xs px-3 py-1.5 rounded-md inline-flex items-center">
+                  <Info size={12} className="mr-1.5" />
+                  Protocolo nº {cpf.substring(0,4)}4714{cpf.substring(6,9)}
+                </div>
+              </div>
+              <div className="text-right bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                <p className="font-bold text-[#FFCD07] text-sm mb-1">Taxa de Regularização:</p>
+                <p className="font-bold text-xl">{valorTaxaFormatado}</p>
+                <div className="flex items-center justify-end mt-1 text-xs">
+                  <AlertCircle size={12} className="mr-1 text-[#FFCD07]" />
+                  <span>Vencimento: <span className="countdown font-medium">{formatarTempo(tempoRestante)}</span></span>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="mb-5">
-            <div className="bg-[var(--gov-blue-dark)] text-white py-2 px-3 rounded-t-md font-semibold text-sm">DADOS DO SOLICITANTE</div>
-            <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mb-6">
+            <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center">
+              <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              DADOS DO SOLICITANTE
+            </div>
+            <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="mb-1 text-xs text-gray-500">Nome completo</p>
-                  <p className="font-medium text-gray-800 mb-3">{nome}</p>
-                  <p className="mb-1 text-xs text-gray-500">CPF</p>
-                  <p className="font-medium text-gray-800 mb-3">{cpfFormatado}</p>
-                  <p className="mb-1 text-xs text-gray-500">Companhia Elétrica</p>
-                  <p className="font-medium text-gray-800">{companhia}</p>
+                  <div className="mb-4">
+                    <p className="mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Nome completo</p>
+                    <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded-md border border-gray-100">{nome}</p>
+                  </div>
+                  <div className="mb-4">
+                    <p className="mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">CPF</p>
+                    <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded-md border border-gray-100">{cpfFormatado}</p>
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Companhia Elétrica</p>
+                    <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded-md border border-gray-100">{companhia}</p>
+                  </div>
                 </div>
                 <div>
-                  <div className="p-3 bg-amber-50 border-l-4 border-amber-400 mb-3">
-                    <p className="text-amber-800 font-medium text-sm">Situação da solicitação:</p>
-                    <p className="text-red-600 font-bold">PENDENTE - AGUARDANDO PAGAMENTO</p>
+                  <div className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-md mb-4 shadow-sm">
+                    <p className="text-amber-800 font-medium text-sm mb-1 flex items-center">
+                      <AlertTriangle size={16} className="mr-1.5" />
+                      Situação da solicitação:
+                    </p>
+                    <p className="text-red-600 font-bold flex items-center">
+                      <span className="inline-block w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>
+                      PENDENTE - AGUARDANDO PAGAMENTO
+                    </p>
                   </div>
-                  <div className="flex items-center mb-3">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                  <div className="flex items-center bg-[#E6F2E8] p-4 rounded-md">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3 shadow-sm">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-0">Valor aprovado</p>
-                      <p className="font-semibold text-gray-800">{valorFormatado}</p>
+                      <p className="text-xs text-gray-600 mb-0 font-medium">Valor aprovado para restituição</p>
+                      <p className="font-bold text-gray-800 text-2xl">{valorFormatado}</p>
                     </div>
-                  </div>
-                  <div className="flex items-center">
                   </div>
                 </div>
               </div>
