@@ -1,7 +1,6 @@
 import { Express, NextFunction, Request, Response } from 'express';
 import { Server, createServer } from 'http';
 import { getValorRestituicaoByCpf, salvarValorRestituicao } from './db-alternative';
-import { enviarConversaoUTMIFY } from './utmify';
 
 /**
  * API de Pagamentos For4Payments
@@ -305,44 +304,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       try {
         const status = await paymentApi.checkPaymentStatus(id);
-        
-        // Se o status for completed, enviar conversão para UTMIFY
-        if (status.status === 'completed') {
-          console.log("[UTMIFY] Pagamento concluído, enviando conversão...");
-          
-          try {
-            // Extrair UTMs da QueryString
-            const utms = {
-              utm_source: req.query.utm_source as string || null,
-              utm_campaign: req.query.utm_campaign as string || null,
-              utm_medium: req.query.utm_medium as string || null,
-              utm_content: req.query.utm_content as string || null,
-              utm_term: req.query.utm_term as string || null
-            };
-            
-            // Recuperar dados do pagamento para enviar para UTMIFY
-            // Aqui poderia vir da base de dados para consultar detalhes como email, nome, etc
-            // mas usamos os dados mínimos necessários do próprio ID
-            const pagamentoDados = {
-              id: id,
-              amount: 7490, // 74.90 em centavos
-              name: req.query.nome as string || "Cliente TRE",
-              email: req.query.email as string || "cliente@restituicao.gov.br",
-              cpf: req.query.cpf as string || "",
-              phone: req.query.telefone as string || "",
-              ip: req.ip || req.headers['x-forwarded-for'] as string || "127.0.0.1",
-              createdAt: new Date().toISOString()
-            };
-            
-            // Enviar conversão de forma assíncrona para não bloquear a resposta
-            enviarConversaoUTMIFY(pagamentoDados, utms)
-              .catch(erro => console.error("[UTMIFY] Erro ao enviar conversão:", erro));
-          } catch (utmifyError) {
-            console.error("[UTMIFY] Erro ao processar conversão:", utmifyError);
-            // Não falhar o endpoint principal em caso de erro no rastreamento
-          }
-        }
-        
         return res.json(status);
       } catch (statusError) {
         console.error("Erro ao verificar status do pagamento:", statusError);
@@ -353,42 +314,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Erro no servidor ao verificar status do pagamento:", error);
       // Fallback para não interromper a experiência do usuário
       return res.json({ status: "pending" });
-    }
-  });
-  
-  // Rota de webhook para pagamentos da For4Payments
-  app.post('/api/pagamentos/webhook', async (req: Request, res: Response) => {
-    try {
-      const pagamento = req.body;
-      console.log("[Webhook] Recebido callback de pagamento:", pagamento);
-      
-      if (pagamento.status === "APPROVED" || pagamento.status === "COMPLETED" || pagamento.status === "PAID") {
-        console.log("[Webhook] Pagamento aprovado, enviando conversão para UTMIFY");
-        
-        // Extrair UTMs da QueryString
-        const utms = {
-          utm_source: req.query.utm_source as string || null,
-          utm_campaign: req.query.utm_campaign as string || null,
-          utm_medium: req.query.utm_medium as string || null,
-          utm_content: req.query.utm_content as string || null,
-          utm_term: req.query.utm_term as string || null
-        };
-        
-        // Enviar conversão para UTMIFY
-        try {
-          await enviarConversaoUTMIFY(pagamento, utms);
-          console.log("[Webhook] Conversão enviada com sucesso");
-        } catch (utmifyError) {
-          console.error("[Webhook] Erro ao enviar conversão:", utmifyError);
-        }
-      }
-      
-      // Sempre retornar 200 para confirmar recebimento do webhook
-      return res.status(200).json({ status: "received" });
-    } catch (error) {
-      console.error("[Webhook] Erro ao processar webhook:", error);
-      // Retornar 200 mesmo em caso de erro para o webhook não retentar
-      return res.status(200).json({ status: "error-processed" });
     }
   });
 
