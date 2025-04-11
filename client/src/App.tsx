@@ -25,6 +25,7 @@ function Router() {
       <Route path="/pagamento" component={PagamentoPix}/>
       <Route path="/sucesso" component={Sucesso}/>
       <Route path="/resultado-calculo" component={ResultadoCalculo}/>
+      <Route path="/resultado-calculo/info" component={ResultadoCalculo}/>
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

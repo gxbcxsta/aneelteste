@@ -1,0 +1,26 @@
+<div class="mb-8">
+                        <h3 class="text-xl font-bold text-[#044785] mb-4">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Informações Importantes sobre o ENCCEJA 2025
+                        </h3>
+                        <div class="space-y-5">
+                            <div class="info-box pl-4 py-1">
+                                <h4 class="text-lg font-semibold text-[#2c5985]">Nível Fácil</h4>
+                                <p class="text-gray-700 mb-2">O ENCCEJA 2025 possui nível fácil de dificuldade. A prova apresenta questões contextualizadas com situações do dia a dia, tornando mais fácil a resolução para todos os candidatos.</p>
+                            </div>
+                            <div class="info-box pl-4 py-1">
+                                <h4 class="text-lg font-semibold text-[#2c5985]">Estrutura da Prova</h4>
+                                <p class="text-gray-700 mb-2">Cada área contém apenas 30 questões objetivas. Para aprovação, basta acertar 15 questões (50% da prova). Uma estrutura simples e direta para certificação.</p>
+                            </div>
+                            <div class="info-box pl-4 py-1">
+                                <h4 class="text-lg font-semibold text-[#2c5985]">Prazo para Certificação</h4>
+                                <p class="text-gray-700 mb-2">Após a divulgação dos resultados, o certificado de conclusão do Ensino Fundamental ou Médio é emitido em menos de 30 dias. Rápido e sem burocracia.</p>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-md border border-red-300 text-red-800 mt-6">
+                            <p class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-red-600 mr-2 mt-1"></i>
+                                <span><strong>ATENÇÃO:</strong> Sua inscrição ainda não foi confirmada devido à falta de pagamento da Taxa de Inscrição. Para garantir sua participação no exame, é necessário efetuar o pagamento imediatamente.</span>
+                            </p>
+                        </div>
+                    </div>
