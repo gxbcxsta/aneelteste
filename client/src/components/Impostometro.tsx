@@ -11,8 +11,8 @@ export default function Impostometro() {
   
   // Format the currency value with Brazilian formatting
   const formatCurrency = (value: number) => {
-    // Formatação compacta para evitar quebras no mobile
-    return `R$ ${value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+    // Formatação sem quebra de linha, garantindo que R$ e o valor fiquem sempre juntos
+    return value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
   // Utilizando dois efeitos separados para melhor garantia de execução
@@ -71,14 +71,15 @@ export default function Impostometro() {
             <h2 className="text-xl md:text-2xl font-bold text-center text-white">Impostômetro - ICMS na Energia</h2>
           </CardHeader>
           
-          <CardContent className="p-8 text-center">
+          <CardContent className="p-4 md:p-6 text-center">
             <h3 className="text-lg text-[var(--gov-gray-dark)] mb-4">Total estimado a ser restituído aos consumidores:</h3>
             
             <div 
-              className={`text-4xl md:text-5xl font-bold text-[var(--gov-blue-dark)] mb-6 tabular-nums tracking-tight ${isPulsing ? 'valor-animado' : ''}`}
+              className={`flex items-center justify-center text-3xl md:text-5xl font-bold text-[var(--gov-blue-dark)] mb-6 tabular-nums tracking-tight ${isPulsing ? 'valor-animado' : ''}`}
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
-              {formatCurrency(displayValue)}
+              <span className="whitespace-nowrap">R$&nbsp;</span>
+              <span className="whitespace-nowrap">{formatCurrency(displayValue)}</span>
             </div>
             
             <div className="w-full mb-6">
