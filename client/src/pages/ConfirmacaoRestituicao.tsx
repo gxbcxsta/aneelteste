@@ -20,7 +20,7 @@ export default function ConfirmacaoRestituicao() {
   const [dialogOpen, setDialogOpen] = useState(false);
   
   // Use useEffect para pegar os parâmetros da URL quando o componente montar
-  useState(() => {
+  useEffect(() => {
     // Recupera parâmetros da URL
     const searchParams = new URLSearchParams(window.location.search);
     
@@ -56,7 +56,7 @@ export default function ConfirmacaoRestituicao() {
     };
     
     buscarRestituicao();
-  });
+  }, []);
 
   // Função para calcular a data de previsão - 72h úteis (3 dias úteis)
   const calcularDataPrevisao = () => {
