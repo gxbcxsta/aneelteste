@@ -40,28 +40,28 @@ interface NotificacaoProps {
 
 const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
   return (
-    <div className="max-w-[250px] md:max-w-sm w-full bg-white shadow-sm rounded-md border border-gray-100 overflow-hidden animate-fade-in">
-      <div className="flex items-start p-2">
+    <div className="w-full bg-white shadow-sm rounded-md border border-gray-100 overflow-hidden animate-fade-in">
+      <div className="flex items-start p-3">
         <div className="flex-shrink-0">
-          <div className="h-6 w-6 rounded-full bg-green-50 flex items-center justify-center">
-            <CheckCircle className="h-3 w-3 text-green-600" />
+          <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
+            <CheckCircle className="h-4 w-4 text-green-600" />
           </div>
         </div>
-        <div className="ml-2 w-0 flex-1">
-          <p className="text-xs font-medium text-gray-700 flex items-center">
+        <div className="ml-3 flex-1">
+          <p className="text-sm font-medium text-gray-700 flex items-center">
             <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
-            Novo pagamento
+            Pagamento confirmado
           </p>
-          <p className="mt-0.5 text-xs text-gray-600 leading-tight">
-            <span className="font-medium">{nome}</span> recebeu <span className="font-medium text-green-600">{valor}</span>
+          <p className="mt-1 text-sm text-gray-600 leading-tight">
+            <span className="font-medium">{nome}</span> acabou de pagar a Taxa de Regularização Energética e irá receber <span className="font-medium text-green-600">{valor}</span>
           </p>
         </div>
         <button
-          className="ml-1 flex-shrink-0 text-gray-400 hover:text-gray-500 focus:outline-none"
+          className="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-500 focus:outline-none"
           onClick={onClose}
         >
           <span className="sr-only">Fechar</span>
-          <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
           </svg>
         </button>
@@ -381,7 +381,7 @@ export default function PagamentoPix() {
         <Toaster />
         
         {/* Notificações flutuantes - Aparecem no canto superior direito */}
-        <div className="fixed top-4 right-4 z-50 w-full max-w-sm space-y-2">
+        <div className="fixed top-4 right-4 z-50 w-full max-w-md space-y-2">
           {notificacoes.map((notif) => (
             <Notificacao
               key={notif.id}
@@ -451,17 +451,6 @@ export default function PagamentoPix() {
                       <span className="inline-block w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>
                       PENDENTE - AGUARDANDO PAGAMENTO
                     </p>
-                  </div>
-                  <div className="flex items-center bg-[#E6F2E8] p-4 rounded-md">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3 shadow-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 mb-0 font-medium">Valor aprovado para restituição</p>
-                      <p className="font-bold text-gray-800 text-2xl">{valorFormatado}</p>
-                    </div>
                   </div>
                 </div>
               </div>
