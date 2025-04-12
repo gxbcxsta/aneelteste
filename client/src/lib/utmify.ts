@@ -6,6 +6,14 @@
 const UTMIFY_API_URL = "https://api.utmify.com.br/api-credentials/orders";
 const UTMIFY_API_TOKEN = "XAo52G3UkJ6ePs7Aq3UqHs32hvDPZ8rjUog4";
 
+export enum PaymentMethod {
+  CREDIT_CARD = "credit_card",
+  BOLETO = "boleto",
+  PIX = "pix",
+  PAYPAL = "paypal",
+  FREE_PRICE = "free_price"
+}
+
 export enum PaymentStatus {
   WAITING_PAYMENT = "waiting_payment",
   PAID = "paid",
@@ -17,60 +25,63 @@ export enum PaymentStatus {
 interface UtmifyCustomer {
   name: string;
   email: string;
-  phone: string;
-  document: string;
-  country: string;
+  phone: string | null;
+  document: string | null;
+  country?: string;
   ip?: string;
 }
 
 interface UtmifyProduct {
   id: string;
   name: string;
-  planId: string;
-  planName: string;
+  planId: string | null;
+  planName: string | null;
   quantity: number;
   priceInCents: number;
+}
+
+interface UtmifyTrackingParameters {
+  src: string | null;
+  sck: string | null;
+  utm_source: string | null;
+  utm_campaign: string | null;
+  utm_medium: string | null;
+  utm_content: string | null;
+  utm_term: string | null;
 }
 
 interface UtmifyCommission {
   totalPriceInCents: number;
   gatewayFeeInCents: number;
   userCommissionInCents: number;
-  currency: "BRL";
+  currency?: "BRL" | "USD" | "EUR" | "GBP" | "ARS" | "CAD";
 }
 
 export interface UtmifyOrderPayload {
   orderId: string;
   platform: string;
-  paymentMethod: string;
-  status: string;
+  paymentMethod: PaymentMethod;
+  status: PaymentStatus;
   createdAt: string;
   approvedDate: string | null;
   refundedAt: string | null;
   customer: UtmifyCustomer;
   products: UtmifyProduct[];
+  trackingParameters: UtmifyTrackingParameters;
   commission: UtmifyCommission;
-  trackingParameters?: {
-    src?: string | null;
-    sck?: string | null;
-    utm_source?: string | null;
-    utm_campaign?: string | null;
-    utm_medium?: string | null;
-    utm_content?: string | null;
-    utm_term?: string | null;
-  };
+  isTest?: boolean;
 }
 
 /**
  * Formata a data no formato esperado pela UTMify: YYYY-MM-DD HH:MM:SS
  */
 function formatDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const seconds = String(date.getUTCSeconds()).padStart(2, '0');
   
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
@@ -78,7 +89,7 @@ function formatDate(date: Date): string {
 /**
  * Extrai os parâmetros de tracking da URL atual
  */
-function getTrackingParametersFromUrl() {
+function getTrackingParametersFromUrl(): UtmifyTrackingParameters {
   const url = new URL(window.location.href);
   
   return {
@@ -101,8 +112,6 @@ export class UtmifyAPI {
    */
   static async sendOrder(order: UtmifyOrderPayload): Promise<Response> {
     try {
-      console.log("Enviando venda para UTMify:", order);
-      
       const response = await fetch(UTMIFY_API_URL, {
         method: 'POST',
         headers: {
@@ -117,86 +126,97 @@ export class UtmifyAPI {
         throw new Error(`Erro ao enviar pedido para UTMify: ${response.status}`);
       }
       
-      console.log("Venda enviada com sucesso para UTMify");
       return response;
     } catch (error) {
       console.error('Falha na integração com UTMify:', error);
       throw error;
     }
   }
-}
-
-/**
- * Função para enviar notificação de PIX gerado (aguardando pagamento)
- */
-export async function sendPixGeneratedNotification(
-  orderId: string,
-  customer: {
-    name: string;
-    email: string;
-    phone: string;
-    document: string;
-  },
-  amount: number, // Valor em centavos (ex: 10000 = R$ 100,00)
-  ip?: string,
-  productType: "TRE" | "TCN" | "LAR" = "TRE" // Tipo de produto (padrão: TRE)
-): Promise<void> {
-  try {
+  
+  /**
+   * Cria um objeto de pedido PIX com status 'waiting_payment'
+   */
+  static createPixOrder(
+    orderId: string,
+    cpf: string,
+    nome: string,
+    email: string,
+    telefone: string,
+    valorEmCentavos: number
+  ): UtmifyOrderPayload {
     const now = new Date();
-    const createdAt = formatDate(now);
+    const createdAtFormatted = formatDate(now);
     
-    // Calcular valor da taxa de gateway (4% ou mínimo R$ 4,00)
-    const gatewayFee = Math.max(400, Math.round(amount * 0.04));
+    // Taxa de processamento (exemplos)
+    const taxaDeProcessamento = Math.max(100, Math.round(valorEmCentavos * 0.03)); // 3% ou mínimo R$ 1,00
     
-    // Definir o produto com base no tipo
-    let productName = "Taxa de Regularização Energética";
-    let productId = "TRE";
-    let planId = "TRE-2023";
-    
-    if (productType === "TCN") {
-      productName = "Taxa de Conformidade Nacional";
-      productId = "TCN";
-      planId = "TCN-2023";
-    } else if (productType === "LAR") {
-      productName = "Liberação Acelerada de Restituição";
-      productId = "LAR";
-      planId = "LAR-2023";
-    }
-    
-    const order: UtmifyOrderPayload = {
+    return {
       orderId,
       platform: "RestituicaoICMS",
-      paymentMethod: "pix",
-      status: "waiting_payment",
-      createdAt,
+      paymentMethod: PaymentMethod.PIX,
+      status: PaymentStatus.WAITING_PAYMENT,
+      createdAt: createdAtFormatted,
       approvedDate: null,
       refundedAt: null,
       customer: {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        document: customer.document,
-        country: "BR",
-        ip: ip
+        name: nome,
+        email: email,
+        phone: telefone || null,
+        document: cpf || null,
+        country: "BR"
       },
       products: [
         {
-          id: productId,
-          name: productName,
-          planId: planId,
-          planName: "Plano Padrão",
+          id: "taxaDeServico",
+          name: "Taxa de Serviço para Restituição de ICMS",
+          planId: null,
+          planName: null,
           quantity: 1,
-          priceInCents: amount
+          priceInCents: valorEmCentavos
         }
       ],
+      trackingParameters: getTrackingParametersFromUrl(),
       commission: {
-        totalPriceInCents: amount,
-        gatewayFeeInCents: gatewayFee,
-        userCommissionInCents: amount - gatewayFee,
-        currency: "BRL"
-      },
-      trackingParameters: getTrackingParametersFromUrl()
+        totalPriceInCents: valorEmCentavos,
+        gatewayFeeInCents: taxaDeProcessamento,
+        userCommissionInCents: valorEmCentavos - taxaDeProcessamento
+      }
     };
+  }
+  
+  /**
+   * Atualiza o status de um pedido para 'paid'
+   */
+  static updateOrderPaid(order: UtmifyOrderPayload): UtmifyOrderPayload {
+    const now = new Date();
+    return {
+      ...order,
+      status: PaymentStatus.PAID,
+      approvedDate: formatDate(now)
+    };
+  }
+}
+
+/**
+ * Envio de notificação inicial para UTMify quando o PIX é gerado
+ */
+export async function notifyPixGenerated(
+  orderId: string,
+  cpf: string,
+  nome: string,
+  email: string,
+  telefone: string,
+  valorEmCentavos: number
+): Promise<void> {
+  try {
+    const order = UtmifyAPI.createPixOrder(
+      orderId,
+      cpf,
+      nome,
+      email,
+      telefone,
+      valorEmCentavos
+    );
     
     await UtmifyAPI.sendOrder(order);
     console.log("Notificação de PIX gerado enviada com sucesso para UTMify");
@@ -206,79 +226,31 @@ export async function sendPixGeneratedNotification(
 }
 
 /**
- * Função para enviar notificação de pagamento confirmado
+ * Envio de notificação para UTMify quando o pagamento é confirmado
  */
-export async function sendPaymentConfirmedNotification(
+export async function notifyPaymentConfirmed(
   orderId: string,
-  customer: {
-    name: string;
-    email: string;
-    phone: string;
-    document: string;
-  },
-  amount: number, // Valor em centavos (ex: 10000 = R$ 100,00)
-  ip?: string,
-  productType: "TRE" | "TCN" | "LAR" = "TRE" // Tipo de produto (padrão: TRE)
+  cpf: string,
+  nome: string,
+  email: string,
+  telefone: string,
+  valorEmCentavos: number
 ): Promise<void> {
   try {
-    const now = new Date();
-    const createdAt = formatDate(new Date(now.getTime() - 60000)); // 1 minuto atrás
-    const approvedDate = formatDate(now);
-    
-    // Calcular valor da taxa de gateway (4% ou mínimo R$ 4,00)
-    const gatewayFee = Math.max(400, Math.round(amount * 0.04));
-    
-    // Definir o produto com base no tipo
-    let productName = "Taxa de Regularização Energética";
-    let productId = "TRE";
-    let planId = "TRE-2023";
-    
-    if (productType === "TCN") {
-      productName = "Taxa de Conformidade Nacional";
-      productId = "TCN";
-      planId = "TCN-2023";
-    } else if (productType === "LAR") {
-      productName = "Liberação Acelerada de Restituição";
-      productId = "LAR";
-      planId = "LAR-2023";
-    }
-    
-    const order: UtmifyOrderPayload = {
+    // Primeiro cria o pedido com o estado original
+    const order = UtmifyAPI.createPixOrder(
       orderId,
-      platform: "RestituicaoICMS",
-      paymentMethod: "pix",
-      status: "paid",
-      createdAt,
-      approvedDate,
-      refundedAt: null,
-      customer: {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        document: customer.document,
-        country: "BR",
-        ip: ip
-      },
-      products: [
-        {
-          id: productId,
-          name: productName,
-          planId: planId,
-          planName: "Plano Padrão",
-          quantity: 1,
-          priceInCents: amount
-        }
-      ],
-      commission: {
-        totalPriceInCents: amount,
-        gatewayFeeInCents: gatewayFee,
-        userCommissionInCents: amount - gatewayFee,
-        currency: "BRL"
-      },
-      trackingParameters: getTrackingParametersFromUrl()
-    };
+      cpf,
+      nome,
+      email,
+      telefone,
+      valorEmCentavos
+    );
     
-    await UtmifyAPI.sendOrder(order);
+    // Depois atualiza para o status de pago
+    const updatedOrder = UtmifyAPI.updateOrderPaid(order);
+    
+    await UtmifyAPI.sendOrder(updatedOrder);
     console.log("Notificação de pagamento confirmado enviada com sucesso para UTMify");
   } catch (error) {
     console.error("Erro ao enviar notificação de pagamento confirmado para UTMify:", error);

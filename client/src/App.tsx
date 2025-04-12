@@ -16,10 +16,10 @@ import PagamentoPix from "@/pages/PagamentoPix";
 import Sucesso from "@/pages/Sucesso";
 import ResultadoCalculo from "@/pages/ResultadoCalculo";
 import ConfirmacaoRestituicao from "@/pages/ConfirmacaoRestituicao";
-import PagamentoTCN from "@/pages/PagamentoTCN";
-import PagamentoLAR from "@/pages/PagamentoLAR";
-import SucessoFinal from "@/pages/SucessoFinal";
 import TaxaComplementar from "@/pages/TaxaComplementar";
+import PagamentoTCN from "@/pages/PagamentoTCN";
+import TaxaLAR from "@/pages/TaxaLAR";
+import PagamentoLAR from "@/pages/PagamentoLAR";
 
 function Router() {
   return (
@@ -34,10 +34,10 @@ function Router() {
         <Route path="/confirmacao" component={Confirmacao}/>
         <Route path="/pagamento" component={PagamentoPix}/>
         <Route path="/taxa-complementar" component={TaxaComplementar}/>
-        <Route path="/tcn" component={PagamentoTCN}/>
-        <Route path="/lar" component={PagamentoLAR}/>
+        <Route path="/pagamento-tcn" component={PagamentoTCN}/>
+        <Route path="/taxa-lar" component={TaxaLAR}/>
+        <Route path="/pagamento-lar" component={PagamentoLAR}/>
         <Route path="/sucesso" component={Sucesso}/>
-        <Route path="/sucesso-final" component={SucessoFinal}/>
         <Route path="/resultado-calculo" component={ResultadoCalculo}/>
         <Route path="/confirmacao-restituicao" component={ConfirmacaoRestituicao}/>
         {/* Fallback to 404 */}
