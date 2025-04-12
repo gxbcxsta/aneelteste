@@ -798,20 +798,18 @@ export default function PagamentoPix() {
                   variant="outline"
                   className="w-full bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 hover:text-amber-900 mb-4"
                   onClick={() => {
-                    // Preparar parâmetros para o redirecionamento
-                    const params = new URLSearchParams({
-                      cpf: cpf,
-                      nome: nome,
-                      valor: valor.toString(),
+                    // Atualizar contexto de usuário
+                    updateUserData({
+                      cpf,
+                      nome,
+                      valorRestituicao: valor,
                       pagamentoId: paymentInfo?.id || "manual",
                       dataPagamento: new Date().toISOString(),
-                      companhia: companhia,
-                      estado: estado,
-                      nasc: dataNascimento,
-                      agencia: urlParams.get('agencia') || "",
-                      conta: urlParams.get('conta') || "",
-                      email: email,
-                      telefone: telefone
+                      companhia,
+                      estado,
+                      dataNascimento,
+                      email,
+                      telefone
                     });
                     
                     toast({
@@ -822,7 +820,7 @@ export default function PagamentoPix() {
                     
                     // Redirecionar para a página de taxa complementar
                     setTimeout(() => {
-                      navigate(`/taxa-complementar?${params.toString()}`);
+                      navigate('/taxa-complementar');
                     }, 1000);
                   }}
                 >
