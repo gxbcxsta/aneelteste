@@ -142,11 +142,10 @@ export default function PagamentoTCN() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: valorTaxa, // Valor da TCN: 118,00
+          // Não é necessário enviar o amount, o servidor detectará 
+          // que é a página TCN e usará o valor fixo de R$118,00
           name: nomeCompleto,
-          email: emailFormatado,
-          cpf: cpfFormatado,
-          phone: telefoneFormatado
+          cpf: cpfFormatado
         }),
       });
       
@@ -255,42 +254,7 @@ export default function PagamentoTCN() {
     };
   }, []);
   
-  // Função para simular pagamento
-  const simularPagamento = () => {
-    setIsLoading(true);
-    setPaymentStatus('processing');
-    setProgress(30);
-    
-    // Simular progresso do processamento
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 10;
-      });
-    }, 800);
-    
-    // Simular conclusão após 3 segundos
-    setTimeout(() => {
-      clearInterval(progressInterval);
-      setProgress(100);
-      setPaymentStatus('completed');
-      setIsLoading(false);
-      
-      // Mostrar toast de confirmação
-      toast({
-        title: "Pagamento da TCN confirmado!",
-        description: "Sua Taxa de Conformidade Nacional foi quitada com sucesso.",
-      });
-      
-      // Redirecionar para a próxima etapa após um breve delay
-      setTimeout(() => {
-        redirecionarParaProximaEtapa();
-      }, 1500);
-    }, 3000);
-  };
+  // Função de simulação removida conforme solicitado pelo cliente
   
   // Função para copiar o código PIX
   const copiarCodigoPix = () => {
