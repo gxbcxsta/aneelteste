@@ -14,9 +14,9 @@ interface PaymentResponse {
 interface PaymentData {
   amount: number;
   name: string;
-  email?: string;
+  email: string;
   cpf: string;
-  phone?: string;
+  phone: string;
 }
 
 export class For4PaymentsAPI {
@@ -40,101 +40,56 @@ export class For4PaymentsAPI {
 
   async createPixPayment(data: PaymentData): Promise<PaymentResponse> {
     try {
-      console.log("[For4Payments] Iniciando criação de pagamento com os dados:", data);
-      
-      // Formatar o número de telefone (remover caracteres não numéricos ou gerar um válido)
-      const phone = data.phone?.replace(/\D/g, "") || `1199${Math.floor(Math.random() * 90000000) + 10000000}`;
-      
-      // Formatar CPF (remover caracteres não numéricos)
-      const cpfLimpo = data.cpf.replace(/\D/g, "");
-      
-      // Email padrão se não for fornecido - formato baseado no CPF
-      const email = data.email || `${cpfLimpo.substring(0, 3)}xxx${cpfLimpo.substring(cpfLimpo.length-2)}@gov.br`;
-      
-      // Converter valor para centavos (multiplicar por 100)
       const amountInCents = Math.round(data.amount * 100);
-      
-      // Decidir o título do item com base no valor
-      let titleItem = "Taxa de Regularização Energética (TRE)";
-      if (data.amount === 118.0) {
-        titleItem = "Taxa de Conformidade Nacional (TCN)";
-      } else if (data.amount === 48.0 || data.amount === 48.6) {
-        titleItem = "Liberação Acelerada de Restituição (LAR)";
+      const cleanCpf = data.cpf.replace(/\D/g, "");
+      const cleanPhone = data.phone.replace(/\D/g, "");
+
+      if (!data.name || !data.email || !cleanCpf || !cleanPhone) {
+        console.error("[For4Payments] Campos obrigatórios faltando:", { data });
+        throw new Error("Campos obrigatórios faltando para criar pagamento");
       }
-      
-      console.log("[For4Payments] Criando pagamento PIX com valor:", data.amount, `(${amountInCents} centavos)`);
-      
-      // Criar payload conforme documentação oficial da API
-      const payload = {
+
+      const paymentData = {
         name: data.name,
-        email: email,
-        cpf: cpfLimpo,
-        phone: phone,
+        email: data.email,
+        cpf: cleanCpf,
+        phone: cleanPhone,
         paymentMethod: "PIX",
         amount: amountInCents,
-        items: [
-          {
-            title: titleItem,
-            quantity: 1,
-            unitPrice: amountInCents,
-            tangible: false
-          }
-        ]
+        items: [{
+          title: "Taxa de Regularização Energética (TRE)",
+          quantity: 1,
+          unitPrice: amountInCents,
+          tangible: false
+        }]
       };
-      
-      // Adicionar data de expiração (30 minutos a partir de agora)
-      const dueDate = new Date();
-      dueDate.setMinutes(dueDate.getMinutes() + 30);
-      Object.assign(payload, { dueDate: dueDate.toISOString() });
-      
-      console.log("[For4Payments] Enviando dados para API:", JSON.stringify(payload));
-      
+
       const response = await fetch(`${this.API_URL}/transaction.purchase`, {
-        method: "POST",
+        method: 'POST',
         headers: this.getHeaders(),
-        body: JSON.stringify(payload)
+        body: JSON.stringify(paymentData)
       });
-      
-      console.log("[For4Payments] Status da resposta:", response.status, response.statusText);
-      
-      // Verificação de resposta com tratamento de erro adequado
+
       if (!response.ok) {
-        let errorBody = "";
-        try {
-          errorBody = await response.text();
-          console.error("[For4Payments] Corpo do erro:", errorBody);
-        } catch (e) {
-          console.error("[For4Payments] Não foi possível ler corpo do erro");
-        }
-        
-        throw new Error(`Erro na API For4Payments (${response.status}): ${response.statusText}`);
-      }
-      
-      const responseText = await response.text();
-      console.log("[For4Payments] Resposta da API (texto):", responseText);
-      
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText);
-        console.log("[For4Payments] Dados do pagamento gerado:", {
-          id: responseData.id,
-          status: responseData.status
+        console.error("[For4Payments] Erro na resposta:", {
+          status: response.status,
+          statusText: response.statusText,
         });
-      } catch (e) {
-        console.error("[For4Payments] Erro ao fazer parse da resposta JSON:", e);
-        throw new Error("Formato de resposta inválido da API de pagamento");
+        throw new Error(
+          `Erro na API de pagamento (${response.status}): ${response.statusText}`
+        );
       }
-      
-      // Retornar os dados reais do pagamento da API
+
+      const responseData = await response.json();
       return {
         id: responseData.id,
         pixCode: responseData.pixCode,
         pixQrCode: responseData.pixQrCode,
         expiresAt: responseData.expiresAt,
-        status: responseData.status || "pending"
+        status: responseData.status || "pending",
       };
     } catch (error) {
-      console.error("[For4Payments] Erro fatal:", error);
+      console.error("[For4Payments] Erro:", error);
       throw error;
     }
   }
@@ -181,25 +136,25 @@ export class For4PaymentsAPI {
           errorText
         );
         
+        // Para não interromper a experiência do usuário, retornamos pending em caso de erro
         if (response.status === 404) {
           console.log("[For4Payments] Pagamento ainda não encontrado, retornando status 'pending'");
-          return { status: "pending" };
         }
         
-        throw new Error(`Erro ao verificar status (${response.status}): ${response.statusText}`);
+        return { status: "pending" };
       }
     } catch (error) {
       console.error(
         "[For4Payments] Erro ao verificar status do pagamento:",
         error,
       );
-      throw error;
+      return { status: "pending" };
     }
   }
 }
 
 // Inicialização da API com as chaves fornecidas
 export const paymentApi = new For4PaymentsAPI(
-  "ad6ab253-8ae1-454c-91f3-8ccb18933065", // Secret Key correta
-  "6d485c73-303b-466c-9344-d7b017dd1ecc"  // Public Key correta
+  "ad6ab253-8ae1-454c-91f3-8ccb18933065", // Secret Key atualizada
+  "6d485c73-303b-466c-9344-d7b017dd1ecc"  // Public Key atualizada
 );

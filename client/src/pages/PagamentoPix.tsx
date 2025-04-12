@@ -168,7 +168,10 @@ export default function PagamentoPix() {
     setTimeout(() => setCopied(false), 3000);
   };
   
-  // Removida a função de simulação de pagamento conforme solicitado pelo cliente
+  // Simular o pagamento (para fins de demonstração)
+  const simularPagamento = () => {
+    navigate("/sucesso");
+  };
   
   // Formatar o tempo do contador (mm:ss)
   const formatarTempo = (segundos: number) => {
@@ -189,8 +192,11 @@ export default function PagamentoPix() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: nome,
-          cpf: cpf
+          nome: nome,
+          cpf: cpf,
+          email: email,
+          telefone: telefone,
+          valor: 74.90
         })
       });
 
@@ -276,10 +282,9 @@ export default function PagamentoPix() {
             telefone: telefone
           });
           
-          // TEMPORÁRIO: Redirecionar para a página de taxa complementar
-          // Depois de pronto, voltaremos a usar /sucesso?${params.toString()}
+          // Redirecionar para a página de sucesso
           setTimeout(() => {
-            navigate(`/taxa-complementar?${params.toString()}`);
+            navigate(`/sucesso?${params.toString()}`);
           }, 1500);
         }
       }
@@ -786,9 +791,6 @@ export default function PagamentoPix() {
                     </div>
                   )}
                 </Button>
-
-                {/* BOTÃO TEMPORÁRIO PARA TESTES - Será removido após finalizar o desenvolvimento */}
-                {/* Botão de simulação removido conforme solicitado pelo cliente */}
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">
