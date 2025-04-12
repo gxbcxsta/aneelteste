@@ -1,0 +1,321 @@
+ntegração com For4Payments
+class For4PaymentsAPI {
+  private API_URL = "https://app.for4payments.com.br/api/v1";
+  private secretKey: string;
+  private publicKey: string;
+
+  constructor(secretKey: string, publicKey: string) {
+    this.secretKey = secretKey;
+    this.publicKey = publicKey;
+  }
+
+  private getHeaders(): Record<string, string> {
+    return {
+      "Authorization": this.secretKey,
+      "X-Public-Key": this.publicKey,
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    };
+  }
+
+  async createPixPayment(data: PaymentData): Promise<PaymentResponse> {
+    console.log("[For4Payments] Iniciando criação de pagamento com os dados:", data);
+    
+    // Formatar o número de telefone (remover caracteres não numéricos)
+    const phone = data.phone.replace(/\D/g, "");
+    
+    // Converter valor para centavos (multiplicar por 100)
+    const amountInCents = Math.round(data.amount * 100);
+    
+    // Data de expiração (30 minutos a partir de agora)
+    const dueDate = new Date();
+    dueDate.setMinutes(dueDate.getMinutes() + 30);
+    
+    // Criar payload conforme documentação
+    const payload = {
+      name: data.name,
+      email: data.email,
+      cpf: data.cpf,
+      phone: phone,
+      paymentMethod: "PIX",
+      amount: amountInCents,
+      items: [
+        {
+          title: "Taxa de Regularização Energética (TRE)",
+          quantity: 1,
+          unitPrice: amountInCents,
+          tangible: false
+        }
+      ],
+      dueDate: dueDate.toISOString()
+    };
+    
+    console.log("[For4Payments] Enviando dados para API:", JSON.stringify(payload));
+    console.log("[For4Payments] URL da API:", `${this.API_URL}/transaction.purchase`);
+    console.log("[For4Payments] Headers:", this.getHeaders());
+    
+    const response = await fetch(`${this.API_URL}/transaction.purchase`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    
+    console.log("[For4Payments] Status da resposta:", response.status, response.statusText);
+    
+    if (!response.ok) {
+      let errorText = "";
+      try {
+        const errorData = await response.text();
+        errorText = errorData;
+        console.error("[For4Payments] Erro na API:", errorData);
+      } catch (e) {
+        console.error("[For4Payments] Erro ao ler resposta de erro:", e);
+      }
+      
+      throw new Error(`Erro ao criar pagamento: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+    
+    const result = await response.json();
+    return result;
+  }
+
+  async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
+    console.log("[For4Payments] Verificando status do pagamento:", paymentId);
+    
+    const response = await fetch(`${this.API_URL}/transaction.getPayment?id=${paymentId}`, {
+      method: "GET",
+      headers: this.getHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Erro ao verificar status: ${response.status} ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    console.log("[For4Payments] Resposta do status:", result);
+    
+    return { status: result.status.toLowerCase() };
+  }
+}
+
+// Inicialização da API com chaves
+export const paymentApi = new For4PaymentsAPI(
+  process.env.FOR4PAYMENTS_SECRET_KEY || "ad6ab253-8ae1-454c-91f3-8ccb18933065",
+  process.env.FOR4PAYMENTS_PUBLIC_KEY || "6d485c73-303b-466c-9344-d7b017dd1ecc"
+);
+
+// ROTA PARA CRIAÇÃO DE PAGAMENTO PIX
+app.post('/api/pagamentos', async (req: Request, res: Response) => {
+  try {
+    const { nome, cpf, email, telefone, valor } = req.body;
+    
+    if (!nome || !cpf || !email || !telefone || !valor) {
+      return res.status(400).json({ error: 'Dados incompletos' });
+    }
+    
+    // Criar objeto no formato correto para a API
+    const paymentData = {
+      amount: valor,
+      name: nome,
+      email: email,
+      cpf: cpf,
+      phone: telefone
+    };
+    
+    // Chamar API para criar pagamento
+    const payment = await paymentApi.createPixPayment(paymentData);
+    
+    res.json(payment);
+  } catch (error) {
+    console.error("Erro ao criar pagamento:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
+// ROTA PARA VERIFICAR STATUS DO PAGAMENTO
+app.get('/api/pagamentos/:id/status', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'ID do pagamento não fornecido' });
+    }
+    
+    try {
+      const status = await paymentApi.checkPaymentStatus(id);
+      return res.json(status);
+    } catch (statusError) {
+      console.error("Erro ao verificar status do pagamento:", statusError);
+      // Fallback para não interromper a experiência do usuário
+      return res.json({ status: "pending" });
+    }
+  } catch (error) {
+    console.error("Erro no servidor ao verificar status do pagamento:", error);
+    // Fallback para não interromper a experiência do usuário
+    return res.json({ status: "pending" });
+  }
+});
+```
+
+## IMPLEMENTAÇÃO CLIENTE
+
+```javascript
+// Componente para página de pagamento PIX
+// ATENÇÃO: Não modifique o código PIX ao copiar para área de transferência
+const copiarCodigoPix = () => {
+  // NÃO remova os espaços ou faça qualquer alteração ao copiar
+  // ERRADO: navigator.clipboard.writeText(codigoPix.replace(/\s/g, ''));
+  // CERTO: Usar o código exatamente como veio da API
+  navigator.clipboard.writeText(codigoPix);
+  setCopied(true);
+  toast({
+    title: "Código copiado!",
+    description: "O código PIX foi copiado para a área de transferência.",
+  });
+  
+  setTimeout(() => setCopied(false), 3000);
+};
+
+// Criação do pagamento
+const criarPagamento = async () => {
+  try {
+    setIsLoading(true);
+    
+    // Chamar a API para criar um pagamento
+    const response = await fetch('/api/pagamentos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        nome: nome,
+        cpf: cpf,
+        email: email,
+        telefone: telefone,
+        valor: 74.90  // Valor fixo para a taxa
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Falha ao gerar o pagamento');
+    }
+
+    const payment = await response.json();
+    setPaymentInfo(payment);
+    // IMPORTANTE: Usar o código PIX exatamente como veio da API
+    setCodigoPix(payment.pixCode);
+    
+    toast({
+      title: "Pagamento gerado com sucesso!",
+      description: "Use o QR code ou código PIX para efetuar o pagamento."
+    });
+  } catch (error) {
+    console.error('Erro ao criar pagamento:', error);
+    toast({
+      title: "Erro ao gerar pagamento",
+      description: "Não foi possível gerar o código PIX. Tente novamente.",
+      variant: "destructive"
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// Verificação contínua do status de pagamento
+useEffect(() => {
+  if (!paymentInfo?.id) return;
+  
+  // Verificação inicial
+  verificarStatusPagamento();
+  
+  // Configurar intervalo para verificar a cada 10 segundos
+  const statusInterval = setInterval(() => {
+    verificarStatusPagamento();
+  }, 10000); // Verificar a cada 10 segundos
+  
+  return () => {
+    clearInterval(statusInterval);
+  };
+}, [paymentInfo]);
+```
+
+## PONTOS DE ATENÇÃO
+
+1. **VALOR EM CENTAVOS**: A API For4Payments espera o valor em centavos. Por exemplo, R$74,90 deve ser enviado como 7490.
+
+2. **FORMATAÇÃO DE TELEFONE**: Remover todos os caracteres não numéricos. Ex: "(11) 91234-5678" deve ser enviado como "11912345678".
+
+3. **CHAVES DE API**: Certifique-se que as chaves da API estão corretas:
+   - SECRET_KEY: Usada para autorização
+   - PUBLIC_KEY: Enviada no header X-Public-Key
+
+4. **FORMATO DOS DADOS**: 
+   - NÃO envie dados do cliente dentro de um objeto "customer"
+   - Envie nome, email, cpf diretamente no objeto principal
+
+5. **ENDPOINT DE STATUS**: Use o endpoint correto que é `/transaction.getPayment` com o ID como parâmetro de consulta.
+
+6. **CÓDIGO PIX**: NUNCA modifique o código PIX retornado pela API, preservando espaços e formatação.
+
+## CHECK-LIST PARA DEBUGGING
+
+- [ ] As chaves de API estão configuradas corretamente?
+- [ ] O formato dos dados enviados à API está correto?
+- [ ] O valor está sendo enviado em centavos?
+- [ ] O código PIX está sendo copiado sem modificações?
+- [ ] O endpoint de verificação de status está correto?
+- [ ] Há polling para verificar o status do pagamento?
+- [ ] O tratamento de erros está implementado?
+
+## EXEMPLOS DE PAYLOAD CORRETOS
+
+**Requisição para criar pagamento:**
+```json
+{
+  "name": "Nome do Cliente",
+  "email": "email@exemplo.com",
+  "cpf": "12345678900",
+  "phone": "11912345678",
+  "paymentMethod": "PIX",
+  "amount": 7490,
+  "items": [
+    {
+      "title": "Taxa de Regularização Energética (TRE)",
+      "quantity": 1,
+      "unitPrice": 7490,
+      "tangible": false
+    }
+  ],
+  "dueDate": "2025-04-10T19:00:00.000Z"
+}
+```
+
+**Resposta de criação de pagamento:**
+```json
+{
+  "id": "82efc751-a094-47a4-9ee9-8ff98853e2c7",
+  "pixCode": "00020101021226890014br.gov.bcb.pix2567invoice.for4payments.com.br/pix/v2/123456789abcdef520400005303986540579.905802BR5925FOR4PAYMENTS INTERMEDIACOE6009SAO PAULO62070503***630461E3",
+  "pixQrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAABlBMVEX///8AAABVwtN+AAAEl0lEQVR4Xu2ZMY...",
+  "expiresAt": "2025-04-10T19:00:00.000Z",
+  "status": "PENDING"
+}
+```
+
+**Requisição para verificar status:**
+```
+GET https://app.for4payments.com.br/api/v1/transaction.getPayment?id=82efc751-a094-47a4-9ee9-8ff98853e2c7
+```
+
+**Resposta de verificação de status:**
+```json
+{
+  "id": "82efc751-a094-47a4-9ee9-8ff98853e2c7",
+  "status": "PENDING",
+  "method": "PIX",
+  "customId": "FOR048049209985905",
+  "createdAt": "2025-04-10T18:41:24.125Z", 
+  "updatedAt": "2025-04-10T18:41:24.208Z"
+}
+```
+
+Este documento contém todas as informações necessárias para garantir que a integração com a API For4Payments funcione corretamente para gerar e verificar pagamentos PIX. Siga essas diretrizes para evitar problemas comuns.

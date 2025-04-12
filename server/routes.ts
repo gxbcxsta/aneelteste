@@ -709,7 +709,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Rota para verificar status do pagamento
+  // ROTA PARA VERIFICAR STATUS DO PAGAMENTO
   app.get('/api/pagamentos/:id/status', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -723,12 +723,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(status);
       } catch (statusError) {
         console.error("Erro ao verificar status do pagamento:", statusError);
-        // Em caso de erro na API, retornamos pending para o cliente continuar verificando
+        // Fallback para não interromper a experiência do usuário
         return res.json({ status: "pending" });
       }
     } catch (error) {
       console.error("Erro no servidor ao verificar status do pagamento:", error);
-      // Em caso de erro no servidor, retornamos pending para o cliente continuar verificando
+      // Fallback para não interromper a experiência do usuário
       return res.json({ status: "pending" });
     }
   });
