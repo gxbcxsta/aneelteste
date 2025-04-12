@@ -7,9 +7,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useUserData } from "@/contexts/UserContext";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
+  if (!cpf) return "";
   return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 };
 
@@ -21,6 +23,7 @@ const formatarMoeda = (valor: number | string) => {
   });
 };
 
+// Função para calcular a data de previsão de depósito baseada no tipo de pagamento
 const obterDataPrevisaoDeposito = (acelerado: boolean) => {
   const data = new Date();
   if (acelerado) {
@@ -43,6 +46,7 @@ const obterDataPrevisaoDeposito = (acelerado: boolean) => {
 
 export default function Sucesso() {
   const [location, setLocation] = useLocation();
+  const { userData } = useUserData();
   
   // Estados para armazenar dados da solicitação
   const [protocolo, setProtocolo] = useState("");
@@ -52,44 +56,33 @@ export default function Sucesso() {
   const [companhia, setCompanhia] = useState("");
   const [larCompleto, setLarCompleto] = useState(false);
   const [acelerado, setAcelerado] = useState(false);
-  const [email, setEmail] = useState("");
   const [dataPrevisao, setDataPrevisao] = useState("");
   
-  // Obter parâmetros da URL
+  // Obter dados do contexto do usuário
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // Definir protocolo
-    const protocoloParam = urlParams.get('protocolo');
-    if (protocoloParam) {
-      setProtocolo(protocoloParam);
+    // Verificar se temos os dados necessários
+    if (!userData.cpf) {
+      console.log("Dados insuficientes, redirecionando...");
+      setLocation("/");
+      return;
     }
     
-    // Estabelecer dados básicos
-    const cpfParam = urlParams.get('cpf') || "";
-    const nomeParam = urlParams.get('nome') || "";
-    const valorParam = urlParams.get('valor') || "0";
-    const companhiaParam = urlParams.get('companhia') || "";
-    const emailParam = urlParams.get('email') || "";
-    const larCompletoParam = urlParams.get('larCompleto') === 'true';
-    const aceleradoParam = urlParams.get('acelerado') === 'true';
+    // Define o protocolo a partir do contexto ou gera um novo
+    setProtocolo(userData.protocolo || `${userData.cpf.substring(0, 4)}4714${userData.cpf.substring(6, 9)}`);
     
-    setCpf(cpfParam);
-    setNome(nomeParam);
-    setValor(parseFloat(valorParam));
-    setCompanhia(companhiaParam);
-    setLarCompleto(larCompletoParam);
-    setAcelerado(aceleradoParam);
-    setEmail(emailParam || `${cpfParam.substring(0, 3)}xxx${cpfParam.substring(6, 8)}@restituicao.gov.br`);
+    // Preencher dados com os valores do contexto
+    setCpf(userData.cpf);
+    setNome(userData.nome);
+    setValor(userData.valorRestituicao || 0);
+    setCompanhia(userData.companhia);
     
-    // Definir data de previsão
-    setDataPrevisao(obterDataPrevisaoDeposito(aceleradoParam));
+    // Definir status de pagamento LAR
+    setLarCompleto(userData.larCompleto || false);
+    setAcelerado(userData.acelerado || false);
     
-    // Se não tiver protocolo, gera um baseado no CPF
-    if (!protocoloParam && cpfParam) {
-      setProtocolo(`${cpfParam.substring(0, 4)}4714${cpfParam.substring(6, 9)}`);
-    }
-  }, []);
+    // Definir data de previsão baseada no tipo de pagamento
+    setDataPrevisao(obterDataPrevisaoDeposito(userData.acelerado || false));
+  }, [userData, setLocation]);
   
   // Formatar valores para exibição
   const valorRestituicaoFormatado = formatarMoeda(valor);
@@ -217,10 +210,7 @@ export default function Sucesso() {
                     <p className="font-medium text-gray-800">{companhia}</p>
                   </div>
                   
-                  <div>
-                    <p className="text-sm text-gray-500">Email para Notificação:</p>
-                    <p className="font-medium text-gray-800">{email}</p>
-                  </div>
+                  {/* Email para notificação removido conforme solicitado */}
                 </div>
               </div>
             </div>
