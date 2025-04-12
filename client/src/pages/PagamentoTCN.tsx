@@ -503,7 +503,7 @@ export default function PagamentoTCN() {
                           Gerando pagamento...
                         </>
                       ) : (
-                        "Gerar pagamento PIX"
+                        "PROSSEGUIR PARA PAGAMENTO"
                       )}
                     </Button>
                   </div>
