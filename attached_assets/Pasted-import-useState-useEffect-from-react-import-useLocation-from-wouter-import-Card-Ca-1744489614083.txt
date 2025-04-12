@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark } from "lucide-react";
+import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark, ArrowRightCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +11,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { notifyPixGenerated, notifyPaymentConfirmed } from "@/lib/utmify";
+import { paymentApi } from "@/lib/for4payments";
+import { sendPixGeneratedNotification, sendPaymentConfirmedNotification } from "@/lib/utmify";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -167,7 +168,10 @@ export default function PagamentoPix() {
     setTimeout(() => setCopied(false), 3000);
   };
   
-  // Removida a função de simulação de pagamento conforme solicitado pelo cliente
+  // Simular o pagamento (para fins de demonstração)
+  const simularPagamento = () => {
+    navigate("/sucesso");
+  };
   
   // Formatar o tempo do contador (mm:ss)
   const formatarTempo = (segundos: number) => {
@@ -181,7 +185,7 @@ export default function PagamentoPix() {
     try {
       setIsLoading(true);
       
-      // Chamar a API para criar um pagamento com todos os parâmetros necessários
+      // Chamar a API para criar um pagamento
       const response = await fetch('/api/pagamentos', {
         method: 'POST',
         headers: {
@@ -192,7 +196,7 @@ export default function PagamentoPix() {
           cpf: cpf,
           email: email,
           telefone: telefone,
-          valor: 74.90 // Valor fixo da Taxa TRE
+          valor: 74.90
         })
       });
 
@@ -204,19 +208,24 @@ export default function PagamentoPix() {
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
       
-      // Enviar informação para UTMify sobre o PIX gerado
+      // Enviar notificação para UTMify sobre o PIX gerado
       try {
-        await notifyPixGenerated(
+        const valorEmCentavos = 7490; // R$ 74,90 em centavos
+        
+        await sendPixGeneratedNotification(
           payment.id,
-          cpf,
-          nome,
-          email,
-          telefone,
-          7490 // valor em centavos (R$ 74,90)
+          {
+            name: nome,
+            email: email,
+            phone: telefone,
+            document: cpf
+          },
+          valorEmCentavos
         );
-        console.log("Notificação UTMify enviada com sucesso - PIX gerado");
-      } catch (utmifyError) {
-        console.error("Erro ao enviar notificação para UTMify:", utmifyError);
+        
+        console.log("Notificação de PIX gerado enviada com sucesso para UTMify");
+      } catch (error) {
+        console.error("Erro ao enviar notificação para UTMify:", error);
         // Não interrompe o fluxo principal se houver erro na integração com UTMify
       }
     } catch (error) {
@@ -231,45 +240,43 @@ export default function PagamentoPix() {
     if (!paymentInfo?.id) return;
     
     setIsLoading(true);
-    console.log("[VerificaçãoPIX] Verificando status do pagamento:", paymentInfo.id);
     
     try {
       const response = await fetch(`/api/pagamentos/${paymentInfo.id}/status`);
       
       if (response.ok) {
         const data = await response.json();
-        console.log("[VerificaçãoPIX] Status recebido da API:", data.status);
-        
-        // Atualizar o estado com o status atual
         setPaymentStatus(data.status);
         
-        // Somente redirecionar se o status for realmente 'completed'
-        if (data.status === 'completed' || data.status === 'COMPLETED' || data.status === 'PAID' || data.status === 'paid') {
-          console.log("[VerificaçãoPIX] Pagamento CONFIRMADO. Preparando redirecionamento...");
-          
+        if (data.status === 'completed') {
           toast({
             title: "Pagamento confirmado!",
             description: "Seu pagamento foi processado com sucesso. Redirecionando...",
             variant: "default"
           });
           
-          // Enviar informação para UTMify sobre o pagamento confirmado
+          // Enviar notificação para UTMify sobre o pagamento confirmado
           try {
-            await notifyPaymentConfirmed(
+            const valorEmCentavos = 7490; // R$ 74,90 em centavos
+            
+            await sendPaymentConfirmedNotification(
               paymentInfo.id,
-              cpf,
-              nome,
-              email,
-              telefone,
-              7490 // valor em centavos (R$ 74,90)
+              {
+                name: nome,
+                email: email,
+                phone: telefone,
+                document: cpf
+              },
+              valorEmCentavos
             );
-            console.log("[VerificaçãoPIX] Notificação UTMify enviada com sucesso - Pagamento confirmado");
-          } catch (utmifyError) {
-            console.error("[VerificaçãoPIX] Erro ao enviar notificação para UTMify:", utmifyError);
+            
+            console.log("Notificação de pagamento confirmado enviada com sucesso para UTMify");
+          } catch (error) {
+            console.error("Erro ao enviar notificação para UTMify:", error);
             // Não interrompe o fluxo principal se houver erro na integração com UTMify
           }
           
-          // Preparar parâmetros para o redirecionamento
+          // Redirecionar para a página de sucesso com todos os parâmetros necessários
           const params = new URLSearchParams({
             cpf: cpf,
             nome: nome,
@@ -285,19 +292,14 @@ export default function PagamentoPix() {
             telefone: telefone
           });
           
-          // Redirecionar para a página de taxa complementar após confirmação real
-          console.log("[VerificaçãoPIX] Redirecionando para a página de taxa complementar");
+          // Redirecionar para a página de sucesso
           setTimeout(() => {
-            navigate(`/taxa-complementar?${params.toString()}`);
+            navigate(`/sucesso?${params.toString()}`);
           }, 1500);
-        } else {
-          console.log("[VerificaçãoPIX] Pagamento ainda pendente:", data.status);
         }
-      } else {
-        console.error("[VerificaçãoPIX] Resposta da API não foi OK:", response.status);
       }
     } catch (error) {
-      console.error('[VerificaçãoPIX] Erro ao verificar status do pagamento:', error);
+      console.error('Erro ao verificar status do pagamento:', error);
     } finally {
       setIsLoading(false);
     }
@@ -799,9 +801,32 @@ export default function PagamentoPix() {
                     </div>
                   )}
                 </Button>
-
-                {/* BOTÃO TEMPORÁRIO PARA TESTES - Será removido após finalizar o desenvolvimento */}
-                {/* Botão de simulação removido conforme solicitado pelo cliente */}
+                
+                {/* Botão para facilitar testes - Pular para TCN sem pagar */}
+                <Button 
+                  variant="ghost" 
+                  className="mb-4 w-full items-center justify-center text-blue-700 border border-blue-300"
+                  onClick={() => {
+                    // Preparar parâmetros para a URL
+                    const params = new URLSearchParams();
+                    params.append('nome', nome);
+                    params.append('cpf', cpf);
+                    params.append('email', email);
+                    params.append('telefone', telefone);
+                    params.append('valor', valor.toString());
+                    params.append('companhia', companhia);
+                    params.append('estado', estado);
+                    params.append('nasc', dataNascimento);
+                    params.append('dataPagamento', new Date().toISOString());
+                    // Redirecionar para a página TCN
+                    navigate(`/tcn?${params.toString()}`);
+                  }}
+                >
+                  <div className="flex items-center">
+                    <ArrowRightCircle className="h-4 w-4 mr-2" />
+                    TESTE: Pular para TCN
+                  </div>
+                </Button>
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">
