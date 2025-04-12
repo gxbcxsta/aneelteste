@@ -88,46 +88,49 @@ const companhiasEletricas: Record<string, string[]> = {
 };
 
 // Opções fixas de companhias para cada estado, conforme especificação
+// Mapeamento de estados para companhias elétricas
 const opcoesCompanhiaPorEstado: Record<string, string[]> = {
+  // Estados com uma única companhia
   "Acre": ["Energisa Acre", "Amazonas Energia", "Equatorial Maranhão"],
-  "Amapá": ["Equatorial CEA", "Roraima Energia", "Energisa Rondônia"],
-  "Amazonas": ["Amazonas Energia", "Energisa Tocantins", "Equatorial Piauí"],
-  "Pará": ["Equatorial Pará", "CELESC Distribuição", "Energisa Sergipe"],
-  "Rondônia": ["Energisa Rondônia", "Equatorial Goiás", "CEMIG Distribuição"],
-  "Roraima": ["Roraima Energia", "Energisa Mato Grosso", "Enel Distribuição Ceará"],
-  "Tocantins": ["Energisa Tocantins", "EDP Espírito Santo", "COPEL Distribuição"],
-  
   "Alagoas": ["Equatorial Alagoas", "Neoenergia Pernambuco", "Energisa Mato Grosso do Sul"],
+  "Amapá": ["CEA Equatorial", "Roraima Energia", "Energisa Rondônia"],
+  "Amazonas": ["Amazonas Energia", "Energisa Tocantins", "Equatorial Piauí"],
   "Bahia": ["Neoenergia Coelba", "Energisa Paraíba", "Equatorial Pará"],
-  "Ceará": ["Enel Distribuição Ceará", "Energisa Acre", "CPFL Piratininga"],
+  "Ceará": ["Enel Ceará", "Energisa Acre", "CPFL Piratininga"],
+  "Distrito Federal": ["Neoenergia Brasília", "Energisa Rondônia", "CPFL Rio Grande Energia (RGE)"],
+  "Espírito Santo": ["EDP Espírito Santo", "Neoenergia Pernambuco", "CELESC Distribuição"],
   "Maranhão": ["Equatorial Maranhão", "Enel Distribuição Rio", "Neoenergia Cosern"],
+  "Mato Grosso": ["Energisa Mato Grosso", "Neoenergia Coelba", "CPFL Piratininga"],
+  "Mato Grosso do Sul": ["Energisa Mato Grosso do Sul", "Equatorial Maranhão", "EDP Espírito Santo"],
   "Paraíba": ["Energisa Paraíba", "Equatorial Goiás", "CPFL Paulista"],
+  "Paraná": ["Copel Distribuição", "Neoenergia Coelba", "Amazonas Energia"],
   "Pernambuco": ["Neoenergia Pernambuco", "Energisa Mato Grosso", "EDP São Paulo"],
   "Piauí": ["Equatorial Piauí", "CELESC Distribuição", "Neoenergia Brasília"],
   "Rio Grande do Norte": ["Neoenergia Cosern", "Energisa Sergipe", "CEMIG Distribuição"],
-  "Sergipe": ["Energisa Sergipe", "Enel Distribuição São Paulo", "Equatorial CEA"],
+  "Rondônia": ["Energisa Rondônia", "Equatorial Goiás", "CEMIG Distribuição"],
+  "Roraima": ["Roraima Energia", "Energisa Mato Grosso", "Enel Ceará"],
+  "Sergipe": ["Energisa Sergipe", "Enel Distribuição São Paulo", "CEA Equatorial"],
+  "Tocantins": ["Energisa Tocantins", "EDP Espírito Santo", "Copel Distribuição"],
   
-  "Distrito Federal": ["Neoenergia Brasília", "Energisa Rondônia", "CPFL Rio Grande Energia (RGE)"],
-  "Goiás": ["Equatorial Goiás", "Energisa Acre", "Light S/A"],
-  "Mato Grosso": ["Energisa Mato Grosso", "Neoenergia Coelba", "CPFL Piratininga"],
-  "Mato Grosso do Sul": ["Energisa Mato Grosso do Sul", "Equatorial Maranhão", "EDP Espírito Santo"],
+  // Estados com duas companhias
+  "Goiás": ["Equatorial Goiás", "Celg GT (Transmissão e Geração)", "Light S/A"],
+  "Pará": ["Equatorial Pará", "Celpa", "Energisa Sergipe"],
+  "Rio de Janeiro": ["Light", "Enel Rio", "Neoenergia Coelba"],
+  "Rio Grande do Sul": ["CEEE Equatorial", "RGE Sul", "Light S/A"],
+  "Santa Catarina": ["Celesc Distribuição", "Cooperativas locais (como CERGAL, CERILUZ, etc.)", "Equatorial Pará"],
   
-  "Espírito Santo": ["EDP Espírito Santo", "Neoenergia Pernambuco", "CELESC Distribuição"],
-  "Minas Gerais": ["CEMIG Distribuição", "Energisa Sergipe", "Equatorial Alagoas"],
-  "Paraná": ["COPEL Distribuição", "Neoenergia Coelba", "Amazonas Energia"],
-  "Santa Catarina": ["CELESC Distribuição", "Energisa Paraíba", "Equatorial Pará"],
+  // Estados com três companhias
+  "Minas Gerais": ["CEMIG Distribuição", "Energisa Minas Gerais", "Light (em pequenas áreas de MG)"],
   
-  // Casos especiais
+  // Estados com múltiplas companhias
   "São Paulo": [
-    "Enel Distribuição São Paulo",
-    "EDP São Paulo",
-    "CPFL Paulista",
-    "CPFL Piratininga",
-    "Neoenergia Elektro",
-    "ISA Energia Brasil"
-  ],
-  "Rio de Janeiro": ["Enel Distribuição Rio", "Light S/A", "Neoenergia Coelba"],
-  "Rio Grande do Sul": ["Equatorial CEEE", "CPFL Rio Grande Energia (RGE)", "Light S/A"]
+    "Enel São Paulo", 
+    "Enel Distribuição São Paulo", 
+    "CPFL Paulista", 
+    "CPFL Piratininga", 
+    "EDP São Paulo", 
+    "Energisa Sul-Sudeste (em parte do interior)"
+  ]
 };
 
 export default function ConfirmarIdentidade() {
@@ -368,48 +371,54 @@ export default function ConfirmarIdentidade() {
   };
   
   // Função para gerar opções de companhia elétrica com base no estado
-  // Usa as opções fixas definidas para cada estado
+  // Usa as opções fixas definidas para cada estado e segue as regras atualizadas da documentação
   const gerarOpcoesCompanhia = (estadoSelecionado: string) => {
     console.log(`Gerando opções de companhia para: ${estadoSelecionado}`);
     setEstado(estadoSelecionado);
     
     // Verificar se temos opções definidas para o estado selecionado
     if (opcoesCompanhiaPorEstado[estadoSelecionado]) {
-      // Usar as opções pre-definidas para o estado
+      // Usar as opções pré-definidas para o estado
       const opcoes = opcoesCompanhiaPorEstado[estadoSelecionado];
       
-      // CASO 1: SÃO PAULO - mostrar todas as 6 companhias, qualquer uma é válida
+      // CASO 1: SÃO PAULO - mostrar todas as companhias, qualquer uma é válida
       if (estadoSelecionado === "São Paulo") {
-        console.log("Caso São Paulo: 6 opções, todas válidas");
+        console.log("Caso São Paulo: todas as opções são válidas");
         setOpcoesCompanhia(opcoes);
-        // Qualquer uma será válida em SP
+        // Todas são válidas em SP
         setCompanhiaCorreta(opcoes[0]); 
-        
-      // CASO 2: RIO DE JANEIRO - as duas primeiras opções são válidas
-      } else if (estadoSelecionado === "Rio de Janeiro") {
-        console.log("Caso Rio de Janeiro: 2 opções válidas + 1 incorreta");
+      
+      // CASO 2: MINAS GERAIS - mostrar todas as três companhias, todas são válidas
+      } else if (estadoSelecionado === "Minas Gerais") {
+        console.log("Caso Minas Gerais: todas as 3 opções são válidas");
         setOpcoesCompanhia(opcoes);
-        // Em RJ, as 2 primeiras são válidas
-        setCompanhiaCorreta(opcoes[0]); 
-        
-      // CASO 3: RIO GRANDE DO SUL - as duas primeiras opções são válidas
-      } else if (estadoSelecionado === "Rio Grande do Sul") {
-        console.log("Caso Rio Grande do Sul: 2 opções válidas + 1 incorreta");
+        // Todas as 3 são válidas
+        setCompanhiaCorreta(opcoes[0]);
+      
+      // CASO 3: ESTADOS COM DUAS COMPANHIAS - mostrar duas companhias corretas + uma opção aleatória
+      } else if (
+        estadoSelecionado === "Rio de Janeiro" || 
+        estadoSelecionado === "Rio Grande do Sul" || 
+        estadoSelecionado === "Goiás" || 
+        estadoSelecionado === "Pará" || 
+        estadoSelecionado === "Santa Catarina"
+      ) {
+        console.log(`Caso ${estadoSelecionado}: 2 opções válidas + 1 incorreta`);
         setOpcoesCompanhia(opcoes);
-        // Em RS, as 2 primeiras são válidas
-        setCompanhiaCorreta(opcoes[0]); 
-        
-      // CASO 4: OUTROS ESTADOS - apenas a primeira opção é válida
+        // As duas primeiras são válidas
+        setCompanhiaCorreta(opcoes[0]);
+      
+      // CASO 4: OUTROS ESTADOS (com uma única companhia) - mostrar a companhia correta + duas opções aleatórias
       } else {
         console.log(`Caso padrão para ${estadoSelecionado}: 1 opção válida + 2 incorretas`);
         setOpcoesCompanhia(opcoes);
-        // Para outros estados, só a primeira é válida
+        // Apenas a primeira é válida
         setCompanhiaCorreta(opcoes[0]);
       }
     } else {
       // Caso de fallback (não deveria ocorrer)
-      console.warn(`Não há opções definidas para o estado ${estadoSelecionado}, usando Minas Gerais como fallback`);
-      const opcoesFallback = opcoesCompanhiaPorEstado["Minas Gerais"];
+      console.warn(`Não há opções definidas para o estado ${estadoSelecionado}, usando São Paulo como fallback`);
+      const opcoesFallback = opcoesCompanhiaPorEstado["São Paulo"];
       setOpcoesCompanhia(opcoesFallback);
       setCompanhiaCorreta(opcoesFallback[0]);
     }
@@ -457,28 +466,61 @@ export default function ConfirmarIdentidade() {
     const companhiaEscolhida = values.companhia;
     let companhiaValida = false;
     
-    // Regras específicas para cada estado
+    // Regras específicas para cada estado com base na documentação atualizada
     if (estado === "São Paulo") {
-      // São Paulo: todas as 6 companhias são válidas
+      // São Paulo: todas as companhias são válidas
       companhiaValida = opcoesCompanhiaPorEstado["São Paulo"].includes(companhiaEscolhida);
       console.log("São Paulo - Todas as opções são válidas:", companhiaValida);
       
     } else if (estado === "Rio de Janeiro") {
-      // Rio de Janeiro: apenas Enel Distribuição Rio e Light S/A são válidas
+      // Rio de Janeiro: apenas Light e Enel Rio são válidas
       companhiaValida = (
-        companhiaEscolhida === "Enel Distribuição Rio" || 
-        companhiaEscolhida === "Light S/A"
+        companhiaEscolhida === "Light" || 
+        companhiaEscolhida === "Enel Rio"
       );
       console.log("Rio de Janeiro - Apenas as 2 primeiras são válidas:", companhiaValida);
       
     } else if (estado === "Rio Grande do Sul") {
-      // Rio Grande do Sul: apenas Equatorial CEEE e CPFL Rio Grande Energia (RGE) são válidas
+      // Rio Grande do Sul: apenas CEEE Equatorial e RGE Sul são válidas
       companhiaValida = (
-        companhiaEscolhida === "Equatorial CEEE" || 
-        companhiaEscolhida === "CPFL Rio Grande Energia (RGE)"
+        companhiaEscolhida === "CEEE Equatorial" || 
+        companhiaEscolhida === "RGE Sul"
       );
       console.log("Rio Grande do Sul - Apenas as 2 primeiras são válidas:", companhiaValida);
-      
+    
+    } else if (estado === "Goiás") {
+      // Goiás: duas companhias válidas
+      companhiaValida = (
+        companhiaEscolhida === "Equatorial Goiás" || 
+        companhiaEscolhida === "Celg GT (Transmissão e Geração)"
+      );
+      console.log("Goiás - Duas opções válidas:", companhiaValida);
+    
+    } else if (estado === "Pará") {
+      // Pará: duas companhias válidas
+      companhiaValida = (
+        companhiaEscolhida === "Equatorial Pará" || 
+        companhiaEscolhida === "Celpa"
+      );
+      console.log("Pará - Duas opções válidas:", companhiaValida);
+    
+    } else if (estado === "Santa Catarina") {
+      // Santa Catarina: duas companhias válidas
+      companhiaValida = (
+        companhiaEscolhida === "Celesc Distribuição" || 
+        companhiaEscolhida === "Cooperativas locais (como CERGAL, CERILUZ, etc.)"
+      );
+      console.log("Santa Catarina - Duas opções válidas:", companhiaValida);
+    
+    } else if (estado === "Minas Gerais") {
+      // Minas Gerais: três companhias válidas
+      companhiaValida = (
+        companhiaEscolhida === "CEMIG Distribuição" || 
+        companhiaEscolhida === "Energisa Minas Gerais" ||
+        companhiaEscolhida === "Light (em pequenas áreas de MG)"
+      );
+      console.log("Minas Gerais - Três opções válidas:", companhiaValida);
+    
     } else {
       // Outros estados: apenas a primeira opção (índice 0) é válida
       companhiaValida = companhiaEscolhida === opcoesCompanhiaPorEstado[estado][0];
