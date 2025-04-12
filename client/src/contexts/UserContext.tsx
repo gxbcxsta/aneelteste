@@ -51,15 +51,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Função para atualizar dados do usuário (parcialmente)
   const updateUserData = (data: Partial<UserData>) => {
-    setUserData(prevData => ({
-      ...prevData,
-      ...data
-    }));
-    
-    // Para fins de debug - registra os dados atualizados no console
-    console.log('Dados do usuário atualizados:', {
-      ...userData,
-      ...data
+    setUserData(prevData => {
+      // Novo estado que será definido
+      const newData = {
+        ...prevData,
+        ...data
+      };
+      
+      // Para fins de debug - registra os dados atualizados no console
+      console.log('Dados do usuário atualizados:', newData);
+      
+      return newData;
     });
   };
 

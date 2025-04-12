@@ -402,6 +402,23 @@ export default function SimuladorRestituicao({
     }
   }, [etapaAtual]);
   
+  // Efeito para enviar os dados ao contexto quando a simulação for concluída
+  useEffect(() => {
+    if (valorFinalRestituicao > 0 && onSimulacaoConcluida) {
+      console.log("SimuladorRestituicao - Simulação concluída:", {
+        valorFinalRestituicao,
+        mesesConsiderados,
+        cpf,
+        nome,
+        dataNascimento,
+        companhia,
+        estado
+      });
+      
+      onSimulacaoConcluida(valorFinalRestituicao, mesesConsiderados);
+    }
+  }, [valorFinalRestituicao, mesesConsiderados, onSimulacaoConcluida, cpf, nome, dataNascimento, companhia, estado]);
+  
   // Renderiza a etapa atual do simulador
   const renderEtapa = () => {
     // Se a tela de loading estiver ativa, mostrar ela no lugar de qualquer etapa

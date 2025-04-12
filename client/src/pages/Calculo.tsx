@@ -8,7 +8,7 @@ import { useUserData } from "@/contexts/UserContext";
 
 export default function Calculo() {
   const [location, navigate] = useLocation();
-  const { userData } = useUserData();
+  const { userData, updateUserData } = useUserData();
   
   // Obter dados do contexto global
   const cpf = userData.cpf || "";
