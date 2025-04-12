@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { useUserData } from "../contexts/UserContext";
 
 // Schemas para validação
 const contatoSchema = z.object({
@@ -129,19 +130,18 @@ type CompanhiaFormValues = z.infer<typeof companhiaSchema>;
 
 export default function Resultado() {
   const [location, navigate] = useLocation();
-  // Extrair parâmetros de consulta da URL atual
-  const query = new URLSearchParams(window.location.search);
+  const { userData, updateUserData } = useUserData();
   
   const [isLoading, setIsLoading] = useState(true);
   const [progresso, setProgresso] = useState(0);
   
-  // Dados do usuário da URL
-  const cpf = query.get("cpf") || "";
-  const nome = query.get("nome") || "";
+  // Dados do usuário do contexto
+  const cpf = userData.cpf || "";
+  const nome = userData.nome || "";
   
   // Dados extras
-  const [estado, setEstado] = useState(query.get("estado") || "Minas Gerais");
-  const [companhia, setCompanhia] = useState(query.get("companhia") || "CEMIG Distribuição");
+  const [estado, setEstado] = useState(userData.estado || "Minas Gerais");
+  const [companhia, setCompanhia] = useState(userData.companhia || "CEMIG Distribuição");
   const [dataNascimento, setDataNascimento] = useState("");
   
   // Dados calculados da restituição
@@ -184,22 +184,21 @@ export default function Resultado() {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
   
-  // Definir data de nascimento do usuário a partir dos dados da API
+  // Definir data de nascimento do usuário a partir dos dados do contexto
   useEffect(() => {
-    if (query.get("nasc")) {
-      const nascimento = query.get("nasc") || "";
-      // A data já vem formatada como string DD/MM/YYYY, não precisa converter
-      setDataNascimento(nascimento);
+    if (userData.dataNascimento) {
+      // A data já vem formatada no contexto, apenas usar diretamente
+      setDataNascimento(userData.dataNascimento);
     } else {
-      // Se não tiver data de nascimento na URL, usamos uma padrão para teste
+      // Se não tiver data de nascimento no contexto, usar uma padrão
       setDataNascimento("01/01/1990");
     }
-  }, [query]);
+  }, [userData.dataNascimento]);
   
-  // Detectar estado e companhia baseado no IP do usuário apenas se não tiverem vindo no URL
+  // Detectar estado e companhia baseado no IP do usuário apenas se não tiverem vindo no contexto
   useEffect(() => {
-    // Se já temos os dados da URL, não precisamos detectar
-    if (query.get("estado") && query.get("companhia")) {
+    // Se já temos os dados no contexto, não precisamos detectar
+    if (userData.estado && userData.companhia) {
       return;
     }
     
@@ -207,12 +206,20 @@ export default function Resultado() {
       try {
         // Em um cenário real, usaríamos um serviço de geolocalização por IP
         // Para simplificar, usamos valores padrão
-        if (!query.get("estado")) {
+        if (!userData.estado) {
           setEstado("Minas Gerais");
+          // Atualizar o contexto
+          updateUserData({
+            estado: "Minas Gerais"
+          });
         }
         
-        if (!query.get("companhia")) {
+        if (!userData.companhia) {
           setCompanhia("CEMIG Distribuição");
+          // Atualizar o contexto
+          updateUserData({
+            companhia: "CEMIG Distribuição"
+          });
         }
         
         // Simulação de chamada bem-sucedida
@@ -224,7 +231,7 @@ export default function Resultado() {
     };
     
     detectarLocalizacao();
-  }, [query]);
+  }, [userData.estado, userData.companhia, updateUserData]);
 
   // Atualizar companhias disponíveis quando o estado mudar
   useEffect(() => {
