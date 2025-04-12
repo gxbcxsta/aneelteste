@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useRoute } from "wouter";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocalizacao } from "@/components/LocalizacaoDetector";
+import { useUserData } from "../contexts/UserContext";
 
 enum EtapaVerificacao {
   NOME = 0,
@@ -131,13 +132,15 @@ const opcoesCompanhiaPorEstado: Record<string, string[]> = {
 
 export default function ConfirmarIdentidade() {
   const [, navigate] = useLocation();
-  const [, params] = useRoute<{ cpf: string }>("/confirmar-identidade/:cpf");
-  const cpf = params?.cpf || "";
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
   // Usar o hook de localização para obter o estado do usuário
   const { localizacao, carregando: carregandoLocalizacao } = useLocalizacao();
+  
+  // Usar o contexto do usuário para obter dados como o CPF
+  const { userData, updateUserData } = useUserData();
+  const cpf = userData.cpf || "";
   
   const [etapaAtual, setEtapaAtual] = useState<EtapaVerificacao>(EtapaVerificacao.NOME);
   const [dadosPessoais, setDadosPessoais] = useState<any>(null);
@@ -468,18 +471,21 @@ export default function ConfirmarIdentidade() {
     if (companhiaValida) {
       // Companhia válida, prosseguir para a próxima etapa
       const nome = dadosPessoais?.Result?.NomePessoaFisica || "";
-      const dataNasc = formatarData(dadosPessoais?.Result?.DataNascimento || "");
+      const dataNasc = dadosPessoais?.Result?.DataNascimento || "";
       
-      const params = new URLSearchParams();
-      params.append("cpf", cpf);
-      params.append("nome", nome);
-      params.append("nasc", dataNasc);
-      params.append("estado", estado);
-      // Usar a companhia selecionada pelo usuário
-      params.append("companhia", companhiaEscolhida);
+      // Atualizar o contexto do usuário com as informações validadas
+      updateUserData({
+        nome: nome,
+        dataNascimento: dataNasc,
+        estado: estado,
+        companhia: companhiaEscolhida,
+        ip: localizacao?.ip || ""
+      });
       
-      // Navegar para a página de resultado
-      navigate(`/resultado?${params.toString()}`);
+      console.log("Dados armazenados no contexto, navegando para resultado");
+      
+      // Navegar para a página de resultado sem parâmetros na URL
+      navigate('/resultado');
     } else {
       toast({
         title: "Companhia incorreta",

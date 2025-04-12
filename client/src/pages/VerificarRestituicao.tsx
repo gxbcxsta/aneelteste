@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { FaInfoCircle } from "react-icons/fa";
 import ImageVerification from "../components/ImageVerification";
+import { useUserData } from "../contexts/UserContext";
 
 // Validação de CPF
 const cpfSchema = z.object({
@@ -37,6 +38,9 @@ export default function VerificarRestituicao() {
   const [errorMessage, setErrorMessage] = useState("");
   const [imageVerified, setImageVerified] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
+  
+  // Usar o contexto de usuário
+  const { userData, updateUserData, clearUserData } = useUserData();
   
   // Formulário de CPF
   const form = useForm<CpfFormType>({
@@ -109,8 +113,16 @@ export default function VerificarRestituicao() {
     const cpfLimpo = data.cpf.replace(/\D/g, "");
     setCpfConsultado(cpfLimpo);
     
-    // Ir diretamente para a página de confirmação de identidade sem mostrar popup
-    navigate(`/confirmar-identidade/${cpfLimpo}`);
+    // Limpar dados anteriores
+    clearUserData();
+    
+    // Salvar o CPF no contexto do usuário
+    updateUserData({
+      cpf: cpfLimpo
+    });
+    
+    // Ir para a página de confirmação de identidade sem passar o CPF na URL
+    navigate('/confirmar-identidade');
   };
 
   const { toast } = useToast();
@@ -150,13 +162,18 @@ export default function VerificarRestituicao() {
     const companhia = dadosConfirmados.companhia || "";
     const estado = dadosConfirmados.estado || "";
     
-    // Construir URL com os parâmetros
-    const url = `/resultado?cpf=${cpfConsultado}&nome=${encodeURIComponent(nome)}&nasc=${encodeURIComponent(dataNasc)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    // Atualizar o contexto do usuário com os dados confirmados
+    updateUserData({
+      nome: nome,
+      dataNascimento: dataNasc,
+      companhia: companhia,
+      estado: estado
+    });
     
-    console.log("Navegando para:", url);
+    console.log("Dados armazenados no contexto, navegando para resultado");
     
-    // Navegar para a página de resultados com os dados confirmados
-    navigate(url);
+    // Navegar para a página de resultados (sem parâmetros na URL)
+    navigate('/resultado');
   };
 
   return (
