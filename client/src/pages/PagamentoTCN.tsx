@@ -459,8 +459,31 @@ export default function PagamentoTCN() {
                   PAGAMENTO VIA PIX
                 </div>
                 <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm">
-                  <div className="mb-5">
-                    <div className="flex justify-center">
+                  <div className="grid md:grid-cols-2 gap-6 items-center mb-5">
+                    <div className="order-2 md:order-1">
+                      <div className="bg-gradient-to-r from-[#071D41] to-[#1351B4] rounded-lg p-5 text-white">
+                        <h3 className="font-bold text-lg mb-3">Dados do Pagamento</h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between border-b border-white/20 pb-2">
+                            <span className="text-gray-200">Valor:</span>
+                            <span className="font-bold text-[#FFCD07]">{valorTaxaFormatado}</span>
+                          </div>
+                          <div className="flex justify-between border-b border-white/20 pb-2">
+                            <span className="text-gray-200">Descrição:</span>
+                            <span>TCN - Taxa de Conformidade Nacional</span>
+                          </div>
+                          <div className="flex justify-between border-b border-white/20 pb-2">
+                            <span className="text-gray-200">Vencimento:</span>
+                            <span className="font-medium">{formatarTempo(tempoRestante)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-200">Para:</span>
+                            <span className="font-medium">ANEEL - Ag. Nacional</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="order-1 md:order-2">
                       <Tabs defaultValue="qrcode" className="w-full">
                         <TabsList className="w-full mb-6 bg-gray-100 p-1 rounded-lg">
                           <TabsTrigger value="qrcode" className="flex-1 data-[state=active]:bg-[#1351B4] data-[state=active]:text-white rounded-md transition-all duration-300">
