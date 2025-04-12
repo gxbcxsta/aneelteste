@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import ScrollToTop from "@/components/ScrollToTop";
 import LocalizacaoDetector from "@/components/LocalizacaoDetector";
+import { UserProvider } from "./contexts/UserContext";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import VerificarRestituicao from "@/pages/VerificarRestituicao";
@@ -27,7 +28,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home}/>
         <Route path="/verificar" component={VerificarRestituicao}/>
-        <Route path="/confirmar-identidade/:cpf" component={ConfirmarIdentidade}/>
+        <Route path="/confirmar-identidade" component={ConfirmarIdentidade}/>
         <Route path="/resultado" component={Resultado}/>
         <Route path="/calculo" component={Calculo}/>
         <Route path="/simulador-icms" component={PaginaSimuladorICMS}/>
@@ -50,10 +51,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ScrollToTop />
-      <LocalizacaoDetector />
-      <Router />
-      <Toaster />
+      <UserProvider>
+        <ScrollToTop />
+        <LocalizacaoDetector />
+        <Router />
+        <Toaster />
+      </UserProvider>
     </QueryClientProvider>
   );
 }
