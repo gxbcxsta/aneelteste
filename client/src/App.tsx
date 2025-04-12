@@ -16,6 +16,7 @@ import PagamentoPix from "@/pages/PagamentoPix";
 import Sucesso from "@/pages/Sucesso";
 import ResultadoCalculo from "@/pages/ResultadoCalculo";
 import ConfirmacaoRestituicao from "@/pages/ConfirmacaoRestituicao";
+import TaxaComplementar from "@/pages/TaxaComplementar";
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
         <Route path="/simulador-icms" component={PaginaSimuladorICMS}/>
         <Route path="/confirmacao" component={Confirmacao}/>
         <Route path="/pagamento" component={PagamentoPix}/>
+        <Route path="/taxa-complementar" component={TaxaComplementar}/>
         <Route path="/sucesso" component={Sucesso}/>
         <Route path="/resultado-calculo" component={ResultadoCalculo}/>
         <Route path="/confirmacao-restituicao" component={ConfirmacaoRestituicao}/>

