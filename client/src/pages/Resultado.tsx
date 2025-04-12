@@ -316,7 +316,11 @@ export default function Resultado() {
     // Simulação de cálculo concluído
     setTimeout(() => {
       // Gerando valores aleatórios para demonstração
-      const baseValue = (parseInt(cpf.slice(-4)) % 30) * 100 + 1500; // Valor entre R$ 1.500 e R$ 4.500
+      // Valor base entre R$1.800,00 e R$3.600,00
+      const min = 180000; // R$1.800,00 em centavos
+      const max = 360000; // R$3.600,00 em centavos
+      const valorCentavos = Math.floor(Math.random() * (max - min + 1)) + min;
+      const baseValue = valorCentavos / 100; // Converter de centavos para reais
       const meses = Math.floor(Math.random() * 36) + 24; // Entre 24 e 60 meses (2 a 5 anos)
       
       // Calcular data de pagamento (entre 30 e 90 dias no futuro)
