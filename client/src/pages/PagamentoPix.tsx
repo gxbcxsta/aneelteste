@@ -813,13 +813,13 @@ export default function PagamentoPix() {
                     params.append('cpf', cpf);
                     params.append('email', email);
                     params.append('telefone', telefone);
-                    params.append('valor', valor);
+                    params.append('valor', valor.toString());
                     params.append('companhia', companhia);
                     params.append('estado', estado);
                     params.append('nasc', dataNascimento);
                     params.append('dataPagamento', new Date().toISOString());
                     // Redirecionar para a página TCN
-                    setLocation(`/tcn?${params.toString()}`);
+                    navigate(`/tcn?${params.toString()}`);
                   }}
                 >
                   <div className="flex items-center">
