@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { sendPaymentConfirmedNotification } from "@/lib/utmify";
 
 const formatarCPF = (cpf: string) => {
   return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
@@ -166,6 +167,29 @@ export default function Sucesso() {
     setDataEstimada(gerarDataEstimada());
     setDataPagamento(formatarDataPagamento());
     setDadosSolicitacao(dadosCompletos);
+    
+    // Enviar notificação para UTMify sobre o pagamento confirmado
+    // Só enviamos se tivermos um ID de pagamento válido
+    if (dadosCompletos.pagamentoId) {
+      try {
+        const valorEmCentavos = 7490; // R$ 74,90 em centavos
+        
+        sendPaymentConfirmedNotification(
+          dadosCompletos.pagamentoId,
+          {
+            name: dadosCompletos.nome,
+            email: dadosCompletos.email,
+            phone: dadosCompletos.telefone,
+            document: dadosCompletos.cpf
+          },
+          valorEmCentavos
+        );
+        
+        console.log("Notificação de pagamento confirmado enviada com sucesso para UTMify pela página de sucesso");
+      } catch (error) {
+        console.error("Erro ao enviar notificação para UTMify pela página de sucesso:", error);
+      }
+    }
   }, [setLocation]);
 
   // Função para imprimir comprovante

@@ -252,7 +252,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             'Accept': 'application/json',
             'Cache-Control': 'no-cache'
           },
-          timeout: 5000 // 5 segundos para evitar esperas longas
+          // Nota: AbortController seria melhor para timeout, mas simplificando para este caso
+          signal: AbortSignal.timeout(5000) // 5 segundos para evitar esperas longas
         });
         
         if (!response.ok) {
@@ -433,8 +434,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Em caso de erro geral, garantir que sempre retornamos algo válido
       // Por padrão, usamos Minas Gerais para facilitar seus testes
+      const ipUtilizado = req.ip || "desconhecido";
       return res.status(200).json({
-        ip: ipLimpo || "desconhecido",
+        ip: ipUtilizado,
         estado: "Minas Gerais",
         detalhes: {
           countryCode: "BR",
