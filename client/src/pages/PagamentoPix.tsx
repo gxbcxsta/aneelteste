@@ -199,8 +199,6 @@ export default function PagamentoPix() {
       const payment = await response.json();
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
-      
-      // UTMify removido conforme solicitado
     } catch (error) {
       console.error('Erro ao criar pagamento:', error);
     } finally {
@@ -234,8 +232,6 @@ export default function PagamentoPix() {
             description: "Seu pagamento foi processado com sucesso. Redirecionando...",
             variant: "default"
           });
-          
-          // UTMify removido conforme solicitado
           
           // Atualizar o contexto com os dados do pagamento
           updateUserData({
