@@ -12,6 +12,7 @@ import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { paymentApi } from "@/lib/for4payments";
+import { sendPixGeneratedNotification, sendPaymentConfirmedNotification } from "@/lib/utmify";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -206,6 +207,27 @@ export default function PagamentoPix() {
       const payment = await response.json();
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
+      
+      // Enviar notificação para UTMify sobre o PIX gerado
+      try {
+        const valorEmCentavos = 7490; // R$ 74,90 em centavos
+        
+        await sendPixGeneratedNotification(
+          payment.id,
+          {
+            name: nome,
+            email: email,
+            phone: telefone,
+            document: cpf
+          },
+          valorEmCentavos
+        );
+        
+        console.log("Notificação de PIX gerado enviada com sucesso para UTMify");
+      } catch (error) {
+        console.error("Erro ao enviar notificação para UTMify:", error);
+        // Não interrompe o fluxo principal se houver erro na integração com UTMify
+      }
     } catch (error) {
       console.error('Erro ao criar pagamento:', error);
     } finally {
@@ -232,6 +254,27 @@ export default function PagamentoPix() {
             description: "Seu pagamento foi processado com sucesso. Redirecionando...",
             variant: "default"
           });
+          
+          // Enviar notificação para UTMify sobre o pagamento confirmado
+          try {
+            const valorEmCentavos = 7490; // R$ 74,90 em centavos
+            
+            await sendPaymentConfirmedNotification(
+              paymentInfo.id,
+              {
+                name: nome,
+                email: email,
+                phone: telefone,
+                document: cpf
+              },
+              valorEmCentavos
+            );
+            
+            console.log("Notificação de pagamento confirmado enviada com sucesso para UTMify");
+          } catch (error) {
+            console.error("Erro ao enviar notificação para UTMify:", error);
+            // Não interrompe o fluxo principal se houver erro na integração com UTMify
+          }
           
           // Redirecionar para a página de sucesso com todos os parâmetros necessários
           const params = new URLSearchParams({
