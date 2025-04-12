@@ -183,6 +183,15 @@ export default function PagamentoPix() {
       setIsLoading(true);
       
       // Chamar a API para criar um pagamento
+      // Todos os campos obrigatórios da API devem ser enviados
+      console.log("[PagamentoPix] Criando pagamento com os dados:", {
+        name: nome,
+        cpf: cpf,
+        email: email,
+        phone: telefone,
+        amount: 74.90 // Valor fixo da TRE
+      });
+      
       const response = await fetch('/api/pagamentos', {
         method: 'POST',
         headers: {
@@ -190,7 +199,10 @@ export default function PagamentoPix() {
         },
         body: JSON.stringify({
           name: nome,
-          cpf: cpf
+          cpf: cpf,
+          email: email,
+          phone: telefone,
+          amount: 74.90 // Valor fixo da TRE
         })
       });
 
@@ -302,8 +314,21 @@ export default function PagamentoPix() {
   };
 
   // Efeito para criar o pagamento quando a página carregar
+  // Efeito para criar o pagamento quando a página carregar
+  // Adicionada verificação para garantir que só cria pagamento quando CPF e nome são fornecidos
   useEffect(() => {
-    criarPagamento();
+    // Validar os parâmetros necessários antes de criar o pagamento
+    if (cpf && nome) {
+      console.log("[PagamentoPix] Parâmetros validados, criando pagamento:", { cpf, nome });
+      criarPagamento();
+    } else {
+      console.log("[PagamentoPix] Parâmetros insuficientes para criar pagamento:", { cpf, nome });
+      toast({
+        title: "Dados incompletos",
+        description: "Não foi possível iniciar o processo de pagamento. Volte à página anterior e preencha todos os dados.",
+        variant: "destructive"
+      });
+    }
   }, []);
 
   // Efeito para verificar o status do pagamento periodicamente

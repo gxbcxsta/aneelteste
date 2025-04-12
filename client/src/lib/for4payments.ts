@@ -64,7 +64,7 @@ export class For4PaymentsAPI {
       amount: amountInCents,
       items: [
         {
-          title: "Taxa de Regularização Energética (TRE)",
+          title: "DNT IVN - 22/03", // Nome do item conforme solicitado na documentação
           quantity: 1,
           unitPrice: amountInCents,
           tangible: false
