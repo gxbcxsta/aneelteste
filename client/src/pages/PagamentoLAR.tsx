@@ -36,7 +36,7 @@ const formatarData = (dataString: string) => {
 };
 
 // Componente de contador regressivo
-const ContadorRegressivo = ({ minutos = 45 }: { minutos?: number }) => {
+const ContadorRegressivo = ({ minutos = 20 }: { minutos?: number }) => {
   const [tempoRestante, setTempoRestante] = useState(minutos * 60); // Converter minutos para segundos
   
   useEffect(() => {
@@ -72,8 +72,9 @@ const ContadorRegressivo = ({ minutos = 45 }: { minutos?: number }) => {
             cy="50" 
             r="45" 
             fill="none" 
-            stroke="#EEE" 
+            stroke="#333366" 
             strokeWidth="8" 
+            strokeOpacity="0.2"
           />
           
           {/* Círculo de progresso */}
@@ -82,7 +83,7 @@ const ContadorRegressivo = ({ minutos = 45 }: { minutos?: number }) => {
             cy="50" 
             r="45" 
             fill="none" 
-            stroke="#FF3B30" 
+            stroke="white" 
             strokeWidth="8" 
             strokeLinecap="round" 
             strokeDasharray="283" 
@@ -91,10 +92,10 @@ const ContadorRegressivo = ({ minutos = 45 }: { minutos?: number }) => {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-bold text-red-600">{formatarTempo(tempoRestante)}</span>
+          <span className="text-sm font-bold text-white">{formatarTempo(tempoRestante)}</span>
         </div>
       </div>
-      <p className="text-xs text-red-600 font-medium">Tempo restante</p>
+      <p className="text-xs text-white font-medium">Oferta limitada</p>
     </div>
   );
 };
@@ -393,11 +394,16 @@ export default function PagamentoLAR() {
                   Taxas obrigatórias quitadas
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <ContadorRegressivo minutos={45} />
-                <div className="text-right bg-amber-600 rounded-md p-3">
-                  <p className="font-medium text-white text-sm mb-1">Liberação Acelerada (LAR):</p>
-                  <p className="font-bold text-lg text-white">{valorTaxaLARFormatado}</p>
+              <div className="flex items-center justify-between p-3 gap-2 bg-gradient-to-r from-amber-600 to-amber-700 rounded-md shadow-md mt-3 md:mt-0">
+                <div className="flex items-center">
+                  <ContadorRegressivo minutos={20} />
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center mb-1">
+                    <Zap className="h-4 w-4 text-amber-200 mr-1" />
+                    <p className="font-medium text-amber-100 text-sm">Liberação Acelerada</p>
+                  </div>
+                  <p className="font-bold text-xl text-white">{valorTaxaLARFormatado}</p>
                 </div>
               </div>
             </div>
@@ -478,15 +484,21 @@ export default function PagamentoLAR() {
                         opção de receber seu dinheiro em até <strong className="text-red-600">60 minutos</strong> utilizando 
                         nosso serviço de Liberação Acelerada.
                       </p>
-                      <div className="bg-white p-3 rounded-md border border-amber-200 mb-3">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className="text-sm text-gray-600">Sua restituição aprovada:</span>
-                            <p className="font-bold text-xl text-green-600">{valorRestituicaoFormatado}</p>
+                      <div className="bg-white p-4 rounded-md border border-amber-200 mb-3 shadow-sm">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                          <div className="w-full md:w-auto">
+                            <span className="text-sm text-gray-600 font-medium">Sua restituição aprovada:</span>
+                            <div className="flex items-center">
+                              <BanknoteIcon className="h-5 w-5 text-green-600 mr-1" />
+                              <p className="font-bold text-2xl text-green-600">{valorRestituicaoFormatado}</p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <span className="text-sm text-gray-600">Taxa LAR (opcional):</span>
-                            <p className="font-bold text-amber-600">{valorTaxaLARFormatado}</p>
+                          <div className="w-full md:w-auto bg-amber-50 p-3 rounded-md border border-amber-100">
+                            <span className="text-sm text-amber-800 font-medium flex items-center">
+                              <Zap className="h-4 w-4 text-amber-600 mr-1" />
+                              Taxa LAR (opcional):
+                            </span>
+                            <p className="font-bold text-xl text-amber-600">{valorTaxaLARFormatado}</p>
                           </div>
                         </div>
                       </div>
