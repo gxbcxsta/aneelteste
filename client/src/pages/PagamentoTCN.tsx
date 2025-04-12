@@ -122,17 +122,22 @@ export default function PagamentoTCN() {
     setIsLoading(true);
     
     try {
+      // Garantir que todos os campos obrigatórios estejam presentes
+      const telefoneFormatado = telefone ? telefone.replace(/\D/g, '') : '11958848876'; // Remover não-dígitos
+      const emailFormatado = email || `${cpf.substring(0, 3)}xxx${cpf.substring(6, 8)}@tcn.gov.br`;
+      const nomeCompleto = nome || 'Nome do Cliente';
+      
       const response = await fetch('/api/pagamentos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: valorTaxa,
-          name: nome,
-          email: email || `${cpf.substring(0, 3)}xxx${cpf.substring(6, 8)}@tcn.gov.br`,
+          amount: valorTaxa, // Valor da TCN: 118,00
+          name: nomeCompleto,
+          email: emailFormatado,
           cpf: cpf,
-          phone: telefone || "(00) 00000-0000"
+          phone: telefoneFormatado
         }),
       });
       
