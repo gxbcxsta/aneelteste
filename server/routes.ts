@@ -202,12 +202,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ipLimpo = ip.split(',')[0].trim();
       }
       
-      // Verificar se há um parâmetro para forçar o estado (para fins de teste)
+      // Verificar se há um parâmetro para forçar o estado (apenas para fins de teste específicos)
       const forceDetection = req.query.forceDetection === 'true';
       
-      // Para testes, se forceDetection é verdadeiro, retornar São Paulo como estado padrão
-      if (forceDetection || process.env.NODE_ENV === 'development') {
-        console.log("Forçando estado para São Paulo");
+      // Somente se forçar detecção explicitamente via parâmetro
+      if (forceDetection) {
+        console.log("Teste de detecção solicitado via parâmetro");
         return res.json({
           ip: ipLimpo,
           estado: "São Paulo",
