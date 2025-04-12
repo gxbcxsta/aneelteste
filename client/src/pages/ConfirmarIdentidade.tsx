@@ -224,15 +224,16 @@ export default function ConfirmarIdentidade() {
         
         const nomesAlternativos = [
           "MÔNICA DE SOUZA ALVES",
-          "VINICIUS CESAR FILHO"
+          "VINICIUS CESAR FILHO",
+          "PEDRO HENRIQUE OLIVEIRA"
         ];
         
         let opcoes = [...nomesAlternativos];
-        // Garantir que o nome correto está nas opções (removendo um dos aleatórios)
+        // Garantir que o nome correto está nas opções substituindo um dos aleatórios
         if (!opcoes.includes(nomeCorreto)) {
-          opcoes = opcoes.slice(0, 2);
-          opcoes.pop(); // Remover o último nome alternativo
-          opcoes.push(nomeCorreto); // Adicionar o nome correto
+          // Escolher aleatoriamente qual nome alternativo substituir
+          const indiceRemover = Math.floor(Math.random() * nomesAlternativos.length);
+          opcoes[indiceRemover] = nomeCorreto; // Substituir um dos nomes aleatórios pelo nome correto
         }
         
         // Embaralhar os nomes
