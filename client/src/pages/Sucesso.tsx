@@ -109,10 +109,19 @@ export default function Sucesso() {
 
     // Gerar data estimada (até 3 dias úteis para avaliação + até 30 dias úteis para pagamento)
     const gerarDataEstimada = () => {
-      const dataPagamento = params.get('dataPagamento') ? new Date(params.get('dataPagamento')) : new Date();
+      // Garantir que temos uma data válida
+      let dataPagamento: Date;
+      
+      try {
+        const dataPagamentoStr = params.get('dataPagamento');
+        dataPagamento = dataPagamentoStr ? new Date(dataPagamentoStr) : new Date();
+      } catch (error) {
+        // Fallback para data atual em caso de erro de parsing
+        dataPagamento = new Date();
+      }
       
       // Adicionar 72 horas (3 dias) à data de pagamento
-      const dataLimite = new Date(dataPagamento);
+      const dataLimite = new Date(dataPagamento.getTime());
       dataLimite.setHours(dataLimite.getHours() + 72);
       
       return dataLimite.toLocaleDateString("pt-BR", {
@@ -287,14 +296,7 @@ export default function Sucesso() {
                     <span className="text-sm text-[var(--gov-gray-dark)]">Data de Nascimento:</span>
                     <span className="text-[var(--gov-gray-dark)]">{dadosSolicitacao.dataNascimento}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                    <span className="text-sm text-[var(--gov-gray-dark)]">E-mail:</span>
-                    <span className="text-[var(--gov-gray-dark)]">{dadosSolicitacao.email}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                    <span className="text-sm text-[var(--gov-gray-dark)]">Telefone:</span>
-                    <span className="text-[var(--gov-gray-dark)]">{formatarTelefone(dadosSolicitacao.telefone)}</span>
-                  </div>
+
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-[var(--gov-gray-dark)]">Estado:</span>
                     <span className="text-[var(--gov-gray-dark)]">{dadosSolicitacao.estado}</span>
@@ -303,37 +305,8 @@ export default function Sucesso() {
               </Card>
             </div>
 
-            <Card className="border-yellow-200 shadow-sm mb-8">
-              <CardHeader className="bg-yellow-50 border-b border-yellow-200">
-                <CardTitle className="text-yellow-800 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" /> Dados Bancários
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                      <span className="text-sm text-[var(--gov-gray-dark)]">Banco:</span>
-                      <span className="text-[var(--gov-gray-dark)] font-medium">{dadosSolicitacao.bancoNome}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                      <span className="text-sm text-[var(--gov-gray-dark)]">Agência:</span>
-                      <span className="text-[var(--gov-gray-dark)]">{dadosSolicitacao.agencia || "Não informado"}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                      <span className="text-sm text-[var(--gov-gray-dark)]">Conta:</span>
-                      <span className="text-[var(--gov-gray-dark)]">{dadosSolicitacao.conta || "Não informado"}</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                      <span className="text-sm text-[var(--gov-gray-dark)]">Tipo:</span>
-                      <span className="text-[var(--gov-gray-dark)]">Conta Corrente</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="bg-gray-50 border-t">
+            <Card className="shadow-sm mb-8">
+              <CardContent className="pt-6">
                 <div className="w-full flex flex-col sm:flex-row gap-3 justify-between">
                   <Button variant="outline" className="gap-2" onClick={imprimirComprovante}>
                     <Download className="h-4 w-4" />
@@ -344,7 +317,7 @@ export default function Sucesso() {
                     Acompanhar Solicitação
                   </Button>
                 </div>
-              </CardFooter>
+              </CardContent>
             </Card>
 
             <Card className="mb-8">
