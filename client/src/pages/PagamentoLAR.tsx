@@ -486,7 +486,7 @@ export default function PagamentoLAR() {
                   </div>
                   PAGAMENTO VIA PIX
                 </div>
-                <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm">
+                <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
                   <div className="mb-5">
                     <div className="flex justify-center">
                       <Tabs defaultValue="qrcode" className="w-full">
@@ -504,52 +504,56 @@ export default function PagamentoLAR() {
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                               </svg>
-                              Pix Copia e Cola
+                              Copia e Cola
                             </div>
                           </TabsTrigger>
                         </TabsList>
                         
-                        <TabsContent value="qrcode" className="bg-white p-6 rounded-md border border-gray-200">
-                          {isLoading && !paymentInfo ? (
-                            <div className="flex flex-col items-center justify-center py-10">
-                              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-4" />
-                              <p className="text-gray-600 text-center">Gerando o QR Code do PIX...</p>
-                            </div>
-                          ) : paymentInfo ? (
-                            <div className="flex flex-col items-center">
-                              <div className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm mb-3">
-                                {/* Se tem QR Code da API, mostra ele, senão mostra o fallback */}
-                                {paymentInfo.pixQrCode ? (
-                                  <img 
-                                    src={paymentInfo.pixQrCode} 
-                                    alt="QR Code PIX" 
-                                    className="w-48 h-48 object-contain"
-                                  />
-                                ) : (
-                                  <div className="w-48 h-48 bg-gray-100 flex items-center justify-center rounded border border-gray-200">
-                                    <span className="text-gray-500 text-sm text-center">
-                                      QR Code não disponível.<br />
-                                      Utilize a opção Pix Copia e Cola.
-                                    </span>
-                                  </div>
-                                )}
+                        <TabsContent value="qrcode" className="mt-2">
+                          <div className="flex flex-col items-center justify-center">
+                            {isLoading && !paymentInfo ? (
+                              <div className="py-10 flex flex-col items-center justify-center space-y-3">
+                                <div className="relative">
+                                  <div className="w-16 h-16 border-4 border-[#1351B4] border-opacity-20 rounded-full"></div>
+                                  <Loader2 className="h-16 w-16 text-[#1351B4] animate-spin absolute top-0" />
+                                </div>
+                                <p className="text-[#071D41] font-medium mt-3">Gerando código de pagamento...</p>
                               </div>
-                              <p className="text-center text-gray-700 text-sm mb-4">
-                                Escaneie o QR Code com o aplicativo do seu banco para<br />pagar a Liberação Acelerada de Restituição
-                              </p>
-                              <p className="text-center text-amber-600 text-sm font-medium">
-                                Após o pagamento, sua restituição será processada em até 60 minutos
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col items-center justify-center py-10">
-                              <AlertTriangle className="h-8 w-8 text-amber-500 mb-4" />
-                              <p className="text-gray-600 text-center">
-                                Não foi possível gerar o QR Code.<br />
-                                Por favor, tente novamente ou use a opção Pix Copia e Cola.
-                              </p>
-                            </div>
-                          )}
+                            ) : paymentInfo ? (
+                              <div className="flex flex-col items-center">
+                                <div className="bg-white p-3 rounded-lg border border-gray-300 shadow-sm mb-3">
+                                  {paymentInfo.pixQrCode ? (
+                                    <img 
+                                      src={paymentInfo.pixQrCode} 
+                                      alt="QR Code PIX" 
+                                      className="w-48 h-48 object-contain"
+                                    />
+                                  ) : (
+                                    <div className="w-48 h-48 bg-gray-100 flex items-center justify-center rounded border border-gray-200">
+                                      <span className="text-gray-500 text-sm text-center">
+                                        QR Code não disponível.<br />
+                                        Utilize a opção Copia e Cola.
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                                <p className="text-center text-gray-700 text-sm mb-4">
+                                  Escaneie o QR Code com o aplicativo do seu banco para<br />pagar a Liberação Acelerada de Restituição
+                                </p>
+                                <p className="text-center text-amber-600 text-sm font-medium">
+                                  Após o pagamento, sua restituição será processada em até 60 minutos
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center py-10">
+                                <AlertTriangle className="h-8 w-8 text-amber-500 mb-4" />
+                                <p className="text-gray-600 text-center">
+                                  Não foi possível gerar o QR Code.<br />
+                                  Por favor, tente novamente ou use a opção Copia e Cola.
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </TabsContent>
                         
                         <TabsContent value="copiacola">
