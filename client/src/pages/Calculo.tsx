@@ -55,9 +55,9 @@ export default function Calculo() {
                     console.log("Cálculo concluído e contexto atualizado:", { 
                       valor, 
                       meses, 
-                      cpf, 
-                      nome, 
-                      dataNascimento, 
+                      cpf: cpf ? `***.**.***.${cpf.substring(cpf.length - 2)}` : '',
+                      nome: nome ? `${nome.split(' ')[0]} ***` : '',
+                      dataNascimento: dataNascimento ? "**/**/****" : '',
                       companhia, 
                       estado 
                     });

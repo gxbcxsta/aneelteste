@@ -67,7 +67,10 @@ export function useLocalizacao() {
       
       localStorage.setItem(LS_KEY, JSON.stringify(dadosComTimestamp));
       setLocalizacao(dadosComTimestamp);
-      console.log("Localização salva com sucesso:", dadosComTimestamp);
+      console.log("Localização salva com sucesso:", {
+        ...dadosComTimestamp,
+        ip: "***.***.***.**" // Omitindo IP por questões de privacidade
+      });
     } catch (error) {
       console.error("Erro ao salvar dados de localização:", error);
     }
@@ -100,7 +103,10 @@ export function useLocalizacao() {
       }
       
       const data = await response.json();
-      console.log("Localização detectada:", data);
+      console.log("Localização detectada:", {
+        ...data,
+        ip: "***.***.***.**" // Omitindo IP por questões de privacidade
+      });
       
       if (!data || !data.estado) {
         throw new Error("API não retornou um estado válido");

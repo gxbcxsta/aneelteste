@@ -62,8 +62,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
         ...data
       };
       
-      // Para fins de debug - registra os dados atualizados no console
-      console.log('Dados do usuário atualizados:', newData);
+      // Para fins de debug - registra os dados atualizados no console (sem dados sensíveis)
+      console.log('Dados do usuário atualizados:', {
+        ...newData,
+        cpf: newData.cpf ? `***.**.***.${newData.cpf.substring(newData.cpf.length - 2)}` : '',
+        nome: newData.nome ? `${newData.nome.split(' ')[0]} ***` : '',
+        ip: newData.ip ? "***.***.***.**" : '',
+        telefone: newData.telefone ? "(**) *.****-**" + newData.telefone.substring(newData.telefone.length - 2) : '',
+        email: newData.email ? "***@" + (newData.email.split('@')[1] || 'dominio.com') : '',
+      });
       
       return newData;
     });
