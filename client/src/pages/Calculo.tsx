@@ -46,9 +46,22 @@ export default function Calculo() {
                   estado={estado}
                   dataNascimento={dataNascimento}
                   onSimulacaoConcluida={(valor, meses) => {
-                    // Não redirecionar para outra página, o componente lidará com a exibição do resultado
-                    console.log("Cálculo concluído: valor", valor, "meses", meses);
-                    // O fluxo permance na página atual
+                    // Atualizar o contexto com o valor da restituição e período
+                    updateUserData({
+                      valorRestituicao: valor,
+                      periodo: meses
+                    });
+                    
+                    console.log("Cálculo concluído e contexto atualizado:", { 
+                      valor, 
+                      meses, 
+                      cpf, 
+                      nome, 
+                      dataNascimento, 
+                      companhia, 
+                      estado 
+                    });
+                    // O fluxo permanece na página atual
                   }}
                 />
               </CardContent>
