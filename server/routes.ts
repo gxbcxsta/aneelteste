@@ -662,9 +662,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Remover formatação do CPF
         const cpfLimpo = cpf.replace(/\D/g, '');
         
-        // Configurar dados obrigatórios com valores padrão para campos opcionais
+        // Gerar telefone válido e email formatado para cumprir os requisitos da API
+        const telefone = req.body.phone || `11${Math.floor(Math.random() * 90000000) + 910000000}`;
         const email = req.body.email || `${cpfLimpo.substring(0, 3)}xxx${cpfLimpo.substring(cpfLimpo.length-2)}@cpf.gov.br`;
-        const phone = req.body.phone || `11${'9' + Math.floor(Math.random() * 90000000 + 10000000)}`;
+        
+        console.log('[For4Payments] Enviando pagamento com dados:', {
+          valor: valorPagamento,
+          nome: name,
+          cpf: cpfLimpo,
+          email: email,
+          telefone: telefone
+        });
         
         // Criar pagamento na For4Payments
         const pagamento = await paymentApi.createPixPayment({
@@ -672,8 +680,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: name,
           email: email,
           cpf: cpfLimpo,
-          phone: phone
+          phone: telefone
         });
+        
+        console.log("[For4Payments] Pagamento criado com sucesso:", pagamento.id);
         
         return res.json({
           id: pagamento.id,
