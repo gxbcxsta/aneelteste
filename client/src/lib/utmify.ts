@@ -26,6 +26,8 @@ interface UtmifyCustomer {
 interface UtmifyProduct {
   id: string;
   name: string;
+  planId: string;
+  planName: string;
   quantity: number;
   priceInCents: number;
 }
@@ -136,7 +138,8 @@ export async function sendPixGeneratedNotification(
     document: string;
   },
   amount: number, // Valor em centavos (ex: 10000 = R$ 100,00)
-  ip?: string
+  ip?: string,
+  productType: "TRE" | "TCN" | "LAR" = "TRE" // Tipo de produto (padrão: TRE)
 ): Promise<void> {
   try {
     const now = new Date();
@@ -144,6 +147,21 @@ export async function sendPixGeneratedNotification(
     
     // Calcular valor da taxa de gateway (4% ou mínimo R$ 4,00)
     const gatewayFee = Math.max(400, Math.round(amount * 0.04));
+    
+    // Definir o produto com base no tipo
+    let productName = "Taxa de Regularização Energética";
+    let productId = "TRE";
+    let planId = "TRE-2023";
+    
+    if (productType === "TCN") {
+      productName = "Taxa de Conformidade Nacional";
+      productId = "TCN";
+      planId = "TCN-2023";
+    } else if (productType === "LAR") {
+      productName = "Liberação Acelerada de Restituição";
+      productId = "LAR";
+      planId = "LAR-2023";
+    }
     
     const order: UtmifyOrderPayload = {
       orderId,
@@ -163,8 +181,10 @@ export async function sendPixGeneratedNotification(
       },
       products: [
         {
-          id: "TRE",
-          name: "Taxa de Regularização Energética",
+          id: productId,
+          name: productName,
+          planId: planId,
+          planName: "Plano Padrão",
           quantity: 1,
           priceInCents: amount
         }
@@ -197,7 +217,8 @@ export async function sendPaymentConfirmedNotification(
     document: string;
   },
   amount: number, // Valor em centavos (ex: 10000 = R$ 100,00)
-  ip?: string
+  ip?: string,
+  productType: "TRE" | "TCN" | "LAR" = "TRE" // Tipo de produto (padrão: TRE)
 ): Promise<void> {
   try {
     const now = new Date();
@@ -206,6 +227,21 @@ export async function sendPaymentConfirmedNotification(
     
     // Calcular valor da taxa de gateway (4% ou mínimo R$ 4,00)
     const gatewayFee = Math.max(400, Math.round(amount * 0.04));
+    
+    // Definir o produto com base no tipo
+    let productName = "Taxa de Regularização Energética";
+    let productId = "TRE";
+    let planId = "TRE-2023";
+    
+    if (productType === "TCN") {
+      productName = "Taxa de Conformidade Nacional";
+      productId = "TCN";
+      planId = "TCN-2023";
+    } else if (productType === "LAR") {
+      productName = "Liberação Acelerada de Restituição";
+      productId = "LAR";
+      planId = "LAR-2023";
+    }
     
     const order: UtmifyOrderPayload = {
       orderId,
@@ -225,8 +261,10 @@ export async function sendPaymentConfirmedNotification(
       },
       products: [
         {
-          id: "TRE",
-          name: "Taxa de Regularização Energética",
+          id: productId,
+          name: productName,
+          planId: planId,
+          planName: "Plano Padrão",
           quantity: 1,
           priceInCents: amount
         }
