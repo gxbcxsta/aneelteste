@@ -297,6 +297,23 @@ export default function PagamentoPix() {
 
   // Efeito para criar o pagamento quando a página carregar
   useEffect(() => {
+    // Verificar se temos todos os dados necessários antes de criar o pagamento
+    if (!cpf || !nome || !email || !telefone) {
+      console.error("[PagamentoPix] Dados essenciais faltando:", { cpf, nome, email, telefone });
+      toast({
+        title: "Erro ao processar pagamento",
+        description: "Dados incompletos para gerar pagamento. Volte e preencha todos os campos.",
+        variant: "destructive"
+      });
+      
+      // Redirecionar para a página inicial após 3 segundos
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+      return;
+    }
+    
+    console.log("[PagamentoPix] Criando pagamento com dados:", { cpf, nome, email, telefone });
     criarPagamento();
   }, []);
 
