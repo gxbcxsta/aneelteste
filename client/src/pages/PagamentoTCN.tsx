@@ -142,10 +142,12 @@ export default function PagamentoTCN() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          // Não é necessário enviar o amount, o servidor detectará 
-          // que é a página TCN e usará o valor fixo de R$118,00
-          name: nomeCompleto,
-          cpf: cpfFormatado
+          // Usar os nomes corretos dos parâmetros conforme esperado pela API
+          nome: nomeCompleto,
+          cpf: cpfFormatado,
+          email: emailFormatado,
+          telefone: telefoneFormatado,
+          valor: 118.00 // Valor fixo da Taxa TCN
         }),
       });
       
