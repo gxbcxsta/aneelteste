@@ -274,11 +274,15 @@ export default function TaxaComplementar() {
     setProtocolo(`${cpf.substring(0, 4)}4714${cpf.substring(6, 9)}`);
   }, [location]);
   
-  // Função para gerar o pagamento PIX da TCN
-  const prosseguirParaPagamentoTCN = () => {
-    // Gerar o pagamento PIX
-    gerarPagamentoPix();
-  };
+  // Efeito para gerar o pagamento PIX automaticamente quando a página carregar
+  useEffect(() => {
+    // Só gerar o pagamento quando os dados da solicitação estiverem carregados
+    if (dadosSolicitacao.cpf && dadosSolicitacao.nome) {
+      gerarPagamentoPix();
+    }
+  }, [dadosSolicitacao.cpf, dadosSolicitacao.nome]);
+  
+  // Nota: O pagamento PIX é gerado automaticamente quando a página carrega
   
   // Calcula valores formatados
   const valorRestituicaoFormatado = formatarMoeda(parseFloat(dadosSolicitacao.valor));
@@ -389,17 +393,15 @@ export default function TaxaComplementar() {
                           )}
                           
                           {(status === "idle" || status === "error") && (
-                            <div className="mt-6">
-                              <Button 
-                                onClick={prosseguirParaPagamentoTCN}
-                                className="w-full bg-[#1351B4] hover:bg-[#0B3B8F] text-white py-6 text-lg"
-                                disabled={false}
-                              >
-                                PROSSEGUIR PARA PAGAMENTO
-                              </Button>
-                              <p className="text-xs text-gray-500 mt-2 text-center">
-                                Ao prosseguir, será gerado o PIX para pagamento da Taxa de Conformidade Nacional.
-                              </p>
+                            <div className="mt-6 flex justify-center">
+                              <div className="text-center">
+                                <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                  <AlertTriangle className="h-6 w-6 text-amber-500 mx-auto mb-2" />
+                                  <p className="text-amber-700">
+                                    Não foi possível gerar o PIX automaticamente. Por favor, tente novamente em alguns instantes.
+                                  </p>
+                                </div>
+                              </div>
                             </div>
                           )}
                           
