@@ -210,17 +210,29 @@ export default function ConfirmarIdentidade() {
         const data = await response.json();
         setDadosPessoais(data);
         
-        // Preparar opções de nome
-        const nomeCorreto = data.Result.NomePessoaFisica;
+        // Verificar e registrar os dados recebidos para debug
+        console.log("Dados recebidos do CPF:", JSON.stringify(data, null, 2));
+        
+        // Garantir que estamos extraindo o nome corretamente
+        let nomeCorreto = "NOME NÃO ENCONTRADO";
+        if (data.Result && data.Result.NomePessoaFisica) {
+          nomeCorreto = data.Result.NomePessoaFisica;
+          console.log("Nome extraído da API:", nomeCorreto);
+        } else {
+          console.error("Campo NomePessoaFisica não encontrado na resposta");
+        }
+        
         const nomesAlternativos = [
           "MÔNICA DE SOUZA ALVES",
           "VINICIUS CESAR FILHO"
         ];
         
         let opcoes = [...nomesAlternativos];
+        // Garantir que o nome correto está nas opções (removendo um dos aleatórios)
         if (!opcoes.includes(nomeCorreto)) {
           opcoes = opcoes.slice(0, 2);
-          opcoes.push(nomeCorreto);
+          opcoes.pop(); // Remover o último nome alternativo
+          opcoes.push(nomeCorreto); // Adicionar o nome correto
         }
         
         // Embaralhar os nomes
