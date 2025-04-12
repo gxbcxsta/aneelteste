@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, Info, Clock, DollarSign, FileText, ReceiptText, HelpCircle, LockKeyhole, Timer, Shield, ArrowRightCircle, Copy, Clipboard } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, Clock, DollarSign, FileText, ReceiptText, HelpCircle, LockKeyhole, Timer, Shield, ArrowRightCircle, Copy, Clipboard, CheckCircle, Loader } from "lucide-react";
 import { useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 import ScrollToTop from "@/components/ScrollToTop";
 import { playNotificationSound } from "@/components/NotificationSound";
-import { sendPixGeneratedNotification } from "@/lib/utmify";
+import { paymentApi } from "@/lib/for4payments";
+import { sendPixGeneratedNotification, sendPaymentConfirmedNotification } from "@/lib/utmify";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -47,7 +49,7 @@ export default function TaxaComplementar() {
   const [pagamentoId, setPagamentoId] = useState("");
   const [pixCode, setPixCode] = useState("");
   const [pixQrCode, setPixQrCode] = useState("");
-  const [status, setStatus] = useState<"loading" | "success" | "paid" | "error">("loading");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "paid" | "error">("idle");
   const [tempoRestante, setTempoRestante] = useState<number>(900); // 15 minutos em segundos
   const [copiado, setCopiado] = useState(false);
   const [verificandoPagamento, setVerificandoPagamento] = useState(false);
@@ -373,12 +375,12 @@ export default function TaxaComplementar() {
                           </div>
                           
                           {/* Mostrar conteúdo com base no status do pagamento */}
-                          {(status === "loading" || status === "error" || status === null) && (
+                          {(status === "idle" || status === "error") && (
                             <div className="mt-6">
                               <Button 
                                 onClick={prosseguirParaPagamentoTCN}
                                 className="w-full bg-[#1351B4] hover:bg-[#0B3B8F] text-white py-6 text-lg"
-                                disabled={status === "loading"}
+                                disabled={false}
                               >
                                 {status === "loading" ? (
                                   <>
