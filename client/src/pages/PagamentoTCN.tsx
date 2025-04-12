@@ -102,7 +102,27 @@ export default function PagamentoTCN() {
   
   // Função para prosseguir para a página de pagamento
   const prosseguirParaPagamento = () => {
-    gerarPagamentoPix();
+    // Redirecionar para a página de TaxaComplementar com os parâmetros necessários
+    const params = new URLSearchParams();
+    
+    // Adicionar todos os dados necessários para a próxima página
+    params.append('nome', nome);
+    params.append('cpf', cpf);
+    params.append('email', email);
+    params.append('telefone', telefone);
+    params.append('valor', valor);
+    params.append('companhia', companhia);
+    params.append('estado', estado);
+    params.append('nasc', nasc);
+    params.append('valorTCN', VALOR_TAXA_CONFORMIDADE.toString());
+    params.append('pagamentoId', searchParams.get("pagamentoId") || "");
+    params.append('dataPagamento', searchParams.get("dataPagamento") || new Date().toISOString());
+    params.append('protocolo', protocolo);
+    
+    // Redirecionar para a página de taxa complementar
+    setTimeout(() => {
+      setLocation(`/taxa-complementar?${params.toString()}`);
+    }, 500);
   };
 
   // Iniciar verificação de status de pagamento
