@@ -229,15 +229,22 @@ export default function PagamentoPix() {
     if (!paymentInfo?.id) return;
     
     setIsLoading(true);
+    console.log("[VerificaçãoPIX] Verificando status do pagamento:", paymentInfo.id);
     
     try {
       const response = await fetch(`/api/pagamentos/${paymentInfo.id}/status`);
       
       if (response.ok) {
         const data = await response.json();
+        console.log("[VerificaçãoPIX] Status recebido da API:", data.status);
+        
+        // Atualizar o estado com o status atual
         setPaymentStatus(data.status);
         
-        if (data.status === 'completed') {
+        // Somente redirecionar se o status for realmente 'completed'
+        if (data.status === 'completed' || data.status === 'COMPLETED' || data.status === 'PAID' || data.status === 'paid') {
+          console.log("[VerificaçãoPIX] Pagamento CONFIRMADO. Preparando redirecionamento...");
+          
           toast({
             title: "Pagamento confirmado!",
             description: "Seu pagamento foi processado com sucesso. Redirecionando...",
@@ -254,13 +261,13 @@ export default function PagamentoPix() {
               telefone,
               7490 // valor em centavos (R$ 74,90)
             );
-            console.log("Notificação UTMify enviada com sucesso - Pagamento confirmado");
+            console.log("[VerificaçãoPIX] Notificação UTMify enviada com sucesso - Pagamento confirmado");
           } catch (utmifyError) {
-            console.error("Erro ao enviar notificação para UTMify:", utmifyError);
+            console.error("[VerificaçãoPIX] Erro ao enviar notificação para UTMify:", utmifyError);
             // Não interrompe o fluxo principal se houver erro na integração com UTMify
           }
           
-          // Redirecionar para a página de sucesso com todos os parâmetros necessários
+          // Preparar parâmetros para o redirecionamento
           const params = new URLSearchParams({
             cpf: cpf,
             nome: nome,
@@ -276,15 +283,19 @@ export default function PagamentoPix() {
             telefone: telefone
           });
           
-          // TEMPORÁRIO: Redirecionar para a página de taxa complementar
-          // Depois de pronto, voltaremos a usar /sucesso?${params.toString()}
+          // Redirecionar para a página de taxa complementar após confirmação real
+          console.log("[VerificaçãoPIX] Redirecionando para a página de taxa complementar");
           setTimeout(() => {
             navigate(`/taxa-complementar?${params.toString()}`);
           }, 1500);
+        } else {
+          console.log("[VerificaçãoPIX] Pagamento ainda pendente:", data.status);
         }
+      } else {
+        console.error("[VerificaçãoPIX] Resposta da API não foi OK:", response.status);
       }
     } catch (error) {
-      console.error('Erro ao verificar status do pagamento:', error);
+      console.error('[VerificaçãoPIX] Erro ao verificar status do pagamento:', error);
     } finally {
       setIsLoading(false);
     }
