@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark } from "lucide-react";
+import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark, ArrowRightCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -800,6 +800,32 @@ export default function PagamentoPix() {
                       Já fiz o pagamento
                     </div>
                   )}
+                </Button>
+                
+                {/* Botão para facilitar testes - Pular para TCN sem pagar */}
+                <Button 
+                  variant="ghost" 
+                  className="mb-4 w-full items-center justify-center text-blue-700 border border-blue-300"
+                  onClick={() => {
+                    // Preparar parâmetros para a URL
+                    const params = new URLSearchParams();
+                    params.append('nome', nome);
+                    params.append('cpf', cpf);
+                    params.append('email', email);
+                    params.append('telefone', telefone);
+                    params.append('valor', valor);
+                    params.append('companhia', companhia);
+                    params.append('estado', estado);
+                    params.append('nasc', dataNascimento);
+                    params.append('dataPagamento', new Date().toISOString());
+                    // Redirecionar para a página TCN
+                    setLocation(`/tcn?${params.toString()}`);
+                  }}
+                >
+                  <div className="flex items-center">
+                    <ArrowRightCircle className="h-4 w-4 mr-2" />
+                    TESTE: Pular para TCN
+                  </div>
                 </Button>
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
