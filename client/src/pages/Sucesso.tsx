@@ -78,7 +78,7 @@ export default function Sucesso() {
   useEffect(() => {
     const timer = setTimeout(() => {
       const params = new URLSearchParams(window.location.search);
-      setLocation(`/tcn?${params.toString()}`);
+      setLocation(`/taxa-complementar?${params.toString()}`);
     }, 7000); // 7 segundos
     
     return () => clearTimeout(timer);
