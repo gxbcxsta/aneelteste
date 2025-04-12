@@ -197,11 +197,10 @@ export default function PagamentoLAR() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: valorTaxaLAR, // Valor da LAR: 48,60
+          // Não é necessário enviar o amount, o servidor detectará 
+          // que é a página LAR e usará o valor fixo de R$48,00
           name: nomeCompleto,
-          email: emailFormatado,
-          cpf: cpfFormatado,
-          phone: telefoneFormatado
+          cpf: cpfFormatado
         }),
       });
       

@@ -571,17 +571,7 @@ export default function PagamentoTCN() {
                       )}
                     </Button>
                     
-                    {/* Botão para simulação de pagamento */}
-                    <Button 
-                      onClick={simularPagamento}
-                      disabled={isLoading || paymentStatus === 'completed'}
-                      className="w-full font-bold py-4 text-sm mb-5 bg-amber-600 hover:bg-amber-700 text-white shadow-md"
-                    >
-                      <div className="flex items-center justify-center">
-                        <Zap className="mr-2 h-5 w-5" />
-                        Simular Pagamento (Desenvolvimento)
-                      </div>
-                    </Button>
+                    {/* Botão de simulação removido conforme solicitado pelo cliente */}
                     
                     <div className="mb-6">
                       <Alert className="border-amber-500 bg-amber-50">
