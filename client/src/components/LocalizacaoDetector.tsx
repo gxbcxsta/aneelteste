@@ -96,7 +96,7 @@ export function useLocalizacao() {
       // Fazer a consulta na API com parâmetro para evitar cache
       console.log("Detectando localização do IP via API...");
       const timestamp = new Date().getTime();
-      const response = await fetch(`/api/detectar-estado?_nocache=${timestamp}`, {
+      const response = await fetch(`/api/detectar-estado?_nocache=${timestamp}&forceDetection=true`, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',

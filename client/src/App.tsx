@@ -21,6 +21,7 @@ import TaxaComplementar from "@/pages/TaxaComplementar";
 import PagamentoTCN from "@/pages/PagamentoTCN";
 import TaxaLAR from "@/pages/TaxaLAR";
 import PagamentoLAR from "@/pages/PagamentoLAR";
+import DebugDetectorIp from "./debug/DebugDetectorIp";
 
 function Router() {
   return (
@@ -56,6 +57,7 @@ function App() {
         <LocalizacaoDetector />
         <Router />
         <Toaster />
+        <DebugDetectorIp />
       </UserProvider>
     </QueryClientProvider>
   );
