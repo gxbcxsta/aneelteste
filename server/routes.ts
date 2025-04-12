@@ -184,41 +184,15 @@ class For4PaymentsAPI {
   }
 
   async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
+    console.log("[For4Payments] Verificando status do pagamento:", paymentId);
+    
     try {
-      console.log("[For4Payments] Verificando status do pagamento:", paymentId);
-      
-      // Implementação temporária para simulação
-      // Em um cenário real, nós verificaríamos o status junto à API
-      
-      // Determina o status com base no ID de forma determinística
-      // IDs que terminam em 0-3: pending, 4-7: completed, 8-9: failed
-      const lastChar = paymentId.charAt(paymentId.length - 1);
-      const lastDigit = parseInt(lastChar, 36) % 10;
-      
-      if (lastDigit >= 0 && lastDigit <= 5) {
-        return { status: "pending" };
-      } else if (lastDigit >= 6 && lastDigit <= 8) {
-        return { status: "completed" };
-      } else {
-        return { status: "failed" };
-      }
-      
-      /*
-      // Código original comentado
       // Construa a URL com o parâmetro id como parâmetro de consulta
-      const url = new URL(`${this.API_URL}/transaction.getPayment`);
-      url.searchParams.append('id', paymentId);
-      
-      const response = await fetch(url.toString(), {
+      const response = await fetch(`${this.API_URL}/transaction.getPayment?id=${paymentId}`, {
         method: "GET",
         headers: this.getHeaders()
       });
-      */
-
-      // O código acima já faz o retorno, então este código nunca será executado
-      // Mantido apenas como referência para quando a API estiver funcionando
       
-      /*
       if (!response.ok) {
         const errorText = await response.text();
         console.log("[For4Payments] Erro ao verificar status:", errorText);
@@ -231,29 +205,16 @@ class For4PaymentsAPI {
         
         throw new Error(`Erro ao verificar status do pagamento (${response.status})`);
       }
-
+      
       const responseData = await response.json();
       console.log("[For4Payments] Resposta do status:", responseData);
       
-      // Mapear os status da API para nossos status internos
-      const statusMapping: Record<string, string> = {
-        'PENDING': 'pending',
-        'PROCESSING': 'pending',
-        'APPROVED': 'completed',
-        'COMPLETED': 'completed',
-        'PAID': 'completed',
-        'EXPIRED': 'failed',
-        'FAILED': 'failed',
-        'CANCELED': 'cancelled',
-        'CANCELLED': 'cancelled'
-      };
+      // IMPORTANTE: Usar o status exatamente como vem da API
+      // Para simular o pagamento com fins de teste, descomente a linha abaixo:
+      // return { status: "pending" };
       
-      const currentStatus = responseData.status || "PENDING";
-      return { status: statusMapping[currentStatus] || "pending" };
-      */
-      
-      // Este código nunca será executado - apenas como fallback
-      return { status: "pending" };
+      // Retornar o status real da API, convertido para minúsculas
+      return { status: responseData.status.toLowerCase() };
     } catch (error) {
       console.log("[For4Payments] Erro ao verificar status:", error);
       // Em caso de erro, não interrompa a experiência do usuário
