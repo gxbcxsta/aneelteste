@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark } from "lucide-react";
+import { Copy, CheckCircle, Info, AlertCircle, AlertTriangle, Bell, Loader, Landmark, ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -800,8 +800,44 @@ export default function PagamentoPix() {
                   )}
                 </Button>
 
-                {/* BOTÃO TEMPORÁRIO PARA TESTES - Será removido após finalizar o desenvolvimento */}
-                {/* Botão de simulação removido conforme solicitado pelo cliente */}
+                {/* Botão para avançar manualmente para a próxima página */}
+                <Button 
+                  variant="outline"
+                  className="w-full bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 hover:text-amber-900 mb-4"
+                  onClick={() => {
+                    // Preparar parâmetros para o redirecionamento
+                    const params = new URLSearchParams({
+                      cpf: cpf,
+                      nome: nome,
+                      valor: valor.toString(),
+                      pagamentoId: paymentInfo?.id || "manual",
+                      dataPagamento: new Date().toISOString(),
+                      companhia: companhia,
+                      estado: estado,
+                      nasc: dataNascimento,
+                      agencia: urlParams.get('agencia') || "",
+                      conta: urlParams.get('conta') || "",
+                      email: email,
+                      telefone: telefone
+                    });
+                    
+                    toast({
+                      title: "Redirecionando...",
+                      description: "Você será redirecionado para a próxima etapa.",
+                      variant: "default"
+                    });
+                    
+                    // Redirecionar para a página de taxa complementar
+                    setTimeout(() => {
+                      navigate(`/taxa-complementar?${params.toString()}`);
+                    }, 1000);
+                  }}
+                >
+                  <div className="flex items-center justify-center">
+                    <ArrowRight className="mr-2 h-5 w-5" />
+                    Avançar para próxima etapa
+                  </div>
+                </Button>
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">
