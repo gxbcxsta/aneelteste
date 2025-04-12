@@ -14,6 +14,9 @@ export interface UserData {
   telefone?: string;
   valorRestituicao?: number;
   pagamentoId?: string;
+  dataPagamento?: string;
+  valorTaxaConformidade?: number;
+  protocolo?: string;
   contaBancaria?: {
     banco: string;
     agencia: string;

@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useUserData } from "@/contexts/UserContext";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -37,6 +38,7 @@ const formatarData = (dataString: string) => {
 export default function TaxaComplementar() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
+  const { userData, updateUserData } = useUserData();
   
   // Valor da Taxa de Conformidade Nacional (TCN)
   const VALOR_TAXA_CONFORMIDADE = 118;
@@ -59,12 +61,10 @@ export default function TaxaComplementar() {
     pagamentoId: ""
   });
   
-  // Obter parâmetros da URL
+  // Obter dados do contexto global
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    
     // Definir protocolo baseado no CPF
-    const cpf = urlParams.get('cpf') || "";
+    const cpf = userData.cpf || "";
     if (cpf) {
       setProtocolo(`${cpf.substring(0, 4)}4714${cpf.substring(6, 9)}`);
     }
@@ -74,9 +74,8 @@ export default function TaxaComplementar() {
     setDataAtual(dataHoje.toLocaleDateString('pt-BR'));
     
     // Definir data do pagamento da primeira taxa
-    const dataPagamentoParam = urlParams.get('dataPagamento');
-    if (dataPagamentoParam) {
-      setDataPagamento(formatarData(dataPagamentoParam));
+    if (userData.dataPagamento) {
+      setDataPagamento(formatarData(userData.dataPagamento));
     } else {
       setDataPagamento(dataHoje.toLocaleDateString('pt-BR', {
         day: '2-digit',
@@ -87,38 +86,44 @@ export default function TaxaComplementar() {
       }));
     }
     
-    // Preencher dados da solicitação
+    // Preencher dados da solicitação com base no contexto global
     setDadosSolicitacao({
-      nome: urlParams.get('nome') || "",
-      cpf: urlParams.get('cpf') || "",
-      valor: urlParams.get('valor') || "0",
-      companhia: urlParams.get('companhia') || "",
-      estado: urlParams.get('estado') || "",
-      dataNascimento: urlParams.get('nasc') || "",
-      email: urlParams.get('email') || "",
-      telefone: urlParams.get('telefone') || "",
-      agencia: urlParams.get('agencia') || "",
-      conta: urlParams.get('conta') || "",
-      pagamentoId: urlParams.get('pagamentoId') || ""
+      nome: userData.nome || "",
+      cpf: userData.cpf || "",
+      valor: userData.valorRestituicao?.toString() || "0",
+      companhia: userData.companhia || "",
+      estado: userData.estado || "",
+      dataNascimento: userData.dataNascimento || "",
+      email: userData.email || "",
+      telefone: userData.telefone || "",
+      agencia: userData.contaBancaria?.agencia || "",
+      conta: userData.contaBancaria?.conta || "",
+      pagamentoId: userData.pagamentoId || ""
     });
-  }, []);
+  }, [userData]);
   
   // Função para prosseguir para a página de pagamento da TCN
   const prosseguirParaPagamentoTCN = () => {
-    // Criar os parâmetros da URL para passar adiante
-    const params = new URLSearchParams();
-    
-    // Adicionar todos os dados necessários para a próxima página
-    Object.entries(dadosSolicitacao).forEach(([key, value]) => {
-      params.append(key, value);
+    // Atualizar contexto com dados adicionais necessários para a próxima etapa
+    updateUserData({
+      // Manter dados existentes
+      cpf: dadosSolicitacao.cpf,
+      nome: dadosSolicitacao.nome,
+      valorRestituicao: parseFloat(dadosSolicitacao.valor),
+      companhia: dadosSolicitacao.companhia,
+      estado: dadosSolicitacao.estado,
+      dataNascimento: dadosSolicitacao.dataNascimento,
+      email: dadosSolicitacao.email,
+      telefone: dadosSolicitacao.telefone,
+      
+      // Adicionar dados específicos para a próxima etapa
+      valorTaxaConformidade: VALOR_TAXA_CONFORMIDADE,
+      protocolo: protocolo
     });
-    
-    params.append('valorTaxaConformidade', VALOR_TAXA_CONFORMIDADE.toString());
-    params.append('protocolo', protocolo);
     
     // Redirecionar para a página de pagamento da taxa complementar
     setTimeout(() => {
-      setLocation(`/pagamento-tcn?${params.toString()}`);
+      setLocation('/pagamento-tcn');
     }, 500);
   };
   
