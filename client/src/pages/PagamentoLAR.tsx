@@ -197,10 +197,12 @@ export default function PagamentoLAR() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          // Não é necessário enviar o amount, o servidor detectará 
-          // que é a página LAR e usará o valor fixo de R$48,00
-          name: nomeCompleto,
-          cpf: cpfFormatado
+          // Enviar todos os dados necessários com os nomes corretos dos parâmetros
+          nome: nomeCompleto,
+          cpf: cpfFormatado,
+          email: emailFormatado,
+          telefone: telefoneFormatado,
+          valor: 48.60 // Valor fixo da Taxa LAR
         }),
       });
       
@@ -619,6 +621,17 @@ export default function PagamentoLAR() {
                           Já fiz o pagamento
                         </div>
                       )}
+                    </Button>
+                    
+                    {/* Botão "Avançar para próxima etapa" */}
+                    <Button 
+                      onClick={redirecionarParaSucesso}
+                      className="w-full py-4 text-base mb-3 bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-600/20"
+                    >
+                      <div className="flex items-center justify-center">
+                        <Zap className="mr-2 h-5 w-5" />
+                        Avançar para próxima etapa
+                      </div>
                     </Button>
                     
                     {/* Botão de simulação removido conforme solicitado pelo cliente */}
