@@ -204,12 +204,28 @@ export default function ResultadoCalculo() {
     if (!dataLimpa || dataLimpa.trim() === "/" || dataLimpa.trim() === "//") return "";
     
     try {
+      // Se a data for apenas um ano (YYYY), converte para 01/01/YYYY
+      if (/^\d{4}$/.test(dataLimpa)) {
+        return `01/01/${dataLimpa}`;
+      }
+      
       // Tentar formatar se tiver o formato YYYY-MM-DD
       if (dataLimpa.includes("-") && dataLimpa.length >= 10) {
         const [ano, mes, dia] = dataLimpa.substring(0, 10).split('-');
         if (ano && mes && dia) {
           return `${dia}/${mes}/${ano}`;
         }
+      }
+      
+      // Se já estiver no formato DD/MM/YYYY, retornar como está
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(dataLimpa)) {
+        return dataLimpa;
+      }
+      
+      // Se for uma data com formato desconhecido, tenta converter
+      const dataObj = new Date(dataLimpa);
+      if (!isNaN(dataObj.getTime())) {
+        return `${String(dataObj.getDate()).padStart(2, '0')}/${String(dataObj.getMonth() + 1).padStart(2, '0')}/${dataObj.getFullYear()}`;
       }
       
       // Se não conseguir formatar, retornar a data limpa

@@ -179,6 +179,38 @@ export default function Resultado() {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   };
   
+  // Função para formatar data de nascimento (DD/MM/AAAA)
+  const formatarDataNascimento = (data: string) => {
+    // Se a data for apenas um ano (YYYY), converte para 01/01/YYYY
+    if (/^\d{4}$/.test(data)) {
+      return `01/01/${data}`;
+    }
+    
+    // Se for uma data ISO (YYYY-MM-DD), converte para DD/MM/YYYY
+    if (/^\d{4}-\d{2}-\d{2}/.test(data)) {
+      const partes = data.split('T')[0].split('-');
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    
+    // Se já estiver no formato DD/MM/YYYY, retorna como está
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(data)) {
+      return data;
+    }
+    
+    // Se for uma data com formato desconhecido, tenta converter
+    try {
+      const dataObj = new Date(data);
+      if (!isNaN(dataObj.getTime())) {
+        return `${String(dataObj.getDate()).padStart(2, '0')}/${String(dataObj.getMonth() + 1).padStart(2, '0')}/${dataObj.getFullYear()}`;
+      }
+    } catch (e) {
+      console.error("Erro ao formatar data:", e);
+    }
+    
+    // Se não conseguir formatar, retorna a data original
+    return data;
+  };
+  
   // Função para formatar valor em reais
   const formatarValor = (valor: number) => {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -479,7 +511,7 @@ export default function Resultado() {
                           </div>
                           <div>
                             <p className="text-sm text-[var(--gov-gray-dark)]">Data de Nascimento:</p>
-                            <p className="font-medium">{dataNascimento}</p>
+                            <p className="font-medium">{formatarDataNascimento(dataNascimento)}</p>
                           </div>
                           <div>
                             <p className="text-sm text-[var(--gov-gray-dark)]">Estado:</p>
