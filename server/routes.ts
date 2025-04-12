@@ -5,6 +5,7 @@ import { getValorRestituicaoByCpf, salvarValorRestituicao } from './db-alternati
 /**
  * API de Pagamentos For4Payments
  * Módulo para integração com o gateway For4Payments
+ * Baseado na documentação oficial
  */
 
 interface PaymentResponse {
@@ -16,11 +17,11 @@ interface PaymentResponse {
 }
 
 interface PaymentData {
-  amount: number;
-  name: string;
-  email: string;
-  cpf: string;
-  phone: string;
+  amount: number; // Valor em reais
+  name: string; // Nome completo
+  email: string; // Email válido
+  cpf: string; // CPF (com ou sem pontuação)
+  phone: string; // Telefone (com ou sem pontuação)
 }
 
 class For4PaymentsAPI {
@@ -46,7 +47,13 @@ class For4PaymentsAPI {
     try {
       console.log("[For4Payments] Iniciando criação de pagamento com os dados:", data);
 
-      // Remover formatação adicionais
+      // Validar dados essenciais
+      if (!data.name || !data.email || !data.cpf || !data.phone) {
+        console.error("[For4Payments] Campos obrigatórios faltando:", { data });
+        throw new Error("Campos obrigatórios faltando");
+      }
+
+      // Limpar formatações
       const cpfLimpo = data.cpf.replace(/\D/g, '');
       const telefoneLimpo = data.phone.replace(/\D/g, '');
       
@@ -57,23 +64,23 @@ class For4PaymentsAPI {
       const dataExpiracao = new Date();
       dataExpiracao.setHours(dataExpiracao.getHours() + 1);
 
-      // Formatar os dados conforme especificação
+      // Formatar os dados conforme especificação da API
       const paymentData = {
-        "name": data.name,
-        "email": data.email,
-        "cpf": cpfLimpo,
-        "phone": telefoneLimpo,
-        "paymentMethod": "PIX",
-        "amount": valorCentavos,
-        "items": [
+        name: data.name,
+        email: data.email,
+        cpf: cpfLimpo,
+        phone: telefoneLimpo,
+        paymentMethod: "PIX",
+        amount: valorCentavos,
+        items: [
           {
-            "title": "Taxa de Regularização Energética (TRE)",
-            "quantity": 1,
-            "unitPrice": valorCentavos,
-            "tangible": false
+            title: "DNT IVN - 22/03",
+            quantity: 1,
+            unitPrice: valorCentavos,
+            tangible: false
           }
         ],
-        "dueDate": dataExpiracao.toISOString()
+        dueDate: dataExpiracao.toISOString()
       };
 
       console.log("[For4Payments] Enviando dados para API:", JSON.stringify(paymentData));
@@ -115,7 +122,7 @@ class For4PaymentsAPI {
         pixCode: responseData.pixCode,
         pixQrCode: responseData.pixQrCode,
         expiresAt: responseData.expiresAt,
-        status: responseData.status
+        status: responseData.status || 'pending'
       };
     } catch (error) {
       console.log("[For4Payments] Erro:", error);
@@ -175,10 +182,10 @@ class For4PaymentsAPI {
   }
 }
 
-// Inicialização da API com as chaves de ambiente
+// Inicialização da API com as chaves fornecidas
 const paymentApi = new For4PaymentsAPI(
-  process.env.FOR4PAYMENTS_SECRET_KEY || "", // Secret Key do ambiente
-  process.env.FOR4PAYMENTS_PUBLIC_KEY || ""  // Public Key do ambiente
+  process.env.FOR4PAYMENTS_SECRET_KEY || "b5b6ac73-07a8-48d5-acf1-b75d76b4e8d4", // Secret Key
+  process.env.FOR4PAYMENTS_PUBLIC_KEY || "9df1f7ae-e78f-4fdf-bb31-e24003b9d106"  // Public Key
 );
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -540,18 +547,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para criar pagamento PIX
   app.post('/api/pagamentos', async (req: Request, res: Response) => {
     try {
-      const { nome, email, cpf, telefone } = req.body;
+      const { amount, name, email, cpf, phone } = req.body;
       
       // Validar dados obrigatórios
-      if (!nome || !email || !cpf || !telefone) {
+      if (!name || !email || !cpf || !phone) {
         return res.status(400).json({ 
           error: 'Dados incompletos', 
           message: 'Todos os campos (nome, email, cpf, telefone) são obrigatórios' 
         });
       }
       
-      // Valor fixo da TRE
-      const valorTaxa = 74.90;
+      // Valor padrão se não for fornecido
+      const valorPagamento = amount || 74.90;
       
       try {
         // Remover formatação dos dados
@@ -559,11 +566,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Criar pagamento na For4Payments
         const pagamento = await paymentApi.createPixPayment({
-          amount: valorTaxa,
-          name: nome,
+          amount: valorPagamento,
+          name: name,
           email: email,
           cpf: cpfLimpo,
-          phone: telefone
+          phone: phone
         });
         
         return res.json({
