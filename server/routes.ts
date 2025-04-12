@@ -194,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Obter o IP real do cliente, considerando proxies
       const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-      console.log(`Recebida solicitação de detecção de estado para IP: ${ip}`);
+      console.log("Recebida solicitação de detecção de estado");
       
       // Limpar o IP para obter apenas o endereço principal (sem portas ou IPs adicionais)
       let ipLimpo = "";
@@ -207,7 +207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Para testes, se forceDetection é verdadeiro, retornar São Paulo como estado padrão
       if (forceDetection || process.env.NODE_ENV === 'development') {
-        console.log(`Forçando estado para São Paulo (IP: ${ipLimpo})`);
+        console.log("Forçando estado para São Paulo");
         return res.json({
           ip: ipLimpo,
           estado: "São Paulo",
@@ -249,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ? "https://ipapi.co/json/" // API para IP externo do servidor
           : `https://ipapi.co/${ipLimpo}/json/`;
         
-        console.log(`Consultando API (${isPrivateIp ? 'IP público do servidor' : ipLimpo}): ${apiUrl}`);
+        console.log(`Consultando API: ${isPrivateIp ? 'IP público do servidor' : 'IP do usuário'}`);
         
         const response = await fetch(apiUrl, {
           headers: {
@@ -304,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         const estado = siglaParaEstado[data.region_code] || "São Paulo";
         
-        console.log(`Estado detectado para IP ${ipLimpo}: ${estado} (${data.region_code})`);
+        console.log(`Estado detectado: ${estado} (${data.region_code})`);
         
         return res.json({
           ip: ipLimpo,
@@ -375,7 +375,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           const estado = siglaParaEstado[fallbackData.region] || "São Paulo";
           
-          console.log(`Estado detectado via API alternativa para IP ${ipLimpo}: ${estado} (${fallbackData.region})`);
+          console.log(`Estado detectado via API alternativa: ${estado} (${fallbackData.region})`);
           
           return res.json({
             ip: ipLimpo || fallbackData.ip,
@@ -418,7 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           const estadoDetectado = estados[estadoIndex];
-          console.log(`Usando detecção determinística para IP ${ipLimpo}: ${estadoDetectado}`);
+          console.log(`Usando detecção determinística: ${estadoDetectado}`);
           
           return res.json({
             ip: ipLimpo || "desconhecido",
