@@ -18,6 +18,8 @@ export interface UserData {
   valorTaxaConformidade?: number;
   protocolo?: string;
   dataPrevista?: string; // Data prevista para recebimento da restituição
+  larCompleto?: boolean; // Indica se o pagamento LAR foi concluído
+  acelerado?: boolean; // Indica se a restituição será acelerada
   contaBancaria?: {
     banco: string;
     agencia: string;

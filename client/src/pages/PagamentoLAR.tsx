@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useUserData } from "@/contexts/UserContext";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -103,6 +104,7 @@ const ContadorRegressivo = ({ minutos = 20 }: { minutos?: number }) => {
 export default function PagamentoLAR() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
+  const { userData, updateUserData } = useUserData();
   
   // Estado de loading para simular o processamento do pagamento
   const [isLoading, setIsLoading] = useState(false);
@@ -110,65 +112,63 @@ export default function PagamentoLAR() {
   const [paymentStatus, setPaymentStatus] = useState<string>('pending');
   const [progress, setProgress] = useState(0);
   
-  // Estados para armazenar dados da solicitação
-  const [protocolo, setProtocolo] = useState("");
-  const [nome, setNome] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [valor, setValor] = useState(0);
+  // Estados locais para manipulação de dados na interface
+  const [protocolo, setProtocolo] = useState(userData.protocolo || "");
   const [valorTaxaLAR, setValorTaxaLAR] = useState(48.6);
-  const [companhia, setCompanhia] = useState("");
-  const [estado, setEstado] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
   const [dataPagamento, setDataPagamento] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
   
-  // Obter parâmetros da URL
+  // Acessar dados diretamente do contexto
+  const nome = userData.nome;
+  const cpf = userData.cpf;
+  const valor = userData.valorRestituicao || 0;
+  const companhia = userData.companhia;
+  const estado = userData.estado;
+  const dataNascimento = userData.dataNascimento;
+  const email = userData.email || "";
+  const telefone = userData.telefone || "";
+  
+  // Obter dados do contexto do usuário
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
+    console.log("Carregando PagamentoLAR com dados do contexto:", userData);
     
-    // Definir protocolo
-    const protocoloParam = urlParams.get('protocolo');
-    if (protocoloParam) {
-      setProtocolo(protocoloParam);
-    }
-    
-    // Estabelecer dados básicos
-    const cpfParam = urlParams.get('cpf') || "";
-    const nomeParam = urlParams.get('nome') || "";
-    const valorParam = urlParams.get('valor') || "0";
-    const companhiaParam = urlParams.get('companhia') || "";
-    const estadoParam = urlParams.get('estado') || "";
-    const nascParam = urlParams.get('dataNascimento') || "";
-    const emailParam = urlParams.get('email') || "";
-    const telefoneParam = urlParams.get('telefone') || "";
-    const taxaLarParam = urlParams.get('valorTaxaLAR') || "48.6";
-    
-    setCpf(cpfParam);
-    setNome(nomeParam);
-    setValor(parseFloat(valorParam));
-    setCompanhia(companhiaParam);
-    setEstado(estadoParam);
-    setDataNascimento(nascParam);
-    setEmail(emailParam);
-    setTelefone(telefoneParam);
-    setValorTaxaLAR(parseFloat(taxaLarParam));
-    
-    // Se não tiver protocolo, gera um baseado no CPF
-    if (!protocoloParam && cpfParam) {
-      setProtocolo(`${cpfParam.substring(0, 4)}4714${cpfParam.substring(6, 9)}`);
+    // Se não tiver protocolo no contexto, gera um baseado no CPF
+    if (!userData.protocolo && userData.cpf) {
+      const novoProtocolo = `${userData.cpf.substring(0, 4)}4714${userData.cpf.substring(6, 9)}`;
+      setProtocolo(novoProtocolo);
+      
+      // Atualizamos o contexto com o protocolo gerado
+      updateUserData({
+        protocolo: novoProtocolo
+      });
     }
     
     // Definir data do pagamento da primeira taxa a partir de hoje
     const dataHoje = new Date();
-    setDataPagamento(dataHoje.toLocaleDateString('pt-BR', {
+    const dataHojeFormatada = dataHoje.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    }));
-  }, []);
+    });
+    
+    setDataPagamento(dataHojeFormatada);
+    
+    // Verificar se temos os dados necessários para prosseguir
+    if (!userData.cpf || !userData.nome || !userData.valorRestituicao) {
+      console.error("Dados insuficientes no contexto do usuário, redirecionando...");
+      toast({
+        title: "Erro ao carregar dados",
+        description: "Informações necessárias não encontradas. Voltando para o início.",
+        variant: "destructive",
+      });
+      
+      // Redirecionar para a página inicial após breve delay
+      setTimeout(() => {
+        setLocation("/verificar");
+      }, 1500);
+    }
+  }, [userData, updateUserData, toast, setLocation]);
   
   // Função para criar o pagamento
   const criarPagamento = async () => {
@@ -312,24 +312,16 @@ export default function PagamentoLAR() {
   
   // Função para redirecionar para a página de sucesso com os parâmetros corretos
   const redirecionarParaSucesso = () => {
-    const params = new URLSearchParams();
-    params.append('cpf', cpf);
-    params.append('nome', nome);
-    params.append('valor', valor.toString());
-    params.append('pagamentoId', paymentInfo?.id || 'lar123456789');
-    params.append('dataPagamento', new Date().toISOString());
-    params.append('companhia', companhia);
-    params.append('estado', estado);
-    params.append('nasc', dataNascimento);
-    params.append('protocolo', protocolo);
-    params.append('email', email);
-    params.append('telefone', telefone);
-    params.append('taxasCompletas', 'true');
-    params.append('larCompleto', 'true');
-    params.append('acelerado', 'true');
+    // Atualizar o contexto com as informações do pagamento LAR
+    updateUserData({
+      pagamentoId: paymentInfo?.id || 'lar123456789',
+      dataPagamento: new Date().toISOString(),
+      larCompleto: true, // Usando um campo adicional para o contexto
+      acelerado: true // Usando um campo adicional para o contexto
+    });
     
-    // Redirecionar para a página de sucesso
-    setLocation(`/sucesso?${params.toString()}`);
+    // Navegar diretamente para a página de sucesso sem parâmetros URL
+    setLocation('/sucesso');
   };
   
   // Formatar valores para exibição
