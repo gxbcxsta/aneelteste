@@ -286,42 +286,7 @@ export default function PagamentoLAR() {
     };
   }, [paymentInfo]);
   
-  // Função para simular pagamento
-  const simularPagamento = () => {
-    setIsLoading(true);
-    setPaymentStatus('processing');
-    setProgress(30);
-    
-    // Simular progresso do processamento
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 10;
-      });
-    }, 800);
-    
-    // Simular conclusão após 3 segundos
-    setTimeout(() => {
-      clearInterval(progressInterval);
-      setProgress(100);
-      setPaymentStatus('completed');
-      setIsLoading(false);
-      
-      // Mostrar toast de confirmação
-      toast({
-        title: "Pagamento da LAR confirmado!",
-        description: "Sua Liberação Acelerada foi ativada com sucesso. Você receberá sua restituição em até 60 minutos!",
-      });
-      
-      // Redirecionar para a próxima etapa após um breve delay
-      setTimeout(() => {
-        redirecionarParaSucesso();
-      }, 2000);
-    }, 3000);
-  };
+  // Função de simulação removida conforme solicitado pelo cliente
   
   // Função para copiar o código PIX
   const copiarCodigoPix = () => {
@@ -656,17 +621,7 @@ export default function PagamentoLAR() {
                       )}
                     </Button>
                     
-                    {/* Botão para simulação de pagamento */}
-                    <Button 
-                      onClick={simularPagamento}
-                      disabled={isLoading || paymentStatus === 'completed'}
-                      className="w-full font-bold py-4 text-sm mb-5 bg-amber-500 hover:bg-amber-600 text-white shadow-md"
-                    >
-                      <div className="flex items-center justify-center">
-                        <Zap className="mr-2 h-5 w-5" />
-                        Simular Pagamento (Desenvolvimento)
-                      </div>
-                    </Button>
+                    {/* Botão de simulação removido conforme solicitado pelo cliente */}
                     
                     <div className="mb-6">
                       <Alert className="border-green-500 bg-green-50">
