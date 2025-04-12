@@ -14,9 +14,9 @@ interface PaymentResponse {
 interface PaymentData {
   amount: number;
   name: string;
-  email?: string;  // Email agora é opcional
+  email?: string;
   cpf: string;
-  phone?: string;  // Telefone agora é opcional
+  phone?: string;
 }
 
 export class For4PaymentsAPI {
@@ -40,70 +40,98 @@ export class For4PaymentsAPI {
 
   async createPixPayment(data: PaymentData): Promise<PaymentResponse> {
     try {
-      console.log("[For4Payments] Criando pagamento PIX com valor:", data.amount, "(0000000" + Math.round(data.amount * 100).toString().padStart(5, '0'), "centavos)");
+      console.log("[For4Payments] Iniciando criação de pagamento com os dados:", data);
       
+      // Formatar o número de telefone (remover caracteres não numéricos)
+      const phone = data.phone?.replace(/\D/g, "") || `1198${Math.floor(Math.random() * 10000000 + 10000000)}`;
+      
+      // Formatar CPF (remover caracteres não numéricos)
+      const cpfLimpo = data.cpf.replace(/\D/g, "");
+      
+      // Email padrão se não for fornecido
+      const email = data.email || `${cpfLimpo.substring(0, 3)}xxx${cpfLimpo.substring(cpfLimpo.length-2)}@cpf.gov.br`;
+      
+      // Converter valor para centavos (multiplicar por 100)
       const amountInCents = Math.round(data.amount * 100);
-      const cleanCpf = data.cpf.replace(/\D/g, "");
       
-      // Email e telefone padrão se não forem fornecidos
-      const email = data.email || `${cleanCpf.substring(0, 3)}xxx@for4.gov.br`;
-      const phone = data.phone || `1195884${Math.floor(Math.random() * 9000) + 1000}`;
+      // Decidir o título do item com base no valor
+      let titleItem = "Taxa de Regularização Energética (TRE)";
+      if (data.amount === 118.0) {
+        titleItem = "Taxa de Conformidade Nacional (TCN)";
+      } else if (data.amount === 48.0) {
+        titleItem = "Liberação Acelerada de Restituição (LAR)";
+      }
       
-      // Dados revisados
-      const paymentData = {
+      console.log("[For4Payments] Criando pagamento PIX com valor:", data.amount, `(${amountInCents} centavos)`);
+      
+      // Criar payload conforme documentação
+      const payload = {
         name: data.name,
         email: email,
-        cpf: cleanCpf,
+        cpf: cpfLimpo,
         phone: phone,
         paymentMethod: "PIX",
         amount: amountInCents,
-        items: [{
-          title: "Taxa ICMS Regulatória",
-          quantity: 1,
-          unitPrice: amountInCents,
-          tangible: false
-        }]
+        items: [
+          {
+            title: titleItem,
+            quantity: 1,
+            unitPrice: amountInCents,
+            tangible: false
+          }
+        ]
       };
       
       // Adicionar data de expiração (30 minutos a partir de agora)
       const dueDate = new Date();
       dueDate.setMinutes(dueDate.getMinutes() + 30);
-      Object.assign(paymentData, { dueDate: dueDate.toISOString() });
-
+      Object.assign(payload, { dueDate: dueDate.toISOString() });
+      
+      console.log("[For4Payments] Enviando dados para API:", JSON.stringify(payload));
+      
       const response = await fetch(`${this.API_URL}/transaction.purchase`, {
-        method: 'POST',
+        method: "POST",
         headers: this.getHeaders(),
-        body: JSON.stringify(paymentData)
+        body: JSON.stringify(payload)
       });
-
+      
+      console.log("[For4Payments] Status da resposta:", response.status, response.statusText);
+      
       if (!response.ok) {
-        console.error("[For4Payments] Erro na resposta:", {
-          status: response.status,
-          statusText: response.statusText,
-        });
-        
-        // Tentar ler o corpo da resposta de erro
+        // Tentar ler corpo de erro
         let errorBody = "";
         try {
           errorBody = await response.text();
-        } catch (e) {}
+          console.error("[For4Payments] Corpo do erro:", errorBody);
+        } catch (e) {
+          console.error("[For4Payments] Não foi possível ler corpo do erro");
+        }
         
-        console.error("[For4Payments] Detalhes do erro:", errorBody);
-        
-        throw new Error(
-          `Erro na API de pagamento (${response.status}): ${response.statusText}`
-        );
+        throw new Error(`Erro ao criar pagamento: ${response.status} ${response.statusText}`);
       }
-
-      const responseData = await response.json();
-      console.log("[For4Payments] Pagamento criado com sucesso:", responseData);
       
+      const responseText = await response.text();
+      console.log("[For4Payments] Resposta da API (texto):", responseText);
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+        console.log("[For4Payments] Dados do pagamento gerado:", {
+          id: responseData.id,
+          status: responseData.status
+        });
+      } catch (e) {
+        console.error("[For4Payments] Erro ao fazer parse da resposta JSON:", e);
+        throw new Error("Formato de resposta inválido da API de pagamento");
+      }
+      
+      // Retornar os dados formatados
       return {
         id: responseData.id,
         pixCode: responseData.pixCode,
         pixQrCode: responseData.pixQrCode,
         expiresAt: responseData.expiresAt,
-        status: responseData.status || "pending",
+        status: responseData.status || "pending"
       };
     } catch (error) {
       console.error("[For4Payments] Erro:", error);
@@ -172,6 +200,6 @@ export class For4PaymentsAPI {
 
 // Inicialização da API com as chaves fornecidas
 export const paymentApi = new For4PaymentsAPI(
-  "ad6ab253-8ae1-454c-91f3-8ccb18933065", // Secret Key atualizada
-  "6d485c73-303b-466c-9344-d7b017dd1ecc"  // Public Key atualizada
+  "b5b6ac73-07a8-48d5-acf1-b75d76b4e8d4", // Secret Key correta
+  "9df1f7ae-e78f-4fdf-bb31-e24003b9d106"  // Public Key correta
 );
