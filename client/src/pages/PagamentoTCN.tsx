@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useUserData } from "@/contexts/UserContext";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -38,6 +39,7 @@ const formatarData = (dataString: string) => {
 export default function PagamentoTCN() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
+  const { userData, updateUserData } = useUserData();
   
   // Estado de loading para simular o processamento do pagamento
   const [isLoading, setIsLoading] = useState(false);
@@ -59,54 +61,60 @@ export default function PagamentoTCN() {
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
   
-  // Obter parâmetros da URL
+  // Obter dados do contexto global
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    
     // Definir protocolo
-    const protocoloParam = urlParams.get('protocolo');
-    if (protocoloParam) {
-      setProtocolo(protocoloParam);
+    if (userData.protocolo) {
+      setProtocolo(userData.protocolo);
     }
     
-    // Estabelecer dados básicos
-    const cpfParam = urlParams.get('cpf') || "";
-    const nomeParam = urlParams.get('nome') || "";
-    const valorParam = urlParams.get('valor') || "0";
-    const companhiaParam = urlParams.get('companhia') || "";
-    const estadoParam = urlParams.get('estado') || "";
-    const nascParam = urlParams.get('dataNascimento') || "";
-    const emailParam = urlParams.get('email') || "";
-    const telefoneParam = urlParams.get('telefone') || "";
+    // Estabelecer dados básicos do contexto
+    const cpfValue = userData.cpf || "";
+    const nomeValue = userData.nome || "";
+    const valorValue = userData.valorRestituicao || 0;
+    const companhiaValue = userData.companhia || "";
+    const estadoValue = userData.estado || "";
+    const nascValue = userData.dataNascimento || "";
+    const emailValue = userData.email || "";
+    const telefoneValue = userData.telefone || "";
     
-    setCpf(cpfParam);
-    setNome(nomeParam);
-    setValor(parseFloat(valorParam));
-    setCompanhia(companhiaParam);
-    setEstado(estadoParam);
-    setDataNascimento(nascParam);
-    setEmail(emailParam);
-    setTelefone(telefoneParam);
+    setCpf(cpfValue);
+    setNome(nomeValue);
+    setValor(valorValue);
+    setCompanhia(companhiaValue);
+    setEstado(estadoValue);
+    setDataNascimento(nascValue);
+    setEmail(emailValue);
+    setTelefone(telefoneValue);
     
-    // Definir valor da taxa TCN
-    const valorTaxaParam = urlParams.get('valorTaxaConformidade') || "118";
-    setValorTaxa(parseFloat(valorTaxaParam));
+    // Definir valor da taxa TCN do contexto ou usar valor padrão
+    const valorTaxaValue = userData.valorTaxaConformidade || 118;
+    setValorTaxa(valorTaxaValue);
     
     // Se não tiver protocolo, gera um baseado no CPF
-    if (!protocoloParam && cpfParam) {
-      setProtocolo(`${cpfParam.substring(0, 4)}4714${cpfParam.substring(6, 9)}`);
+    if (!userData.protocolo && cpfValue) {
+      const novoProtocolo = `${cpfValue.substring(0, 4)}4714${cpfValue.substring(6, 9)}`;
+      setProtocolo(novoProtocolo);
+      
+      // Atualiza o contexto com o protocolo gerado
+      updateUserData({
+        protocolo: novoProtocolo
+      });
     }
     
     // Definir data do pagamento da primeira taxa a partir de hoje
     const dataHoje = new Date();
-    setDataPagamento(dataHoje.toLocaleDateString('pt-BR', {
+    const dataHojeFormatada = dataHoje.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    }));
-  }, []);
+    });
+    
+    setDataPagamento(userData.dataPagamento ? formatarData(userData.dataPagamento) : dataHojeFormatada);
+    
+  }, [userData]);
   
   // Formato para exibição de tempo restante
   const formatarTempo = (segundos: number) => {
@@ -278,23 +286,26 @@ export default function PagamentoTCN() {
       });
   };
   
-  // Função para redirecionar para a próxima etapa com os parâmetros corretos
+  // Função para redirecionar para a próxima etapa usando o contexto
   const redirecionarParaProximaEtapa = () => {
-    const params = new URLSearchParams();
-    params.append('cpf', cpf);
-    params.append('nome', nome);
-    params.append('valor', valor.toString());
-    params.append('pagamentoId', paymentInfo?.id || 'tcn123456789');
-    params.append('dataPagamento', new Date().toISOString());
-    params.append('companhia', companhia);
-    params.append('estado', estado);
-    params.append('nasc', dataNascimento);
-    params.append('protocolo', protocolo);
-    params.append('email', email);
-    params.append('telefone', telefone);
+    // Atualizar contexto do usuário com as novas informações
+    updateUserData({
+      cpf,
+      nome,
+      valorRestituicao: valor,
+      pagamentoId: paymentInfo?.id || 'tcn123456789',
+      dataPagamento: new Date().toISOString(),
+      companhia,
+      estado,
+      dataNascimento,
+      protocolo,
+      email,
+      telefone,
+      valorTaxaConformidade: valorTaxa
+    });
     
     // Redirecionar para a terceira etapa - Taxa de Liberação Acelerada de Restituição
-    setLocation(`/taxa-lar?${params.toString()}`);
+    setLocation('/taxa-lar');
   };
   
   // Formatar valores para exibição
