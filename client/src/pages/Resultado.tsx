@@ -142,7 +142,7 @@ export default function Resultado() {
   // Dados extras
   const [estado, setEstado] = useState(userData.estado || "Minas Gerais");
   const [companhia, setCompanhia] = useState(userData.companhia || "CEMIG Distribuição");
-  const [dataNascimento, setDataNascimento] = useState("");
+  const [dataNascimento, setDataNascimento] = useState(userData.dataNascimento || "");
   
   // Dados calculados da restituição
   const [valorTotal, setValorTotal] = useState(0);
@@ -256,7 +256,16 @@ export default function Resultado() {
   // Simulação inicial de cálculo da restituição
   useEffect(() => {
     // Verificar se temos CPF e nome
+    console.log("Verificando dados do usuário no contexto:", { 
+      cpf, 
+      nome, 
+      dataNascimento: userData.dataNascimento,
+      estado: userData.estado,
+      companhia: userData.companhia 
+    });
+    
     if (!cpf || !nome) {
+      console.log("CPF ou nome não encontrados, redirecionando para /verificar");
       navigate("/verificar");
       return;
     }
@@ -293,7 +302,7 @@ export default function Resultado() {
     }, 3000); // Reduzido para 3 segundos para melhor experiência do usuário
     
     return () => clearInterval(timer);
-  }, [cpf, nome, navigate]);
+  }, [cpf, nome, navigate, userData]);
   
   // Função para gerar o PDF de comprovante
   const gerarComprovante = () => {
@@ -395,6 +404,15 @@ export default function Resultado() {
   const prosseguirParaSimulador = () => {
     // Atualizar os dados no contexto antes de navegar
     updateUserData({
+      cpf,
+      nome,
+      dataNascimento,
+      estado,
+      companhia,
+      valorRestituicao: valorTotal
+    });
+    
+    console.log("Redirecionando para página de cálculo com dados:", {
       cpf,
       nome,
       dataNascimento,
