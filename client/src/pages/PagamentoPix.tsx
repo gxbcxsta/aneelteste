@@ -12,7 +12,6 @@ import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { paymentApi } from "@/lib/for4payments";
-import { notifyPixGenerated, notifyPaymentConfirmed } from "@/lib/utmify";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
