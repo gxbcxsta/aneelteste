@@ -168,10 +168,7 @@ export default function PagamentoPix() {
     setTimeout(() => setCopied(false), 3000);
   };
   
-  // Simular o pagamento (para fins de demonstração)
-  const simularPagamento = () => {
-    navigate("/sucesso");
-  };
+  // Removida a função de simulação de pagamento conforme solicitado pelo cliente
   
   // Formatar o tempo do contador (mm:ss)
   const formatarTempo = (segundos: number) => {
@@ -192,11 +189,8 @@ export default function PagamentoPix() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          nome: nome,
-          cpf: cpf,
-          email: email,
-          telefone: telefone,
-          valor: 74.90
+          name: nome,
+          cpf: cpf
         })
       });
 

