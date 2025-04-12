@@ -17,6 +17,7 @@ export interface UserData {
   dataPagamento?: string;
   valorTaxaConformidade?: number;
   protocolo?: string;
+  dataPrevista?: string; // Data prevista para recebimento da restituição
   contaBancaria?: {
     banco: string;
     agencia: string;

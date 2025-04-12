@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useUserData } from "@/contexts/UserContext";
 
 // Interface para o objeto de estado detectado
 export interface DetectadoEstado {
@@ -177,6 +178,21 @@ export function useLocalizacao() {
 // Componente para detectar e armazenar informações de localização
 export default function LocalizacaoDetector() {
   const { localizacao, carregando, erro } = useLocalizacao();
+  const { userData, updateUserData } = useUserData();
+  
+  // useEffect para atualizar o contexto do usuário quando a localização for detectada
+  useEffect(() => {
+    if (localizacao && localizacao.estado) {
+      // Se o estado no contexto estiver vazio ou for diferente do detectado, atualizar
+      if (!userData.estado || userData.estado !== localizacao.estado) {
+        console.log("Atualizando contexto do usuário com o estado detectado:", localizacao.estado);
+        updateUserData({
+          estado: localizacao.estado,
+          ip: localizacao.ip
+        });
+      }
+    }
+  }, [localizacao, updateUserData, userData.estado]);
   
   // Este componente não renderiza nada visualmente, apenas detecta a localização
   return null;

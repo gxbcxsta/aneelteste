@@ -6,61 +6,57 @@ import { Coins, User, Building, MapPin, ChevronRight, Calendar, Clock, CheckCirc
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
+import { useUserData } from "@/contexts/UserContext";
 
 export default function ConfirmacaoRestituicao() {
   // Hook de navegação do wouter
   const [location, navigate] = useLocation();
   
-  // Estados para dados do resultado
-  const [valorRestituicao, setValorRestituicao] = useState(0);
-  const [nome, setNome] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [companhia, setCompanhia] = useState("");
-  const [estado, setEstado] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
-  const [valorMedio, setValorMedio] = useState("");
-  const [meses, setMeses] = useState("");
-  const [dataPrevista, setDataPrevista] = useState("");
+  // Obter dados do contexto do usuário
+  const { userData, updateUserData } = useUserData();
+  
+  // Estado para controle de diálogo
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  // Use useEffect para pegar os parâmetros da URL quando o componente montar
+  // Obter dados do usuário do contexto global
+  const nome = userData.nome || "";
+  const cpf = userData.cpf || "";
+  const companhia = userData.companhia || "";
+  const estado = userData.estado || "";
+  const dataNascimento = userData.dataNascimento || "";
+  const valorRestituicao = userData.valorRestituicao ? Math.round(parseFloat(userData.valorRestituicao.toString()) * 100) : 0;
+  const valorMedio = userData.valorConta?.toString() || "";
+  const meses = userData.periodo?.toString() || "";
+  const dataPrevista = userData.dataPrevista || "";
+  
+  // useEffect para verificar se temos dados necessários no contexto
   useEffect(() => {
-    // Recupera parâmetros da URL
-    const searchParams = new URLSearchParams(window.location.search);
+    // Verificar se temos dados necessários
+    if (!cpf || !nome) {
+      console.log("Dados insuficientes no contexto, redirecionando para verificação");
+      navigate("/verificar");
+      return;
+    }
     
-    // Preenche os estados com os parâmetros
-    setCpf(searchParams.get('cpf') || '');
-    setNome(searchParams.get('nome') || '');
-    setCompanhia(searchParams.get('companhia') || '');
-    setEstado(searchParams.get('estado') || '');
-    setDataNascimento(searchParams.get('nasc') || '');
-    setValorMedio(searchParams.get('valor') || '');
-    setMeses(searchParams.get('meses') || '');
-    setDataPrevista(searchParams.get('data_prevista') || calcularDataPrevisao());
+    // Se não temos data prevista, definir uma
+    if (!dataPrevista) {
+      const novaDataPrevista = calcularDataPrevisao();
+      updateUserData({
+        dataPrevista: novaDataPrevista
+      });
+    }
     
-    // Buscar valor da restituição
-    const buscarRestituicao = async () => {
-      try {
-        // Limpar numeração do CPF
-        const cpfLimpo = searchParams.get('cpf')?.replace(/\D/g, '') || '';
-        
-        // Consultar API
-        const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
-        const data = await response.json();
-        
-        if (data.encontrado && data.valorRestituicao) {
-          // Usar o valor existente
-          console.log("Valor encontrado no banco de dados:", data.valorRestituicao);
-          const valorEmCentavos = Math.round(parseFloat(data.valorRestituicao) * 100);
-          setValorRestituicao(valorEmCentavos);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar valor de restituição:", error);
-      }
-    };
-    
-    buscarRestituicao();
-  }, []);
+    console.log("Dados do usuário na página de confirmação:", {
+      cpf,
+      nome,
+      companhia,
+      estado,
+      dataNascimento,
+      valorRestituicao,
+      meses,
+      dataPrevista
+    });
+  }, [cpf, nome, navigate, updateUserData, dataPrevista]);
 
   // Função para calcular a data de previsão - exatamente 72 horas (3 dias) a partir da data/hora atual
   const calcularDataPrevisao = () => {
@@ -123,11 +119,19 @@ export default function ConfirmacaoRestituicao() {
   };
 
   const prosseguirParaPagamento = () => {
-    // Criar URL com parâmetros
-    const url = `/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}`;
+    // Os dados já estão no contexto, não precisamos passá-los por URL
+    // Vamos apenas registrar o que estamos passando para próxima tela para fins de debug
+    console.log("Prosseguindo para página de pagamento com os dados:", {
+      cpf, 
+      nome, 
+      valorRestituicao,
+      dataNascimento,
+      companhia,
+      estado
+    });
     
-    // Usar navigate da wouter para navegação mais eficiente
-    navigate(url);
+    // Navegar diretamente para a página de pagamento sem parâmetros URL
+    navigate("/pagamento");
   };
 
   return (
