@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { notifyPixGenerated, notifyPaymentConfirmed } from "@/lib/utmify";
+// Utmify removido de acordo com os requisitos
 import { useUserData } from "@/contexts/UserContext";
 
 // Gerar um código PIX aleatório
@@ -200,21 +200,7 @@ export default function PagamentoPix() {
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
       
-      // Enviar informação para UTMify sobre o PIX gerado
-      try {
-        await notifyPixGenerated(
-          payment.id,
-          cpf,
-          nome,
-          email,
-          telefone,
-          7490 // valor em centavos (R$ 74,90)
-        );
-        console.log("Notificação UTMify enviada com sucesso - PIX gerado");
-      } catch (utmifyError) {
-        console.error("Erro ao enviar notificação para UTMify:", utmifyError);
-        // Não interrompe o fluxo principal se houver erro na integração com UTMify
-      }
+      // UTMify removido conforme solicitado
     } catch (error) {
       console.error('Erro ao criar pagamento:', error);
     } finally {
@@ -249,21 +235,7 @@ export default function PagamentoPix() {
             variant: "default"
           });
           
-          // Enviar informação para UTMify sobre o pagamento confirmado
-          try {
-            await notifyPaymentConfirmed(
-              paymentInfo.id,
-              cpf,
-              nome,
-              email,
-              telefone,
-              7490 // valor em centavos (R$ 74,90)
-            );
-            console.log("[VerificaçãoPIX] Notificação UTMify enviada com sucesso - Pagamento confirmado");
-          } catch (utmifyError) {
-            console.error("[VerificaçãoPIX] Erro ao enviar notificação para UTMify:", utmifyError);
-            // Não interrompe o fluxo principal se houver erro na integração com UTMify
-          }
+          // UTMify removido conforme solicitado
           
           // Atualizar o contexto com os dados do pagamento
           updateUserData({
