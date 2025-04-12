@@ -45,7 +45,7 @@ export default function PagamentoTCN() {
   const [pagamentoId, setPagamentoId] = useState("");
   const [pixCode, setPixCode] = useState("");
   const [pixQrCode, setPixQrCode] = useState("");
-  const [status, setStatus] = useState<"loading" | "success" | "paid" | "error">("loading");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "paid" | "error">("idle");
   const [tempoRestante, setTempoRestante] = useState<number>(900); // 15 minutos em segundos
   const [copiado, setCopiado] = useState(false);
   const [verificandoPagamento, setVerificandoPagamento] = useState(false);
@@ -490,21 +490,13 @@ export default function PagamentoTCN() {
                   </div>
                 )}
                 
-                {(status === "loading" || status === "error") && (
+                {(status === "idle" || status === "error") && (
                   <div className="mt-6 flex justify-center">
                     <Button 
                       className="bg-amber-600 hover:bg-amber-700 text-white"
                       onClick={prosseguirParaPagamento}
-                      disabled={status === "loading"}
                     >
-                      {status === "loading" ? (
-                        <>
-                          <span className="animate-spin mr-2">⟳</span>
-                          Gerando pagamento...
-                        </>
-                      ) : (
-                        "PROSSEGUIR PARA PAGAMENTO"
-                      )}
+                      PROSSEGUIR PARA PAGAMENTO
                     </Button>
                   </div>
                 )}
