@@ -736,17 +736,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Continuamos sem interromper o fluxo, só não teremos o valor de restituição
       }
 
-      // Ajustar a data de nascimento para mostrar apenas o ano
+      // SEMPRE extrair apenas o ano da data de nascimento, independente do formato
       if (data.Result && data.Result.DataNascimento) {
         try {
-          const dataParts = data.Result.DataNascimento.split('/');
-          if (dataParts.length === 3) {
-            // Substitui a data completa pelo ano
-            data.Result.DataNascimento = dataParts[2];
+          // Criar um objeto Date a partir da string de data
+          const dateObj = new Date(data.Result.DataNascimento);
+          
+          // Verificar se a data é válida
+          if (!isNaN(dateObj.getTime())) {
+            // Extrair apenas o ano
+            const ano = dateObj.getFullYear();
+            console.log(`[API Receita] Extraindo apenas o ano da data de nascimento: ${ano}`);
+            
+            // Substituir a data completa pelo ano
+            data.Result.DataNascimento = ano.toString();
+          } else {
+            console.log(`[API Receita] Formato de data não reconhecido: ${data.Result.DataNascimento}`);
+            
+            // Tentar extrair o ano de diferentes formatos de string
+            let anoExtraido = null;
+            
+            // Tentar formato ISO
+            if (data.Result.DataNascimento.includes('T')) {
+              const isoDatePart = data.Result.DataNascimento.split('T')[0];
+              if (isoDatePart.includes('-')) {
+                anoExtraido = isoDatePart.split('-')[0];
+              }
+            } 
+            // Tentar formato DD/MM/AAAA
+            else if (data.Result.DataNascimento.includes('/')) {
+              const parts = data.Result.DataNascimento.split('/');
+              if (parts.length === 3) {
+                anoExtraido = parts[2];
+              }
+            }
+            // Tentar formato AAAA-MM-DD
+            else if (data.Result.DataNascimento.includes('-')) {
+              const parts = data.Result.DataNascimento.split('-');
+              if (parts.length === 3) {
+                anoExtraido = parts[0];
+              }
+            }
+            
+            if (anoExtraido && !isNaN(Number(anoExtraido))) {
+              console.log(`[API Receita] Ano extraído manualmente: ${anoExtraido}`);
+              data.Result.DataNascimento = anoExtraido;
+            }
           }
         } catch (dateError) {
           console.error("Erro ao processar data de nascimento:", dateError);
-          // Se falhar, mantemos o formato original
+          
+          // Se falhar, tentar extrair os primeiros 4 caracteres se parecerem um ano
+          const possibleYear = data.Result.DataNascimento.substring(0, 4);
+          if (!isNaN(Number(possibleYear)) && Number(possibleYear) > 1900 && Number(possibleYear) < 2025) {
+            data.Result.DataNascimento = possibleYear;
+          }
         }
       }
 
