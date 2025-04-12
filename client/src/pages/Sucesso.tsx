@@ -109,19 +109,13 @@ export default function Sucesso() {
 
     // Gerar data estimada (até 3 dias úteis para avaliação + até 30 dias úteis para pagamento)
     const gerarDataEstimada = () => {
-      const hoje = new Date();
-      let diasUteis = 0;
-      let dataAtual = new Date(hoje);
+      const dataPagamento = params.get('dataPagamento') ? new Date(params.get('dataPagamento')) : new Date();
       
-      while (diasUteis < 30) {
-        dataAtual.setDate(dataAtual.getDate() + 1);
-        // Verifica se é dia útil (não é sábado nem domingo)
-        if (dataAtual.getDay() !== 0 && dataAtual.getDay() !== 6) {
-          diasUteis++;
-        }
-      }
+      // Adicionar 72 horas (3 dias) à data de pagamento
+      const dataLimite = new Date(dataPagamento);
+      dataLimite.setHours(dataLimite.getHours() + 72);
       
-      return dataAtual.toLocaleDateString("pt-BR", {
+      return dataLimite.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
