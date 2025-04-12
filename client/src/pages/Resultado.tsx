@@ -393,16 +393,18 @@ export default function Resultado() {
   
   // Prosseguir para o simulador
   const prosseguirParaSimulador = () => {
-    // Criar URL com todos os parâmetros necessários
-    const params = new URLSearchParams();
-    params.append("cpf", cpf);
-    params.append("nome", nome);
-    params.append("nasc", dataNascimento);
-    params.append("estado", estado);
-    params.append("companhia", companhia);
+    // Atualizar os dados no contexto antes de navegar
+    updateUserData({
+      cpf,
+      nome,
+      dataNascimento,
+      estado,
+      companhia,
+      valorRestituicao: valorTotal
+    });
     
-    // Navegar para página de cálculo
-    navigate(`/calculo?${params.toString()}`);
+    // Navegar para página de cálculo sem parâmetros na URL
+    navigate('/calculo');
   };
   
   return (
