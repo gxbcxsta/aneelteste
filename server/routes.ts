@@ -181,6 +181,8 @@ const paymentApi = new For4PaymentsAPI(
   "6d485c73-303b-466c-9344-d7b017dd1ecc"  // Public Key fornecida pelo cliente
 );
 
+
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // API route for potential simulation endpoints
   app.get('/api/health', (req, res) => {
@@ -618,7 +620,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rota para verificar status de pagamento
+
+
+// Rota para verificar status de pagamento
   app.get('/api/pagamentos/:id/status', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -685,8 +689,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(200).json({
           Result: {
             NumeroCpf: cpfLimpo,
-            NomePessoaFisica: "GABRIEL ARTHUR ALVES SABINO RAPOSO", // Nome fixo para facilitar testes
-            DataNascimento: "04/07/1997",
+            NomePessoaFisica: `NOME CLIENTE CPF ${cpfLimpo.substring(0, 4)}`, // Nome baseado no CPF
+            DataNascimento: `${1950 + (parseInt(cpfLimpo.substring(5, 9)) % 51)}`, // Apenas o ano
             ValorRestituicao: valorCalculado
           },
           Status: {
@@ -700,8 +704,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(200).json({
         Result: {
           NumeroCpf: cpfLimpo,
-          NomePessoaFisica: "GABRIEL ARTHUR ALVES SABINO RAPOSO", // Nome fixo para facilitar testes
-          DataNascimento: "04/07/1997",
+          NomePessoaFisica: `NOME CLIENTE CPF ${cpfLimpo.substring(0, 4)}`, // Nome baseado no CPF
+          DataNascimento: `${1950 + (parseInt(cpfLimpo.substring(5, 9)) % 51)}`, // Apenas o ano
           ValorRestituicao: valorRestituicao
         },
         Status: {
