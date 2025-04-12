@@ -23,7 +23,7 @@ export default function DebugDetectorIp() {
       sessionStorage.clear();
       
       // Forçar recarga da página sem usar cache
-      window.location.reload(true);
+      window.location.reload();
     } catch (error) {
       console.error("Erro ao limpar cache:", error);
     }

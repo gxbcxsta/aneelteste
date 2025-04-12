@@ -57,7 +57,6 @@ function App() {
         <LocalizacaoDetector />
         <Router />
         <Toaster />
-        <DebugDetectorIp />
       </UserProvider>
     </QueryClientProvider>
   );
