@@ -251,28 +251,46 @@ export default function ConfirmarIdentidade() {
         
         setOpcoesNome(embaralharArray(opcoes));
         
-        // Preparar opções de ano
+        // Preparar opções de data de nascimento
         const dataNascimento = data.Result.DataNascimento;
-        const anoCorreto = getAnoNascimento(dataNascimento);
         
-        const gerarAnoAleatorio = () => {
-          const anoCorretoNum = parseInt(anoCorreto);
-          const variacao = Math.floor(Math.random() * 15) + 1; // Variação de 1 a 15 anos
-          const sinal = Math.random() > 0.5 ? 1 : -1;
-          return (anoCorretoNum + variacao * sinal).toString();
+        // Função para gerar uma data aleatória entre 1959 e 1995
+        const gerarDataNascimentoAleatoria = () => {
+          // Gerar ano entre 1959 e 1995
+          const anoMin = 1959;
+          const anoMax = 1995;
+          const ano = Math.floor(Math.random() * (anoMax - anoMin + 1)) + anoMin;
+          
+          // Gerar mês (1-12)
+          const mes = Math.floor(Math.random() * 12) + 1;
+          
+          // Determinar o número máximo de dias no mês
+          let diasMax = 31;
+          if ([4, 6, 9, 11].includes(mes)) {
+            diasMax = 30;
+          } else if (mes === 2) {
+            // Verificar se é ano bissexto
+            diasMax = (ano % 4 === 0 && (ano % 100 !== 0 || ano % 400 === 0)) ? 29 : 28;
+          }
+          
+          // Gerar dia (1-diasMax)
+          const dia = Math.floor(Math.random() * diasMax) + 1;
+          
+          // Formatar a data como DD/MM/YYYY
+          return `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${ano}`;
         };
         
-        // Gerar 2 anos aleatórios diferentes
-        const anosAleatorios: string[] = [];
-        while (anosAleatorios.length < 2) {
-          const anoAleatorio = gerarAnoAleatorio();
-          if (!anosAleatorios.includes(anoAleatorio) && anoAleatorio !== anoCorreto) {
-            anosAleatorios.push(anoAleatorio);
+        // Gerar 2 datas aleatórias diferentes
+        const datasAleatorias: string[] = [];
+        while (datasAleatorias.length < 2) {
+          const dataAleatoria = gerarDataNascimentoAleatoria();
+          if (!datasAleatorias.includes(dataAleatoria) && dataAleatoria !== dataNascimento) {
+            datasAleatorias.push(dataAleatoria);
           }
         }
         
-        // Adicionar o ano correto e embaralhar
-        setOpcoesAno(embaralharArray([...anosAleatorios, anoCorreto]));
+        // Adicionar a data correta e embaralhar
+        setOpcoesAno(embaralharArray([...datasAleatorias, dataNascimento]));
         
       } catch (error) {
         console.error("Erro ao buscar dados do CPF:", error);
@@ -397,12 +415,11 @@ export default function ConfirmarIdentidade() {
     }
   };
 
-  // Lidar com o envio do formulário de ano
+  // Lidar com o envio do formulário de data de nascimento
   const onSubmitAno = async (values: AnoFormValues) => {
     const dataNascimento = dadosPessoais?.Result?.DataNascimento || "";
-    const anoCorreto = getAnoNascimento(dataNascimento);
     
-    if (values.ano === anoCorreto) {
+    if (values.ano === dataNascimento) {
       // Usar o estado já detectado através do componente LocalizacaoDetector
       let estadoSelecionado = estado;
       
@@ -428,8 +445,8 @@ export default function ConfirmarIdentidade() {
       setEtapaAtual(EtapaVerificacao.COMPANHIA_ELETRICA);
     } else {
       toast({
-        title: "Ano incorreto",
-        description: "Por favor, selecione o ano correto do seu nascimento.",
+        title: "Data incorreta",
+        description: "Por favor, selecione a data de nascimento correta.",
         variant: "destructive",
       });
     }
@@ -564,7 +581,7 @@ export default function ConfirmarIdentidade() {
                   {etapaAtual === EtapaVerificacao.ANO_NASCIMENTO && (
                     <div>
                       <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
-                        Agora, selecione o ano do seu nascimento entre as opções abaixo:
+                        Agora, selecione sua data de nascimento entre as opções abaixo:
                       </h2>
                       
                       <Form {...anoForm}>
