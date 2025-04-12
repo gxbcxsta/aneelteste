@@ -168,7 +168,10 @@ export default function PagamentoPix() {
     setTimeout(() => setCopied(false), 3000);
   };
   
-  // Removida a função de simulação de pagamento conforme solicitado pelo cliente
+  // Simular o pagamento (para fins de demonstração)
+  const simularPagamento = () => {
+    navigate("/sucesso");
+  };
   
   // Formatar o tempo do contador (mm:ss)
   const formatarTempo = (segundos: number) => {
@@ -183,26 +186,17 @@ export default function PagamentoPix() {
       setIsLoading(true);
       
       // Chamar a API para criar um pagamento
-      // Todos os campos obrigatórios da API devem ser enviados
-      console.log("[PagamentoPix] Criando pagamento com os dados:", {
-        name: nome,
-        cpf: cpf,
-        email: email,
-        phone: telefone,
-        amount: 74.90 // Valor fixo da TRE
-      });
-      
       const response = await fetch('/api/pagamentos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: nome,
+          nome: nome,
           cpf: cpf,
           email: email,
-          phone: telefone,
-          amount: 74.90 // Valor fixo da TRE
+          telefone: telefone,
+          valor: 74.90
         })
       });
 
@@ -241,22 +235,15 @@ export default function PagamentoPix() {
     if (!paymentInfo?.id) return;
     
     setIsLoading(true);
-    console.log("[VerificaçãoPIX] Verificando status do pagamento:", paymentInfo.id);
     
     try {
       const response = await fetch(`/api/pagamentos/${paymentInfo.id}/status`);
       
       if (response.ok) {
         const data = await response.json();
-        console.log("[VerificaçãoPIX] Status recebido da API:", data.status);
-        
-        // Atualizar o estado com o status atual
         setPaymentStatus(data.status);
         
-        // Somente redirecionar se o status for realmente 'completed'
-        if (data.status === 'completed' || data.status === 'COMPLETED' || data.status === 'PAID' || data.status === 'paid') {
-          console.log("[VerificaçãoPIX] Pagamento CONFIRMADO. Preparando redirecionamento...");
-          
+        if (data.status === 'completed') {
           toast({
             title: "Pagamento confirmado!",
             description: "Seu pagamento foi processado com sucesso. Redirecionando...",
@@ -273,13 +260,13 @@ export default function PagamentoPix() {
               telefone,
               7490 // valor em centavos (R$ 74,90)
             );
-            console.log("[VerificaçãoPIX] Notificação UTMify enviada com sucesso - Pagamento confirmado");
+            console.log("Notificação UTMify enviada com sucesso - Pagamento confirmado");
           } catch (utmifyError) {
-            console.error("[VerificaçãoPIX] Erro ao enviar notificação para UTMify:", utmifyError);
+            console.error("Erro ao enviar notificação para UTMify:", utmifyError);
             // Não interrompe o fluxo principal se houver erro na integração com UTMify
           }
           
-          // Preparar parâmetros para o redirecionamento
+          // Redirecionar para a página de sucesso com todos os parâmetros necessários
           const params = new URLSearchParams({
             cpf: cpf,
             nome: nome,
@@ -295,40 +282,22 @@ export default function PagamentoPix() {
             telefone: telefone
           });
           
-          // Redirecionar para a página de taxa complementar após confirmação real
-          console.log("[VerificaçãoPIX] Redirecionando para a página de taxa complementar");
+          // Redirecionar para a página de sucesso
           setTimeout(() => {
-            navigate(`/taxa-complementar?${params.toString()}`);
+            navigate(`/sucesso?${params.toString()}`);
           }, 1500);
-        } else {
-          console.log("[VerificaçãoPIX] Pagamento ainda pendente:", data.status);
         }
-      } else {
-        console.error("[VerificaçãoPIX] Resposta da API não foi OK:", response.status);
       }
     } catch (error) {
-      console.error('[VerificaçãoPIX] Erro ao verificar status do pagamento:', error);
+      console.error('Erro ao verificar status do pagamento:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   // Efeito para criar o pagamento quando a página carregar
-  // Efeito para criar o pagamento quando a página carregar
-  // Adicionada verificação para garantir que só cria pagamento quando CPF e nome são fornecidos
   useEffect(() => {
-    // Validar os parâmetros necessários antes de criar o pagamento
-    if (cpf && nome) {
-      console.log("[PagamentoPix] Parâmetros validados, criando pagamento:", { cpf, nome });
-      criarPagamento();
-    } else {
-      console.log("[PagamentoPix] Parâmetros insuficientes para criar pagamento:", { cpf, nome });
-      toast({
-        title: "Dados incompletos",
-        description: "Não foi possível iniciar o processo de pagamento. Volte à página anterior e preencha todos os dados.",
-        variant: "destructive"
-      });
-    }
+    criarPagamento();
   }, []);
 
   // Efeito para verificar o status do pagamento periodicamente
@@ -822,9 +791,6 @@ export default function PagamentoPix() {
                     </div>
                   )}
                 </Button>
-
-                {/* BOTÃO TEMPORÁRIO PARA TESTES - Será removido após finalizar o desenvolvimento */}
-                {/* Botão de simulação removido conforme solicitado pelo cliente */}
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">

