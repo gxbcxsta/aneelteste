@@ -705,6 +705,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!data) {
         return res.status(500).json({ error: "Resposta vazia da API" });
       }
+      
+      // Verifica e registra os dados para debug
+      console.log("[API Receita] Dados recebidos:", JSON.stringify(data, null, 2));
+      
+      // Garantir que estamos extraindo o campo NomePessoaFisica corretamente
+      if (data.Result && data.Result.NomePessoaFisica) {
+        console.log(`[API Receita] Nome da pessoa física extraído: "${data.Result.NomePessoaFisica}"`);
+      } else {
+        console.error("[API Receita] Campo NomePessoaFisica não encontrado na resposta");
+      }
 
       // Se tudo deu certo, verifica se precisamos calcular e armazenar um valor de restituição
       try {
