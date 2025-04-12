@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation } from "wouter";
 import { z } from "zod";
+import { useUserData } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -247,6 +248,8 @@ export default function SimuladorRestituicao({
   
   // Hook de navegação
   const [location, navigate] = useLocation();
+  // Hook de contexto do usuário
+  const { updateUserData } = useUserData();
   
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = async (data: PeriodoFormValues) => {
@@ -270,8 +273,19 @@ export default function SimuladorRestituicao({
         meses = 12;
     }
     
-    // Redirecionar para a página de resultado-calculo usando o navigate da wouter
-    navigate(`/resultado-calculo?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&nasc=${encodeURIComponent(dataNascimento)}&valor=${encodeURIComponent(valorMedioFinal)}&meses=${encodeURIComponent(meses)}`);
+    // Atualizar contexto do usuário com os dados
+    updateUserData({
+      cpf,
+      nome,
+      companhia,
+      estado,
+      dataNascimento,
+      valorConta: valorMedioFinal,
+      periodo: meses
+    });
+    
+    // Redirecionar para a página de resultado-calculo usando navigate
+    navigate('/resultado-calculo');
   };
   
   // Funções de navegação entre etapas
@@ -351,8 +365,26 @@ export default function SimuladorRestituicao({
     setAnimacaoAtiva(true);
     
     setTimeout(() => {
-      // Redirecionar para a página de pagamento PIX com todos os dados relevantes
-      navigate(`/pagamento?cpf=${encodeURIComponent(cpf)}&nome=${encodeURIComponent(nome)}&valor=${encodeURIComponent(valorFinalRestituicao)}&nasc=${encodeURIComponent(dataNascimento)}&companhia=${encodeURIComponent(companhia)}&estado=${encodeURIComponent(estado)}&bancoNome=${encodeURIComponent(bancoSelecionado)}`);
+      // Atualizar contexto do usuário com os dados finais
+      updateUserData({
+        cpf,
+        nome,
+        dataNascimento,
+        companhia,
+        estado,
+        valorRestituicao: valorFinalRestituicao,
+        email: emailConfirmado,
+        telefone: telefoneConfirmado,
+        contaBancaria: {
+          banco: bancoSelecionado,
+          agencia: "",
+          conta: "",
+          tipo: "pix"
+        }
+      });
+      
+      // Redirecionar para a página de pagamento PIX usando o contexto
+      navigate('/pagamento');
     }, 500);
   };
   

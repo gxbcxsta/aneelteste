@@ -4,18 +4,18 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import SimuladorRestituicao from "@/components/SimuladorRestituicao";
+import { useUserData } from "@/contexts/UserContext";
 
 export default function Calculo() {
   const [location, navigate] = useLocation();
-  // Extrair parâmetros de consulta da URL atual
-  const query = new URLSearchParams(window.location.search);
+  const { userData } = useUserData();
   
-  // Dados do usuário da URL
-  const cpf = query.get("cpf") || "";
-  const nome = query.get("nome") || "";
-  const estado = query.get("estado") || "Minas Gerais";
-  const companhia = query.get("companhia") || "CEMIG Distribuição";
-  const dataNascimento = query.get("nasc") || "";
+  // Obter dados do contexto global
+  const cpf = userData.cpf || "";
+  const nome = userData.nome || "";
+  const estado = userData.estado || "Minas Gerais";
+  const companhia = userData.companhia || "CEMIG Distribuição";
+  const dataNascimento = userData.dataNascimento || "";
   
   // Verificar se temos dados necessários
   useEffect(() => {
