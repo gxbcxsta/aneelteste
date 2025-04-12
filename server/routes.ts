@@ -746,7 +746,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Continuamos sem interromper o fluxo, só não teremos o valor de restituição
       }
 
-      // SEMPRE extrair apenas o ano da data de nascimento, independente do formato
+      // Formatar a data de nascimento como DD/MM/YYYY, independente do formato original
       if (data.Result && data.Result.DataNascimento) {
         try {
           // Criar um objeto Date a partir da string de data
@@ -754,12 +754,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Verificar se a data é válida
           if (!isNaN(dateObj.getTime())) {
-            // Extrair apenas o ano
+            // Formatar a data completa como DD/MM/YYYY
+            const dia = String(dateObj.getDate()).padStart(2, '0');
+            const mes = String(dateObj.getMonth() + 1).padStart(2, '0');
             const ano = dateObj.getFullYear();
-            console.log(`[API Receita] Extraindo apenas o ano da data de nascimento: ${ano}`);
+            const dataFormatada = `${dia}/${mes}/${ano}`;
             
-            // Substituir a data completa pelo ano
-            data.Result.DataNascimento = ano.toString();
+            console.log(`[API Receita] Data de nascimento formatada: ${dataFormatada}`);
+            
+            // Substituir a data completa pelo formato DD/MM/YYYY
+            data.Result.DataNascimento = dataFormatada;
           } else {
             console.log(`[API Receita] Formato de data não reconhecido: ${data.Result.DataNascimento}`);
             
