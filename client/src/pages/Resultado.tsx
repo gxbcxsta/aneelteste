@@ -181,9 +181,11 @@ export default function Resultado() {
   
   // Função para formatar data de nascimento (DD/MM/AAAA)
   const formatarDataNascimento = (data: string) => {
-    // Se a data for apenas um ano (YYYY), converte para 01/01/YYYY
+    // Se a data for apenas um ano (YYYY), gera uma data completa aleatória com esse ano
     if (/^\d{4}$/.test(data)) {
-      return `01/01/${data}`;
+      const dia = Math.floor(Math.random() * 28) + 1;
+      const mes = Math.floor(Math.random() * 12) + 1;
+      return `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${data}`;
     }
     
     // Se for uma data ISO (YYYY-MM-DD), converte para DD/MM/YYYY

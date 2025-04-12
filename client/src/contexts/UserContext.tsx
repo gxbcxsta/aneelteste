@@ -16,6 +16,7 @@ export interface UserData {
   pagamentoId?: string;
   dataPagamento?: string;
   valorTaxaConformidade?: number;
+  valorTaxaLAR?: number;
   protocolo?: string;
   dataPrevista?: string; // Data prevista para recebimento da restituição
   larCompleto?: boolean; // Indica se o pagamento LAR foi concluído

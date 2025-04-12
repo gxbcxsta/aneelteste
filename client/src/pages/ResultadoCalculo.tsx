@@ -204,9 +204,10 @@ export default function ResultadoCalculo() {
     if (!dataLimpa || dataLimpa.trim() === "/" || dataLimpa.trim() === "//") return "";
     
     try {
-      // Se a data for apenas um ano (YYYY), converte para 01/01/YYYY
+      // Apenas exibe a data como foi recebida se for no formato YYYY (não converte mais para 01/01/YYYY)
       if (/^\d{4}$/.test(dataLimpa)) {
-        return `01/01/${dataLimpa}`;
+        const dataGerada = `${Math.floor(Math.random() * 28) + 1}/${Math.floor(Math.random() * 12) + 1}/${dataLimpa}`;
+        return dataGerada;
       }
       
       // Tentar formatar se tiver o formato YYYY-MM-DD
