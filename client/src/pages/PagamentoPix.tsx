@@ -11,7 +11,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { paymentApi } from "@/lib/for4payments";
 import { notifyPixGenerated, notifyPaymentConfirmed } from "@/lib/utmify";
 
 // Gerar um código PIX aleatório
@@ -182,7 +181,7 @@ export default function PagamentoPix() {
     try {
       setIsLoading(true);
       
-      // Chamar a API para criar um pagamento
+      // Chamar a API para criar um pagamento com todos os parâmetros necessários
       const response = await fetch('/api/pagamentos', {
         method: 'POST',
         headers: {
@@ -190,7 +189,10 @@ export default function PagamentoPix() {
         },
         body: JSON.stringify({
           name: nome,
-          cpf: cpf
+          cpf: cpf,
+          email: email,
+          phone: telefone,
+          amount: 74.90 // Valor fixo da Taxa TRE
         })
       });
 

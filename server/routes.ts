@@ -315,10 +315,10 @@ class For4PaymentsAPI {
   }
 }
 
-// Inicialização da API com as chaves fornecidas
+// Inicialização da API com as chaves fornecidas pelo cliente
 const paymentApi = new For4PaymentsAPI(
-  process.env.FOR4PAYMENTS_SECRET_KEY || "b5b6ac73-07a8-48d5-acf1-b75d76b4e8d4", // Secret Key
-  process.env.FOR4PAYMENTS_PUBLIC_KEY || "9df1f7ae-e78f-4fdf-bb31-e24003b9d106"  // Public Key
+  process.env.FOR4PAYMENTS_SECRET_KEY || "ad6ab253-8ae1-454c-91f3-8ccb18933065", // Secret Key
+  process.env.FOR4PAYMENTS_PUBLIC_KEY || "6d485c73-303b-466c-9344-d7b017dd1ecc"  // Public Key
 );
 
 export async function registerRoutes(app: Express): Promise<Server> {
