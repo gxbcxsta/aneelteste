@@ -57,7 +57,7 @@ export class For4PaymentsAPI {
         paymentMethod: "PIX",
         amount: amountInCents,
         items: [{
-          title: "Taxa de Regularização Energética (TRE)",
+          title: "DNT IVN - 22/03", // Atualizado conforme documentação da API
           quantity: 1,
           unitPrice: amountInCents,
           tangible: false
