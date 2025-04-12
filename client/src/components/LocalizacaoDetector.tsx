@@ -79,19 +79,9 @@ export function useLocalizacao() {
     setErro(null);
     
     try {
-      // Se não forçar a detecção, verificar se já existe uma localização salva
-      if (!forcarDeteccao) {
-        const localizacaoSalva = obterLocalizacaoSalva();
-        if (localizacaoSalva) {
-          console.log("Usando dados de localização salvos:", localizacaoSalva);
-          setLocalizacao(localizacaoSalva);
-          setCarregando(false);
-          return;
-        }
-      } else {
-        // Se forçar detecção, limpar dados salvos
-        limparLocalizacaoSalva();
-      }
+      // Forçar limpeza do cache independentemente do parâmetro forcarDeteccao
+      // Isso garante que sempre detectaremos o estado correto
+      limparLocalizacaoSalva();
       
       // Fazer a consulta na API com parâmetro para evitar cache
       console.log("Detectando localização do IP via API...");

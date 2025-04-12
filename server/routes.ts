@@ -202,16 +202,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ipLimpo = ip.split(',')[0].trim();
       }
       
-      // Para testes específicos (seu IP) - sempre retornar Minas Gerais para o IP de teste
-      if (ipLimpo === "201.80.15.81") {
-        console.log(`IP específico detectado (${ipLimpo}): retornando Minas Gerais`);
+      // Verificar se há um parâmetro para forçar o estado (para fins de teste)
+      const forceDetection = req.query.forceDetection === 'true';
+      
+      // Para testes, se forceDetection é verdadeiro, retornar São Paulo como estado padrão
+      if (forceDetection || process.env.NODE_ENV === 'development') {
+        console.log(`Forçando estado para São Paulo (IP: ${ipLimpo})`);
         return res.json({
           ip: ipLimpo,
-          estado: "Minas Gerais",
+          estado: "São Paulo",
           detalhes: {
             countryCode: "BR",
-            regionName: "Minas Gerais",
-            regionCode: "MG"
+            regionName: "São Paulo",
+            regionCode: "SP"
           }
         });
       }
@@ -433,7 +436,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Erro geral ao processar estado:", error);
       
       // Em caso de erro geral, garantir que sempre retornamos algo válido
-      // Por padrão, usamos Minas Gerais para facilitar seus testes
+      // Por padrão, usamos São Paulo
       const currentIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
       let ipAjustado = "";
       if (typeof currentIp === 'string') {
@@ -442,11 +445,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       return res.status(200).json({
         ip: ipAjustado || "desconhecido",
-        estado: "Minas Gerais",
+        estado: "São Paulo",
         detalhes: {
           countryCode: "BR",
-          regionName: "Minas Gerais",
-          regionCode: "MG" 
+          regionName: "São Paulo",
+          regionCode: "SP" 
         }
       });
     }
