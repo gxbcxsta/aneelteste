@@ -206,22 +206,6 @@ export default function PagamentoPix() {
       const payment = await response.json();
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
-      
-      // Enviar informação para UTMify sobre o PIX gerado
-      try {
-        await notifyPixGenerated(
-          payment.id,
-          cpf,
-          nome,
-          email,
-          telefone,
-          7490 // valor em centavos (R$ 74,90)
-        );
-        console.log("Notificação UTMify enviada com sucesso - PIX gerado");
-      } catch (utmifyError) {
-        console.error("Erro ao enviar notificação para UTMify:", utmifyError);
-        // Não interrompe o fluxo principal se houver erro na integração com UTMify
-      }
     } catch (error) {
       console.error('Erro ao criar pagamento:', error);
     } finally {
@@ -248,22 +232,6 @@ export default function PagamentoPix() {
             description: "Seu pagamento foi processado com sucesso. Redirecionando...",
             variant: "default"
           });
-          
-          // Enviar informação para UTMify sobre o pagamento confirmado
-          try {
-            await notifyPaymentConfirmed(
-              paymentInfo.id,
-              cpf,
-              nome,
-              email,
-              telefone,
-              7490 // valor em centavos (R$ 74,90)
-            );
-            console.log("Notificação UTMify enviada com sucesso - Pagamento confirmado");
-          } catch (utmifyError) {
-            console.error("Erro ao enviar notificação para UTMify:", utmifyError);
-            // Não interrompe o fluxo principal se houver erro na integração com UTMify
-          }
           
           // Redirecionar para a página de sucesso com todos os parâmetros necessários
           const params = new URLSearchParams({
