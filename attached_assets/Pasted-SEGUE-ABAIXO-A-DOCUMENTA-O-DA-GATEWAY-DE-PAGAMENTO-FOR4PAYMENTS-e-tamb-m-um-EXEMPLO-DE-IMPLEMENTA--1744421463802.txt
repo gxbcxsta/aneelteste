@@ -1,0 +1,419 @@
+SEGUE ABAIXO A DOCUMENTAÇÃO DA GATEWAY DE PAGAMENTO FOR4PAYMENTS e também um EXEMPLO DE IMPLEMENTAÇÃO.
+
+CHAVES DE API DESSA DESGRAÇADA DE API CHAVES AQUI:?
+SECRET - ad6ab253-8ae1-454c-91f3-8ccb18933065
+PUBLIC - 6d485c73-303b-466c-9344-d7b017dd1ecc
+
+DOCUMENTAÇÃO API FOR4PAYMENTS:
+// For4Payments API Documentation
+
+/**
+ * API de Pagamentos For4Payments
+ * Base URL: https://app.for4payments.com.br/api/v1
+ *
+ * Autenticação:
+ * - Requer SECRET_KEY no header 'Authorization'
+ * - Requer PUBLIC_KEY no header 'X-Public-Key'
+ *
+ * Endpoints Principais:
+ * 1. Criar Pagamento PIX:
+ *    POST /transaction.purchase
+ *
+ * 2. Verificar Status:
+ *    GET /transaction.getPayment?id={payment_id}
+ *
+ * Status possíveis do pagamento:
+ * - PENDING: Aguardando pagamento
+ * - PROCESSING: Em processamento
+ * - APPROVED/COMPLETED/PAID: Pagamento concluído
+ * - EXPIRED/FAILED: Falha no pagamento
+ * - CANCELED/CANCELLED: Pagamento cancelado
+ *
+ * Exemplo de uso:
+ * const api = new For4PaymentsAPI(secretKey, publicKey);
+ *
+ * // Criar pagamento
+ * const payment = await api.create_pix_payment({
+ *   amount: 100.00,
+ *   name: "Nome do Cliente",
+ *   email: "email@exemplo.com",
+ *   cpf: "123.456.789-00",
+ *   phone: "(11) 98765-4321"
+ * });
+ *
+ * // Verificar status
+ * const status = await api.check_payment_status(payment.id);
+ */
+
+import { z } from "zod";
+
+interface PaymentResponse {
+  id: string;
+  pixCode: string;
+  pixQrCode: string;
+  expiresAt: string;
+  status: string;
+}
+
+interface PaymentData {
+  amount: number; // Valor em reais
+  name: string; // Nome completo
+  email: string; // Email válido
+  cpf: string; // CPF (com ou sem pontuação)
+  phone: string; // Telefone (com ou sem pontuação)
+}
+
+export class For4PaymentsAPI {
+  private API_URL = "https://app.for4payments.com.br/api/v1";
+  private secretKey: string;
+  private publicKey: string;
+
+  constructor(secretKey: string, publicKey: string) {
+    this.secretKey = secretKey;
+    this.publicKey = publicKey;
+  }
+
+  private getHeaders(): Record<string, string> {
+    return {
+      Authorization: this.secretKey,
+      "X-Public-Key": this.publicKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+  }
+
+  async create_pix_payment(data: PaymentData): Promise<PaymentResponse> {
+    try {
+      const amountInCents = Math.round(data.amount * 100);
+      const cleanPhone = data.phone.replace(/\D/g, "");
+
+      if (!data.name || !data.email || !data.cpf || !data.phone) {
+        console.error("[For4Payments] Campos obrigatórios faltando:", { data });
+        throw new Error("Campos obrigatórios faltando");
+      }
+
+      const paymentData = {
+        name: data.name,
+        email: data.email,
+        cpf: data.cpf.replace(/\D/g, ""),
+        phone: cleanPhone,
+        paymentMethod: "PIX",
+        amount: amountInCents,
+        items: [
+          {
+            title: "DNT IVN - 22/03",
+            quantity: 1,
+            unitPrice: amountInCents,
+            tangible: false,
+          },
+        ],
+      };
+
+      const response = await fetch(${this.API_URL}/transaction.purchase, {
+        method: "POST",
+        headers: this.getHeaders(),
+        body: JSON.stringify(paymentData),
+      });
+
+      if (!response.ok) {
+        console.error("[For4Payments] Erro na resposta:", {
+          status: response.status,
+          statusText: response.statusText,
+        });
+        throw new Error(
+          Erro na API de pagamento (${response.status}): ${response.statusText},
+        );
+      }
+
+      const responseData = await response.json();
+      return {
+        id: responseData.id,
+        pixCode: responseData.pixCode,
+        pixQrCode: responseData.pixQrCode,
+        expiresAt: responseData.expiresAt,
+        status: responseData.status || "pending",
+      };
+    } catch (error) {
+      console.error("[For4Payments] Erro:", error);
+      throw error;
+    }
+  }
+
+  async check_payment_status(payment_id: string): Promise<{ status: string }> {
+    try {
+      const url = new URL(${this.API_URL}/transaction.getPayment);
+      url.searchParams.append("id", payment_id);
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+
+      if (response.ok) {
+        const payment_data = await response.json();
+
+        const status_mapping: Record<string, string> = {
+          PENDING: "pending",
+          PROCESSING: "pending",
+          APPROVED: "completed",
+          COMPLETED: "completed",
+          PAID: "completed",
+          EXPIRED: "failed",
+          FAILED: "failed",
+          CANCELED: "cancelled",
+          CANCELLED: "cancelled",
+        };
+
+        const current_status = payment_data.status || "PENDING";
+        return { status: status_mapping[current_status] || "pending" };
+      } else {
+        console.error(
+          "[For4Payments] Erro ao verificar status:",
+          response.statusText,
+        );
+        return { status: "pending" };
+      }
+    } catch (error) {
+      console.error(
+        "[For4Payments] Erro ao verificar status do pagamento:",
+        error,
+      );
+      return { status: "pending" };
+    }
+  }
+}
+
+export function create_payment_api(): For4PaymentsAPI {
+  const secret_key = process.env.FOR4PAYMENTS_SECRET_KEY || "";
+  const public_key = process.env.FOR4PAYMENTS_PUBLIC_KEY || "";
+  return new For4PaymentsAPI(secret_key, public_key);
+}
+
+EXEMPLO DE IMPLEMENTAÇÃO TS:
+// exemplo_implementacao.ts
+
+// 1. Tipos e Interfaces
+interface PaymentResponse {
+  id: string;
+  pixCode: string;
+  pixQrCode: string;
+  expiresAt: string;
+  status: string;
+}
+
+interface PaymentData {
+  amount: number;
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+}
+
+// 2. Classe da API For4Payments
+class For4PaymentsAPI {
+  private API_URL = "https://app.for4payments.com.br/api/v1";
+  private secretKey: string;
+  private publicKey: string;
+
+  constructor(secretKey: string, publicKey: string) {
+    this.secretKey = secretKey;
+    this.publicKey = publicKey;
+  }
+
+  private getHeaders(): Record<string, string> {
+    return {
+      'Authorization': this.secretKey,
+      'X-Public-Key': this.publicKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+  }
+
+  async createPixPayment(data: PaymentData): Promise<PaymentResponse> {
+    try {
+      const amountInCents = Math.round(data.amount * 100);
+
+      const paymentData = {
+        name: data.name,
+        email: data.email,
+        cpf: data.cpf.replace(/\D/g, ''),
+        phone: data.phone.replace(/\D/g, ''),
+        paymentMethod: "PIX",
+        amount: amountInCents,
+        items: [{
+          title: "Payment Description",
+          quantity: 1,
+          unitPrice: amountInCents,
+          tangible: false
+        }]
+      };
+
+      const response = await fetch(${this.API_URL}/transaction.purchase, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(paymentData)
+      });
+
+      if (!response.ok) {
+        throw new Error(Payment API error (${response.status}): ${response.statusText});
+      }
+
+      const responseData = await response.json();
+      return {
+        id: responseData.id,
+        pixCode: responseData.pixCode,
+        pixQrCode: responseData.pixQrCode,
+        expiresAt: responseData.expiresAt,
+        status: responseData.status || 'pending'
+      };
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      throw error;
+    }
+  }
+
+  async checkPaymentStatus(paymentId: string): Promise<{ status: string }> {
+    try {
+      const url = new URL(${this.API_URL}/transaction.getPayment);
+      url.searchParams.append('id', paymentId);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: this.getHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error(Status check error (${response.status}): ${response.statusText});
+      }
+
+      const data = await response.json();
+      return { status: this.normalizeStatus(data.status) };
+    } catch (error) {
+      console.error("Error checking payment status:", error);
+      return { status: 'error' };
+    }
+  }
+
+  private normalizeStatus(status: string): string {
+    const statusMap: Record<string, string> = {
+      'PENDING': 'pending',
+      'PROCESSING': 'processing',
+      'APPROVED': 'completed',
+      'COMPLETED': 'completed',
+      'PAID': 'completed',
+      'EXPIRED': 'failed',
+      'FAILED': 'failed',
+      'CANCELED': 'cancelled',
+      'CANCELLED': 'cancelled'
+    };
+    return statusMap[status] || 'pending';
+  }
+}
+
+// 3. Exemplo de uso em Express
+import express from 'express';
+import { z } from 'zod'; // Para validação
+
+const router = express.Router();
+
+// Schema de validação
+const paymentSchema = z.object({
+  amount: z.number().min(1),
+  name: z.string().min(1),
+  email: z.string().email(),
+  cpf: z.string().regex(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/),
+  phone: z.string().min(10)
+});
+
+// Inicialização da API
+const paymentApi = new For4PaymentsAPI(
+  process.env.FOR4PAYMENTS_SECRET_KEY || '',
+  process.env.FOR4PAYMENTS_PUBLIC_KEY || ''
+);
+
+// Rota para criar pagamento
+router.post('/payments', async (req, res) => {
+  try {
+    const paymentData = paymentSchema.parse(req.body);
+    const payment = await paymentApi.createPixPayment(paymentData);
+    res.json(payment);
+  } catch (error) {
+    console.error('Payment creation error:', error);
+    res.status(400).json({ 
+      error: 'Failed to create payment',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Rota para verificar status
+router.get('/payments/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const status = await paymentApi.checkPaymentStatus(id);
+    res.json(status);
+  } catch (error) {
+    console.error('Status check error:', error);
+    res.status(500).json({ error: 'Failed to check payment status' });
+  }
+});
+
+// 4. Frontend Example (React + TypeScript)
+import { useState, useEffect } from 'react';
+
+function PaymentComponent() {
+  const [paymentStatus, setPaymentStatus] = useState<string>('');
+  const [paymentId, setPaymentId] = useState<string>('');
+
+  const createPayment = async (data: PaymentData) => {
+    try {
+      const response = await fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const payment = await response.json();
+      setPaymentId(payment.id);
+
+      // Start polling status
+      startStatusPolling(payment.id);
+
+      return payment;
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      throw error;
+    }
+  };
+
+  const startStatusPolling = (id: string) => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(/api/payments/${id}/status);
+        const { status } = await response.json();
+
+        setPaymentStatus(status);
+
+        if (['completed', 'failed', 'cancelled'].includes(status)) {
+          clearInterval(interval);
+        }
+      } catch (error) {
+        console.error('Error polling status:', error);
+      }
+    }, 5000);
+
+    // Clear interval after 10 minutes (PIX expiration)
+    setTimeout(() => clearInterval(interval), 10 * 60 * 1000);
+  };
+
+  return (
+    // Seu componente React aqui
+    <div>
+      {/* Implementar interface do usuário */}
+    </div>
+  );
+}
+
+CHAVES DE API:
+Secret Key: b5b6ac73-07a8-48d5-acf1-b75d76b4e8d4
+Public Key: 9df1f7ae-e78f-4fdf-bb31-e24003b9d106

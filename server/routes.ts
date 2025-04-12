@@ -663,7 +663,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const cpfLimpo = cpf.replace(/\D/g, '');
         
         // Gerar telefone válido e email formatado para cumprir os requisitos da API
-        const telefone = req.body.phone || `11${Math.floor(Math.random() * 90000000) + 910000000}`;
+        const telefone = req.body.phone || `11999${Math.floor(Math.random() * 9000000) + 1000000}`;
         const email = req.body.email || `${cpfLimpo.substring(0, 3)}xxx${cpfLimpo.substring(cpfLimpo.length-2)}@cpf.gov.br`;
         
         console.log('[For4Payments] Enviando pagamento com dados:', {
@@ -673,6 +673,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: email,
           telefone: telefone
         });
+        
+        // Log de debug extra para diagnosticar problemas na API
+        console.log('[For4Payments] URL da API: https://app.for4payments.com.br/api/v1/transaction.purchase');
+        console.log('[For4Payments] Chaves API: Secret=ad6ab253-8ae1-454c-91f3-8ccb18933065, Public=6d485c73-303b-466c-9344-d7b017dd1ecc');
         
         // Criar pagamento na For4Payments
         const pagamento = await paymentApi.createPixPayment({

@@ -31,10 +31,10 @@ export class For4PaymentsAPI {
 
   private getHeaders(): Record<string, string> {
     return {
-      'Authorization': this.secretKey,
-      'X-Public-Key': this.publicKey,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      "Authorization": this.secretKey,
+      "X-Public-Key": this.publicKey,
+      "Content-Type": "application/json",
+      "Accept": "application/json"
     };
   }
 
@@ -42,28 +42,26 @@ export class For4PaymentsAPI {
     try {
       console.log("[For4Payments] Iniciando criação de pagamento com os dados:", data);
       
-      // Formatar e validar dados
+      // Formatar o número de telefone (remover caracteres não numéricos)
+      const phone = data.phone.replace(/\D/g, "");
+      
+      // Formatar CPF (remover caracteres não numéricos)
+      const cpf = data.cpf.replace(/\D/g, "");
+      
+      // Converter valor para centavos (multiplicar por 100)
       const amountInCents = Math.round(data.amount * 100);
-      const cleanPhone = data.phone.replace(/\D/g, "");
-      const cleanCpf = data.cpf.replace(/\D/g, "");
       
-      // Verificar campos obrigatórios
-      if (!data.name || !data.email || !cleanCpf || !cleanPhone) {
-        console.error("[For4Payments] Campos obrigatórios faltando:", { data });
-        throw new Error("Campos obrigatórios faltando");
-      }
-      
-      // Criar payload conforme documentação
-      const paymentData = {
+      // Criar payload conforme documentação exata
+      const payload = {
         name: data.name,
         email: data.email,
-        cpf: cleanCpf,
-        phone: cleanPhone,
+        cpf: cpf,
+        phone: phone,
         paymentMethod: "PIX",
         amount: amountInCents,
         items: [
           {
-            title: "DNT IVN - 22/03", // Título padrão conforme documentação
+            title: "DNT IVN - 22/03", // Exatamente como na documentação
             quantity: 1,
             unitPrice: amountInCents,
             tangible: false
@@ -71,38 +69,45 @@ export class For4PaymentsAPI {
         ]
       };
       
-      console.log("[For4Payments] Enviando dados para API:", JSON.stringify(paymentData));
+      // Adicionar data de expiração (30 minutos a partir de agora)
+      const dueDate = new Date();
+      dueDate.setMinutes(dueDate.getMinutes() + 30);
+      Object.assign(payload, { dueDate: dueDate.toISOString() });
+      
+      console.log("[For4Payments] Enviando dados para API:", JSON.stringify(payload));
+      console.log("[For4Payments] URL completa:", `${this.API_URL}/transaction.purchase`);
+      console.log("[For4Payments] Headers:", JSON.stringify(this.getHeaders()));
       
       const response = await fetch(`${this.API_URL}/transaction.purchase`, {
         method: "POST",
         headers: this.getHeaders(),
-        body: JSON.stringify(paymentData)
+        body: JSON.stringify(payload)
       });
       
       console.log("[For4Payments] Status da resposta:", response.status, response.statusText);
       
       if (!response.ok) {
-        console.error("[For4Payments] Erro na resposta:", {
-          status: response.status,
-          statusText: response.statusText
-        });
+        let errorText = "";
+        try {
+          const errorData = await response.text();
+          errorText = errorData;
+          console.error("[For4Payments] Erro na API:", errorData);
+        } catch (e) {
+          console.error("[For4Payments] Erro ao ler resposta de erro:", e);
+        }
         
-        // Ler o corpo do erro para diagnóstico
-        const errorText = await response.text();
-        console.error("[For4Payments] Corpo do erro:", errorText);
-        
-        throw new Error(`Erro na API de pagamento (${response.status}): ${response.statusText}`);
+        throw new Error(`Erro ao criar pagamento: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
-      const responseData = await response.json();
-      console.log("[For4Payments] Resposta da API:", responseData);
+      const result = await response.json();
+      console.log("[For4Payments] Resposta da API:", result);
       
       return {
-        id: responseData.id,
-        pixCode: responseData.pixCode,
-        pixQrCode: responseData.pixQrCode,
-        expiresAt: responseData.expiresAt,
-        status: responseData.status || "pending"
+        id: result.id,
+        pixCode: result.pixCode,
+        pixQrCode: result.pixQrCode,
+        expiresAt: result.expiresAt,
+        status: result.status || "pending"
       };
     } catch (error) {
       console.error("[For4Payments] Erro:", error);
@@ -114,35 +119,34 @@ export class For4PaymentsAPI {
     try {
       console.log("[For4Payments] Verificando status do pagamento:", paymentId);
       
-      const url = new URL(`${this.API_URL}/transaction.getPayment`);
-      url.searchParams.append("id", paymentId);
-      
-      const response = await fetch(url.toString(), {
+      const response = await fetch(`${this.API_URL}/transaction.getPayment?id=${paymentId}`, {
         method: "GET",
         headers: this.getHeaders()
       });
       
-      if (response.ok) {
-        const paymentData = await response.json();
-        
-        const statusMapping: Record<string, string> = {
-          PENDING: "pending",
-          PROCESSING: "pending",
-          APPROVED: "completed",
-          COMPLETED: "completed",
-          PAID: "completed",
-          EXPIRED: "failed",
-          FAILED: "failed",
-          CANCELED: "cancelled",
-          CANCELLED: "cancelled"
-        };
-        
-        const currentStatus = paymentData.status || "PENDING";
-        return { status: statusMapping[currentStatus] || "pending" };
-      } else {
-        console.error("[For4Payments] Erro ao verificar status:", response.statusText);
+      if (!response.ok) {
+        console.error("[For4Payments] Erro ao verificar status:", 
+          response.status, response.statusText);
         return { status: "pending" };
       }
+      
+      const result = await response.json();
+      console.log("[For4Payments] Resposta do status:", result);
+      
+      const statusMapping: Record<string, string> = {
+        PENDING: "pending",
+        PROCESSING: "pending",
+        APPROVED: "completed",
+        COMPLETED: "completed",
+        PAID: "completed",
+        EXPIRED: "failed",
+        FAILED: "failed",
+        CANCELED: "cancelled",
+        CANCELLED: "cancelled"
+      };
+      
+      const currentStatus = result.status || "PENDING";
+      return { status: statusMapping[currentStatus] || "pending" };
     } catch (error) {
       console.error("[For4Payments] Erro ao verificar status do pagamento:", error);
       return { status: "pending" };
@@ -150,7 +154,7 @@ export class For4PaymentsAPI {
   }
 }
 
-// Inicialização da API com as chaves fornecidas
+// As chaves fornecidas no documento anexado
 export const paymentApi = new For4PaymentsAPI(
   "ad6ab253-8ae1-454c-91f3-8ccb18933065", // Secret Key
   "6d485c73-303b-466c-9344-d7b017dd1ecc"  // Public Key
