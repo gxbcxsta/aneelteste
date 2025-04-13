@@ -246,6 +246,26 @@ export default function SimuladorRestituicao({
   const [mensagemCarregamento, setMensagemCarregamento] = useState('');
   const [progressoCarregamento, setProgressoCarregamento] = useState(0);
   
+  // Função para iniciar a animação de carregamento com progresso crescente
+  const iniciarAnimacaoCarregamento = (mensagemInicial: string) => {
+    setMensagemCarregamento(mensagemInicial);
+    setProgressoCarregamento(10);
+    
+    // Simular progresso crescente
+    let progresso = 10;
+    const intervalId = setInterval(() => {
+      progresso += 5;
+      if (progresso <= 95) {
+        setProgressoCarregamento(progresso);
+      } else {
+        clearInterval(intervalId);
+        setProgressoCarregamento(100);
+      }
+    }, 200);
+    
+    return intervalId;
+  };
+  
   // Hook de navegação
   const [location, navigate] = useLocation();
   // Hook de contexto do usuário

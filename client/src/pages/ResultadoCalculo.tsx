@@ -32,9 +32,10 @@ export default function ResultadoCalculo() {
   const dataNascimento = userData.dataNascimento || "";
   
   // IMPORTANTE: Esses valores não afetam o cálculo da restituição
-  // A restituição é determinada apenas pelo CPF e sempre será a mesma para um mesmo CPF
+  // A restituição é determinada apenas pelo período selecionado
   const valorMedio = userData.valorConta?.toString() || "";
-  const meses = userData.periodo?.toString() || "";
+  // O meses aqui será um número (não uma string)
+  const meses = userData.periodo || 0;
   
   // Sequência de mensagens a serem exibidas durante o loading
   const mensagens = [
@@ -369,9 +370,9 @@ export default function ResultadoCalculo() {
                     {/* Texto explicativo sobre o valor da restituição baseado no período */}
                     <p className="text-xs text-[var(--gov-gray-dark)] mt-2 text-center">
                       Valor de restituição baseado no período selecionado:
-                      {meses <= 12 && <span className="font-semibold"> R$ 1.977,90 (1 a 11 meses)</span>}
-                      {meses > 12 && meses <= 36 && <span className="font-semibold"> R$ 2.897,30 (1 a 3 anos)</span>}
-                      {meses > 36 && <span className="font-semibold"> R$ 3.221,16 (4 a 5 anos)</span>}
+                      {Number(meses) <= 12 && <span className="font-semibold"> R$ 1.977,90 (1 a 11 meses)</span>}
+                      {Number(meses) > 12 && Number(meses) <= 36 && <span className="font-semibold"> R$ 2.897,30 (1 a 3 anos)</span>}
+                      {Number(meses) > 36 && <span className="font-semibold"> R$ 3.221,16 (4 a 5 anos)</span>}
                     </p>
                   </div>
                 </div>
