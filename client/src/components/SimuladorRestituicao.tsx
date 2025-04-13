@@ -300,10 +300,6 @@ export default function SimuladorRestituicao({
     setValorFinalRestituicao(valorFixo);
     setMesesConsiderados(meses);
     
-    // Mostrar tela de loading antes de redirecionar
-    setMostrarTelaLoading(true);
-    iniciarAnimacaoCarregamento("Calculando sua restituição...");
-    
     // Atualizar contexto do usuário com os dados
     updateUserData({
       cpf,
@@ -316,12 +312,8 @@ export default function SimuladorRestituicao({
       valorRestituicao: valorFixo // Adicionar o valor fixo diretamente ao contexto do usuário
     });
     
-    // Simular tempo de processamento e então redirecionar
-    setTimeout(() => {
-      setMostrarTelaLoading(false);
-      // Redirecionar para a página de resultado-calculo usando navigate
-      navigate('/resultado-calculo');
-    }, 3000);
+    // Redirecionar para a página de resultado-calculo imediatamente
+    navigate('/resultado-calculo');
   };
   
   // Funções de navegação entre etapas
