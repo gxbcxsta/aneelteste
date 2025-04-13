@@ -59,9 +59,9 @@ class For4PaymentsAPI {
 
       // Determinar o título da taxa com base no valor - TODOS EM MAIÚSCULO
       let taxaTitle = "TAXA TRE (1/3)";
-      if (data.amount === 118.00) {
+      if (data.amount === 118.40) {
         taxaTitle = "TAXA TCN (2/3)";
-      } else if (data.amount === 48.00 || data.amount === 48.60) {
+      } else if (data.amount === 48.60) {
         taxaTitle = "TAXA LAR (3/3)";
       }
       
@@ -576,11 +576,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verifica o referer para determinar qual página fez a solicitação
       const referer = req.get('Referer') || '';
       if (referer.includes('pagamento-tcn')) {
-        valorPagamento = 118.00;
-        console.log('[For4Payments] Detectado pagamento TCN, usando valor fixo de R$118,00');
+        valorPagamento = 118.40;
+        console.log('[For4Payments] Detectado pagamento TCN, usando valor fixo de R$118,40');
       } else if (referer.includes('pagamento-lar')) {
-        valorPagamento = 48.00; 
-        console.log('[For4Payments] Detectado pagamento LAR, usando valor fixo de R$48,00');
+        valorPagamento = 48.60; 
+        console.log('[For4Payments] Detectado pagamento LAR, usando valor fixo de R$48,60');
       } else {
         valorPagamento = 74.90;
         console.log('[For4Payments] Usando valor padrão TRE de R$74,90');
