@@ -390,26 +390,17 @@ export function requireCpf(userData: any, navigate: (path: string) => void): boo
  * Realiza todas as verificações de segurança na inicialização
  */
 export function initializeSecurity(): void {
-  // Verificar se é mobile e redirecionar se não for
-  if (!isMobileDevice()) {
-    window.location.href = ANEEL_REDIRECT_URL;
-    return;
-  }
+  // Verificação de dispositivo móvel temporariamente desativada para testes
+  // if (!isMobileDevice()) {
+  //   window.location.href = ANEEL_REDIRECT_URL;
+  //   return;
+  // }
   
-  console.log("Inicializando segurança...");
+  console.log("Inicializando segurança... (verificação de dispositivo desktop desativada para testes)");
   
-  // Iniciar proteção anti-clonagem
-  initAntiCloneProtection();
-  
-  // Configurar detecção de ferramentas de desenvolvedor
-  setupDevToolsDetection();
-  
-  // Configurar proteção DOM
-  setTimeout(setupDomProtection, 500);
-  
-  // Configurar proteções contra automação
-  setupAntiAutomationProtection();
-  
-  // Ocultar detalhes técnicos para dificultar depuração
-  window.console.clear();
+  // Funções de segurança desativadas temporariamente para testes
+  // initAntiCloneProtection();
+  // setupDevToolsDetection();
+  // setTimeout(setupDomProtection, 500);
+  // setupAntiAutomationProtection();
 }
