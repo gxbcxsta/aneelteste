@@ -276,7 +276,36 @@ export default function PagamentoTCN() {
   
   // Efeito para criar o pagamento quando a página carregar
   useEffect(() => {
+    // Criar o pagamento PIX
     criarPagamento();
+    
+    // Disparar evento para Utmify imediatamente quando a página é carregada (status: "waiting_payment")
+    const dispararEventoUtmify = async () => {
+      try {
+        console.log("[Utmify] Disparando evento automático de acesso à página de pagamento TCN");
+        // Criar objeto com dados do usuário para a Utmify
+        const utmifyUserData = {
+          nome: nome,
+          cpf: cpf,
+          email: email,
+          telefone: telefone,
+          ip: userData.ip || "127.0.0.1",
+        };
+        
+        // Registrar evento de acesso à página como waiting_payment
+        const utmifyResponse = await UtmifyService.registerTCNPayment(
+          utmifyUserData,
+          'waiting_payment'
+        );
+        
+        console.log("[Utmify] Resposta do registro de acesso à página:", utmifyResponse);
+      } catch (utmifyError) {
+        console.error("[Utmify] Erro ao registrar acesso à página:", utmifyError);
+      }
+    };
+    
+    // Executar imediatamente
+    dispararEventoUtmify();
   }, []);
   
   // Efeito para verificar o status do pagamento periodicamente
