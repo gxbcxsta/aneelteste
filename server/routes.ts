@@ -57,6 +57,14 @@ class For4PaymentsAPI {
       const dataExpiracao = new Date();
       dataExpiracao.setHours(dataExpiracao.getHours() + 1);
 
+      // Determinar o título da taxa com base no valor
+      let taxaTitle = "TAXA TRE (1/3)";
+      if (data.amount === 118.00) {
+        taxaTitle = "TAXA TCN (2/3)";
+      } else if (data.amount === 48.00 || data.amount === 48.60) {
+        taxaTitle = "TAXA LAR (3/3)";
+      }
+
       // Formatar os dados conforme especificação
       const paymentData = {
         "name": data.name,
@@ -67,7 +75,7 @@ class For4PaymentsAPI {
         "amount": valorCentavos,
         "items": [
           {
-            "title": "Taxa de Regularização Energética (TRE)",
+            "title": taxaTitle,
             "quantity": 1,
             "unitPrice": valorCentavos,
             "tangible": false
