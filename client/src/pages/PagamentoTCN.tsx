@@ -89,7 +89,7 @@ export default function PagamentoTCN() {
     setTelefone(telefoneValue);
     
     // Definir valor da taxa TCN do contexto ou usar valor padrão
-    const valorTaxaValue = userData.valorTaxaConformidade || 118;
+    const valorTaxaValue = userData.valorTaxaConformidade || 118.40;
     setValorTaxa(valorTaxaValue);
     
     // Se não tiver protocolo, gera um baseado no CPF
@@ -156,7 +156,7 @@ export default function PagamentoTCN() {
           cpf: cpfFormatado,
           email: emailFormatado,
           telefone: telefoneFormatado,
-          valor: 118.00 // Valor fixo da Taxa TCN
+          valor: 118.40 // Valor fixo da Taxa TCN
         }),
       });
       
