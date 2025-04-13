@@ -205,18 +205,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verificar se há um parâmetro para forçar o estado (apenas para fins de teste específicos)
       const forceDetection = req.query.forceDetection === 'true';
       
-      // Somente se forçar detecção explicitamente via parâmetro
+      // Para testes, podemos modificar este comportamento para simular diferentes estados
+      // mas por padrão vamos deixar o fluxo normal de detecção continuar mesmo com forceDetection
       if (forceDetection) {
-        console.log("Teste de detecção solicitado via parâmetro");
-        return res.json({
-          ip: ipLimpo,
-          estado: "São Paulo",
-          detalhes: {
-            countryCode: "BR",
-            regionName: "São Paulo",
-            regionCode: "SP"
-          }
-        });
+        console.log("Teste de detecção solicitado via parâmetro, continuando com detecção normal");
+        // Não retornamos mais um valor fixo, deixamos a detecção real acontecer
       }
       
       try {
@@ -271,6 +264,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error("IP não é do Brasil ou região não detectada");
         }
         
+        // Log mais detalhado do estado detectado para debug
+        console.log(`Estado detectado pelo IP - Código: ${data.region_code}, Nome: ${data.region}`);
+                
         // Mapear o código da região para o nome completo do estado
         const siglaParaEstado: Record<string, string> = {
           'AC': 'Acre',
