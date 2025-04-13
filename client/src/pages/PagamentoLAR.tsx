@@ -544,14 +544,14 @@ export default function PagamentoLAR() {
                           </div>
                         </div>
                       </div>
-                      <div className="bg-red-50 p-3 rounded-md border border-red-200">
+                      <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
                         <div className="flex items-center">
-                          <Clock className="h-5 w-5 text-red-600 mr-2" />
+                          <Clock className="h-5 w-5 text-blue-600 mr-2" />
                           <div>
-                            <span className="font-bold text-red-600">Esta oferta é por tempo limitado!</span>
-                            <p className="text-sm text-red-700">
-                              Se não optar pela Liberação Acelerada agora, seu pagamento será processado pelo fluxo 
-                              padrão, com prazo de até 15 dias úteis.
+                            <span className="font-bold text-blue-600">Opção de processamento acelerado</span>
+                            <p className="text-sm text-blue-700">
+                              A LAR permite processar seu pagamento de forma acelerada. Se preferir o fluxo padrão,
+                              o prazo será de até 15 dias úteis.
                             </p>
                           </div>
                         </div>

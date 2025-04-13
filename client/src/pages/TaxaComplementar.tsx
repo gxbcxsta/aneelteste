@@ -202,7 +202,9 @@ export default function TaxaComplementar() {
           <div className="mb-6">
             <Alert className="border-amber-500 bg-amber-50">
               <AlertTriangle className="h-5 w-5 text-amber-600" />
-              <AlertTitle className="font-bold text-amber-800">Status da Restituição: EM PROCESSAMENTO</AlertTitle>
+              <AlertTitle className="font-bold text-amber-800">
+                Status da Restituição: <span className="bg-amber-200 px-2 py-1 rounded-md text-amber-900">EM PROCESSAMENTO</span>
+              </AlertTitle>
               <AlertDescription className="text-amber-700">
                 Seu pagamento da Taxa de Regularização (TRE) foi confirmado. Para concluir o processo de liberação, 
                 é necessário o pagamento da Taxa de Conformidade Nacional (TCN).
@@ -351,7 +353,7 @@ export default function TaxaComplementar() {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Prosseguir com o Pagamento da TCN
+                    PAGAR TAXA TCN
                   </div>
                 </Button>
                 
