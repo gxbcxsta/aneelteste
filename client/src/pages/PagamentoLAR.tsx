@@ -726,18 +726,7 @@ export default function PagamentoLAR() {
                       )}
                     </Button>
                     
-                    {/* Botão "Avançar para próxima etapa" */}
-                    <Button 
-                      onClick={redirecionarParaSucesso}
-                      className="w-full py-4 text-base mb-3 bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-600/20"
-                    >
-                      <div className="flex items-center justify-center">
-                        <Zap className="mr-2 h-5 w-5" />
-                        Avançar para próxima etapa
-                      </div>
-                    </Button>
-                    
-                    {/* Botão de simulação removido conforme solicitado pelo cliente */}
+                    {/* Botão "Avançar para próxima etapa" removido a pedido do cliente */}
                     
                     <div className="mb-6">
                       <Alert className="border-green-500 bg-green-50">
