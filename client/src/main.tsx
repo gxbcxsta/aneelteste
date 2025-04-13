@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { initializeSecurity } from "./utils/SecurityUtils";
 
 // Add custom style variables for the GOV.BR look
 const styleElement = document.createElement("style");
@@ -85,5 +86,15 @@ const handlePageTransitions = () => {
 
 // Executar script de transições
 handlePageTransitions();
+
+// Inicializar verificações de segurança
+try {
+  // Verifica se estamos em um navegador (não em SSR)
+  if (typeof window !== 'undefined') {
+    initializeSecurity();
+  }
+} catch (error) {
+  console.error("Erro ao inicializar segurança:", error);
+}
 
 createRoot(document.getElementById("root")!).render(<App />);

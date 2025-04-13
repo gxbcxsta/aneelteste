@@ -21,6 +21,7 @@ export interface UserData {
   dataPrevista?: string; // Data prevista para recebimento da restituição
   larCompleto?: boolean; // Indica se o pagamento LAR foi concluído
   acelerado?: boolean; // Indica se a restituição será acelerada
+  statusDefinido?: boolean; // Flag para evitar loop infinito de renderização
   contaBancaria?: {
     banco: string;
     agencia: string;

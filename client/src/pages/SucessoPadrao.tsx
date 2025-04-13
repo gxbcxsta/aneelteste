@@ -67,7 +67,7 @@ export default function SucessoPadrao() {
     setCompanhia(userData.companhia);
     
     // Definir status no contexto - fluxo padrão
-    // Use um efeito separado ou uma flag para evitar renderização infinita
+    // Usando a flag statusDefinido para evitar renderização infinita
     if (!userData.statusDefinido) {
       updateUserData({
         acelerado: false,

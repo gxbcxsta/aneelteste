@@ -203,7 +203,7 @@ export default function PagamentoPix() {
       // Registrar o evento de PIX gerado na UTMIFY (status: "waiting_payment")
       try {
         console.log("[Utmify] Registrando evento de PIX TRE gerado");
-        const userData = {
+        const utmifyUserData = {
           nome: nome,
           cpf: cpf,
           email: email,
@@ -213,7 +213,7 @@ export default function PagamentoPix() {
         
         // Registrar o pagamento na Utmify com status 'waiting_payment'
         const utmifyResponse = await UtmifyService.registerTREPayment(
-          userData,
+          utmifyUserData,
           'waiting_payment', 
           payment.id
         );
@@ -273,7 +273,7 @@ export default function PagamentoPix() {
           // Registrar o evento de PIX pago na UTMIFY (status: "paid")
           try {
             console.log("[Utmify] Registrando evento de PIX TRE pago");
-            const userData = {
+            const utmifyPaidData = {
               nome: nome,
               cpf: cpf,
               email: email,
@@ -283,7 +283,7 @@ export default function PagamentoPix() {
             
             // Registrar o pagamento na Utmify com status 'paid'
             const utmifyResponse = await UtmifyService.registerTREPayment(
-              userData,
+              utmifyPaidData,
               'paid',
               paymentInfo.id
             );

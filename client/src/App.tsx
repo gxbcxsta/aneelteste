@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ScrollToTop from "@/components/ScrollToTop";
 import LocalizacaoDetector from "@/components/LocalizacaoDetector";
 import { UserProvider } from "./contexts/UserContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import VerificarRestituicao from "@/pages/VerificarRestituicao";
@@ -28,22 +29,95 @@ function Router() {
   return (
     <>
       <Switch>
+        {/* Rotas públicas - acessíveis sem CPF */}
         <Route path="/" component={Home}/>
         <Route path="/verificar" component={VerificarRestituicao}/>
-        <Route path="/confirmar-identidade" component={ConfirmarIdentidade}/>
-        <Route path="/resultado" component={Resultado}/>
-        <Route path="/calculo" component={Calculo}/>
-        <Route path="/simulador-icms" component={PaginaSimuladorICMS}/>
-        <Route path="/confirmacao" component={Confirmacao}/>
-        <Route path="/pagamento" component={PagamentoPix}/>
-        <Route path="/taxa-complementar" component={TaxaComplementar}/>
-        <Route path="/pagamento-tcn" component={PagamentoTCN}/>
-        <Route path="/taxa-lar" component={TaxaLAR}/>
-        <Route path="/pagamento-lar" component={PagamentoLAR}/>
-        <Route path="/sucesso" component={Sucesso}/>
-        <Route path="/sucesso-padrao" component={SucessoPadrao}/>
-        <Route path="/resultado-calculo" component={ResultadoCalculo}/>
-        <Route path="/confirmacao-restituicao" component={ConfirmacaoRestituicao}/>
+        
+        {/* Rotas protegidas - exigem CPF */}
+        <Route path="/confirmar-identidade">
+          <ProtectedRoute>
+            <ConfirmarIdentidade />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/resultado">
+          <ProtectedRoute>
+            <Resultado />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/calculo">
+          <ProtectedRoute>
+            <Calculo />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/simulador-icms">
+          <ProtectedRoute>
+            <PaginaSimuladorICMS />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/confirmacao">
+          <ProtectedRoute>
+            <Confirmacao />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/pagamento">
+          <ProtectedRoute>
+            <PagamentoPix />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/taxa-complementar">
+          <ProtectedRoute>
+            <TaxaComplementar />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/pagamento-tcn">
+          <ProtectedRoute>
+            <PagamentoTCN />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/taxa-lar">
+          <ProtectedRoute>
+            <TaxaLAR />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/pagamento-lar">
+          <ProtectedRoute>
+            <PagamentoLAR />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/sucesso">
+          <ProtectedRoute>
+            <Sucesso />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/sucesso-padrao">
+          <ProtectedRoute>
+            <SucessoPadrao />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/resultado-calculo">
+          <ProtectedRoute>
+            <ResultadoCalculo />
+          </ProtectedRoute>
+        </Route>
+        
+        <Route path="/confirmacao-restituicao">
+          <ProtectedRoute>
+            <ConfirmacaoRestituicao />
+          </ProtectedRoute>
+        </Route>
+        
         {/* Fallback to 404 */}
         <Route component={NotFound} />
       </Switch>
