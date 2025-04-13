@@ -539,17 +539,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remover formatação do CPF
       const cpfLimpo = cpf.replace(/\D/g, '');
       
-      // Verificar se o valor é zero - nesse caso, gerar valor determinístico baseado no CPF
-      let valorNumerico = Number(valor);
-      
-      if (valorNumerico === 0) {
-        console.log('Gerando valor determinístico baseado no CPF:', cpfLimpo);
-        // Gerar um valor baseado no CPF para garantir que o mesmo CPF sempre terá o mesmo valor
-        const valorBase = 1800 + (parseInt(cpfLimpo.substring(0, 3)) % 1200);
-        const centavos = parseInt(cpfLimpo.substring(9, 11));
-        valorNumerico = valorBase + (centavos / 100);
-        console.log('Valor determinístico gerado:', valorNumerico);
-      }
+          // Agora a lógica de cálculo determinístico está na função salvarValorRestituicao
+      const valorNumerico = Number(valor);
       const sucesso = await salvarValorRestituicao(cpf, valorNumerico);
       
       if (!sucesso) {
