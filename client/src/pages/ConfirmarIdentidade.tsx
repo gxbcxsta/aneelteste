@@ -231,8 +231,82 @@ export default function ConfirmarIdentidade() {
   useEffect(() => {
     if (!cpf) return;
 
-    // Carregar dados do CPF
+    // Verificar se já temos os dados no contexto
+    if (userData && userData.nome && userData.dataNascimento) {
+      console.log("Dados já disponíveis no contexto do usuário:", userData.nome);
+      
+      // Criar um objeto de dados pessoais a partir dos dados do contexto
+      const contextData = {
+        Result: {
+          NomePessoaFisica: userData.nome,
+          DataNascimento: userData.dataNascimento
+        }
+      };
+      
+      setDadosPessoais(contextData);
+      
+      // Nome correto sempre fica entre dois aleatórios (como posição do meio)
+      const nomeAlternativo1 = "MÔNICA DE SOUZA ALVES";
+      const nomeAlternativo2 = "PEDRO HENRIQUE OLIVEIRA";
+      const nomeCorreto = userData.nome;
+      
+      // Atualizar as opções - sem embaralhar, nome real sempre fica no meio
+      setOpcoesNome([nomeAlternativo1, nomeCorreto, nomeAlternativo2]);
+      
+      // Função para gerar uma data aleatória entre 1959 e 1995
+      const gerarDataNascimentoAleatoria = () => {
+        // Gerar ano entre 1959 e 1995
+        const anoMin = 1959;
+        const anoMax = 1995;
+        const ano = Math.floor(Math.random() * (anoMax - anoMin + 1)) + anoMin;
+        
+        // Gerar mês (1-12)
+        const mes = Math.floor(Math.random() * 12) + 1;
+        
+        // Determinar o número máximo de dias no mês
+        let diasMax = 31;
+        if ([4, 6, 9, 11].includes(mes)) {
+          diasMax = 30;
+        } else if (mes === 2) {
+          // Verificar se é ano bissexto
+          diasMax = (ano % 4 === 0 && (ano % 100 !== 0 || ano % 400 === 0)) ? 29 : 28;
+        }
+        
+        // Gerar dia (1-diasMax)
+        const dia = Math.floor(Math.random() * diasMax) + 1;
+        
+        // Formatar a data como DD/MM/YYYY
+        return `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${ano}`;
+      };
+      
+      // Gerar 2 datas aleatórias diferentes
+      const dataAleatoria1 = gerarDataNascimentoAleatoria();
+      let dataAleatoria2 = "";
+      
+      // Garantir que a segunda data seja diferente da primeira
+      do {
+        dataAleatoria2 = gerarDataNascimentoAleatoria();
+      } while (dataAleatoria2 === dataAleatoria1 || dataAleatoria2 === userData.dataNascimento);
+      
+      // Colocar a data real sempre no meio (posição 1)
+      setOpcoesAno([dataAleatoria1, userData.dataNascimento, dataAleatoria2]);
+      
+      // Marcar como carregado
+      setIsLoading(false);
+      return;
+    }
+
+    // Se não temos os dados no contexto, precisamos carregar da API
     const fetchCpfData = async () => {
+      // Configurar a tela para pré-carregamento
+      // Nome de carregamento fica no meio (posição 1)
+      const nomeCarregando = "CARREGANDO DADOS...";
+      const nomeAlternativo1 = "MÔNICA DE SOUZA ALVES";
+      const nomeAlternativo2 = "PEDRO HENRIQUE OLIVEIRA";
+      
+      // Inicialmente mostramos opções com "CARREGANDO DADOS..."
+      setOpcoesNome([nomeAlternativo1, nomeCarregando, nomeAlternativo2]);
+      
       try {
         // Usar Promise.all para carregar dados em paralelo, reduzindo o tempo total
         const response = await fetch(`/api/consulta-cpf?cpf=${cpf}`);
@@ -244,9 +318,6 @@ export default function ConfirmarIdentidade() {
         const data = await response.json();
         setDadosPessoais(data);
         
-        // Verificar e registrar os dados recebidos para debug
-        console.log("Dados recebidos do CPF:", JSON.stringify(data, null, 2));
-        
         // Garantir que estamos extraindo o nome corretamente
         let nomeCorreto = "NOME NÃO ENCONTRADO";
         if (data.Result && data.Result.NomePessoaFisica) {
@@ -257,10 +328,6 @@ export default function ConfirmarIdentidade() {
         }
         
         // Nome correto sempre fica entre dois aleatórios (como posição do meio)
-        const nomeAlternativo1 = "MÔNICA DE SOUZA ALVES";
-        const nomeAlternativo2 = "PEDRO HENRIQUE OLIVEIRA";
-        
-        // Criar array com nome real sempre na posição do meio (índice 1)
         const opcoes = [nomeAlternativo1, nomeCorreto, nomeAlternativo2];
         
         // Atualizar as opções - sem embaralhar, nome real sempre fica no meio
@@ -321,7 +388,7 @@ export default function ConfirmarIdentidade() {
     };
 
     fetchCpfData();
-  }, [cpf, navigate, toast, localizacao, carregandoLocalizacao]);
+  }, [cpf, navigate, toast, localizacao, carregandoLocalizacao, userData]);
 
   // Extrair o ano da data de nascimento
   const getAnoNascimento = (dataStr: string): string => {

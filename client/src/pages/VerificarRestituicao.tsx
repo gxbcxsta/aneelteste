@@ -139,6 +139,13 @@ export default function VerificarRestituicao() {
       
       console.log("Dados do CPF obtidos com sucesso:", dadosCpf.Result.NomePessoaFisica);
       
+      // Salvar os dados no contexto para não precisar consultar novamente na página de confirmação
+      updateUserData({
+        cpf: cpfLimpo,
+        nome: dadosCpf.Result.NomePessoaFisica,
+        dataNascimento: dadosCpf.Result.DataNascimento
+      });
+      
       // Atualizar estado de consulta (para manter compatibilidade)
       setCpfConsultado(cpfLimpo);
       
