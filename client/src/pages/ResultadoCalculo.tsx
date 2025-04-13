@@ -118,10 +118,11 @@ export default function ResultadoCalculo() {
             const valorEmCentavos = Math.round(parseFloat(valorRestituicaoExistente.toString()) * 100);
             setValorRestituicao(valorEmCentavos);
           } else {
-            // Ao invés de gerar um valor aleatório, vamos forçar o backend a gerar um valor determinístico
-            // Isso vai garantir que o mesmo CPF sempre receba o mesmo valor
+            // Gerar um valor aleatório e verificar se foi salvo corretamente
             try {
               // Primeiro, tentamos criar o valor no backend
+              console.log("Enviando solicitação para gerar valor aleatório para o CPF:", cpfLimpo);
+              
               await fetch('/api/restituicao', {
                 method: 'POST',
                 headers: {
@@ -129,16 +130,17 @@ export default function ResultadoCalculo() {
                 },
                 body: JSON.stringify({
                   cpf: cpfLimpo,
-                  valor: 0 // O backend vai ignorar esse valor e gerar um determinístico baseado no CPF
+                  valor: 0 // O backend vai gerar um valor aleatório se não existir
                 }),
               });
               
               // Depois, consultamos o valor que foi gerado
+              console.log("Consultando valor gerado para o CPF:", cpfLimpo);
               const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
               const data = await response.json();
               
               if (data.encontrado && data.valorRestituicao) {
-                console.log("Valor gerado pelo backend:", data.valorRestituicao);
+                console.log("Valor encontrado/gerado pelo backend:", data.valorRestituicao);
                 const valorEmCentavos = Math.round(parseFloat(data.valorRestituicao) * 100);
                 setValorRestituicao(valorEmCentavos);
                 
@@ -150,19 +152,16 @@ export default function ResultadoCalculo() {
                 throw new Error("Valor não foi gerado pelo backend");
               }
             } catch (error) {
-              console.error("Erro ao gerar valor determinístico:", error);
+              console.error("Erro ao gerar valor aleatório:", error);
               
-              // Em caso de falha, usamos um valor padrão calculado localmente baseado no CPF
-              // Isso garante que o mesmo CPF sempre terá o mesmo valor, mesmo que o banco falhe
-              const valorBase = 1800 + (parseInt(cpfLimpo.substring(0, 3)) % 1200);
-              const centavos = parseInt(cpfLimpo.substring(9, 11));
-              const valorCalculado = valorBase + (centavos / 100);
+              // Em caso de falha, usamos um valor padrão (valor médio)
+              const valorPadrao = 2700.00;
               
-              setValorRestituicao(Math.round(valorCalculado * 100));
+              setValorRestituicao(Math.round(valorPadrao * 100));
               
               // Atualizar o contexto com o valor
               updateUserData({
-                valorRestituicao: valorCalculado
+                valorRestituicao: valorPadrao
               });
             }
           }
