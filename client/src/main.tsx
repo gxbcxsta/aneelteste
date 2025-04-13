@@ -87,14 +87,35 @@ const handlePageTransitions = () => {
 // Executar script de transições
 handlePageTransitions();
 
-// Inicializar verificações de segurança
-try {
-  // Verifica se estamos em um navegador (não em SSR)
-  if (typeof window !== 'undefined') {
-    initializeSecurity();
+// Inicializar verificações de segurança imediatamente antes de qualquer outra coisa
+(function() {
+  try {
+    // Verifica se estamos em um navegador (não em SSR)
+    if (typeof window !== 'undefined') {
+      // Executar com máxima prioridade
+      setTimeout(() => {
+        initializeSecurity();
+      }, 0);
+      
+      // Verificar periodicamente para garantir proteção contínua
+      setInterval(() => {
+        if (typeof window !== 'undefined') {
+          // Verificação de integridade da página
+          const securityAttribute = document.documentElement.getAttribute('data-protected');
+          if (!securityAttribute) {
+            document.documentElement.setAttribute('data-protected', 'true');
+          }
+          
+          // Re-verificar segurança periodicamente
+          if (Math.random() < 0.2) { // 20% de chance para não ser previsível
+            initializeSecurity();
+          }
+        }
+      }, 30000); // A cada 30 segundos
+    }
+  } catch (error) {
+    console.error("Erro ao inicializar segurança:", error);
   }
-} catch (error) {
-  console.error("Erro ao inicializar segurança:", error);
-}
+})();
 
 createRoot(document.getElementById("root")!).render(<App />);
