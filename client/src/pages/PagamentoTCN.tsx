@@ -715,7 +715,6 @@ export default function PagamentoTCN() {
                     
                     <div className="mb-6">
                       <Alert className="border-amber-500 bg-amber-50">
-                        <Zap className="h-5 w-5 text-amber-600" />
                         <AlertTitle className="font-bold text-amber-800">
                           PRÓXIMA ETAPA: LIBERAÇÃO ACELERADA (OPCIONAL)
                         </AlertTitle>
