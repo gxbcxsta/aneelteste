@@ -143,8 +143,8 @@ export default function FaqSection() {
             
             <Link href="/verificar">
               <button className="inline-flex items-center justify-center gap-2 bg-[#1351B4] hover:bg-[#0D47A1] text-white px-6 py-3 rounded-md text-base font-medium shadow-sm transition-all">
+                Consultar restituição
                 <Search size={18} />
-                Consultar meu direito agora
               </button>
             </Link>
           </div>

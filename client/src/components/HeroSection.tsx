@@ -36,8 +36,8 @@ export default function HeroSection() {
             <div className="flex justify-start">
               <Link href="/verificar">
                 <button className="flex items-center justify-center gap-1 sm:gap-2 bg-[#FFCD07] hover:bg-[#F2C200] text-[#071D41] px-3 sm:px-6 py-2 sm:py-3 rounded-md text-sm sm:text-base font-bold shadow-md transition-all duration-300 ease-in-out transform hover:translate-y-[-2px]">
-                  <Search size={16} className="hidden xs:inline" />
                   Consultar restituição
+                  <Search size={16} />
                 </button>
               </Link>
             </div>
@@ -78,8 +78,8 @@ export default function HeroSection() {
               
               <Link href="/verificar">
                 <button className="w-full mt-2 flex items-center justify-center gap-1 bg-white text-[#071D41] px-2 py-1 rounded-md text-xs font-medium hover:bg-[#FFCD07] transition-all">
-                  <Search size={12} />
                   Consultar restituição
+                  <Search size={12} />
                 </button>
               </Link>
             </div>
