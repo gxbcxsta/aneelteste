@@ -371,7 +371,7 @@ export default function TaxaLAR() {
                 </Button>
                 
                 <Button 
-                  onClick={() => setLocation('/sucesso')}
+                  onClick={() => setLocation('/sucesso-padrao')}
                   variant="outline"
                   className="w-full font-medium py-6 text-lg border-gray-300 text-gray-600 hover:bg-gray-100 flex items-center justify-center"
                 >
