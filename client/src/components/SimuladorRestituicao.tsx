@@ -554,7 +554,7 @@ export default function SimuladorRestituicao({
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="text-[var(--gov-gray-dark)]">
-                        Não tenho o número de cliente, usar CPF
+                        Não sei meu número de cliente. Desejo seguir com o CPF.
                       </FormLabel>
                     </div>
                   </FormItem>
