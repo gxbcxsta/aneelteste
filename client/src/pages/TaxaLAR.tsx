@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useUserData } from "@/contexts/UserContext";
+import { registerTCNPayment } from "@/services/UtmifyService";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {

