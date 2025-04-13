@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { playNotificationSound } from "@/components/NotificationSound";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-// Utmify removido de acordo com os requisitos
+import UtmifyService from "@/services/UtmifyService";
 import { useUserData } from "@/contexts/UserContext";
 
 // Gerar um código PIX aleatório

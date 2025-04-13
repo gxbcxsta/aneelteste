@@ -1,0 +1,132 @@
+Aqui está um texto explicando de forma clara, técnica e prática para o Replit o propósito da API da Utmify, como usá-la corretamente no seu projeto, onde exatamente utilizar, quais dados enviar e qual token usar.
+
+🔌 Integração com a API da UTMIFY no Replit
+✅ Objetivo da API da UTMIFY
+A API da Utmify serve para metrificar e registrar vendas, capturando dados como:
+
+Origem de tráfego (utm_source, utm_campaign, etc),
+
+Informações do cliente (nome, e-mail, telefone, IP...),
+
+Produto vendido,
+
+Método e status do pagamento (PIX gerado, PIX pago),
+
+Valores da transação e comissões.
+
+Essa métrica é essencial para acompanhamento de conversão e eficiência de campanhas de tráfego pago.
+
+🔐 Token de autenticação
+Substitua o token de exemplo da documentação pelo seu token exclusivo:
+
+http
+Copiar
+Editar
+x-api-token: XAo52G3UkJ6ePs7Aq3UqHs32hvDPZ8rjUog4
+Esse token deve estar presente nos headers de todas as requisições enviadas para:
+
+arduino
+Copiar
+Editar
+https://api.utmify.com.br/api-credentials/orders
+📌 Onde exatamente usar a API
+Você só precisa enviar dados para a API da Utmify nas páginas de pagamento com PIX, que são:
+
+/pagamento
+
+/pagamento-tcn
+
+/pagamento-lar
+
+🔁 Como usar a API em cada página
+🧾 Página: /pagamento
+Aqui o usuário gera o PIX da taxa TRE no valor de R$ 74,90.
+
+Você deve fazer duas chamadas para a API da UTMIFY:
+
+Quando o PIX for gerado: status "waiting_payment"
+
+Quando o PIX for pago: status "paid"
+
+Quando o pagamento for confirmado, o usuário será redirecionado para /taxa-complementar, então esse redirecionamento pode servir como gatilho de envio do status "paid" para a API.
+
+Se o usuário não pagar e apenas gerar o PIX, envie somente o status "waiting_payment".
+
+🧾 Página: /pagamento-tcn
+Aqui significa que o usuário já pagou a taxa da página anterior (/pagamento).
+
+Ele vai realizar o pagamento da taxa TCN e, se pago com sucesso, será redirecionado para /taxa-lar.
+
+Assim como na anterior, envie:
+
+status: "waiting_payment" quando gerar o PIX
+
+status: "paid" quando redirecionar para /taxa-lar
+
+🧾 Página: /pagamento-lar
+Nesta página, o usuário já pagou TRE + TCN, e agora vai pagar a taxa LAR.
+
+Quando ele finalizar o pagamento, será redirecionado para a página /sucesso.
+
+Nesse redirecionamento, envie status: "paid" indicando que ele pagou as 3 taxas.
+
+✅ Página: /sucesso
+Essa página confirma que o usuário pagou todas as taxas.
+
+Ao acessá-la, envie o status final "paid" para a API da Utmify, com os dados da última transação (taxa LAR).
+
+🛠 Exemplo de código no Replit (fetch em JavaScript)
+js
+Copiar
+Editar
+fetch("https://api.utmify.com.br/api-credentials/orders", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-token": "XAo52G3UkJ6ePs7Aq3UqHs32hvDPZ8rjUog4"
+  },
+  body: JSON.stringify({
+    orderId: "ID_UNICO_DA_VENDA",
+    platform: "MinhaPlataforma",
+    paymentMethod: "pix",
+    status: "paid", // ou "waiting_payment"
+    createdAt: "2025-04-12 14:00:00",
+    approvedDate: "2025-04-12 14:15:00", // ou null se não foi pago ainda
+    refundedAt: null,
+    customer: {
+      name: "Gabriel Arthur",
+      email: "gabriel@email.com",
+      phone: "31999999999",
+      document: "00000000000",
+      country: "BR",
+      ip: "127.0.0.1"
+    },
+    products: [
+      {
+        id: "pix-tre",
+        name: "Taxa TRE",
+        planId: null,
+        planName: null,
+        quantity: 1,
+        priceInCents: 7490
+      }
+    ],
+    trackingParameters: {
+      src: null,
+      sck: null,
+      utm_source: "Facebook",
+      utm_campaign: "CampanhaTRE",
+      utm_medium: "Stories",
+      utm_content: null,
+      utm_term: null
+    },
+    commission: {
+      totalPriceInCents: 7490,
+      gatewayFeeInCents: 300,
+      userCommissionInCents: 7190
+    }
+  })
+})
+.then(res => res.json())
+.then(console.log)
+.catch(console.error)
