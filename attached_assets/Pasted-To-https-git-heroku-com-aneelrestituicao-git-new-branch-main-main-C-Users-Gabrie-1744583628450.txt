@@ -1,0 +1,57 @@
+To https://git.heroku.com/aneelrestituicao.git
+ * [new branch]      main -> main
+
+C:\Users\GabrielPC\Documents\GChub\OP\ANEEL>heroku logs --tail
+2025-04-13T22:22:23.792441+00:00 app[api]: Initial release by user gxbcxsta@gmail.com
+2025-04-13T22:22:23.792441+00:00 app[api]: Release v1 created by user gxbcxsta@gmail.com
+2025-04-13T22:22:23.972930+00:00 app[api]: Enable Logplex by user gxbcxsta@gmail.com
+2025-04-13T22:22:23.972930+00:00 app[api]: Release v2 created by user gxbcxsta@gmail.com
+2025-04-13T22:28:51.435637+00:00 app[api]: @ref:postgresql-octagonal-77212 completed provisioning, setting DATABASE_URL. by user heroku-postgresql@addons.heroku.com
+2025-04-13T22:28:51.435637+00:00 app[api]: Release v3 created by user heroku-postgresql@addons.heroku.com
+2025-04-13T22:29:50.953228+00:00 heroku[router]: at=info code=H81 desc="Blank app" method=GET path="/" host=aneelrestituicao-80fe4096d657.herokuapp.com request_id=c37e4e87-cb90-49e7-9f57-1a910bd05cd8 fwd="201.80.15.81" dyno= connect= service= status=502 bytes= protocol=https
+2025-04-13T22:29:51.201421+00:00 heroku[router]: at=info code=H81 desc="Blank app" method=GET path="/favicon.ico" host=aneelrestituicao-80fe4096d657.herokuapp.com request_id=34d10325-2c71-449c-8a81-8da2778e20bf fwd="201.80.15.81" dyno= connect= service= status=502 bytes= protocol=https
+2025-04-13T22:31:14.318400+00:00 app[api]: Set FOR4PAYMENTS_SECRET_KEY config vars by user gxbcxsta@gmail.com
+2025-04-13T22:31:14.318400+00:00 app[api]: Release v4 created by user gxbcxsta@gmail.com
+2025-04-13T22:31:16.813912+00:00 app[api]: Release v5 created by user gxbcxsta@gmail.com
+2025-04-13T22:31:16.813912+00:00 app[api]: Set FOR4PAYMENTS_PUBLIC_KEY config vars by user gxbcxsta@gmail.com
+2025-04-13T22:31:18.948029+00:00 app[api]: Release v6 created by user gxbcxsta@gmail.com
+2025-04-13T22:31:18.948029+00:00 app[api]: Set UTMIFY_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-13T22:31:21.123729+00:00 app[api]: Set API_TOKEN_RECEITA config vars by user gxbcxsta@gmail.com
+2025-04-13T22:31:21.123729+00:00 app[api]: Release v7 created by user gxbcxsta@gmail.com
+2025-04-13T22:31:23.224505+00:00 app[api]: Release v8 created by user gxbcxsta@gmail.com
+2025-04-13T22:31:23.224505+00:00 app[api]: Set NODE_ENV config vars by user gxbcxsta@gmail.com
+2025-04-13T22:32:20.647339+00:00 app[api]: @ref:postgresql-cubed-36965 completed provisioning, setting HEROKU_POSTGRESQL_GRAY_URL. by user heroku-postgresql@addons.heroku.com
+2025-04-13T22:32:20.647339+00:00 app[api]: Release v9 created by user heroku-postgresql@addons.heroku.com
+2025-04-13T22:33:23.638115+00:00 heroku[web.1]: Starting process with command `node server.js`
+2025-04-13T22:33:24.172564+00:00 app[web.1]: file:///app/server.js:2
+2025-04-13T22:33:24.172580+00:00 app[web.1]: const { spawn } = require('child_process');
+2025-04-13T22:33:24.172580+00:00 app[web.1]: ^
+2025-04-13T22:33:24.172581+00:00 app[web.1]:
+2025-04-13T22:33:24.172582+00:00 app[web.1]: ReferenceError: require is not defined in ES module scope, you can use import instead
+2025-04-13T22:33:24.172589+00:00 app[web.1]: This file is being treated as an ES module because it has a '.js' file extension and '/app/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+2025-04-13T22:33:24.172589+00:00 app[web.1]: at file:///app/server.js:2:19
+2025-04-13T22:33:24.172590+00:00 app[web.1]: at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+2025-04-13T22:33:24.172590+00:00 app[web.1]: at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:578:26)
+2025-04-13T22:33:24.172591+00:00 app[web.1]: at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-04-13T22:33:24.172591+00:00 app[web.1]:
+2025-04-13T22:33:24.172591+00:00 app[web.1]: Node.js v22.14.0
+2025-04-13T22:33:24.216408+00:00 heroku[web.1]: Process exited with status 1
+2025-04-13T22:33:24.243248+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-13T22:33:24.246338+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-13T22:33:28.983608+00:00 heroku[web.1]: Starting process with command `node server.js`
+2025-04-13T22:33:29.497298+00:00 app[web.1]: file:///app/server.js:2
+2025-04-13T22:33:29.497328+00:00 app[web.1]: const { spawn } = require('child_process');
+2025-04-13T22:33:29.497329+00:00 app[web.1]: ^
+2025-04-13T22:33:29.497329+00:00 app[web.1]:
+2025-04-13T22:33:29.497330+00:00 app[web.1]: ReferenceError: require is not defined in ES module scope, you can use import instead
+2025-04-13T22:33:29.497337+00:00 app[web.1]: This file is being treated as an ES module because it has a '.js' file extension and '/app/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+2025-04-13T22:33:29.497337+00:00 app[web.1]: at file:///app/server.js:2:19
+2025-04-13T22:33:29.497338+00:00 app[web.1]: at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+2025-04-13T22:33:29.497338+00:00 app[web.1]: at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:578:26)
+2025-04-13T22:33:29.497338+00:00 app[web.1]: at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-04-13T22:33:29.497339+00:00 app[web.1]:
+2025-04-13T22:33:29.497339+00:00 app[web.1]: Node.js v22.14.0
+2025-04-13T22:33:29.540026+00:00 heroku[web.1]: Process exited with status 1
+2025-04-13T22:33:29.561718+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-13T22:33:30.440198+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=aneelrestituicao-80fe4096d657.herokuapp.com request_id=c4f1ce34-1ac9-4847-99be-ac2efb77a8ca fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-13T22:33:31.003481+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=aneelrestituicao-80fe4096d657.herokuapp.com request_id=25afb9aa-14ef-4657-a6b2-65690bd537a8 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
