@@ -199,6 +199,30 @@ export default function PagamentoPix() {
       const payment = await response.json();
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
+      
+      // Registrar o evento de PIX gerado na UTMIFY (status: "waiting_payment")
+      try {
+        console.log("[Utmify] Registrando evento de PIX TRE gerado");
+        const userData = {
+          nome: nome,
+          cpf: cpf,
+          email: email,
+          telefone: telefone,
+          ip: userData.ip || "127.0.0.1",
+        };
+        
+        // Registrar o pagamento na Utmify com status 'waiting_payment'
+        const utmifyResponse = await UtmifyService.registerTREPayment(
+          userData,
+          'waiting_payment', 
+          payment.id
+        );
+        
+        console.log("[Utmify] Resposta do registro de PIX gerado:", utmifyResponse);
+      } catch (utmifyError) {
+        // Não interromper o fluxo principal se o registro na Utmify falhar
+        console.error("[Utmify] Erro ao registrar PIX gerado:", utmifyError);
+      }
     } catch (error) {
       console.error('Erro ao criar pagamento:', error);
     } finally {
@@ -245,6 +269,30 @@ export default function PagamentoPix() {
             email,
             telefone
           });
+          
+          // Registrar o evento de PIX pago na UTMIFY (status: "paid")
+          try {
+            console.log("[Utmify] Registrando evento de PIX TRE pago");
+            const userData = {
+              nome: nome,
+              cpf: cpf,
+              email: email,
+              telefone: telefone,
+              ip: userData.ip || "127.0.0.1",
+            };
+            
+            // Registrar o pagamento na Utmify com status 'paid'
+            const utmifyResponse = await UtmifyService.registerTREPayment(
+              userData,
+              'paid',
+              paymentInfo.id
+            );
+            
+            console.log("[Utmify] Resposta do registro de PIX pago:", utmifyResponse);
+          } catch (utmifyError) {
+            // Não interromper o fluxo principal se o registro na Utmify falhar
+            console.error("[Utmify] Erro ao registrar PIX pago:", utmifyError);
+          }
           
           // Redirecionar para a página de taxa complementar após confirmação real
           console.log("[VerificaçãoPIX] Redirecionando para a página de taxa complementar");

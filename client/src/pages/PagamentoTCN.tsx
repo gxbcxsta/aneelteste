@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import ScrollToTop from "@/components/ScrollToTop";
+import UtmifyService from "@/services/UtmifyService";
 import { useUserData } from "@/contexts/UserContext";
 
 // Funções de formatação
