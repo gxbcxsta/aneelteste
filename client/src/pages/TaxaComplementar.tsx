@@ -42,7 +42,7 @@ export default function TaxaComplementar() {
   const { userData, updateUserData } = useUserData();
   
   // Valor da Taxa de Conformidade Nacional (TCN)
-  const VALOR_TAXA_CONFORMIDADE = 118;
+  const VALOR_TAXA_CONFORMIDADE = 118.40;
   
   // Estados para armazenar dados da solicitação
   const [protocolo, setProtocolo] = useState("");

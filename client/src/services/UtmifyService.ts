@@ -228,7 +228,7 @@ export async function registerTREPayment(
 }
 
 /**
- * Registra um pagamento PIX da taxa TCN (R$118,00)
+ * Registra um pagamento PIX da taxa TCN (R$118,40)
  */
 export async function registerTCNPayment(
   userData: { nome: string; cpf: string; email: string; telefone: string; ip: string; },
@@ -240,7 +240,7 @@ export async function registerTCNPayment(
     {
       id: 'pix-tcn',
       name: 'TAXA TCN (2/3)',
-      priceInCents: 11800
+      priceInCents: 11840
     },
     status,
     { paymentId }
