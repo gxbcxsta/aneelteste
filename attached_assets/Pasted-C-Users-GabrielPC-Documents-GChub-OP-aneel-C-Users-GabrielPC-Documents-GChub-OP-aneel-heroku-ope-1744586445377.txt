@@ -1,0 +1,81 @@
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku open -a aneelicms
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku logs --tail
+2025-04-13T23:15:54.674066+00:00 app[api]: Initial release by user gxbcxsta@gmail.com
+2025-04-13T23:15:54.674066+00:00 app[api]: Release v1 created by user gxbcxsta@gmail.com
+2025-04-13T23:15:54.886769+00:00 app[api]: Release v2 created by user gxbcxsta@gmail.com
+2025-04-13T23:15:54.886769+00:00 app[api]: Enable Logplex by user gxbcxsta@gmail.com
+2025-04-13T23:16:51.711991+00:00 app[api]: Set FOR4PAYMENTS_SECRET_KEY config vars by user gxbcxsta@gmail.com
+2025-04-13T23:16:51.711991+00:00 app[api]: Release v3 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:06.966122+00:00 app[api]: Set FOR4PAYMENTS_PUBLIC_KEY config vars by user gxbcxsta@gmail.com
+2025-04-13T23:17:06.966122+00:00 app[api]: Release v4 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:12.064792+00:00 app[api]: Release v5 created by user heroku-postgresql@addons.heroku.com
+2025-04-13T23:17:12.064792+00:00 app[api]: @ref:postgresql-polished-63804 completed provisioning, setting DATABASE_URL. by user heroku-postgresql@addons.heroku.com
+2025-04-13T23:17:18.201936+00:00 app[api]: Release v6 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:18.201936+00:00 app[api]: Set UTMIFY_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-13T23:17:36.672100+00:00 app[api]: Release v7 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:36.672100+00:00 app[api]: Set API_TOKEN_RECEITA config vars by user gxbcxsta@gmail.com
+2025-04-13T23:17:49.043273+00:00 app[api]: Release v8 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:49.043273+00:00 app[api]: Set NODE_ENV config vars by user gxbcxsta@gmail.com
+2025-04-13T23:19:37.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-13T23:20:06.280335+00:00 app[api]: Release v9 created by user gxbcxsta@gmail.com
+2025-04-13T23:20:06.280335+00:00 app[api]: Deploy 45b2ae75 by user gxbcxsta@gmail.com
+2025-04-13T23:20:06.291617+00:00 app[api]: Scaled to web@1:Basic by user gxbcxsta@gmail.com
+2025-04-13T23:20:10.000000+00:00 app[api]: Build succeeded
+2025-04-13T23:20:11.553987+00:00 heroku[web.1]: Starting process with command `npm run start`
+2025-04-13T23:20:12.381224+00:00 app[web.1]:
+2025-04-13T23:20:12.381291+00:00 app[web.1]: > rest-express@1.0.0 start
+2025-04-13T23:20:12.381293+00:00 app[web.1]: > NODE_ENV=production node dist/index.js
+2025-04-13T23:20:12.381296+00:00 app[web.1]:
+2025-04-13T23:20:12.433778+00:00 app[web.1]: node:internal/modules/package_json_reader:268
+2025-04-13T23:20:12.433794+00:00 app[web.1]: throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+2025-04-13T23:20:12.433795+00:00 app[web.1]: ^
+2025-04-13T23:20:12.433795+00:00 app[web.1]:
+2025-04-13T23:20:12.433808+00:00 app[web.1]: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from /app/dist/index.js
+2025-04-13T23:20:12.433808+00:00 app[web.1]: at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+2025-04-13T23:20:12.433808+00:00 app[web.1]: at packageResolve (node:internal/modules/esm/resolve:768:81)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:854:18)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-13T23:20:12.433811+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-13T23:20:12.433811+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-13T23:20:12.433811+00:00 app[web.1]: at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+2025-04-13T23:20:12.433811+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-13T23:20:12.433811+00:00 app[web.1]: }
+2025-04-13T23:20:12.433812+00:00 app[web.1]:
+2025-04-13T23:20:12.433813+00:00 app[web.1]: Node.js v22.14.0
+2025-04-13T23:20:12.505042+00:00 heroku[web.1]: Process exited with status 1
+2025-04-13T23:20:12.532231+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-13T23:20:12.535904+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-13T23:20:17.235864+00:00 heroku[web.1]: Starting process with command `npm run start`
+2025-04-13T23:20:18.051212+00:00 app[web.1]:
+2025-04-13T23:20:18.051258+00:00 app[web.1]: > rest-express@1.0.0 start
+2025-04-13T23:20:18.051261+00:00 app[web.1]: > NODE_ENV=production node dist/index.js
+2025-04-13T23:20:18.051263+00:00 app[web.1]:
+2025-04-13T23:20:18.102443+00:00 app[web.1]: node:internal/modules/package_json_reader:268
+2025-04-13T23:20:18.102454+00:00 app[web.1]: throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+2025-04-13T23:20:18.102455+00:00 app[web.1]: ^
+2025-04-13T23:20:18.102455+00:00 app[web.1]:
+2025-04-13T23:20:18.102488+00:00 app[web.1]: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from /app/dist/index.js
+2025-04-13T23:20:18.102490+00:00 app[web.1]: at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+2025-04-13T23:20:18.102491+00:00 app[web.1]: at packageResolve (node:internal/modules/esm/resolve:768:81)
+2025-04-13T23:20:18.102491+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:854:18)
+2025-04-13T23:20:18.102491+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-13T23:20:18.102493+00:00 app[web.1]: at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+2025-04-13T23:20:18.102493+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-13T23:20:18.102493+00:00 app[web.1]: }
+2025-04-13T23:20:18.102494+00:00 app[web.1]:
+2025-04-13T23:20:18.102494+00:00 app[web.1]: Node.js v22.14.0
+2025-04-13T23:20:18.173029+00:00 heroku[web.1]: Process exited with status 1
+2025-04-13T23:20:18.196417+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-13T23:20:25.194371+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=aneelicms-e0e6ea73ebda.herokuapp.com request_id=8c849d66-3759-4d70-9585-395de21fd44e fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-13T23:20:26.188028+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=aneelicms-e0e6ea73ebda.herokuapp.com request_id=e40817c3-7021-409b-a31e-0ecdc0bd9bda fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+
+
+
