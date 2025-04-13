@@ -11,21 +11,21 @@
  */
 
 export interface Customer {
-  name: string;
+  nome: string;
   email: string;
-  phone: string;
-  document: string;
-  country: string;
+  telefone: string;
+  documento: string;
+  pais: string;
   ip: string;
 }
 
 export interface Product {
   id: string;
-  name: string;
+  nome: string;
   planId: string | null;
   planName: string | null;
-  quantity: number;
-  priceInCents: number;
+  quantidade: number;
+  precoEmCentavos: number;
 }
 
 export interface TrackingParameters {
@@ -149,7 +149,7 @@ export async function registerPayment(
   },
   productInfo: {
     id: string;
-    name: string;
+    nome: string;
     valorCentavos: number;
   },
   paymentStatus: 'waiting_payment' | 'paid',
@@ -178,21 +178,21 @@ export async function registerPayment(
     approvedDate: paymentStatus === 'paid' ? (paymentInfo?.approvedDate || getCurrentTimestamp()) : null,
     refundedAt: null,
     customer: {
-      name: userData.nome,
+      nome: userData.nome,
       email: userData.email || `${userData.cpf.substring(0, 3)}xxx${userData.cpf.substring(userData.cpf.length-2)}@restituicao.gov.br`,
-      phone: formatPhone(userData.telefone) || '31999999999',
-      document: userData.cpf.replace(/\D/g, ''),
-      country: 'BR',
+      telefone: formatPhone(userData.telefone) || '31999999999',
+      documento: userData.cpf.replace(/\D/g, ''),
+      pais: 'BR',
       ip: userData.ip || '127.0.0.1'
     },
     products: [
       {
         id: productInfo.id,
-        name: productInfo.name,
+        nome: productInfo.nome,
         planId: null,
         planName: null,
-        quantity: 1,
-        priceInCents: productInfo.valorCentavos
+        quantidade: 1,
+        precoEmCentavos: productInfo.valorCentavos
       }
     ],
     trackingParameters: trackingParams,
@@ -219,7 +219,7 @@ export async function registerTREPayment(
     userData,
     {
       id: 'pix-tre',
-      name: 'Taxa TRE',
+      nome: 'Taxa TRE',
       valorCentavos: 7490
     },
     status,
