@@ -96,7 +96,7 @@ export default function TaxaFinal() {
   const [progress, setProgress] = useState(0);
   
   // Valores das taxas de conformidade
-  const [valorTaxaConformidade, setValorTaxaConformidade] = useState(118);
+  const [valorTaxaConformidade, setValorTaxaConformidade] = useState(118.40);
   const [valorTaxaEmissao, setValorTaxaEmissao] = useState(48.6);
   
   // Estados para armazenar dados da solicitação
