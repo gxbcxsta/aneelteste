@@ -5,18 +5,55 @@
     "node",
     "express",
     "react",
-    "typescript"
+    "typescript",
+    "icms",
+    "restituicao",
+    "energia"
   ],
+  "website": "https://restituicao.gov.br/",
+  "repository": "https://github.com/seuusuario/restituicao-icms",
+  "logo": "https://raw.githubusercontent.com/seuusuario/restituicao-icms/main/public/logo.png",
+  "success_url": "/",
   "stack": "heroku-22",
   "buildpacks": [
     {
       "url": "heroku/nodejs"
     }
   ],
+  "addons": [
+    {
+      "plan": "heroku-postgresql:mini"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
   "env": {
     "NODE_ENV": {
       "description": "Ambiente da aplicação",
       "value": "production"
+    },
+    "FOR4PAYMENTS_SECRET_KEY": {
+      "description": "Chave secreta da API For4Payments",
+      "required": true
+    },
+    "FOR4PAYMENTS_PUBLIC_KEY": {
+      "description": "Chave pública da API For4Payments",
+      "required": true
+    },
+    "UTMIFY_API_TOKEN": {
+      "description": "Token da API Utmify",
+      "required": true
+    },
+    "API_TOKEN_RECEITA": {
+      "description": "Token da API da Receita Federal (Exato Digital)",
+      "required": true
     }
+  },
+  "scripts": {
+    "postdeploy": "npm run db:push"
   }
 }
