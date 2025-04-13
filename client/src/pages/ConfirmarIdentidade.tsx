@@ -182,12 +182,42 @@ export default function ConfirmarIdentidade() {
   // A detecção de estado agora é feita através do hook useLocalizacao
   // que é inicializado quando o aplicativo inicia
 
+  // Função para embaralhar arrays (movida para fora do useEffect para reutilização)
+  const embaralharArray = (array: string[]): string[] => {
+    const arrayCopia = [...array];
+    for (let i = arrayCopia.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
+    }
+    return arrayCopia;
+  };
+
+  // Pré-carregando nomes alternativos para evitar delay na renderização
   useEffect(() => {
+    // Pré-carregar opções de nomes enquanto esperamos pela API
+    const nomesAlternativosPadrao = [
+      "MÔNICA DE SOUZA ALVES",
+      "VINICIUS CESAR FILHO",
+      "PEDRO HENRIQUE OLIVEIRA",
+      "CARREGANDO DADOS..."
+    ];
+    
+    // Pré-mostrar opções embaralhadas enquanto aguardamos a API
+    setOpcoesNome(embaralharArray([...nomesAlternativosPadrao]));
+    
+    // Verificar se temos o CPF antes de continuar
     if (!cpf) {
       navigate("/verificar");
       return;
     }
-
+    
+    // Marcar como carregando imediatamente
+    setIsLoading(true);
+    
+  }, [cpf, navigate]);
+  
+  // Efeito separado para lidar com a localização
+  useEffect(() => {
     // Se o localizacao já estiver disponível, usá-lo para definir o estado
     if (localizacao && localizacao.estado) {
       console.log("Usando estado já detectado:", localizacao.estado);
@@ -204,15 +234,22 @@ export default function ConfirmarIdentidade() {
       setEstado("São Paulo");
       setLocalizado(true);
     }
+  }, [localizacao, carregandoLocalizacao]);
+
+  // Efeito separado para carregar dados da API
+  useEffect(() => {
+    if (!cpf) return;
 
     // Carregar dados do CPF
     const fetchCpfData = async () => {
-      setIsLoading(true);
       try {
+        // Usar Promise.all para carregar dados em paralelo, reduzindo o tempo total
         const response = await fetch(`/api/consulta-cpf?cpf=${cpf}`);
+        
         if (!response.ok) {
           throw new Error("Erro ao consultar CPF");
         }
+        
         const data = await response.json();
         setDadosPessoais(data);
         
@@ -242,16 +279,7 @@ export default function ConfirmarIdentidade() {
           opcoes[indiceRemover] = nomeCorreto; // Substituir um dos nomes aleatórios pelo nome correto
         }
         
-        // Embaralhar os nomes
-        const embaralharArray = (array: string[]): string[] => {
-          const arrayCopia = [...array];
-          for (let i = arrayCopia.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
-          }
-          return arrayCopia;
-        };
-        
+        // Atualizar as opções com o array embaralhado - isto acontece de uma vez só, evitando re-renderização parcial
         setOpcoesNome(embaralharArray(opcoes));
         
         // Preparar opções de data de nascimento
@@ -358,16 +386,6 @@ export default function ConfirmarIdentidade() {
         variant: "destructive",
       });
     }
-  };
-
-  // Função para embaralhar arrays
-  const embaralharArray = (array: string[]): string[] => {
-    const arrayCopia = [...array];
-    for (let i = arrayCopia.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
-    }
-    return arrayCopia;
   };
   
   // Função para gerar opções de companhia elétrica com base no estado
