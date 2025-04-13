@@ -588,7 +588,7 @@ export default function PagamentoPix() {
                   </div>
                   <div>
                     <p className="text-[#071D41] font-semibold text-sm mb-1">Informações sobre o depósito</p>
-                    <p className="text-gray-700 text-sm">Após a confirmação do pagamento da Taxa de Regularização, o valor de <span className="font-semibold text-green-700">{valorFormatado}</span> será depositado em sua conta bancária em até <span className="font-semibold">72 horas úteis</span>.</p>
+                    <p className="text-gray-700 text-sm">Após a confirmação do pagamento da Taxa de Regularização, o valor de <span className="font-semibold text-green-700">{valorFormatado}</span> será depositado em sua conta bancária em até <span className="font-semibold">15 dias úteis</span>.</p>
                     <div className="mt-2 bg-white/50 rounded p-2 border border-[#1351B4]/20 text-xs text-gray-600">
                       <p>Conforme resolução ANEEL nº 1.000/2021, o processo de restituição é <span className="font-medium text-[#071D41]">irreversível</span> após a confirmação do pagamento da TRE. Os valores serão depositados na conta bancária informada em seu cadastro.</p>
                     </div>
