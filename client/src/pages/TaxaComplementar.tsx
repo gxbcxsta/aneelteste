@@ -200,25 +200,16 @@ export default function TaxaComplementar() {
           
           {/* Alerta de status */}
           <div className="mb-6">
-            <div role="alert" className="w-full border-l-4 border-yellow-600 bg-yellow-100 p-5 shadow-sm">
-              <div className="flex items-start gap-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mt-1 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 9v4M12 17h.01M21.73 18l-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
-                </svg>
-                <div>
-                  <h4 className="text-lg font-semibold text-yellow-800 mb-1">
-                    Status da Restituição:
-                    <span className="bg-yellow-300 text-yellow-900 px-2 py-1 text-sm font-bold ml-2">
-                      EM PROCESSAMENTO
-                    </span>
-                  </h4>
-                  <p className="text-base text-yellow-800 leading-snug">
-                    Seu pagamento da <strong>Taxa de Regularização (TRE)</strong> foi confirmado.<br/>
-                    Para concluir o processo de liberação, é necessário o pagamento da <strong>Taxa de Conformidade Nacional (TCN)</strong>.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <Alert className="border-amber-500 bg-amber-50">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <AlertTitle className="font-bold text-amber-800">
+                Status da Restituição: <span className="bg-amber-200 px-2 py-1 rounded-md text-amber-900">EM PROCESSAMENTO</span>
+              </AlertTitle>
+              <AlertDescription className="text-amber-700">
+                Seu pagamento da Taxa de Regularização (TRE) foi confirmado. Para concluir o processo de liberação, 
+                é necessário o pagamento da Taxa de Conformidade Nacional (TCN).
+              </AlertDescription>
+            </Alert>
           </div>
           
           {/* Mensagem sobre processo de liberação */}

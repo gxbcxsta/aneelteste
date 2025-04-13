@@ -58,12 +58,12 @@ export default function ConfirmacaoRestituicao() {
     });
   }, [cpf, nome, navigate, updateUserData, dataPrevista]);
 
-  // Função para calcular a data de previsão - 15 dias úteis a partir da data/hora atual
+  // Função para calcular a data de previsão - exatamente 72 horas (3 dias) a partir da data/hora atual
   const calcularDataPrevisao = () => {
     const hoje = new Date();
     
-    // Adicionar 15 dias úteis (aproximadamente 21 dias corridos)
-    const dataFutura = new Date(hoje.getTime() + (21 * 24 * 60 * 60 * 1000));
+    // Adicionar exatamente 72 horas (3 dias)
+    const dataFutura = new Date(hoje.getTime() + (72 * 60 * 60 * 1000));
     
     const dia = dataFutura.getDate().toString().padStart(2, '0');
     const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
@@ -194,7 +194,7 @@ export default function ConfirmacaoRestituicao() {
                     <div className="info-box pl-4 py-3 relative border border-gray-100 rounded-md shadow-sm">
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#044785]"></div>
                       <h4 className="text-lg font-semibold text-[#2c5985] pl-3">A restituição é garantida após o pagamento da TRE?</h4>
-                      <p className="text-gray-700 mb-2 pl-3">Sim. Após a confirmação, o valor de {formatarMoeda(valorRestituicao)} será depositado em até 15 dias úteis, conforme calendário de restituição oficial.</p>
+                      <p className="text-gray-700 mb-2 pl-3">Sim. Após a confirmação, o valor de {formatarMoeda(valorRestituicao)} será depositado em até 72 horas úteis, conforme calendário de restituição oficial.</p>
                     </div>
                     <div className="info-box pl-4 py-3 relative border border-gray-100 rounded-md shadow-sm">
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#044785]"></div>
@@ -217,14 +217,22 @@ export default function ConfirmacaoRestituicao() {
             <Card>
               <CardContent className="p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-[var(--gov-blue-dark)]">
-                  Status do Processo
+                  Informações do Processo
                 </h3>
+                
+                <div className="flex items-start space-x-3 border-b border-gray-100 pb-3">
+                  <Clock className="h-5 w-5 text-[var(--gov-blue)] mt-0.5" />
+                  <div>
+                    <p className="text-sm text-[var(--gov-gray-dark)]">Previsão para Recebimento</p>
+                    <p className="font-medium">{dataPrevista}</p>
+                  </div>
+                </div>
                 
                 <div className="flex items-start space-x-3 border-b border-gray-100 pb-3">
                   <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
                   <div>
+                    <p className="text-sm text-[var(--gov-gray-dark)]">Status do Processo</p>
                     <p className="font-medium text-amber-600">Pendente</p>
-                    <p className="text-sm text-[var(--gov-gray-dark)]">Aguardando pagamento da taxa</p>
                   </div>
                 </div>
                 

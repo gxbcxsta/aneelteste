@@ -428,25 +428,16 @@ export default function PagamentoTCN() {
           </div>
           
           <div className="mb-5">
-            <div role="alert" className="w-full border-l-4 border-yellow-600 bg-yellow-100 p-5 shadow-sm">
-              <div className="flex items-start gap-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mt-1 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 9v4M12 17h.01M21.73 18l-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
-                </svg>
-                <div>
-                  <h4 className="text-lg font-semibold text-yellow-800 mb-1">
-                    2ª ETAPA - PAGAMENTO DA TAXA DE CONFORMIDADE NACIONAL (TCN)
-                  </h4>
-                  <span className="block bg-yellow-300 text-yellow-900 px-2 py-1 text-sm font-bold mt-1 w-fit rounded">
-                    ETAPA OBRIGATÓRIA
-                  </span>
-                  <p className="text-base text-yellow-800 leading-snug mt-3">
-                    Esta é a segunda etapa obrigatória para a liberação da sua <strong>restituição de ICMS</strong>.<br/>
-                    Efetue o pagamento da <strong>TCN</strong> para validar seu crédito no <strong>Sistema Nacional de Compensações Elétricas</strong>.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <Alert className="border-amber-500 bg-amber-50">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <AlertTitle className="font-bold text-amber-800">
+                2ª ETAPA - PAGAMENTO DA TAXA DE CONFORMIDADE NACIONAL (TCN)
+              </AlertTitle>
+              <AlertDescription className="text-amber-700">
+                Esta é a segunda etapa obrigatória para a liberação da sua restituição de ICMS. 
+                Efetue o pagamento da TCN para validar seu crédito no Sistema Nacional de Compensações Elétricas.
+              </AlertDescription>
+            </Alert>
           </div>
           
           {paymentStatus === 'completed' ? (
@@ -715,6 +706,7 @@ export default function PagamentoTCN() {
                     
                     <div className="mb-6">
                       <Alert className="border-amber-500 bg-amber-50">
+                        <Zap className="h-5 w-5 text-amber-600" />
                         <AlertTitle className="font-bold text-amber-800">
                           PRÓXIMA ETAPA: LIBERAÇÃO ACELERADA (OPCIONAL)
                         </AlertTitle>
