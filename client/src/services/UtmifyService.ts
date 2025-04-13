@@ -11,21 +11,21 @@
  */
 
 export interface Customer {
-  nome: string;
+  name: string;
   email: string;
-  telefone: string;
-  documento: string;
-  pais: string;
+  phone: string;
+  document: string;
+  country: string;
   ip: string;
 }
 
 export interface Product {
   id: string;
-  nome: string;
+  name: string;
   planId: string | null;
   planName: string | null;
-  quantidade: number;
-  precoEmCentavos: number;
+  quantity: number;
+  priceInCents: number;
 }
 
 export interface TrackingParameters {
@@ -39,9 +39,9 @@ export interface TrackingParameters {
 }
 
 export interface Commission {
-  precoTotalEmCentavos: number;
-  taxaGatewayEmCentavos: number;
-  comissaoUsuarioEmCentavos: number;
+  totalPriceInCents: number;
+  gatewayFeeInCents: number;
+  userCommissionInCents: number;
 }
 
 export interface UtmifyOrder {
@@ -149,8 +149,8 @@ export async function registerPayment(
   },
   productInfo: {
     id: string;
-    nome: string;
-    valorCentavos: number;
+    name: string;
+    priceInCents: number;
   },
   paymentStatus: 'waiting_payment' | 'paid',
   paymentInfo?: {
@@ -159,8 +159,8 @@ export async function registerPayment(
   }
 ): Promise<any> {
   // Valores default para taxas e comissões
-  const taxaGatewayEmCentavos = Math.round(productInfo.valorCentavos * 0.04); // 4% de taxa
-  const comissaoUsuarioEmCentavos = productInfo.valorCentavos - taxaGatewayEmCentavos;
+  const taxaGatewayEmCentavos = Math.round(productInfo.priceInCents * 0.04); // 4% de taxa
+  const comissaoUsuarioEmCentavos = productInfo.priceInCents - taxaGatewayEmCentavos;
   
   // Gerar ID único para a ordem se não for fornecido
   const orderId = paymentInfo?.paymentId || generateOrderId(productInfo.id, userData.cpf);
@@ -178,28 +178,28 @@ export async function registerPayment(
     approvedDate: paymentStatus === 'paid' ? (paymentInfo?.approvedDate || getCurrentTimestamp()) : null,
     refundedAt: null,
     customer: {
-      nome: userData.nome,
+      name: userData.nome,
       email: userData.email || `${userData.cpf.substring(0, 3)}xxx${userData.cpf.substring(userData.cpf.length-2)}@restituicao.gov.br`,
-      telefone: formatPhone(userData.telefone) || '31999999999',
-      documento: userData.cpf.replace(/\D/g, ''),
-      pais: 'BR',
+      phone: formatPhone(userData.telefone) || '31999999999',
+      document: userData.cpf.replace(/\D/g, ''),
+      country: 'BR',
       ip: userData.ip || '127.0.0.1'
     },
     products: [
       {
         id: productInfo.id,
-        nome: productInfo.nome,
+        name: productInfo.name,
         planId: null,
         planName: null,
-        quantidade: 1,
-        precoEmCentavos: productInfo.valorCentavos
+        quantity: 1,
+        priceInCents: productInfo.priceInCents
       }
     ],
     trackingParameters: trackingParams,
     commission: {
-      precoTotalEmCentavos: productInfo.valorCentavos,
-      taxaGatewayEmCentavos: taxaGatewayEmCentavos,
-      comissaoUsuarioEmCentavos: comissaoUsuarioEmCentavos
+      totalPriceInCents: productInfo.priceInCents,
+      gatewayFeeInCents: taxaGatewayEmCentavos,
+      userCommissionInCents: comissaoUsuarioEmCentavos
     }
   };
   
