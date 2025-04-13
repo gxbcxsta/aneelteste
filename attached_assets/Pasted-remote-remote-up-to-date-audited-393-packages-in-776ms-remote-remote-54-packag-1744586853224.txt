@@ -1,0 +1,141 @@
+remote:
+remote:        up to date, audited 393 packages in 776ms
+remote:
+remote:        54 packages are looking for funding
+remote:          run `npm fund` for details
+remote:
+remote:        1 moderate severity vulnerability
+remote:
+remote:        To address all issues, run:
+remote:          npm audit fix
+remote:
+remote:        Run `npm audit` for details.
+remote:        npm notice
+remote:        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+remote:        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+remote:        npm notice To update run: npm install -g npm@11.3.0
+remote:        npm notice
+remote:
+remote: -----> Build succeeded!
+remote: -----> Discovering process types
+remote:        Procfile declares types -> web
+remote:
+remote: -----> Compressing...
+remote:        Done: 99.5M
+remote: -----> Launching...
+remote:        Released v10
+remote:        https://aneelicms-e0e6ea73ebda.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy... done.
+To https://git.heroku.com/aneelicms.git
+   45b2ae7..4aa1bd9  main -> main
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku run npm run db:push -a aneelicms
+Running run npm run db:push on ⬢ aneelicms... up, run.4230
+/bin/bash: line 1: run: command not found
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku logs --tail
+2025-04-13T23:15:54.674066+00:00 app[api]: Initial release by user gxbcxsta@gmail.com
+2025-04-13T23:15:54.674066+00:00 app[api]: Release v1 created by user gxbcxsta@gmail.com
+2025-04-13T23:15:54.886769+00:00 app[api]: Release v2 created by user gxbcxsta@gmail.com
+2025-04-13T23:15:54.886769+00:00 app[api]: Enable Logplex by user gxbcxsta@gmail.com
+2025-04-13T23:16:51.711991+00:00 app[api]: Set FOR4PAYMENTS_SECRET_KEY config vars by user gxbcxsta@gmail.com
+2025-04-13T23:16:51.711991+00:00 app[api]: Release v3 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:06.966122+00:00 app[api]: Set FOR4PAYMENTS_PUBLIC_KEY config vars by user gxbcxsta@gmail.com
+2025-04-13T23:17:06.966122+00:00 app[api]: Release v4 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:12.064792+00:00 app[api]: Release v5 created by user heroku-postgresql@addons.heroku.com
+2025-04-13T23:17:12.064792+00:00 app[api]: @ref:postgresql-polished-63804 completed provisioning, setting DATABASE_URL. by user heroku-postgresql@addons.heroku.com
+2025-04-13T23:17:18.201936+00:00 app[api]: Release v6 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:18.201936+00:00 app[api]: Set UTMIFY_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-13T23:17:36.672100+00:00 app[api]: Release v7 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:36.672100+00:00 app[api]: Set API_TOKEN_RECEITA config vars by user gxbcxsta@gmail.com
+2025-04-13T23:17:49.043273+00:00 app[api]: Release v8 created by user gxbcxsta@gmail.com
+2025-04-13T23:17:49.043273+00:00 app[api]: Set NODE_ENV config vars by user gxbcxsta@gmail.com
+2025-04-13T23:19:37.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-13T23:20:06.280335+00:00 app[api]: Release v9 created by user gxbcxsta@gmail.com
+2025-04-13T23:20:06.280335+00:00 app[api]: Deploy 45b2ae75 by user gxbcxsta@gmail.com
+2025-04-13T23:20:06.291617+00:00 app[api]: Scaled to web@1:Basic by user gxbcxsta@gmail.com
+2025-04-13T23:20:10.000000+00:00 app[api]: Build succeeded
+2025-04-13T23:20:11.553987+00:00 heroku[web.1]: Starting process with command `npm run start`
+2025-04-13T23:20:12.381224+00:00 app[web.1]:
+2025-04-13T23:20:12.381291+00:00 app[web.1]: > rest-express@1.0.0 start
+2025-04-13T23:20:12.381293+00:00 app[web.1]: > NODE_ENV=production node dist/index.js
+2025-04-13T23:20:12.381296+00:00 app[web.1]:
+2025-04-13T23:20:12.433778+00:00 app[web.1]: node:internal/modules/package_json_reader:268
+2025-04-13T23:20:12.433794+00:00 app[web.1]: throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+2025-04-13T23:20:12.433795+00:00 app[web.1]: ^
+2025-04-13T23:20:12.433795+00:00 app[web.1]:
+2025-04-13T23:20:12.433808+00:00 app[web.1]: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from /app/dist/index.js
+2025-04-13T23:20:12.433808+00:00 app[web.1]: at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+2025-04-13T23:20:12.433808+00:00 app[web.1]: at packageResolve (node:internal/modules/esm/resolve:768:81)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:854:18)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-13T23:20:12.433810+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-13T23:20:12.433811+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-13T23:20:12.433811+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-13T23:20:12.433811+00:00 app[web.1]: at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+2025-04-13T23:20:12.433811+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-13T23:20:12.433811+00:00 app[web.1]: }
+2025-04-13T23:20:12.433812+00:00 app[web.1]:
+2025-04-13T23:20:12.433813+00:00 app[web.1]: Node.js v22.14.0
+2025-04-13T23:20:12.505042+00:00 heroku[web.1]: Process exited with status 1
+2025-04-13T23:20:12.532231+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-13T23:20:12.535904+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-13T23:20:17.235864+00:00 heroku[web.1]: Starting process with command `npm run start`
+2025-04-13T23:20:18.051212+00:00 app[web.1]:
+2025-04-13T23:20:18.051258+00:00 app[web.1]: > rest-express@1.0.0 start
+2025-04-13T23:20:18.051261+00:00 app[web.1]: > NODE_ENV=production node dist/index.js
+2025-04-13T23:20:18.051263+00:00 app[web.1]:
+2025-04-13T23:20:18.102443+00:00 app[web.1]: node:internal/modules/package_json_reader:268
+2025-04-13T23:20:18.102454+00:00 app[web.1]: throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+2025-04-13T23:20:18.102455+00:00 app[web.1]: ^
+2025-04-13T23:20:18.102455+00:00 app[web.1]:
+2025-04-13T23:20:18.102488+00:00 app[web.1]: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from /app/dist/index.js
+2025-04-13T23:20:18.102490+00:00 app[web.1]: at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+2025-04-13T23:20:18.102491+00:00 app[web.1]: at packageResolve (node:internal/modules/esm/resolve:768:81)
+2025-04-13T23:20:18.102491+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:854:18)
+2025-04-13T23:20:18.102491+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-13T23:20:18.102492+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-13T23:20:18.102493+00:00 app[web.1]: at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+2025-04-13T23:20:18.102493+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-13T23:20:18.102493+00:00 app[web.1]: }
+2025-04-13T23:20:18.102494+00:00 app[web.1]:
+2025-04-13T23:20:18.102494+00:00 app[web.1]: Node.js v22.14.0
+2025-04-13T23:20:18.173029+00:00 heroku[web.1]: Process exited with status 1
+2025-04-13T23:20:18.196417+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-13T23:20:25.194371+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=aneelicms-e0e6ea73ebda.herokuapp.com request_id=8c849d66-3759-4d70-9585-395de21fd44e fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-13T23:20:26.188028+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=aneelicms-e0e6ea73ebda.herokuapp.com request_id=e40817c3-7021-409b-a31e-0ecdc0bd9bda fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-13T23:24:46.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-13T23:25:15.872952+00:00 app[api]: Release v10 created by user gxbcxsta@gmail.com
+2025-04-13T23:25:15.872952+00:00 app[api]: Deploy 4aa1bd91 by user gxbcxsta@gmail.com
+2025-04-13T23:25:16.097721+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-13T23:25:19.000000+00:00 app[api]: Build succeeded
+2025-04-13T23:25:21.100477+00:00 heroku[web.1]: Starting process with command `node server-heroku.js`
+2025-04-13T23:25:21.665100+00:00 app[web.1]: file:///app/server-heroku.js:2
+2025-04-13T23:25:21.665162+00:00 app[web.1]: const express = require('express');
+2025-04-13T23:25:21.665164+00:00 app[web.1]: ^
+2025-04-13T23:25:21.665167+00:00 app[web.1]:
+2025-04-13T23:25:21.665169+00:00 app[web.1]: ReferenceError: require is not defined in ES module scope, you can use import instead
+2025-04-13T23:25:21.665171+00:00 app[web.1]: This file is being treated as an ES module because it has a '.js' file extension and '/app/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+2025-04-13T23:25:21.665171+00:00 app[web.1]: at file:///app/server-heroku.js:2:17
+2025-04-13T23:25:21.665174+00:00 app[web.1]: at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+2025-04-13T23:25:21.665174+00:00 app[web.1]: at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:578:26)
+2025-04-13T23:25:21.665174+00:00 app[web.1]: at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-04-13T23:25:21.665175+00:00 app[web.1]:
+2025-04-13T23:25:21.665175+00:00 app[web.1]: Node.js v22.14.0
+2025-04-13T23:25:21.717444+00:00 heroku[web.1]: Process exited with status 1
+2025-04-13T23:25:21.743699+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-13T23:25:27.592383+00:00 app[api]: Starting process with command `run npm run db:push` by user gxbcxsta@gmail.com
+2025-04-13T23:25:32.877335+00:00 heroku[run.4230]: State changed from starting to up
+2025-04-13T23:25:35.938945+00:00 heroku[run.4230]: Process exited with status 127
+2025-04-13T23:25:35.958889+00:00 heroku[run.4230]: State changed from up to complete
+2025-04-13T23:26:00.443478+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=aneelicms-e0e6ea73ebda.herokuapp.com request_id=a3754d2a-51c9-49cb-8c70-c009bf790d14 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-13T23:26:00.698207+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=aneelicms-e0e6ea73ebda.herokuapp.com request_id=339b8462-4897-43a4-b4a3-f0232e801323 fwd="201.80.15.81" dyno= connect=Running cat Procfile on ⬢ aneelicms... up, run.6860
+web: node server-heroku.js
+^C
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku run cat Procfile -a aneelicms
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>

@@ -2,6 +2,7 @@
 const express = require('express');
 const path = require('path');
 const { Pool } = require('pg');
+const axios = require('axios');
 
 // Configuração do banco de dados
 const pool = new Pool({
@@ -32,6 +33,32 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   next();
+});
+
+// Parser para JSON e URL-encoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Rota para consulta de CPF
+app.get("/api/consulta-cpf", async (req, res) => {
+  try {
+    const cpf = req.query.cpf;
+    if (!cpf) {
+      return res.status(400).json({ error: "CPF não fornecido" });
+    }
+
+    // Usar o token diretamente em vez da variável de ambiente
+    const token = "268753a9b3a24819ae0f02159dee6724";
+    const url = `https://api.exato.digital/receita-federal/cpf?token=${token}&cpf=${cpf}&format=json`;
+    
+    const response = await axios.get(url);
+    const data = response.data;
+    
+    return res.json(data);
+  } catch (error) {
+    console.error("Erro ao consultar CPF:", error);
+    return res.status(500).json({ error: "Erro ao consultar CPF" });
+  }
 });
 
 // Rota padrão para o SPA
