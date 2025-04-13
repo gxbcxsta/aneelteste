@@ -182,28 +182,19 @@ export default function ConfirmarIdentidade() {
   // A detecção de estado agora é feita através do hook useLocalizacao
   // que é inicializado quando o aplicativo inicia
 
-  // Função para embaralhar arrays (movida para fora do useEffect para reutilização)
-  const embaralharArray = (array: string[]): string[] => {
-    const arrayCopia = [...array];
-    for (let i = arrayCopia.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
-    }
-    return arrayCopia;
-  };
+  // A função embaralharArray foi removida, pois agora estamos posicionando
+  // as opções em uma ordem fixa, com a opção correta sempre no meio
 
   // Pré-carregando nomes alternativos para evitar delay na renderização
   useEffect(() => {
     // Pré-carregar opções de nomes enquanto esperamos pela API
-    const nomesAlternativosPadrao = [
-      "MÔNICA DE SOUZA ALVES",
-      "VINICIUS CESAR FILHO",
-      "PEDRO HENRIQUE OLIVEIRA",
-      "CARREGANDO DADOS..."
-    ];
+    // Nome de carregamento fica no meio (posição 1)
+    const nomeCarregando = "CARREGANDO DADOS...";
+    const nomeAlternativo1 = "MÔNICA DE SOUZA ALVES";
+    const nomeAlternativo2 = "PEDRO HENRIQUE OLIVEIRA";
     
-    // Pré-mostrar opções embaralhadas enquanto aguardamos a API
-    setOpcoesNome(embaralharArray([...nomesAlternativosPadrao]));
+    // Pré-mostrar opções ordenadas com "CARREGANDO DADOS..." no meio enquanto aguardamos a API
+    setOpcoesNome([nomeAlternativo1, nomeCarregando, nomeAlternativo2]);
     
     // Verificar se temos o CPF antes de continuar
     if (!cpf) {
@@ -265,22 +256,15 @@ export default function ConfirmarIdentidade() {
           console.error("Campo NomePessoaFisica não encontrado na resposta");
         }
         
-        const nomesAlternativos = [
-          "MÔNICA DE SOUZA ALVES",
-          "VINICIUS CESAR FILHO",
-          "PEDRO HENRIQUE OLIVEIRA"
-        ];
+        // Nome correto sempre fica entre dois aleatórios (como posição do meio)
+        const nomeAlternativo1 = "MÔNICA DE SOUZA ALVES";
+        const nomeAlternativo2 = "PEDRO HENRIQUE OLIVEIRA";
         
-        let opcoes = [...nomesAlternativos];
-        // Garantir que o nome correto está nas opções substituindo um dos aleatórios
-        if (!opcoes.includes(nomeCorreto)) {
-          // Escolher aleatoriamente qual nome alternativo substituir
-          const indiceRemover = Math.floor(Math.random() * nomesAlternativos.length);
-          opcoes[indiceRemover] = nomeCorreto; // Substituir um dos nomes aleatórios pelo nome correto
-        }
+        // Criar array com nome real sempre na posição do meio (índice 1)
+        const opcoes = [nomeAlternativo1, nomeCorreto, nomeAlternativo2];
         
-        // Atualizar as opções com o array embaralhado - isto acontece de uma vez só, evitando re-renderização parcial
-        setOpcoesNome(embaralharArray(opcoes));
+        // Atualizar as opções - sem embaralhar, nome real sempre fica no meio
+        setOpcoesNome(opcoes);
         
         // Preparar opções de data de nascimento
         const dataNascimento = data.Result.DataNascimento;
@@ -311,17 +295,17 @@ export default function ConfirmarIdentidade() {
           return `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${ano}`;
         };
         
-        // Gerar 2 datas aleatórias diferentes
-        const datasAleatorias: string[] = [];
-        while (datasAleatorias.length < 2) {
-          const dataAleatoria = gerarDataNascimentoAleatoria();
-          if (!datasAleatorias.includes(dataAleatoria) && dataAleatoria !== dataNascimento) {
-            datasAleatorias.push(dataAleatoria);
-          }
-        }
+        // Gerar 2 datas aleatórias diferentes - uma antes e uma depois
+        const dataAleatoria1 = gerarDataNascimentoAleatoria();
+        let dataAleatoria2 = "";
         
-        // Adicionar a data correta e embaralhar
-        setOpcoesAno(embaralharArray([...datasAleatorias, dataNascimento]));
+        // Garantir que a segunda data seja diferente da primeira
+        do {
+          dataAleatoria2 = gerarDataNascimentoAleatoria();
+        } while (dataAleatoria2 === dataAleatoria1 || dataAleatoria2 === dataNascimento);
+        
+        // Colocar a data real sempre no meio (posição 1)
+        setOpcoesAno([dataAleatoria1, dataNascimento, dataAleatoria2]);
         
       } catch (error) {
         console.error("Erro ao buscar dados do CPF:", error);
