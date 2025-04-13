@@ -76,12 +76,12 @@ export default function ResultadoCalculo() {
           setMensagemLoading(mensagens[mensagens.length - 1]);
           setProgresso(100);
           
-          // Depois de um breve atraso, mostrar o resultado
+          // Reduzido o tempo de espera antes de mostrar o resultado (era 1000ms)
           setTimeout(() => {
             setIsLoading(false);
-          }, 1000);
+          }, 500);
         }
-      }, 1000);
+      }, 700); // Tempo reduzido (era 1000ms)
       
       return intervalId;
     };
