@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocalizacao } from "@/components/LocalizacaoDetector";
 import { useUserData } from "../contexts/UserContext";
