@@ -253,25 +253,36 @@ export default function SimuladorRestituicao({
   
   // Submissão do formulário da etapa 3 (período)
   const onSubmitPeriodo = async (data: PeriodoFormValues) => {
-    // Define o número de meses baseado na seleção do usuário
+    // Define o número de meses e o valor fixo baseado na seleção do usuário
     let meses = 0;
+    let valorFixo = 0;
     
     switch(data.periodo) {
       case 'menos-12':
         meses = 12;
+        valorFixo = 1977.90; // Valor fixo para 1-11 meses: R$1.977,90
         break;
       case '1-3-anos':
         meses = 24;
+        valorFixo = 2897.30; // Valor fixo para 1-3 anos: R$2.897,30
         break;
       case '3-5-anos':
-        meses = 42;
-        break;
       case '5-anos':
-        meses = 60;
+        meses = data.periodo === '3-5-anos' ? 42 : 60;
+        valorFixo = 3221.16; // Valor fixo para 4-5 anos: R$3.221,16
         break;
       default:
         meses = 12;
+        valorFixo = 1977.90;
     }
+    
+    // Atualizar valor final de restituição com o valor fixo baseado no período
+    setValorFinalRestituicao(valorFixo);
+    setMesesConsiderados(meses);
+    
+    // Mostrar tela de loading antes de redirecionar
+    setMostrarTelaLoading(true);
+    iniciarAnimacaoCarregamento("Calculando sua restituição...");
     
     // Atualizar contexto do usuário com os dados
     updateUserData({
@@ -281,11 +292,16 @@ export default function SimuladorRestituicao({
       estado,
       dataNascimento,
       valorConta: valorMedioFinal,
-      periodo: meses
+      periodo: meses,
+      valorRestituicao: valorFixo // Adicionar o valor fixo diretamente ao contexto do usuário
     });
     
-    // Redirecionar para a página de resultado-calculo usando navigate
-    navigate('/resultado-calculo');
+    // Simular tempo de processamento e então redirecionar
+    setTimeout(() => {
+      setMostrarTelaLoading(false);
+      // Redirecionar para a página de resultado-calculo usando navigate
+      navigate('/resultado-calculo');
+    }, 3000);
   };
   
   // Funções de navegação entre etapas

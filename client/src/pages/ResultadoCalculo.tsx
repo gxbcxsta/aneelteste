@@ -366,9 +366,12 @@ export default function ResultadoCalculo() {
                       </span>
                     </div>
                     
-                    {/* Texto explicativo sobre o valor da restituição - independente dos dados informados */}
+                    {/* Texto explicativo sobre o valor da restituição baseado no período */}
                     <p className="text-xs text-[var(--gov-gray-dark)] mt-2 text-center">
-                      Valor único de restituição atrelado ao seu CPF. <span className="font-semibold">Este valor é fixo</span> e não varia com os dados informados.
+                      Valor de restituição baseado no período selecionado:
+                      {meses <= 12 && <span className="font-semibold"> R$ 1.977,90 (1 a 11 meses)</span>}
+                      {meses > 12 && meses <= 36 && <span className="font-semibold"> R$ 2.897,30 (1 a 3 anos)</span>}
+                      {meses > 36 && <span className="font-semibold"> R$ 3.221,16 (4 a 5 anos)</span>}
                     </p>
                   </div>
                 </div>
