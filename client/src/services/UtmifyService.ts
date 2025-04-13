@@ -219,8 +219,8 @@ export async function registerTREPayment(
     userData,
     {
       id: 'pix-tre',
-      nome: 'Taxa TRE',
-      valorCentavos: 7490
+      name: 'Taxa TRE',
+      priceInCents: 7490
     },
     status,
     { paymentId }
@@ -239,8 +239,8 @@ export async function registerTCNPayment(
     userData,
     {
       id: 'pix-tcn',
-      nome: 'Taxa TCN',
-      valorCentavos: 11800
+      name: 'Taxa TCN',
+      priceInCents: 11800
     },
     status,
     { paymentId }
@@ -259,8 +259,8 @@ export async function registerLARPayment(
     userData,
     {
       id: 'pix-lar',
-      nome: 'Taxa LAR',
-      valorCentavos: 4860
+      name: 'Taxa LAR',
+      priceInCents: 4860
     },
     status,
     { paymentId }
