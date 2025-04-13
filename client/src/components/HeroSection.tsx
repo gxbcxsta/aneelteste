@@ -33,11 +33,11 @@ export default function HeroSection() {
               <span className="bg-[#FFCD07] text-[#071D41] rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center mr-2 text-sm sm:text-base">✓</span>
               Descubra se tem dinheiro a receber!</p>
             
-            <div className="flex justify-center sm:justify-start">
+            <div className="flex justify-start">
               <Link href="/verificar">
                 <button className="flex items-center justify-center gap-1 sm:gap-2 bg-[#FFCD07] hover:bg-[#F2C200] text-[#071D41] px-3 sm:px-6 py-2 sm:py-3 rounded-md text-sm sm:text-base font-bold shadow-md transition-all duration-300 ease-in-out transform hover:translate-y-[-2px]">
                   <Search size={16} className="hidden xs:inline" />
-                  Verificar meu direito
+                  Consultar restituição
                 </button>
               </Link>
             </div>
@@ -79,7 +79,7 @@ export default function HeroSection() {
               <Link href="/verificar">
                 <button className="w-full mt-2 flex items-center justify-center gap-1 bg-white text-[#071D41] px-2 py-1 rounded-md text-xs font-medium hover:bg-[#FFCD07] transition-all">
                   <Search size={12} />
-                  Verificar meu direito
+                  Consultar restituição
                 </button>
               </Link>
             </div>

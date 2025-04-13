@@ -838,42 +838,7 @@ export default function PagamentoPix() {
                   )}
                 </Button>
 
-                {/* Botão para avançar manualmente para a próxima página */}
-                <Button 
-                  variant="outline"
-                  className="w-full bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 hover:text-amber-900 mb-4"
-                  onClick={() => {
-                    // Atualizar contexto de usuário
-                    updateUserData({
-                      cpf,
-                      nome,
-                      valorRestituicao: valor,
-                      pagamentoId: paymentInfo?.id || "manual",
-                      dataPagamento: new Date().toISOString(),
-                      companhia,
-                      estado,
-                      dataNascimento,
-                      email,
-                      telefone
-                    });
-                    
-                    toast({
-                      title: "Redirecionando...",
-                      description: "Você será redirecionado para a próxima etapa.",
-                      variant: "default"
-                    });
-                    
-                    // Redirecionar para a página de taxa complementar
-                    setTimeout(() => {
-                      navigate('/taxa-complementar');
-                    }, 1000);
-                  }}
-                >
-                  <div className="flex items-center justify-center">
-                    <ArrowRight className="mr-2 h-5 w-5" />
-                    Avançar para próxima etapa
-                  </div>
-                </Button>
+                {/* Botão "Avançar para próxima etapa" removido a pedido do cliente */}
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">

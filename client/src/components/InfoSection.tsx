@@ -127,7 +127,7 @@ export default function InfoSection() {
               <Link href="/verificar">
                 <button className="inline-flex items-center justify-center gap-2 bg-[#FFCD07] hover:bg-[#F2C200] text-[#071D41] px-6 py-3 rounded-md text-base font-bold shadow-md transition-all">
                   <Search size={18} />
-                  Verificar meu direito à restituição
+                  Consultar restituição
                 </button>
               </Link>
             </div>
