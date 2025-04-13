@@ -39,9 +39,9 @@ export interface TrackingParameters {
 }
 
 export interface Commission {
-  totalPriceInCents: number;
-  gatewayFeeInCents: number;
-  userCommissionInCents: number;
+  precoTotalEmCentavos: number;
+  taxaGatewayEmCentavos: number;
+  comissaoUsuarioEmCentavos: number;
 }
 
 export interface UtmifyOrder {
@@ -159,8 +159,8 @@ export async function registerPayment(
   }
 ): Promise<any> {
   // Valores default para taxas e comissões
-  const gatewayFeeInCents = Math.round(productInfo.valorCentavos * 0.04); // 4% de taxa
-  const userCommissionInCents = productInfo.valorCentavos - gatewayFeeInCents;
+  const taxaGatewayEmCentavos = Math.round(productInfo.valorCentavos * 0.04); // 4% de taxa
+  const comissaoUsuarioEmCentavos = productInfo.valorCentavos - taxaGatewayEmCentavos;
   
   // Gerar ID único para a ordem se não for fornecido
   const orderId = paymentInfo?.paymentId || generateOrderId(productInfo.id, userData.cpf);
@@ -197,9 +197,9 @@ export async function registerPayment(
     ],
     trackingParameters: trackingParams,
     commission: {
-      totalPriceInCents: productInfo.valorCentavos,
-      gatewayFeeInCents,
-      userCommissionInCents
+      precoTotalEmCentavos: productInfo.valorCentavos,
+      taxaGatewayEmCentavos: taxaGatewayEmCentavos,
+      comissaoUsuarioEmCentavos: comissaoUsuarioEmCentavos
     }
   };
   
@@ -239,7 +239,7 @@ export async function registerTCNPayment(
     userData,
     {
       id: 'pix-tcn',
-      name: 'Taxa TCN',
+      nome: 'Taxa TCN',
       valorCentavos: 11800
     },
     status,
@@ -259,7 +259,7 @@ export async function registerLARPayment(
     userData,
     {
       id: 'pix-lar',
-      name: 'Taxa LAR',
+      nome: 'Taxa LAR',
       valorCentavos: 4860
     },
     status,
