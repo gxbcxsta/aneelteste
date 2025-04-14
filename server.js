@@ -3,6 +3,17 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// Importar configuração do banco de dados Heroku se estiver disponível
+let dbConfig;
+try {
+  dbConfig = require('./server/heroku-db-config');
+  if (dbConfig && typeof dbConfig.prepareDatabaseUrl === 'function') {
+    dbConfig.prepareDatabaseUrl();
+  }
+} catch (err) {
+  console.warn('Aviso: Não foi possível carregar a configuração do banco de dados Heroku:', err.message);
+}
+
 // Caminho para o binário do node
 const NODE_BIN = process.execPath;
 

@@ -1,0 +1,372 @@
+Microsoft Windows [versão 10.0.19045.5737]
+(c) Microsoft Corporation. Todos os direitos reservados.
+
+C:\Users\GabrielPC\Desktop\ANEEL>git init
+Reinitialized existing Git repository in C:/Users/GabrielPC/Desktop/ANEEL/.git/
+
+C:\Users\GabrielPC\Desktop\ANEEL>git add .
+warning: in the working copy of '.env.example', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.replit', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DOC-FOR4PAYMENTS-INTEGRACAO-PIX.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-mb-8-h3-class-text-xl-font-bold-text-044785-mb-4--1744330047633.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-p-4-p-class-mb-4-Para-efetuar-sua-inscri-o-informe-os-dados-ab-1744312346210.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-p-6-relative-bg-gray-50-div-class-flex-justify-between-items-center-mb-4-b-1744336880435.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-p-6-relative-bg-gray-50-div-class-flex-justify-between-items-center-mb-4-b-1744336889145.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Aqui-est-um-texto-explicando-de-forma-clara-t-cnica-e-pr-tica-para-o-Replit-o-prop-sito-da-API-da--1744502978215.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Aqui-est-um-texto-explicando-de-forma-clara-t-cnica-e-pr-tica-para-o-Replit-o-prop-sito-da-API-da--1744502981115.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Aqui-est-um-texto-explicando-de-forma-clara-t-cnica-e-pr-tica-para-o-Replit-o-prop-sito-da-API-da--1744502989284.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-IP-do-ACRE-Mostre-as-alternativas-Energisa-Acre-correta-Amazonas-Energia-Equatorial-1744383723866.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-IP-do-ACRE-Mostre-as-alternativas-Energisa-Acre-correta-Amazonas-Energia-Equatorial-1744387825752.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-IP-do-ACRE-Mostre-as-alternativas-Energisa-Acre-correta-Amazonas-Energia-Equatorial-1744393202890.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Olha-essa-vai-ser-a-ltima-vez-que-eu-vou-tentar-isso-com-voc-Se-voc-n-o-conseguir-eu-nunca-mai-1744398257578.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Preciso-de-fazer-algumas-altera-es-simples-porem-bem-importantes-1-ALTERA-O-Na-pagina-resulta--1744250056966.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Preciso-de-fazer-algumas-altera-es-simples-porem-bem-importantes-1-ALTERA-O-Na-pagina-resulta--1744250060923.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Tenho-algumas-altera-es-para-serem-feitas-1-Na-pagina-verificar-quando-a-pessoa-digita-seu-CPF-1744311688754.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Tenho-algumas-altera-es-para-serem-feitas-1-Na-pagina-verificar-quando-a-pessoa-digita-seu-CPF-1744311705559.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-Express-NextFunction-Request-Response-from-express-import-Server-createServer--1744489597600.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-Express-NextFunction-Request-Response-from-express-import-Server-createServer--1744489600356.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-useState-useEffect-from-react-import-useLocation-from-wouter-import-Card-Ca-1744489029453.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-useState-useEffect-from-react-import-useLocation-from-wouter-import-Card-Ca-1744489614083.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421898378.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421921522.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421922711.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421922973.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421923407.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421923870.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421924868.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744422144650.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Sistema-Deteccao-Localizacao-Companhias.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/App.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ContatoSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/FaqSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Footer.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/GovHeader.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Header.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/HeroSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ImageVerification.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Impostometro.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/InfoSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/LoadingPopup.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/LocalizacaoDetector.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/NotificationSound.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ProtectedRoute.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ScrollToTop.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/SimuladorICMS.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/SimuladorRestituicao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/VerificacaoIdentidade.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/accordion.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/alert-dialog.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/alert.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/aspect-ratio.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/avatar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/badge.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/breadcrumb.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/button.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/calendar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/card.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/carousel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/chart.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/checkbox.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/collapsible.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/command.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/context-menu.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/dialog.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/drawer.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/dropdown-menu.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/form.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/hover-card.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/input-otp.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/input.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/label.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/menubar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/navigation-menu.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/pagination.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/popover.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/progress.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/radio-group.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/resizable.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/scroll-area.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/select.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/separator.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/sheet.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/skeleton.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/slider.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/switch.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/table.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/tabs.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/textarea.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toast.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toaster.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toggle-group.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toggle.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/tooltip.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/contexts/UserContext.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/debug/DebugDetectorIp.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/hooks/use-mobile.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/hooks/use-toast.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/index.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/lib/for4payments.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/lib/queryClient.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/lib/utils.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/main.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Calculo.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Confirmacao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ConfirmacaoRestituicao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ConfirmarIdentidade.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Home.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/PagamentoLAR.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/PagamentoPix.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/PagamentoTCN.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Resultado.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ResultadoCalculo.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/SimuladorICMS.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Sucesso.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/SucessoPadrao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/TaxaComplementar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/TaxaFinal.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/TaxaLAR.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/VerificarRestituicao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/not-found.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/services/UtmifyService.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/utils/SecurityUtils.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'drizzle.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'engines.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'migrations/0000_aspiring_husk.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'migrations/meta/0000_snapshot.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'migrations/meta/_journal.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'postcss.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/footprint.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/globe.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/lightning.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/lock.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/search.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'replit.nix', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server-heroku.cjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/db-alternative.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/db.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/heroku-db-config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/routes.backup.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/routes.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/storage.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/vite.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'shared/schema.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tailwind.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'theme.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tsconfig.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'vite.config.ts', LF will be replaced by CRLF the next time Git touches it
+
+C:\Users\GabrielPC\Desktop\ANEEL>git commit -m "ver~soa inicial para deploy"
+On branch main
+nothing to commit, working tree clean
+
+C:\Users\GabrielPC\Desktop\ANEEL>heroku create aneeltre
+Creating ⬢ aneeltre... done
+https://aneeltre-75002be02a37.herokuapp.com/ | https://git.heroku.com/aneeltre.git
+
+C:\Users\GabrielPC\Desktop\ANEEL>git remote -v
+heroku  https://git.heroku.com/aneeltre.git (fetch)
+heroku  https://git.heroku.com/aneeltre.git (push)
+
+C:\Users\GabrielPC\Desktop\ANEEL>heroku config:set API_TOKEN_RECEITA=268753a9b3a24819ae0f02159dee6724 -a aneeltre
+Setting API_TOKEN_RECEITA and restarting ⬢ aneeltre... done, v3
+API_TOKEN_RECEITA: 268753a9b3a24819ae0f02159dee6724
+
+C:\Users\GabrielPC\Desktop\ANEEL>heroku config:set NODE_ENV=production -a aneeltre
+Setting NODE_ENV and restarting ⬢ aneeltre... done, v4
+NODE_ENV: production
+
+C:\Users\GabrielPC\Desktop\ANEEL>git push heroku main
+Enumerating objects: 2553, done.
+Counting objects: 100% (2553/2553), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (2516/2516), done.
+Writing objects: 100% (2553/2553), 3.46 MiB | 1.48 MiB/s, done.
+Total 2553 (delta 2086), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2086/2086), done.
+remote: Updated 209 paths from c639761
+remote: Compressing source files... done.
+remote: Building source:
+remote:
+remote: -----> Building on the Heroku-24 stack
+remote: -----> Determining which buildpack to use for this app
+remote: -----> Node.js app detected
+remote:
+remote: -----> Creating runtime environment
+remote:
+remote:        NPM_CONFIG_LOGLEVEL=error
+remote:        NODE_VERBOSE=false
+remote:        NODE_ENV=production
+remote:        NODE_MODULES_CACHE=true
+remote:
+remote: -----> Installing binaries
+remote:        engines.node (package.json):   unspecified
+remote:        engines.npm (package.json):    unspecified (use default)
+remote:
+remote:        Resolving node version 22.x...
+remote:        Downloading and installing node 22.14.0...
+remote:        Using default npm version: 10.9.2
+remote:
+remote: -----> Installing dependencies
+remote:        Installing node modules
+remote:
+remote:        added 486 packages, and audited 487 packages in 6s
+remote:
+remote:        63 packages are looking for funding
+remote:          run `npm fund` for details
+remote:
+remote:        8 moderate severity vulnerabilities
+remote:
+remote:        To address issues that do not require attention, run:
+remote:          npm audit fix
+remote:
+remote:        To address all issues (including breaking changes), run:
+remote:          npm audit fix --force
+remote:
+remote:        Run `npm audit` for details.
+remote:        npm notice
+remote:        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+remote:        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+remote:        npm notice To update run: npm install -g npm@11.3.0
+remote:        npm notice
+remote:
+remote: -----> Build
+remote:        Running build
+remote:
+remote:        > rest-express@1.0.0 build
+remote:        > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+remote:
+remote:        vite v5.4.14 building for production...
+remote:        transforming...
+remote: Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+remote:   npx update-browserslist-db@latest
+remote:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+remote:        ✓ 1770 modules transformed.
+remote:        rendering chunks...
+remote:        computing gzip size...
+remote:        ../dist/public/index.html                   4.14 kB │ gzip:   1.60 kB
+remote:        ../dist/public/assets/govbr-B9sTV8pj.png   15.88 kB
+remote:        ../dist/public/assets/index-CX6EiJWz.css   82.09 kB │ gzip:  13.91 kB
+remote:        ../dist/public/assets/index-Dnh6dcW9.js   688.28 kB │ gzip: 190.69 kB
+remote:
+remote: (!) Some chunks are larger than 500 kB after minification. Consider:
+remote: - Using dynamic import() to code-split the application
+remote: - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+remote: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+remote:        ✓ built in 3.51s
+remote:
+remote:   dist/index.js  29.3kb
+remote:
+remote: ⚡ Done in 4ms
+remote:
+remote: -----> Caching build
+remote:        - npm cache
+remote:
+remote: -----> Pruning devDependencies
+remote:
+remote:        up to date, audited 393 packages in 825ms
+remote:
+remote:        54 packages are looking for funding
+remote:          run `npm fund` for details
+remote:
+remote:        1 moderate severity vulnerability
+remote:
+remote:        To address all issues, run:
+remote:          npm audit fix
+remote:
+remote:        Run `npm audit` for details.
+remote:        npm notice
+remote:        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+remote:        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+remote:        npm notice To update run: npm install -g npm@11.3.0
+remote:        npm notice
+remote:
+remote: -----> Build succeeded!
+remote: -----> Discovering process types
+remote:        Procfile declares types -> web
+remote:
+remote: -----> Compressing...
+remote:        Done: 99.5M
+remote: -----> Launching...
+remote:        Released v5
+remote:        https://aneeltre-75002be02a37.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy... done.
+To https://git.heroku.com/aneeltre.git
+ * [new branch]      main -> main
+
+C:\Users\GabrielPC\Desktop\ANEEL>heroku logs --tail -a aneeltre
+2025-04-14T00:36:34.853222+00:00 app[api]: Release v1 created by user gxbcxsta@gmail.com
+2025-04-14T00:36:34.853222+00:00 app[api]: Initial release by user gxbcxsta@gmail.com
+2025-04-14T00:36:35.049482+00:00 app[api]: Enable Logplex by user gxbcxsta@gmail.com
+2025-04-14T00:36:35.049482+00:00 app[api]: Release v2 created by user gxbcxsta@gmail.com
+2025-04-14T00:41:43.006416+00:00 app[api]: Release v3 created by user gxbcxsta@gmail.com
+2025-04-14T00:41:43.006416+00:00 app[api]: Set API_TOKEN_RECEITA config vars by user gxbcxsta@gmail.com
+2025-04-14T00:41:48.980173+00:00 app[api]: Release v4 created by user gxbcxsta@gmail.com
+2025-04-14T00:41:48.980173+00:00 app[api]: Set NODE_ENV config vars by user gxbcxsta@gmail.com
+2025-04-14T00:42:00.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-14T00:42:30.395148+00:00 app[api]: Release v5 created by user gxbcxsta@gmail.com
+2025-04-14T00:42:30.395148+00:00 app[api]: Deploy 6e32c7c6 by user gxbcxsta@gmail.com
+2025-04-14T00:42:30.411739+00:00 app[api]: Scaled to web@1:Basic by user gxbcxsta@gmail.com
+2025-04-14T00:42:34.000000+00:00 app[api]: Build succeeded
+2025-04-14T00:42:35.736117+00:00 heroku[web.1]: Starting process with command `node server-heroku.cjs`
+2025-04-14T00:42:36.425767+00:00 app[web.1]: node:internal/modules/cjs/loader:1228
+2025-04-14T00:42:36.425801+00:00 app[web.1]: throw err;
+2025-04-14T00:42:36.425802+00:00 app[web.1]: ^
+2025-04-14T00:42:36.425802+00:00 app[web.1]:
+2025-04-14T00:42:36.425803+00:00 app[web.1]: Error: Cannot find module 'axios'
+2025-04-14T00:42:36.425803+00:00 app[web.1]: Require stack:
+2025-04-14T00:42:36.425804+00:00 app[web.1]: - /app/server-heroku.cjs
+2025-04-14T00:42:36.425814+00:00 app[web.1]: at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+2025-04-14T00:42:36.425815+00:00 app[web.1]: at Function._load (node:internal/modules/cjs/loader:1055:27)
+2025-04-14T00:42:36.425815+00:00 app[web.1]: at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-04-14T00:42:36.425815+00:00 app[web.1]: at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+2025-04-14T00:42:36.425815+00:00 app[web.1]: at Module.require (node:internal/modules/cjs/loader:1311:12)
+2025-04-14T00:42:36.425816+00:00 app[web.1]: at require (node:internal/modules/helpers:136:16)
+2025-04-14T00:42:36.425816+00:00 app[web.1]: at Object.<anonymous> (/app/server-heroku.cjs:4:15)
+2025-04-14T00:42:36.425816+00:00 app[web.1]: at Module._compile (node:internal/modules/cjs/loader:1554:14)
+2025-04-14T00:42:36.425817+00:00 app[web.1]: at Object..js (node:internal/modules/cjs/loader:1706:10)
+2025-04-14T00:42:36.425817+00:00 app[web.1]: at Module.load (node:internal/modules/cjs/loader:1289:32) {
+2025-04-14T00:42:36.425817+00:00 app[web.1]: code: 'MODULE_NOT_FOUND',
+2025-04-14T00:42:36.425818+00:00 app[web.1]: requireStack: [ '/app/server-heroku.cjs' ]
+2025-04-14T00:42:36.425818+00:00 app[web.1]: }
+2025-04-14T00:42:36.426242+00:00 app[web.1]:
+2025-04-14T00:42:36.426249+00:00 app[web.1]: Node.js v22.14.0
+2025-04-14T00:42:36.473199+00:00 heroku[web.1]: Process exited with status 1
+2025-04-14T00:42:36.504439+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-14T00:42:36.508622+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-14T00:42:41.236294+00:00 heroku[web.1]: Starting process with command `node server-heroku.cjs`
+2025-04-14T00:42:41.813361+00:00 app[web.1]: node:internal/modules/cjs/loader:1228
+2025-04-14T00:42:41.813376+00:00 app[web.1]: throw err;
+2025-04-14T00:42:41.813376+00:00 app[web.1]: ^
+2025-04-14T00:42:41.813377+00:00 app[web.1]:
+2025-04-14T00:42:41.813377+00:00 app[web.1]: Error: Cannot find module 'axios'
+2025-04-14T00:42:41.813377+00:00 app[web.1]: Require stack:
+2025-04-14T00:42:41.813377+00:00 app[web.1]: - /app/server-heroku.cjs
+2025-04-14T00:42:41.813378+00:00 app[web.1]: at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+2025-04-14T00:42:41.813378+00:00 app[web.1]: at Function._load (node:internal/modules/cjs/loader:1055:27)
+2025-04-14T00:42:41.813378+00:00 app[web.1]: at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-04-14T00:42:41.813379+00:00 app[web.1]: at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+2025-04-14T00:42:41.813379+00:00 app[web.1]: at Module.require (node:internal/modules/cjs/loader:1311:12)
+2025-04-14T00:42:41.813379+00:00 app[web.1]: at require (node:internal/modules/helpers:136:16)
+2025-04-14T00:42:41.813380+00:00 app[web.1]: at Object.<anonymous> (/app/server-heroku.cjs:4:15)
+2025-04-14T00:42:41.813380+00:00 app[web.1]: at Module._compile (node:internal/modules/cjs/loader:1554:14)
+2025-04-14T00:42:41.813380+00:00 app[web.1]: at Object..js (node:internal/modules/cjs/loader:1706:10)
+2025-04-14T00:42:41.813380+00:00 app[web.1]: at Module.load (node:internal/modules/cjs/loader:1289:32) {
+2025-04-14T00:42:41.813380+00:00 app[web.1]: code: 'MODULE_NOT_FOUND',
+2025-04-14T00:42:41.813381+00:00 app[web.1]: requireStack: [ '/app/server-heroku.cjs' ]
+2025-04-14T00:42:41.813381+00:00 app[web.1]: }
+2025-04-14T00:42:41.813381+00:00 app[web.1]:
+2025-04-14T00:42:41.813381+00:00 app[web.1]: Node.js v22.14.0
+2025-04-14T00:42:41.857053+00:00 heroku[web.1]: Process exited with status 1
+2025-04-14T00:42:41.881568+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-14T00:45:49.551856+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=aneeltre-75002be02a37.herokuapp.com request_id=a8751151-01b2-42fc-8209-655f669cdba5 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-14T00:45:50.943793+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=aneeltre-75002be02a37.herokuapp.com request_id=549cca8f-b184-4ee1-9594-e5e7ab07b67e fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
