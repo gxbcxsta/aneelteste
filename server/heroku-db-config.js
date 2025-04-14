@@ -28,5 +28,7 @@ function prepareDatabaseUrl() {
   }
 }
 
-// Exportar a função para ser usada no arquivo principal usando sintaxe ES Modules
-export { prepareDatabaseUrl };
+// Exportar a função para ser usada no arquivo principal
+module.exports = {
+  prepareDatabaseUrl
+};
