@@ -1,13 +1,13 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import { cpfRestituicoes, CpfRestituicao, InsertCpfRestituicao } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
-// Inicializar o cliente PostgreSQL com o Driver padrão do Neon
-const sql = neon(process.env.DATABASE_URL!);
-// Tratar o SQL como cliente para o Drizzle
-// @ts-ignore - Resolvendo problema de tipagem do Drizzle com Neon
-export const db = drizzle(sql);
+// Criar o cliente PostgreSQL padrão
+const client = postgres(process.env.DATABASE_URL!, { max: 1 });
+
+// Criar a instância Drizzle
+export const db = drizzle(client);
 
 // Função para consultar o valor de restituição de um CPF específico
 export async function getValorRestituicaoByCpf(cpf: string): Promise<number | null> {
