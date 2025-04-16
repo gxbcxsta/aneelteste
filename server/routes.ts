@@ -203,6 +203,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: 'ok', message: 'ANEEL ICMS Restituição API' });
   });
   
+  // API para enviar código OTP por SMS
+  app.post("/api/enviar-codigo-otp", async (req: Request, res: Response) => {
+    try {
+      const { telefone, cpf } = req.body;
+      
+      if (!telefone || !cpf) {
+        return res.status(400).json({
+          success: false,
+          error: "Telefone e CPF são obrigatórios."
+        });
+      }
+      
+      console.log(`Solicitação de envio de SMS OTP para telefone: ${telefone}, CPF: ${cpf}`);
+      
+      // Enviar o código OTP via serviço SMS
+      const resultado = await smsService.sendOtpCode(telefone, cpf);
+      
+      if (!resultado.success) {
+        return res.status(500).json({
+          success: false,
+          error: resultado.message || "Erro ao enviar SMS"
+        });
+      }
+      
+      // Em ambiente de desenvolvimento, enviamos o código para facilitar os testes
+      if (process.env.NODE_ENV !== 'production') {
+        return res.json({
+          success: true,
+          message: "Código OTP enviado com sucesso",
+          code: resultado.code // Apenas para ambiente de desenvolvimento
+        });
+      }
+      
+      // Em produção, não enviamos o código na resposta
+      return res.json({
+        success: true,
+        message: "Código OTP enviado com sucesso"
+      });
+      
+    } catch (error) {
+      console.error('Erro ao enviar código OTP:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao processar a solicitação de envio de SMS."
+      });
+    }
+  });
+  
+  // API para verificar código OTP
+  app.post("/api/verificar-codigo-otp", async (req: Request, res: Response) => {
+    try {
+      const { telefone, codigo, cpf } = req.body;
+      
+      if (!telefone || !codigo || !cpf) {
+        return res.status(400).json({
+          success: false,
+          error: "Telefone, código e CPF são obrigatórios."
+        });
+      }
+      
+      console.log(`Verificando código OTP: ${codigo} para telefone: ${telefone}, CPF: ${cpf}`);
+      
+      // Verificar o código OTP
+      const verificado = await smsService.verifyOtpCode(telefone, codigo, cpf);
+      
+      if (!verificado) {
+        return res.status(400).json({
+          success: false,
+          error: "Código inválido ou expirado."
+        });
+      }
+      
+      // Código verificado com sucesso
+      return res.json({
+        success: true,
+        message: "Código verificado com sucesso"
+      });
+      
+    } catch (error) {
+      console.error('Erro ao verificar código OTP:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao processar a verificação do código."
+      });
+    }
+  });
+  
   // Rota para detectar localização por IP
   app.get('/api/detectar-estado', async (req: Request, res: Response) => {
     try {

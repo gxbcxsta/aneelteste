@@ -1,6 +1,6 @@
 import { db } from './db';
 import { otp_codigos, InsertOtpCodigo } from '@shared/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 
 // Configuração da API de SMS
 const SMS_API_TOKEN = '01eb31cf-8692-4869-9843-860260706c27'; // Token da API Integraflux
@@ -147,7 +147,7 @@ export class SmsService {
             eq(otp_codigos.usado, false)
           )
         )
-        .orderBy(otp_codigos.criado_em, 'desc')
+        .orderBy(desc(otp_codigos.criado_em))
         .limit(1);
       
       if (!otp) {

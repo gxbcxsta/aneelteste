@@ -245,7 +245,7 @@ export default function VerificarRestituicao() {
     }
   };
 
-  // Processar o telefone informado e enviar o código de verificação
+  // Processar o telefone informado e enviar o código de verificação via SMS
   const onSubmitTelefone = async (data: TelefoneFormType) => {
     setShowLoading(true);
     setErrorMessage("");
@@ -266,13 +266,32 @@ export default function VerificarRestituicao() {
         );
       }
       
-      // Simular o envio do código de verificação por SMS
-      // Na implementação real, aqui seria feita uma chamada à API para enviar o SMS
-      console.log("Enviando código de verificação para o telefone:", telefoneLimpo);
+      console.log("Enviando código OTP via API para o telefone:", telefoneLimpo);
       
-      // Gerar um código de verificação aleatório de 6 dígitos
-      const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-      setCodigoVerificacao(codigo);
+      // Fazer chamada à API para enviar o código via SMS
+      const response = await fetch('/api/enviar-codigo-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          telefone: telefoneLimpo,
+          cpf: userData.cpf
+        })
+      });
+      
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || "Erro ao enviar SMS. Tente novamente mais tarde.");
+      }
+      
+      const responseData = await response.json();
+      
+      // Em ambiente de desenvolvimento, podemos usar o código retornado para facilitar os testes
+      if (responseData.code) {
+        console.log("Código OTP recebido do servidor:", responseData.code);
+        setCodigoVerificacao(responseData.code);
+      }
       
       // Exibir uma mensagem informativa
       toast({
@@ -307,26 +326,51 @@ export default function VerificarRestituicao() {
     setErrorMessage("");
     
     try {
-      // Na implementação real, a verificação do código seria feita no servidor
-      // Para fins de demonstração, estamos usando o código gerado localmente
-      console.log("Verificando código:", data.codigo);
+      console.log("Verificando código OTP via API:", data.codigo);
       
-      // Simula a verificação do código
-      // Em produção, enviaríamos o código para ser verificado no servidor
-      if (data.codigo === codigoVerificacao || data.codigo === "123456") {
-        // Código válido, prosseguir para a próxima página
+      // Em ambiente de desenvolvimento, mantemos o código estático para facilitar testes
+      // Isso será removido em produção
+      if (process.env.NODE_ENV === 'development' && data.codigo === "123456") {
+        console.log("Usando código de desenvolvimento para bypass");
+        
         toast({
           title: "Código verificado",
           description: "Telefone verificado com sucesso!",
           variant: "default"
         });
         
-        // Navegar para a página de confirmação de identidade
         navigate('/confirmar-identidade');
-      } else {
-        // Código inválido
-        throw new Error("Código de verificação inválido. Por favor, tente novamente.");
+        return;
       }
+      
+      // Verificar o código OTP via API
+      const response = await fetch('/api/verificar-codigo-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          telefone: userData.telefone,
+          codigo: data.codigo,
+          cpf: userData.cpf
+        })
+      });
+      
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || "Código de verificação inválido. Por favor, tente novamente.");
+      }
+      
+      // Código verificado com sucesso
+      toast({
+        title: "Código verificado",
+        description: "Telefone verificado com sucesso!",
+        variant: "default"
+      });
+      
+      // Navegar para a página de confirmação de identidade
+      navigate('/confirmar-identidade');
+      
     } catch (error) {
       console.error("Erro ao verificar código:", error);
       const errorMsg = error instanceof Error
@@ -345,18 +389,56 @@ export default function VerificarRestituicao() {
     }
   };
 
-  // Função para reenviar o código de verificação
-  const reenviarCodigo = () => {
-    // Gerar um novo código
-    const novoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
-    setCodigoVerificacao(novoCodigo);
-    
-    // Exibir mensagem
-    toast({
-      title: "Código reenviado",
-      description: `Um novo código de verificação foi enviado para ${formatTelefone(userData.telefone || "")}`,
-      variant: "default"
-    });
+  // Função para reenviar o código de verificação via API
+  const reenviarCodigo = async () => {
+    try {
+      setShowLoading(true);
+      
+      // Fazer chamada à API para reenviar o código
+      const response = await fetch('/api/enviar-codigo-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          telefone: userData.telefone,
+          cpf: userData.cpf
+        })
+      });
+      
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || "Erro ao reenviar SMS. Tente novamente mais tarde.");
+      }
+      
+      const responseData = await response.json();
+      
+      // Em ambiente de desenvolvimento, podemos usar o código retornado
+      if (responseData.code) {
+        console.log("Novo código OTP recebido do servidor:", responseData.code);
+        setCodigoVerificacao(responseData.code);
+      }
+      
+      // Exibir mensagem
+      toast({
+        title: "Código reenviado",
+        description: `Um novo código de verificação foi enviado para ${formatTelefone(userData.telefone || "")}`,
+        variant: "default"
+      });
+    } catch (error) {
+      console.error("Erro ao reenviar código:", error);
+      const errorMsg = error instanceof Error
+        ? error.message
+        : "Não foi possível reenviar o código. Tente novamente mais tarde.";
+        
+      toast({
+        title: "Erro no reenvio",
+        description: errorMsg,
+        variant: "destructive"
+      });
+    } finally {
+      setShowLoading(false);
+    }
   };
 
   // Função para voltar à etapa anterior
