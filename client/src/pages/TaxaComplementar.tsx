@@ -203,7 +203,7 @@ export default function TaxaComplementar() {
             <Alert className="border-amber-500 bg-amber-50">
               <AlertTriangle className="h-5 w-5 text-amber-600" />
               <AlertTitle className="font-bold text-amber-800">
-                Status da Restituição: <span className="bg-amber-200 px-2 py-1 rounded-md text-amber-900">EM PROCESSAMENTO</span>
+                Status da Restituição: <span className="text-amber-900 font-medium">EM PROCESSAMENTO</span>
               </AlertTitle>
               <AlertDescription className="text-amber-700">
                 Seu pagamento da Taxa de Regularização (TRE) foi confirmado. Para concluir o processo de liberação, 

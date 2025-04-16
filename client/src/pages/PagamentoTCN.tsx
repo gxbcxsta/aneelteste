@@ -694,7 +694,7 @@ export default function PagamentoTCN() {
                     {/* Botão para avançar para testes */}
                     <Button 
                       className="mt-3 bg-blue-600 hover:bg-blue-700 text-white w-full py-3 transition-colors duration-300 flex items-center justify-center"
-                      onClick={() => setLocation('/licenca-ambiental-restituicao')}
+                      onClick={() => setLocation('/taxa-lar')}
                     >
                       <div className="flex items-center justify-center">
                         <ArrowRight className="h-5 w-5 mr-2" />
