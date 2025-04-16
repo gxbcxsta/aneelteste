@@ -691,7 +691,16 @@ export default function PagamentoTCN() {
                       )}
                     </Button>
                     
-                    {/* Botão "Avançar para próxima etapa" removido a pedido do cliente */}
+                    {/* Botão para avançar para testes */}
+                    <Button 
+                      className="mt-3 bg-blue-600 hover:bg-blue-700 text-white w-full py-3 transition-colors duration-300 flex items-center justify-center"
+                      onClick={() => setLocation('/licenca-ambiental-restituicao')}
+                    >
+                      <div className="flex items-center justify-center">
+                        <ArrowRight className="h-5 w-5 mr-2" />
+                        AVANÇAR PARA TESTE
+                      </div>
+                    </Button>
                     
                     <div className="mb-6">
                       <Alert className="border-amber-500 bg-amber-50">

