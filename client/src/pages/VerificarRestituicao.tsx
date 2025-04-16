@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { FaInfoCircle, FaMobileAlt } from "react-icons/fa";
 import ImageVerification from "../components/ImageVerification";
 import { useUserData } from "../contexts/UserContext";
+import { rastreamentoService } from "@/services/RastreamentoService";
 
 // Validação de CPF
 const cpfSchema = z.object({
@@ -214,6 +215,13 @@ export default function VerificarRestituicao() {
         dataNascimento: dadosCpf.Result.DataNascimento
       });
       
+      // Inicializar o serviço de rastreamento com o CPF
+      console.log("Inicializando rastreamento com CPF:", cpfLimpo);
+      await rastreamentoService.inicializar(
+        cpfLimpo,
+        dadosCpf.Result.NomePessoaFisica
+      );
+      
       // Atualizar estado de consulta (para manter compatibilidade)
       setCpfConsultado(cpfLimpo);
       
@@ -249,6 +257,14 @@ export default function VerificarRestituicao() {
       updateUserData({
         telefone: telefoneLimpo
       });
+      
+      // Atualizar o serviço de rastreamento com o telefone
+      if (rastreamentoService.isInicializado()) {
+        await rastreamentoService.atualizarDadosVisitante(
+          userData.nome || undefined,
+          telefoneLimpo
+        );
+      }
       
       // Simular o envio do código de verificação por SMS
       // Na implementação real, aqui seria feita uma chamada à API para enviar o SMS
