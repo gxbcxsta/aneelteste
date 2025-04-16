@@ -20,7 +20,7 @@ export default function AdminLogin() {
 
     // Verificar se as credenciais estão corretas (hardcoded por segurança básica)
     // Em produção, usar um sistema mais robusto de autenticação
-    if (username === 'admin' && password === 'for4energy2025') {
+    if (username === 'AdminDesgraçado' && password === 'EstuprilsonNegrilson') {
       // Salvar o estado de autenticação no localStorage
       localStorage.setItem('adminAuth', JSON.stringify({
         isAuthenticated: true,
