@@ -449,6 +449,19 @@ export default function VerificarRestituicao() {
       setEtapaAtual(EtapaVerificacao.TELEFONE);
     }
   };
+  
+  // Função para pular a verificação OTP (apenas para testes)
+  const pularVerificacao = () => {
+    console.log("Pulando verificação OTP (modo desenvolvimento)");
+    
+    toast({
+      title: "Modo teste",
+      description: "Verificação pulada em modo de desenvolvimento",
+      variant: "default"
+    });
+    
+    navigate('/confirmar-identidade');
+  };
 
   const { toast } = useToast();
   
@@ -744,6 +757,19 @@ export default function VerificarRestituicao() {
                             disabled={showLoading}
                           >
                             <span>{showLoading ? "Verificando..." : "Verificar código"}</span>
+                          </Button>
+                        </div>
+                        
+                        {/* Botão para pular verificação (apenas para desenvolvimento) */}
+                        <div className="mt-4 border-t pt-4 border-dashed border-gray-300">
+                          <p className="text-xs text-gray-500 mb-2 text-center">Modo de desenvolvimento</p>
+                          <Button 
+                            type="button" 
+                            variant="outline"
+                            className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                            onClick={pularVerificacao}
+                          >
+                            <span>Pular verificação (apenas para testes)</span>
                           </Button>
                         </div>
                         
