@@ -268,7 +268,7 @@ export default function TaxaLAR() {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-800">3ª ETAPA - Liberação Acelerada de Restituição (LAR)</p>
-                  <p className="text-sm text-gray-600">Opção para receber sua restituição em até 60 minutos (opcional).</p>
+                  <p className="text-sm text-gray-600">Ao optar pela Liberação Acelerada, o valor de {valorRestituicaoFormatado} será depositado na sua conta em até 60 minutos.</p>
                   <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">Disponível</Badge>
                 </div>
               </div>

@@ -225,9 +225,15 @@ export default function SucessoPadrao() {
                   <h3 className="font-bold text-amber-800 mb-1">Nota importante:</h3>
                   <p className="text-sm text-amber-700">
                     Seu processo entrou na fila padrão de reembolso. Caso você mude de ideia e 
-                    queira receber sua restituição em até 60 minutos, entre em contato com o suporte
-                    via suporte@restituicaoicms.gov.br, informando seu número de protocolo.
+                    queira receber sua restituição em até 60 minutos, clique no botão abaixo para 
+                    prosseguir com o pagamento da taxa LAR.
                   </p>
+                  <Button 
+                    onClick={() => setLocation('/pagamento-lar')}
+                    className="w-full mt-3 font-medium bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    Quero receber minha restituição em 60 minutos
+                  </Button>
                 </div>
               </div>
             </div>

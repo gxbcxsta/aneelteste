@@ -249,7 +249,7 @@ export default function TaxaComplementar() {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-600">3ª ETAPA - Liberação Acelerada de Restituição (LAR)</p>
-                  <p className="text-sm text-gray-500">Opção disponível apenas após quitação da Taxa de Conformidade Nacional (TCN).</p>
+                  <p className="text-sm text-gray-500">Ao optar pela Liberação Acelerada, o valor de {valorRestituicaoFormatado} será depositado na sua conta em até 60 minutos. Opção disponível apenas após quitação da Taxa de Conformidade Nacional (TCN).</p>
                   <Badge variant="outline" className="mt-1 bg-gray-100 text-gray-500 border-gray-300">Bloqueado</Badge>
                 </div>
               </div>
