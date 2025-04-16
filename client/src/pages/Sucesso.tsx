@@ -27,22 +27,37 @@ const formatarMoeda = (valor: number | string) => {
 // Função para calcular a data de previsão de depósito baseada no tipo de pagamento
 const obterDataPrevisaoDeposito = (acelerado: boolean) => {
   const data = new Date();
+  
   if (acelerado) {
     // Se acelerado, adicionar apenas 1 hora
     data.setHours(data.getHours() + 1);
+    
+    return data.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   } else {
-    // Se não acelerado, adicionar 15 dias úteis
-    // Para simplificar, adicionar 21 dias corridos (aproximadamente 15 dias úteis)
-    data.setDate(data.getDate() + 21);
+    // Se não acelerado, adicionar 15 dias úteis (excluindo finais de semana)
+    let diasUteis = 0;
+    
+    // Adicionar dias até atingir 15 dias úteis
+    while (diasUteis < 15) {
+      data.setDate(data.getDate() + 1);
+      // Verifica se não é sábado (6) nem domingo (0)
+      if (data.getDay() !== 0 && data.getDay() !== 6) {
+        diasUteis++;
+      }
+    }
+    
+    return data.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
-  
-  return data.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
 };
 
 export default function Sucesso() {
@@ -259,10 +274,24 @@ export default function Sucesso() {
                 {acelerado ? "Entrega Acelerada (60 minutos)" : "Prazo de Entrega (15 dias úteis)"}
               </h3>
               
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                <div className={`bg-white rounded-md border ${acelerado ? "border-amber-200" : "border-blue-200"} px-4 py-2 sm:py-3 inline-flex items-center justify-center`}>
+                  <Calendar className={`h-5 w-5 ${acelerado ? "text-amber-600" : "text-blue-600"} mr-2`} />
+                  <span className={`font-bold ${acelerado ? "text-amber-800" : "text-blue-800"}`}>
+                    Data Prevista: {dataPrevisao}
+                  </span>
+                </div>
+                <p className={`text-sm ${acelerado ? "text-amber-700" : "text-blue-700"} sm:ml-2 font-medium`}>
+                  {acelerado 
+                    ? "(Processamento prioritário em até 60 minutos)"
+                    : "(15 dias úteis a partir de hoje, excluindo finais de semana)"}
+                </p>
+              </div>
+              
               <p className={`text-sm ${acelerado ? "text-amber-700" : "text-blue-700"}`}>
                 {acelerado
                   ? "Você optou pela Liberação Acelerada de Restituição (LAR). Seu pagamento será processado com prioridade e você receberá o valor em até 60 minutos."
-                  : "Seu valor de restituição será processado e depositado no prazo regular de até 15 dias úteis conforme a disponibilidade de fundos."}
+                  : "Seu valor de restituição será processado e depositado no prazo regular conforme a disponibilidade de fundos."}
               </p>
             </div>
             
