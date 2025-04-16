@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Trash2, CheckCircle, Info, Search, ChevronRight, AlertTriangle, DollarSign, X, LogOut, Database, ShieldAlert } from "lucide-react";
+import { Trash2, CheckCircle, Info, Search, ChevronRight, AlertTriangle, AlertCircle, DollarSign, X, LogOut, Database, ShieldAlert } from "lucide-react";
 
 // Interfaces para os dados da API
 interface Visitante {
