@@ -598,7 +598,7 @@ export default function SimuladorRestituicao({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">
-                      Valor médio mensal da sua conta de luz
+                      Qual o valor que você costuma pagar por mês na conta de luz?
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -648,7 +648,7 @@ export default function SimuladorRestituicao({
               
               <div className="space-y-4">
                 <FormLabel className="text-[var(--gov-blue-dark)] font-semibold">
-                  Por quanto tempo você pagou essa média nos últimos 5 anos?
+                  Há quanto tempo, mais ou menos, você paga esse valor na conta de luz?
                 </FormLabel>
                 
                 <div className="space-y-2">
@@ -662,7 +662,7 @@ export default function SimuladorRestituicao({
                           <div className="w-2 h-2 rounded-full bg-[var(--gov-blue)]"></div>
                         )}
                       </div>
-                      <span className="font-medium text-sm">1 a 11 Meses</span>
+                      <span className="font-medium text-sm">Menos de 1 ano</span>
                     </div>
                   </div>
                   
