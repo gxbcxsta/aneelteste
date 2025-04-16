@@ -291,8 +291,95 @@ export default function Admin() {
     }
   }, [selectedVisitante, refetchPaginas]);
 
+  // Se não estiver autenticado, não renderizar o conteúdo
+  if (!isAuthenticated) {
+    return null;
+  }
+    
   return (
     <div className="container mx-auto py-10 px-4">
+      {/* Diálogo para limpar o banco de dados */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5 text-red-500" /> 
+              Limpar Banco de Dados
+            </DialogTitle>
+            <DialogDescription>
+              Esta ação excluirá PERMANENTEMENTE todos os dados de rastreamento e não pode ser desfeita.
+              Digite a chave de acesso para continuar.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="accessKey">Chave de Acesso</Label>
+              <Input
+                id="accessKey"
+                type="password"
+                placeholder="Digite a chave de acesso"
+                value={accessKey}
+                onChange={(e) => setAccessKey(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+            
+            {clearResult && (
+              <Alert variant={clearResult.success ? "default" : "destructive"}>
+                {clearResult.success ? (
+                  <CheckCircle className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
+                )}
+                <AlertTitle>{clearResult.success ? "Sucesso" : "Erro"}</AlertTitle>
+                <AlertDescription>{clearResult.message}</AlertDescription>
+              </Alert>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setDialogOpen(false)}
+              disabled={isClearing}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleClearDatabase}
+              disabled={isClearing}
+            >
+              {isClearing ? "Limpando..." : "Limpar Banco de Dados"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Cabeçalho com botões de ação */}
+      <div className="flex justify-end mb-6 gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setDialogOpen(true)}
+          className="gap-1"
+        >
+          <Trash2 className="h-4 w-4" />
+          Limpar Dados
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleLogout}
+          className="gap-1"
+        >
+          <LogOut className="h-4 w-4" />
+          Sair
+        </Button>
+      </div>
+      
       <Card className="mb-8">
         <CardHeader className="bg-blue-50 border-b">
           <CardTitle className="text-2xl font-bold text-blue-900">

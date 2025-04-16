@@ -26,6 +26,7 @@ import TaxaLAR from "@/pages/TaxaLAR";
 import PagamentoLAR from "@/pages/PagamentoLAR";
 import DebugDetectorIp from "./debug/DebugDetectorIp";
 import Admin from "@/pages/Admin";
+import AdminLogin from "@/pages/AdminLogin";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function Router() {
         <Route path="/" component={Home}/>
         <Route path="/verificar" component={VerificarRestituicao}/>
         <Route path="/admin" component={Admin}/>
+        <Route path="/admin-login" component={AdminLogin}/>
         
         {/* Rotas protegidas - exigem CPF */}
         <Route path="/confirmar-identidade">
