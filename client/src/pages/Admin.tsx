@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,8 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Info, Search, ChevronRight, AlertTriangle, DollarSign, X } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Trash2, CheckCircle, Info, Search, ChevronRight, AlertTriangle, DollarSign, X, LogOut, Database, ShieldAlert } from "lucide-react";
 
 // Interfaces para os dados da API
 interface Visitante {
@@ -50,6 +52,113 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState('visitantes');
   const [selectedVisitante, setSelectedVisitante] = useState<number | null>(null);
   const [searchCpf, setSearchCpf] = useState('');
+  const [, setLocation] = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [accessKey, setAccessKey] = useState('');
+  const [isClearing, setIsClearing] = useState(false);
+  const [clearResult, setClearResult] = useState<{success?: boolean, message?: string} | null>(null);
+
+  // Verificar autenticação
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const authData = localStorage.getItem('adminAuth');
+        if (!authData) {
+          setIsAuthenticated(false);
+          setLocation('/admin-login');
+          return;
+        }
+
+        const auth = JSON.parse(authData);
+        
+        // Verificar se a autenticação está expirada (24 horas)
+        const now = new Date().getTime();
+        const authTime = auth.timestamp || 0;
+        const authExpired = now - authTime > 24 * 60 * 60 * 1000;
+        
+        if (!auth.isAuthenticated || authExpired) {
+          localStorage.removeItem('adminAuth');
+          setIsAuthenticated(false);
+          setLocation('/admin-login');
+          return;
+        }
+        
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+        setIsAuthenticated(false);
+        setLocation('/admin-login');
+      }
+    };
+    
+    checkAuth();
+  }, [setLocation]);
+
+  // Função para fazer logout
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuth');
+    setIsAuthenticated(false);
+    setLocation('/admin-login');
+  };
+  
+  // Função para limpar o banco de dados
+  const handleClearDatabase = async () => {
+    if (!accessKey.trim()) {
+      setClearResult({ 
+        success: false, 
+        message: 'A chave de acesso é obrigatória' 
+      });
+      return;
+    }
+    
+    setIsClearing(true);
+    setClearResult(null);
+    
+    try {
+      const response = await fetch('/api/admin/limpar-dados', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessKey })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setClearResult({ 
+          success: true, 
+          message: data.message || 'Banco de dados limpo com sucesso' 
+        });
+        
+        // Atualizar os dados após limpar o banco
+        setTimeout(() => {
+          refetchVisitantes();
+          refetchPaginas();
+          refetchEstatisticas();
+        }, 1000);
+        
+        // Fechar diálogo após limpar com sucesso
+        setTimeout(() => {
+          setDialogOpen(false);
+          setAccessKey('');
+          setClearResult(null);
+        }, 2000);
+      } else {
+        setClearResult({ 
+          success: false, 
+          message: data.message || 'Erro ao limpar banco de dados' 
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao limpar banco:', error);
+      setClearResult({ 
+        success: false, 
+        message: 'Erro ao processar solicitação' 
+      });
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   // Consulta para obter todos os visitantes
   const {

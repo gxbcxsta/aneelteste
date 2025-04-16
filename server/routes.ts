@@ -1,8 +1,8 @@
 import { Express, NextFunction, Request, Response } from 'express';
 import { Server, createServer } from 'http';
-import { getValorRestituicaoByCpf, salvarValorRestituicao } from './db-alternative';
+import { getValorRestituicaoByCpf, salvarValorRestituicao, db } from './db';
 import { storage } from './storage';
-import { insertVisitanteSchema, insertPaginaVisitadaSchema } from '@shared/schema';
+import { insertVisitanteSchema, insertPaginaVisitadaSchema, paginas_visitadas, visitantes } from '@shared/schema';
 
 /**
  * API de Pagamentos For4Payments
