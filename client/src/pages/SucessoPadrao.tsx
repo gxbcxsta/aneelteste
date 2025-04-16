@@ -26,8 +26,16 @@ const formatarMoeda = (valor: number | string) => {
 // Função para calcular a data de previsão de depósito (15 dias úteis)
 const obterDataPrevisaoDepositoPadrao = () => {
   const data = new Date();
-  // Adicionar 21 dias corridos (aproximadamente 15 dias úteis)
-  data.setDate(data.getDate() + 21);
+  let diasUteis = 0;
+  
+  // Adicionar dias até atingir 15 dias úteis (excluindo sábados e domingos)
+  while (diasUteis < 15) {
+    data.setDate(data.getDate() + 1);
+    // Verifica se não é sábado (6) nem domingo (0)
+    if (data.getDay() !== 0 && data.getDay() !== 6) {
+      diasUteis++;
+    }
+  }
   
   return data.toLocaleDateString('pt-BR', {
     day: '2-digit',
@@ -211,9 +219,19 @@ export default function SucessoPadrao() {
                 Prazo de Entrega (15 dias úteis)
               </h3>
               
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                <div className="bg-white rounded-md border border-blue-200 px-4 py-2 sm:py-3 inline-flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-blue-600 mr-2" />
+                  <span className="font-bold text-blue-800">Data Prevista: {dataPrevisao}</span>
+                </div>
+                <p className="text-sm text-blue-700 sm:ml-2 font-medium">
+                  (15 dias úteis a partir de hoje, excluindo finais de semana)
+                </p>
+              </div>
+              
               <p className="text-sm text-blue-700">
                 Você optou pelo processamento padrão. Sua restituição entrará na fila regular
-                de processamento e será depositada em sua conta em até 15 dias úteis.
+                de processamento e será depositada em sua conta na data prevista acima.
                 Você não será cobrado nenhuma taxa adicional por este serviço.
               </p>
             </div>
