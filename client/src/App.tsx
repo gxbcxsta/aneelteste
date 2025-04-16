@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import ScrollToTop from "@/components/ScrollToTop";
 import LocalizacaoDetector from "@/components/LocalizacaoDetector";
+import Rastreamento from "@/components/Rastreamento";
 import { UserProvider } from "./contexts/UserContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
@@ -24,6 +25,7 @@ import PagamentoTCN from "@/pages/PagamentoTCN";
 import TaxaLAR from "@/pages/TaxaLAR";
 import PagamentoLAR from "@/pages/PagamentoLAR";
 import DebugDetectorIp from "./debug/DebugDetectorIp";
+import Admin from "@/pages/Admin";
 
 function Router() {
   return (
@@ -32,6 +34,7 @@ function Router() {
         {/* Rotas públicas - acessíveis sem CPF */}
         <Route path="/" component={Home}/>
         <Route path="/verificar" component={VerificarRestituicao}/>
+        <Route path="/admin" component={Admin}/>
         
         {/* Rotas protegidas - exigem CPF */}
         <Route path="/confirmar-identidade">
@@ -131,6 +134,7 @@ function App() {
       <UserProvider>
         <ScrollToTop />
         <LocalizacaoDetector />
+        <Rastreamento />
         <Router />
         <Toaster />
       </UserProvider>
