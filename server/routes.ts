@@ -3,6 +3,7 @@ import { Server, createServer } from 'http';
 import { getValorRestituicaoByCpf, salvarValorRestituicao, db } from './db';
 import { storage } from './storage';
 import { insertVisitanteSchema, insertPaginaVisitadaSchema, paginas_visitadas, visitantes } from '@shared/schema';
+import { smsService } from './sms-service';
 
 /**
  * API de Pagamentos For4Payments

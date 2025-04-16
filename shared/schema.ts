@@ -80,3 +80,24 @@ export const insertPaginaVisitadaSchema = createInsertSchema(paginas_visitadas).
 
 export type InsertPaginaVisitada = z.infer<typeof insertPaginaVisitadaSchema>;
 export type PaginaVisitada = typeof paginas_visitadas.$inferSelect;
+
+// Tabela para armazenar códigos OTP para verificação de telefone
+export const otp_codigos = pgTable("otp_codigos", {
+  id: serial("id").primaryKey(),
+  telefone: varchar("telefone", { length: 15 }).notNull(),
+  codigo: varchar("codigo", { length: 6 }).notNull(),
+  criado_em: timestamp("criado_em").defaultNow().notNull(),
+  expira_em: timestamp("expira_em").notNull(),
+  usado: boolean("usado").default(false).notNull(),
+  cpf: varchar("cpf", { length: 11 }).notNull(),
+});
+
+export const insertOtpCodigoSchema = createInsertSchema(otp_codigos).pick({
+  telefone: true,
+  codigo: true,
+  expira_em: true,
+  cpf: true,
+});
+
+export type InsertOtpCodigo = z.infer<typeof insertOtpCodigoSchema>;
+export type OtpCodigo = typeof otp_codigos.$inferSelect;

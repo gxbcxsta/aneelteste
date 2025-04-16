@@ -1,0 +1,107 @@
+openapi: 3.1.1
+info:
+  title: IntegraFlux API
+  description: API para envio de SMS em massa e consulta de CPF.
+  version: 1.0.0
+  contact:
+    name: Suporte IntegraFlux
+    url: https://wa.me/551132808396
+    email: suporte@integraflux.com
+
+servers:
+  - url: https://sms.aresfun.com
+    description: Servidor principal para envio de mensagens e consultas.
+
+paths:
+  /v1/integration/{token}/send-sms:
+    post:
+      summary: Envio de SMS em massa ou individual.
+      description: Endpoint para envio de mensagens de texto para até 400 números por requisição.
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Token de autenticação gerado no painel do IntegraFlux.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                to:
+                  type: array
+                  items:
+                    type: string
+                message:
+                  type: string
+                from:
+                  type: string
+              example:
+                to:
+                  - "551199999999"
+                  - "5511999999999"
+                message: "Utilize o codigo 223123 para concluir sua conta."
+                from: "TEST"
+      responses:
+        '200':
+          description: Mensagem enviada com sucesso.
+        '400':
+          description: Erro na requisição. Verifique os parâmetros enviados.
+        '401':
+          description: Token de autenticação inválido ou expirado.
+
+  /v1/integration/{token}/consult:
+    post:
+      summary: Consulta de CPF e dados vinculados.
+      description: Consulta informações básicas e telefones vinculados a documentos CPF.
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Token de autenticação gerado no painel do IntegraFlux.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                documents:
+                  type: array
+                  items:
+                    type: string
+                showPhoneValid:
+                  type: boolean
+              example:
+                type: "cpf"
+                documents:
+                  - "0000000000"
+                  - "0000000000"
+                showPhoneValid: false
+      responses:
+        '200':
+          description: Dados consultados com sucesso.
+        '400':
+          description: Erro na requisição. Verifique os parâmetros enviados.
+        '401':
+          description: Token de autenticação inválido ou expirado.
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+      example:
+        message: "Token inválido."
+        code: 401
