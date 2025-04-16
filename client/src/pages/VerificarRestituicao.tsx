@@ -78,7 +78,7 @@ export default function VerificarRestituicao() {
         
         // Verificamos se os dados contêm as propriedades necessárias
         if (!data.Result || !data.Result.NomePessoaFisica || !data.Result.DataNascimento) {
-          throw new Error("Dados incompletos retornados pela API");
+          throw new Error("CPF incorreto. Verifique os números e tente novamente.");
         }
         
         return data;
@@ -134,7 +134,7 @@ export default function VerificarRestituicao() {
       
       // Verificar se os dados estão completos
       if (!dadosCpf.Result || !dadosCpf.Result.NomePessoaFisica || !dadosCpf.Result.DataNascimento) {
-        throw new Error("Dados incompletos retornados pela API");
+        throw new Error("CPF incorreto. Verifique os números e tente novamente.");
       }
       
       console.log("Dados do CPF obtidos com sucesso:", dadosCpf.Result.NomePessoaFisica);
