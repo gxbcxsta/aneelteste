@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle, Info, Loader2, Clock, DollarSign, Copy, FileText, CheckCircle2, Zap } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, Loader2, Clock, DollarSign, Copy, FileText, CheckCircle2, Zap, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

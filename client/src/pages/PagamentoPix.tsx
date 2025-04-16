@@ -41,24 +41,24 @@ interface NotificacaoProps {
 
 const Notificacao = ({ nome, valor, onClose }: NotificacaoProps) => {
   return (
-    <div className="w-full bg-white shadow-sm rounded-md border border-gray-100 overflow-hidden animate-fade-in">
+    <div className="w-full bg-[#071D41] shadow-md rounded-md border border-[#0C4DA2] overflow-hidden animate-fade-in">
       <div className="flex items-start p-3">
         <div className="flex-shrink-0">
-          <div className="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center">
-            <CheckCircle className="h-4 w-4 text-green-600" />
+          <div className="h-8 w-8 rounded-full bg-green-800 flex items-center justify-center">
+            <CheckCircle className="h-4 w-4 text-white" />
           </div>
         </div>
         <div className="ml-3 flex-1">
-          <p className="text-sm font-medium text-gray-700 flex items-center">
-            <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+          <p className="text-sm font-medium text-white flex items-center">
+            <span className="w-2 h-2 bg-green-400 rounded-full mr-1.5 animate-pulse"></span>
             Pagamento confirmado
           </p>
-          <p className="mt-1 text-sm text-gray-600 leading-tight">
-            <span className="font-medium">{nome}</span> acabou de pagar a Taxa de Regularização Energética e irá receber <span className="font-medium text-green-600">{valor}</span>
+          <p className="mt-1 text-sm text-gray-200 leading-tight">
+            <span className="font-medium text-white">{nome}</span> acabou de pagar a Taxa de Regularização Energética e irá receber <span className="font-medium text-green-400">{valor}</span>
           </p>
         </div>
         <button
-          className="ml-3 flex-shrink-0 text-gray-400 hover:text-gray-500 focus:outline-none"
+          className="ml-3 flex-shrink-0 text-gray-300 hover:text-white focus:outline-none"
           onClick={onClose}
         >
           <span className="sr-only">Fechar</span>

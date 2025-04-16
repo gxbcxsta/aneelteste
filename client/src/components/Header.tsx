@@ -37,8 +37,7 @@ export default function Header() {
           
           {/* Navigation for desktop */}
           <nav className="hidden md:flex items-center space-x-2 text-white">
-            <Link href="/">
-              <div className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition-colors cursor-pointer ${
+            <div className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition-colors cursor-pointer ${
                 isActive("/") 
                   ? "bg-[#0C4DA2] text-white" 
                   : "text-[#E5E5E5] hover:bg-[#0D47A1] hover:text-white"
@@ -46,7 +45,6 @@ export default function Header() {
                 <Home size={16} className="mr-1.5" />
                 Início
               </div>
-            </Link>
             
             <Link href="/verificar">
               <div className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition-colors cursor-pointer ${
@@ -59,8 +57,7 @@ export default function Header() {
               </div>
             </Link>
             
-            <Link href="/informacoes">
-              <div className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition-colors cursor-pointer ${
+            <div className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition-colors cursor-pointer ${
                 isActive("/informacoes") 
                   ? "bg-[#0C4DA2] text-white" 
                   : "text-[#E5E5E5] hover:bg-[#0D47A1] hover:text-white"
@@ -68,7 +65,6 @@ export default function Header() {
                 <FileText size={16} className="mr-1.5" />
                 Informações
               </div>
-            </Link>
             
             <div className="ml-3">
               <Link href="/verificar">
