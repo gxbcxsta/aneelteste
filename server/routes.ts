@@ -989,6 +989,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Rota para limpar o banco de dados (protegida por chave de acesso)
+  app.post('/api/admin/limpar-dados', async (req: Request, res: Response) => {
+    try {
+      // Verificar se a chave de acesso está correta
+      const { accessKey } = req.body;
+      
+      // Chave de acesso fixa para proteção básica
+      // Em um ambiente de produção, usar um sistema mais robusto
+      const ADMIN_ACCESS_KEY = 'for4energy_admin_2025';
+
+      if (accessKey !== ADMIN_ACCESS_KEY) {
+        return res.status(401).json({ 
+          error: 'Acesso não autorizado', 
+          message: 'Chave de acesso inválida' 
+        });
+      }
+      
+      // Limpar dados do banco - usando queries diretas para essa funcionalidade específica
+      await db.delete(paginas_visitadas);
+      await db.delete(visitantes);
+      
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Banco de dados limpo com sucesso' 
+      });
+    } catch (error) {
+      console.error('Erro ao limpar banco de dados:', error);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+  
   // Criação do servidor HTTP para o Express
   const server = createServer(app);
   return server;

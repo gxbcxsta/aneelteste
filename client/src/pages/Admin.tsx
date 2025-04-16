@@ -430,7 +430,7 @@ export default function Admin() {
                             <TableBody>
                               {paginasVisitadas.map((pagina: PaginaVisitada) => (
                                 <TableRow key={pagina.id}>
-                                  <TableCell className="font-medium">{pagina.pagina}</TableCell>
+                                  <TableCell className="font-medium">{pagina.url}</TableCell>
                                   <TableCell className="text-sm truncate max-w-[200px]">{pagina.url}</TableCell>
                                   <TableCell>{formatarData(pagina.timestamp)}</TableCell>
                                   <TableCell>{pagina.dispositivo || 'N/A'}</TableCell>
