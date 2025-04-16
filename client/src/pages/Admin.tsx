@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Info, Search, ChevronRight, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, Info, Search, ChevronRight, AlertTriangle, DollarSign, X } from "lucide-react";
 
 // Interfaces para os dados da API
 interface Visitante {
@@ -34,6 +35,14 @@ interface PaginaVisitada {
 
 interface EstatisticaPagina {
   pagina: string;
+  total: number;
+}
+
+// Interface para o status de pagamento
+interface StatusPagamento {
+  tre: boolean;
+  tcn: boolean;
+  lar: boolean;
   total: number;
 }
 
@@ -106,6 +115,53 @@ export default function Admin() {
       (v.nome && v.nome.toLowerCase().includes(searchCpf.toLowerCase()))
     );
   };
+
+  // Verifica o status de pagamento com base nas páginas visitadas
+  const verificarStatusPagamento = (paginas: PaginaVisitada[]): StatusPagamento => {
+    if (!paginas || !Array.isArray(paginas)) {
+      return { tre: false, tcn: false, lar: false, total: 0 };
+    }
+    
+    // URLs que indicam pagamentos realizados
+    const urlsTRE = paginas.some(p => p.url.includes('/taxa-complementar'));
+    const urlsTCN = paginas.some(p => p.url.includes('/taxa-lar'));
+    const urlsLAR = paginas.some(p => p.url.includes('/sucesso'));
+    
+    // Cálculo do total gasto
+    let total = 0;
+    if (urlsTRE) total += 74.90; // Taxa TRE
+    if (urlsTCN) total += 118.40; // Taxa TCN
+    if (urlsLAR) total += 48.60; // Taxa LAR
+    
+    return {
+      tre: urlsTRE,
+      tcn: urlsTCN,
+      lar: urlsLAR,
+      total: total
+    };
+  };
+  
+  // Calcular totais de vendas baseado nas estatísticas
+  const calcularTotalVendas = useMemo(() => {
+    if (!estatisticas || !Array.isArray(estatisticas)) {
+      return { trePagos: 0, tcnPagos: 0, larPagos: 0, totalVendas: 0 };
+    }
+    
+    // Encontrar as estatísticas de pagina relevantes
+    const taxaComplementar = estatisticas.find(e => e.pagina === '/taxa-complementar')?.total || 0;
+    const taxaLar = estatisticas.find(e => e.pagina === '/taxa-lar')?.total || 0;
+    const sucesso = estatisticas.find(e => e.pagina === '/sucesso')?.total || 0;
+    
+    // Calcular valores
+    const trePagos = taxaComplementar;
+    const tcnPagos = taxaLar;
+    const larPagos = sucesso;
+    
+    // Calcular total de vendas
+    const totalVendas = (trePagos * 74.90) + (tcnPagos * 118.40) + (larPagos * 48.60);
+    
+    return { trePagos, tcnPagos, larPagos, totalVendas };
+  }, [estatisticas]);
 
   // Atualizar os dados ao mudar de tab
   useEffect(() => {
@@ -239,70 +295,264 @@ export default function Admin() {
               
               {/* Detalhes do visitante selecionado */}
               {selectedVisitante && (
-                <Card className="mt-8">
-                  <CardHeader className="bg-gray-50">
-                    <CardTitle className="text-lg">
-                      Páginas Visitadas
-                    </CardTitle>
-                    <CardDescription>
-                      Histórico de navegação do visitante selecionado
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    {loadingPaginas ? (
-                      <div className="space-y-2">
-                        {[...Array(3)].map((_, i) => (
-                          <Skeleton key={i} className="h-10 w-full" />
-                        ))}
-                      </div>
-                    ) : paginasError ? (
-                      <Alert variant="destructive">
-                        <AlertTitle>Erro ao carregar histórico</AlertTitle>
-                        <AlertDescription>
-                          Ocorreu um erro ao buscar o histórico de navegação.
-                        </AlertDescription>
-                      </Alert>
-                    ) : !paginasVisitadas || !Array.isArray(paginasVisitadas) || paginasVisitadas.length === 0 ? (
-                      <Alert>
-                        <Info className="h-4 w-4" />
-                        <AlertTitle>Nenhuma página visitada</AlertTitle>
-                        <AlertDescription>
-                          Este visitante ainda não acessou nenhuma página.
-                        </AlertDescription>
-                      </Alert>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Página</TableHead>
-                              <TableHead>URL</TableHead>
-                              <TableHead>Data/Hora</TableHead>
-                              <TableHead>Dispositivo</TableHead>
-                              <TableHead>Referrer</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {paginasVisitadas.map((pagina: PaginaVisitada) => (
-                              <TableRow key={pagina.id}>
-                                <TableCell className="font-medium">{pagina.pagina}</TableCell>
-                                <TableCell className="text-sm truncate max-w-[200px]">{pagina.url}</TableCell>
-                                <TableCell>{formatarData(pagina.timestamp)}</TableCell>
-                                <TableCell>{pagina.dispositivo || 'N/A'}</TableCell>
-                                <TableCell className="text-sm truncate max-w-[200px]">{pagina.referrer || 'N/A'}</TableCell>
+                <>
+                  {/* Card de Pagamentos */}
+                  {!loadingPaginas && !paginasError && paginasVisitadas && Array.isArray(paginasVisitadas) && paginasVisitadas.length > 0 && (
+                    <Card className="mt-8 mb-8">
+                      <CardHeader className="bg-green-50">
+                        <CardTitle className="text-lg flex items-center">
+                          <DollarSign className="h-5 w-5 mr-2 text-green-600" />
+                          Status de Pagamentos
+                        </CardTitle>
+                        <CardDescription>
+                          Status de pagamento das taxas para o visitante selecionado
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-4">
+                        {/* Calcular o status de pagamento baseado nas páginas visitadas */}
+                        {(() => {
+                          const statusPagamento = verificarStatusPagamento(paginasVisitadas);
+                          return (
+                            <div className="space-y-6">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Taxa TRE */}
+                                <div className={`p-4 rounded-lg border ${statusPagamento.tre ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h3 className="text-sm font-medium">Taxa TRE</h3>
+                                    <Badge variant={statusPagamento.tre ? "default" : "destructive"}>
+                                      {statusPagamento.tre ? "PAGO" : "NÃO PAGO"}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xl font-bold">R$ 74,90</p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {statusPagamento.tre 
+                                      ? "Acesso à página /taxa-complementar detectado" 
+                                      : "Nenhum acesso à página /taxa-complementar"}
+                                  </p>
+                                </div>
+                                
+                                {/* Taxa TCN */}
+                                <div className={`p-4 rounded-lg border ${statusPagamento.tcn ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h3 className="text-sm font-medium">Taxa TCN</h3>
+                                    <Badge variant={statusPagamento.tcn ? "default" : "destructive"}>
+                                      {statusPagamento.tcn ? "PAGO" : "NÃO PAGO"}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xl font-bold">R$ 118,40</p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {statusPagamento.tcn 
+                                      ? "Acesso à página /taxa-lar detectado" 
+                                      : "Nenhum acesso à página /taxa-lar"}
+                                  </p>
+                                </div>
+                                
+                                {/* Taxa LAR */}
+                                <div className={`p-4 rounded-lg border ${statusPagamento.lar ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h3 className="text-sm font-medium">Taxa LAR</h3>
+                                    <Badge variant={statusPagamento.lar ? "default" : "destructive"}>
+                                      {statusPagamento.lar ? "PAGO" : "NÃO PAGO"}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xl font-bold">R$ 48,60</p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {statusPagamento.lar 
+                                      ? "Acesso à página /sucesso detectado" 
+                                      : "Nenhum acesso à página /sucesso"}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              {/* Total Gasto */}
+                              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h3 className="text-lg font-semibold mb-2">Total Gasto</h3>
+                                <p className="text-3xl font-bold text-blue-700">
+                                  R$ {statusPagamento.total.toFixed(2).replace('.', ',')}
+                                </p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {statusPagamento.total > 0 
+                                    ? `${statusPagamento.tre ? 'TRE' : ''}${statusPagamento.tre && (statusPagamento.tcn || statusPagamento.lar) ? ' + ' : ''}${statusPagamento.tcn ? 'TCN' : ''}${(statusPagamento.tre || statusPagamento.tcn) && statusPagamento.lar ? ' + ' : ''}${statusPagamento.lar ? 'LAR' : ''}`
+                                    : 'Nenhum pagamento detectado'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Card de Páginas Visitadas */}
+                  <Card className="mt-8">
+                    <CardHeader className="bg-gray-50">
+                      <CardTitle className="text-lg">
+                        Páginas Visitadas
+                      </CardTitle>
+                      <CardDescription>
+                        Histórico de navegação do visitante selecionado
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      {loadingPaginas ? (
+                        <div className="space-y-2">
+                          {[...Array(3)].map((_, i) => (
+                            <Skeleton key={i} className="h-10 w-full" />
+                          ))}
+                        </div>
+                      ) : paginasError ? (
+                        <Alert variant="destructive">
+                          <AlertTitle>Erro ao carregar histórico</AlertTitle>
+                          <AlertDescription>
+                            Ocorreu um erro ao buscar o histórico de navegação.
+                          </AlertDescription>
+                        </Alert>
+                      ) : !paginasVisitadas || !Array.isArray(paginasVisitadas) || paginasVisitadas.length === 0 ? (
+                        <Alert>
+                          <Info className="h-4 w-4" />
+                          <AlertTitle>Nenhuma página visitada</AlertTitle>
+                          <AlertDescription>
+                            Este visitante ainda não acessou nenhuma página.
+                          </AlertDescription>
+                        </Alert>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Página</TableHead>
+                                <TableHead>URL</TableHead>
+                                <TableHead>Data/Hora</TableHead>
+                                <TableHead>Dispositivo</TableHead>
+                                <TableHead>Referrer</TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                            </TableHeader>
+                            <TableBody>
+                              {paginasVisitadas.map((pagina: PaginaVisitada) => (
+                                <TableRow key={pagina.id}>
+                                  <TableCell className="font-medium">{pagina.pagina}</TableCell>
+                                  <TableCell className="text-sm truncate max-w-[200px]">{pagina.url}</TableCell>
+                                  <TableCell>{formatarData(pagina.timestamp)}</TableCell>
+                                  <TableCell>{pagina.dispositivo || 'N/A'}</TableCell>
+                                  <TableCell className="text-sm truncate max-w-[200px]">{pagina.referrer || 'N/A'}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </>
               )}
             </TabsContent>
             
             {/* Tab de Estatísticas */}
-            <TabsContent value="estatisticas">
+            <TabsContent value="estatisticas" className="space-y-8">
+              {/* Card de resumo financeiro */}
+              <Card>
+                <CardHeader className="bg-green-50 border-b">
+                  <CardTitle className="text-lg flex items-center">
+                    <DollarSign className="h-5 w-5 mr-2 text-green-600" />
+                    Resumo de Vendas
+                  </CardTitle>
+                  <CardDescription>
+                    Resumo financeiro baseado nos acessos às páginas de pagamento
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  {loadingEstatisticas ? (
+                    <div className="space-y-2">
+                      {[...Array(3)].map((_, i) => (
+                        <Skeleton key={i} className="h-10 w-full" />
+                      ))}
+                    </div>
+                  ) : estatisticasError ? (
+                    <Alert variant="destructive">
+                      <AlertTitle>Erro ao carregar estatísticas financeiras</AlertTitle>
+                      <AlertDescription>
+                        Ocorreu um erro ao calcular os dados financeiros.
+                      </AlertDescription>
+                    </Alert>
+                  ) : !estatisticas || !Array.isArray(estatisticas) ? (
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertTitle>Nenhuma estatística disponível</AlertTitle>
+                      <AlertDescription>
+                        Não há dados financeiros registrados.
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                      {/* Resumo TRE */}
+                      <div className="p-4 rounded-lg border bg-blue-50 border-blue-200">
+                        <h3 className="text-sm font-medium text-blue-800 mb-2">Taxa TRE (R$ 74,90)</h3>
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <p className="text-3xl font-bold text-blue-900">
+                              {calcularTotalVendas.trePagos}
+                            </p>
+                            <p className="text-sm text-blue-600">Unidades</p>
+                          </div>
+                          <p className="text-lg font-semibold text-blue-700">
+                            R$ {(calcularTotalVendas.trePagos * 74.9).toFixed(2).replace('.', ',')}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Resumo TCN */}
+                      <div className="p-4 rounded-lg border bg-indigo-50 border-indigo-200">
+                        <h3 className="text-sm font-medium text-indigo-800 mb-2">Taxa TCN (R$ 118,40)</h3>
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <p className="text-3xl font-bold text-indigo-900">
+                              {calcularTotalVendas.tcnPagos}
+                            </p>
+                            <p className="text-sm text-indigo-600">Unidades</p>
+                          </div>
+                          <p className="text-lg font-semibold text-indigo-700">
+                            R$ {(calcularTotalVendas.tcnPagos * 118.4).toFixed(2).replace('.', ',')}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Resumo LAR */}
+                      <div className="p-4 rounded-lg border bg-purple-50 border-purple-200">
+                        <h3 className="text-sm font-medium text-purple-800 mb-2">Taxa LAR (R$ 48,60)</h3>
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <p className="text-3xl font-bold text-purple-900">
+                              {calcularTotalVendas.larPagos}
+                            </p>
+                            <p className="text-sm text-purple-600">Unidades</p>
+                          </div>
+                          <p className="text-lg font-semibold text-purple-700">
+                            R$ {(calcularTotalVendas.larPagos * 48.6).toFixed(2).replace('.', ',')}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Total de vendas */}
+                      <div className="p-4 rounded-lg border bg-green-50 border-green-200">
+                        <h3 className="text-sm font-medium text-green-800 mb-2">Total de Vendas</h3>
+                        <div className="flex items-end justify-between">
+                          <div>
+                            <p className="text-3xl font-bold text-green-900">
+                              {calcularTotalVendas.trePagos + calcularTotalVendas.tcnPagos + calcularTotalVendas.larPagos}
+                            </p>
+                            <p className="text-sm text-green-600">Transações</p>
+                          </div>
+                          <p className="text-lg font-semibold text-green-700">
+                            R$ {calcularTotalVendas.totalVendas.toFixed(2).replace('.', ',')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Card de estatísticas de visualização */}
               <Card>
                 <CardHeader className="bg-gray-50">
                   <CardTitle className="text-lg">

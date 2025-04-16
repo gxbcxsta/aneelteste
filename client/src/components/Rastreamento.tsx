@@ -89,35 +89,10 @@ export default function Rastreamento() {
     rastrearPagina();
   }, [location, lastTrackedLocation]);
   
-  // Função para obter um título amigável da página baseado na rota
+  // Função para obter a URL exata da página para rastreamento
   function obterTituloPagina(rota: string): string {
-    // Mapeamento de rotas para títulos
-    const titulosPaginas: Record<string, string> = {
-      '/': 'Página Inicial',
-      '/verificar': 'Verificação de CPF',
-      '/confirmar-identidade': 'Confirmação de Identidade',
-      '/calculo': 'Cálculo de Restituição',
-      '/resultado': 'Resultado do Cálculo',
-      '/taxa-complementar': 'Taxa Complementar',
-      '/taxa-lar': 'Taxa LAR',
-      '/sucesso': 'Processo Completo (LAR)',
-      '/sucesso-padrao': 'Processo Completo (Regular)',
-      '/confirmacao': 'Confirmação de Pagamento',
-      '/consulta': 'Consulta de Protocolo',
-      '/admin': 'Painel de Administração',
-    };
-    
-    // Verificar se temos um título para a rota
-    if (titulosPaginas[rota]) {
-      return titulosPaginas[rota];
-    }
-    
-    // Para rotas desconhecidas, retornar uma versão formatada da rota
-    return rota
-      .replace('/', '')
-      .split('-')
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(' ') || 'Página Desconhecida';
+    // Retornar a URL exata conforme solicitado
+    return rota;
   }
   
   return null; // Este componente não renderiza nada visualmente
