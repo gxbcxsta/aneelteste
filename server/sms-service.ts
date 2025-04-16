@@ -81,18 +81,38 @@ export class SmsService {
       // Preparar a mensagem SMS
       const smsMessage = `Seu código de verificação para ANEEL ICMS Restituição é: ${otpCode}. Válido por 15 minutos.`;
       
+      // Preparar payload para a API
+      const payload = {
+        to: [formattedPhone],
+        message: smsMessage,
+        from: SMS_SENDER
+      };
+      
+      // Log detalhado do payload
+      console.log(`Enviando requisição para API SMS: ${SMS_API_URL}`);
+      console.log(`Payload da requisição:`, JSON.stringify(payload, null, 2));
+      
       // Enviar o SMS
       const response = await fetch(SMS_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          to: [formattedPhone],
-          message: smsMessage,
-          from: SMS_SENDER
-        })
+        body: JSON.stringify(payload)
       });
+      
+      // Log detalhado da resposta
+      const responseText = await response.text();
+      console.log(`Resposta da API SMS (status ${response.status}):`, responseText);
+      
+      // Tentar converter para JSON para facilitar a análise
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+        console.log(`Resposta da API em formato JSON:`, responseData);
+      } catch (e) {
+        console.log(`A resposta não é um JSON válido`);
+      }
       
       if (!response.ok) {
         console.error(`Erro ao enviar SMS: ${response.status} ${response.statusText}`);
@@ -101,7 +121,18 @@ export class SmsService {
         return { 
           success: false, 
           code: otpCode, // Em produção, remover esse retorno
-          message: `Erro ao enviar SMS: ${response.status}` 
+          message: `Erro ao enviar SMS: ${response.status}. Detalhes: ${responseText}` 
+        };
+      }
+      
+      // Se chegarmos até aqui, a resposta foi bem-sucedida, mas o SMS pode não ter sido enviado
+      // Vamos verificar a resposta para ter certeza
+      if (responseData && responseData.error) {
+        console.error(`Erro reportado pela API: ${JSON.stringify(responseData.error)}`);
+        return {
+          success: false,
+          code: otpCode,
+          message: `Erro reportado pela API: ${JSON.stringify(responseData.error)}`
         };
       }
       
