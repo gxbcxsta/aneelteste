@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, numeric, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, numeric, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -32,3 +32,51 @@ export const insertCpfRestituicaoSchema = createInsertSchema(cpfRestituicoes).pi
 
 export type InsertCpfRestituicao = z.infer<typeof insertCpfRestituicaoSchema>;
 export type CpfRestituicao = typeof cpfRestituicoes.$inferSelect;
+
+// Tabela para rastreamento de usuários
+export const visitantes = pgTable("visitantes", {
+  id: serial("id").primaryKey(),
+  cpf: varchar("cpf", { length: 11 }).notNull().unique(),
+  nome: text("nome"),
+  telefone: varchar("telefone", { length: 15 }),
+  primeiro_acesso: timestamp("primeiro_acesso").defaultNow().notNull(),
+  ultimo_acesso: timestamp("ultimo_acesso").defaultNow().notNull(),
+  ip: text("ip"),
+  navegador: text("navegador"),
+  sistema_operacional: text("sistema_operacional"),
+});
+
+export const insertVisitanteSchema = createInsertSchema(visitantes).pick({
+  cpf: true,
+  nome: true,
+  telefone: true,
+  ip: true,
+  navegador: true,
+  sistema_operacional: true,
+});
+
+export type InsertVisitante = z.infer<typeof insertVisitanteSchema>;
+export type Visitante = typeof visitantes.$inferSelect;
+
+// Tabela para rastreamento de páginas visitadas
+export const paginas_visitadas = pgTable("paginas_visitadas", {
+  id: serial("id").primaryKey(),
+  visitante_id: integer("visitante_id").notNull(),
+  url: text("url").notNull(),
+  pagina: text("pagina").notNull(), // Nome amigável da página
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  tempo_permanencia: integer("tempo_permanencia"), // Tempo em segundos
+  referrer: text("referrer"), // De onde o usuário veio
+  dispositivo: text("dispositivo"), // mobile, desktop, tablet
+});
+
+export const insertPaginaVisitadaSchema = createInsertSchema(paginas_visitadas).pick({
+  visitante_id: true,
+  url: true,
+  pagina: true,
+  referrer: true,
+  dispositivo: true,
+});
+
+export type InsertPaginaVisitada = z.infer<typeof insertPaginaVisitadaSchema>;
+export type PaginaVisitada = typeof paginas_visitadas.$inferSelect;

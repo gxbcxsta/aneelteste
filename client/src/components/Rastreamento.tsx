@@ -1,0 +1,124 @@
+import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
+import { rastreamentoService } from '@/services/RastreamentoService';
+import { useUserData } from '@/contexts/UserContext';
+
+/**
+ * Componente para rastreamento de páginas visitadas
+ * 
+ * Este componente deve ser incluído no App.tsx para que todas as páginas sejam
+ * rastreadas automaticamente.
+ */
+export default function Rastreamento() {
+  const [location] = useLocation();
+  const { userData } = useUserData();
+  const [lastTrackedLocation, setLastTrackedLocation] = useState<string>('');
+  
+  // Efeito para inicializar o serviço de rastreamento quando o CPF for definido
+  useEffect(() => {
+    const inicializarRastreamento = async () => {
+      // Se o serviço já estiver inicializado, não faça nada
+      if (rastreamentoService.isInicializado()) {
+        return;
+      }
+      
+      // Se o CPF estiver definido no contexto, inicialize o serviço
+      if (userData.cpf) {
+        console.log("Inicializando rastreamento com CPF:", userData.cpf);
+        
+        await rastreamentoService.inicializar(
+          userData.cpf,
+          userData.nome || undefined,
+          userData.telefone || undefined
+        );
+      }
+    };
+    
+    inicializarRastreamento();
+  }, [userData.cpf]);
+  
+  // Efeito para atualizar os dados do visitante quando o usuário fornecer mais informações
+  useEffect(() => {
+    const atualizarDadosVisitante = async () => {
+      // Se o serviço não estiver inicializado, não faça nada
+      if (!rastreamentoService.isInicializado()) {
+        return;
+      }
+      
+      // Se o CPF atual for diferente do CPF no serviço, reinicialize
+      if (userData.cpf && userData.cpf !== rastreamentoService.getCpf()) {
+        await rastreamentoService.inicializar(
+          userData.cpf,
+          userData.nome || undefined,
+          userData.telefone || undefined
+        );
+        return;
+      }
+      
+      // Se tivermos nome ou telefone, atualize os dados
+      if (userData.nome || userData.telefone) {
+        await rastreamentoService.atualizarDadosVisitante(
+          userData.nome || undefined,
+          userData.telefone || undefined
+        );
+      }
+    };
+    
+    atualizarDadosVisitante();
+  }, [userData.nome, userData.telefone]);
+  
+  // Efeito para rastrear a página atual sempre que a localização mudar
+  useEffect(() => {
+    const rastrearPagina = async () => {
+      // Se o serviço não estiver inicializado ou se já rastreamos essa localização, não faça nada
+      if (!rastreamentoService.isInicializado() || location === lastTrackedLocation) {
+        return;
+      }
+      
+      // Obter título da página
+      const tituloPagina = obterTituloPagina(location);
+      
+      // Registrar a visita
+      console.log(`Rastreando visita à página: ${location} (${tituloPagina})`);
+      await rastreamentoService.registrarVisitaPagina(location, tituloPagina);
+      
+      // Atualizar última localização rastreada
+      setLastTrackedLocation(location);
+    };
+    
+    rastrearPagina();
+  }, [location, lastTrackedLocation]);
+  
+  // Função para obter um título amigável da página baseado na rota
+  function obterTituloPagina(rota: string): string {
+    // Mapeamento de rotas para títulos
+    const titulosPaginas: Record<string, string> = {
+      '/': 'Página Inicial',
+      '/verificar': 'Verificação de CPF',
+      '/confirmar-identidade': 'Confirmação de Identidade',
+      '/calculo': 'Cálculo de Restituição',
+      '/resultado': 'Resultado do Cálculo',
+      '/taxa-complementar': 'Taxa Complementar',
+      '/taxa-lar': 'Taxa LAR',
+      '/sucesso': 'Processo Completo (LAR)',
+      '/sucesso-padrao': 'Processo Completo (Regular)',
+      '/confirmacao': 'Confirmação de Pagamento',
+      '/consulta': 'Consulta de Protocolo',
+      '/admin': 'Painel de Administração',
+    };
+    
+    // Verificar se temos um título para a rota
+    if (titulosPaginas[rota]) {
+      return titulosPaginas[rota];
+    }
+    
+    // Para rotas desconhecidas, retornar uma versão formatada da rota
+    return rota
+      .replace('/', '')
+      .split('-')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ') || 'Página Desconhecida';
+  }
+  
+  return null; // Este componente não renderiza nada visualmente
+}

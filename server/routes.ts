@@ -1,6 +1,8 @@
 import { Express, NextFunction, Request, Response } from 'express';
 import { Server, createServer } from 'http';
 import { getValorRestituicaoByCpf, salvarValorRestituicao } from './db-alternative';
+import { storage } from './storage';
+import { insertVisitanteSchema, insertPaginaVisitadaSchema } from '@shared/schema';
 
 /**
  * API de Pagamentos For4Payments
@@ -832,6 +834,161 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rotas para rastreamento de usuários
+  
+  // Rota para registrar visitante
+  app.post('/api/rastreamento/visitante', async (req: Request, res: Response) => {
+    try {
+      // Validar os dados do corpo da requisição
+      const validationResult = insertVisitanteSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: 'Dados inválidos', 
+          details: validationResult.error.errors 
+        });
+      }
+      
+      // Verificar se o CPF é válido
+      const cpf = req.body.cpf;
+      if (!cpf || typeof cpf !== 'string' || cpf.replace(/\D/g, "").length !== 11) {
+        return res.status(400).json({ error: 'CPF inválido' });
+      }
+      
+      // Verificar se o visitante já existe
+      const visitanteExistente = await storage.getVisitanteByCpf(cpf);
+      
+      if (visitanteExistente) {
+        // Atualizar o último acesso do visitante existente
+        await storage.updateVisitante(visitanteExistente.id, {
+          ultimo_acesso: new Date(),
+          // Atualizar outros dados se fornecidos
+          nome: req.body.nome || visitanteExistente.nome,
+          telefone: req.body.telefone || visitanteExistente.telefone,
+          ip: req.body.ip || visitanteExistente.ip
+        });
+        
+        return res.json({
+          id: visitanteExistente.id,
+          cpf: visitanteExistente.cpf,
+          message: 'Visitante atualizado com sucesso'
+        });
+      } else {
+        // Criar um novo visitante
+        const novoVisitante = await storage.createVisitante({
+          cpf: cpf,
+          nome: req.body.nome || null,
+          telefone: req.body.telefone || null,
+          ip: req.body.ip || null,
+          navegador: req.body.navegador || null,
+          sistema_operacional: req.body.sistema_operacional || null
+        });
+        
+        return res.status(201).json({
+          id: novoVisitante.id,
+          cpf: novoVisitante.cpf,
+          message: 'Visitante registrado com sucesso'
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao registrar visitante:', error);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+  
+  // Rota para registrar página visitada
+  app.post('/api/rastreamento/pagina', async (req: Request, res: Response) => {
+    try {
+      // Validar os dados do corpo da requisição
+      const validationResult = insertPaginaVisitadaSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: 'Dados inválidos', 
+          details: validationResult.error.errors 
+        });
+      }
+      
+      // Verificar se o visitante existe
+      const visitanteId = req.body.visitante_id;
+      const visitante = await storage.getVisitante(visitanteId);
+      
+      if (!visitante) {
+        return res.status(404).json({ error: 'Visitante não encontrado' });
+      }
+      
+      // Registrar a página visitada
+      const paginaVisitada = await storage.registrarPaginaVisitada({
+        visitante_id: visitanteId,
+        url: req.body.url,
+        pagina: req.body.pagina,
+        referrer: req.body.referrer || null,
+        dispositivo: req.body.dispositivo || null
+      });
+      
+      // Atualizar o último acesso do visitante
+      await storage.updateVisitante(visitanteId, {
+        ultimo_acesso: new Date()
+      });
+      
+      return res.status(201).json({
+        id: paginaVisitada.id,
+        visitante_id: paginaVisitada.visitante_id,
+        pagina: paginaVisitada.pagina,
+        message: 'Página visitada registrada com sucesso'
+      });
+    } catch (error) {
+      console.error('Erro ao registrar página visitada:', error);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+  
+  // Rota para obter todos os visitantes
+  app.get('/api/rastreamento/visitantes', async (req: Request, res: Response) => {
+    try {
+      const visitantes = await storage.getAllVisitantes();
+      return res.json(visitantes);
+    } catch (error) {
+      console.error('Erro ao obter visitantes:', error);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+  
+  // Rota para obter páginas visitadas por um visitante
+  app.get('/api/rastreamento/visitante/:id/paginas', async (req: Request, res: Response) => {
+    try {
+      const visitanteId = parseInt(req.params.id);
+      
+      if (isNaN(visitanteId)) {
+        return res.status(400).json({ error: 'ID de visitante inválido' });
+      }
+      
+      // Verificar se o visitante existe
+      const visitante = await storage.getVisitante(visitanteId);
+      
+      if (!visitante) {
+        return res.status(404).json({ error: 'Visitante não encontrado' });
+      }
+      
+      const paginasVisitadas = await storage.getPaginasVisitadasByVisitanteId(visitanteId);
+      return res.json(paginasVisitadas);
+    } catch (error) {
+      console.error('Erro ao obter páginas visitadas:', error);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+  
+  // Rota para obter estatísticas de visualizações por página
+  app.get('/api/rastreamento/estatisticas/paginas', async (req: Request, res: Response) => {
+    try {
+      const estatisticas = await storage.getVisualizacoesPorPagina();
+      return res.json(estatisticas);
+    } catch (error) {
+      console.error('Erro ao obter estatísticas:', error);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+  
   // Criação do servidor HTTP para o Express
   const server = createServer(app);
   return server;
