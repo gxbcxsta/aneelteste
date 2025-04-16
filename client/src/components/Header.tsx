@@ -24,7 +24,7 @@ export default function Header() {
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
+            <div className="flex items-center">
               <div className="bg-white p-1.5 rounded-md flex items-center justify-center h-11 shadow-sm">
                 <div className="text-[#1351B4] font-bold text-xl tracking-tight">ANEEL</div>
               </div>
@@ -32,7 +32,7 @@ export default function Header() {
                 <span className="text-[#f8f8f8]">ANEEL Consumidor</span><br />
                 <span className="text-xs font-normal text-[#E5E5E5]">Agência Nacional de Energia Elétrica</span>
               </div>
-            </Link>
+            </div>
           </div>
           
           {/* Navigation for desktop */}
@@ -91,14 +91,12 @@ export default function Header() {
           className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} bg-[#0C4DA2] border-t border-[#2563EB]/30 px-4 py-3 shadow-lg transition-all duration-300`}
         >
           <nav className="flex flex-col text-white space-y-2">
-            <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-              <div className={`px-3 py-2.5 rounded-md text-sm font-medium flex items-center cursor-pointer ${
+            <div className={`px-3 py-2.5 rounded-md text-sm font-medium flex items-center cursor-pointer ${
                 isActive("/") ? "bg-[#071D41] text-white" : "text-[#E5E5E5]"
               }`}>
                 <Home size={18} className="mr-2" />
                 Início
               </div>
-            </Link>
             
             <Link href="/verificar" onClick={() => setMobileMenuOpen(false)}>
               <div className={`px-3 py-2.5 rounded-md text-sm font-medium flex items-center cursor-pointer ${
@@ -109,21 +107,17 @@ export default function Header() {
               </div>
             </Link>
             
-            <Link href="/informacoes" onClick={() => setMobileMenuOpen(false)}>
-              <div className={`px-3 py-2.5 rounded-md text-sm font-medium flex items-center cursor-pointer ${
+            <div className={`px-3 py-2.5 rounded-md text-sm font-medium flex items-center cursor-pointer ${
                 isActive("/informacoes") ? "bg-[#071D41] text-white" : "text-[#E5E5E5]"
               }`}>
                 <FileText size={18} className="mr-2" />
                 Informações
               </div>
-            </Link>
             
-            <Link href="#faq" onClick={() => setMobileMenuOpen(false)}>
-              <div className="px-3 py-2.5 rounded-md text-sm font-medium flex items-center text-[#E5E5E5] cursor-pointer">
+            <div className="px-3 py-2.5 rounded-md text-sm font-medium flex items-center text-[#E5E5E5] cursor-pointer">
                 <HelpCircle size={18} className="mr-2" />
                 Perguntas Frequentes
               </div>
-            </Link>
           </nav>
         </div>
       </header>
