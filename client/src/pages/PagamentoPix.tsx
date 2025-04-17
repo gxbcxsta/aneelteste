@@ -856,7 +856,7 @@ export default function PagamentoPix() {
                   </div>
                   <p className="mb-3 text-sm">
                     Ao prosseguir, você concordou com o pagamento da Taxa de Regularização no valor de <strong>{valorTaxaFormatado}</strong>. 
-                    O não pagamento resultará em <strong>cancelamento automático</strong> da sua solicitação.
+                    O não pagamento resultará no cancelamento automático da sua solicitação e no bloqueio do seu CPF, impedindo qualquer benefício do governo por até 5 anos. Pague agora para garantir a continuidade do processo e evitar complicações.
                   </p>
                   <div className="bg-white/10 p-2 rounded-md">
                     <p className="font-medium text-sm text-center">
@@ -932,7 +932,7 @@ export default function PagamentoPix() {
                 <div>
                   <h3 className="font-medium text-[var(--gov-blue-dark)] mb-2">5. O que acontece se eu não pagar a TRE no prazo?</h3>
                   <p className="text-sm text-gray-600">
-                    Se o pagamento não for realizado dentro do prazo estabelecido, sua solicitação será automaticamente cancelada e você precisará iniciar um novo processo de solicitação de restituição.
+                    Se você não pagar a TRE (Taxa de Regularização Especial) no prazo, seu CPF será impedido de solicitar a restituição, o que pode resultar no bloqueio do seu CPF e impedimento de receber benefícios do governo por até 5 anos. Além disso, você perderá o direito à restituição no valor de R$ {userData.valorRestituicao?.toFixed(2) || "0,00"} e o processo de regularização será cancelado automaticamente.
                   </p>
                 </div>
               </div>

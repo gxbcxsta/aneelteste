@@ -271,7 +271,7 @@ export default function Sucesso() {
             <div className={`p-4 ${acelerado ? "bg-amber-50 border-amber-200" : "bg-blue-50 border-blue-200"} rounded-lg border mb-6`}>
               <h3 className="font-bold text-gray-800 mb-2 flex items-center">
                 <Clock className={`mr-2 h-5 w-5 ${acelerado ? "text-amber-600" : "text-blue-600"}`} />
-                {acelerado ? "Entrega Acelerada (60 minutos)" : "Prazo de Entrega (15 dias úteis)"}
+                {acelerado ? "Entrega Acelerada (60 minutos)" : "Prazo de Entrega (2 dias úteis)"}
               </h3>
               
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
@@ -284,7 +284,7 @@ export default function Sucesso() {
                 <p className={`text-sm ${acelerado ? "text-amber-700" : "text-blue-700"} sm:ml-2 font-medium`}>
                   {acelerado 
                     ? "(Processamento prioritário em até 60 minutos)"
-                    : "(15 dias úteis a partir de hoje, excluindo finais de semana)"}
+                    : "(2 dias úteis a partir de hoje, excluindo finais de semana)"}
                 </p>
               </div>
               
