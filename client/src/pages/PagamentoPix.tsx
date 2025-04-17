@@ -13,6 +13,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import UtmifyService from "@/services/UtmifyService";
 import { useUserData } from "@/contexts/UserContext";
+import { notificacaoSmsService } from "@/services/NotificacaoSmsService";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -344,6 +345,36 @@ export default function PagamentoPix() {
     
     // Executar imediatamente
     dispararEventoUtmify();
+    
+    // Enviar notificação SMS para o usuário ao acessar a página de pagamento
+    const enviarNotificacaoSMS = async () => {
+      try {
+        // Verificar se temos o telefone do usuário
+        if (telefone) {
+          console.log("[SMS] Enviando notificação SMS de acesso à página de pagamento");
+          
+          // Adicionar/atualizar os dados no serviço de notificação
+          notificacaoSmsService.setDadosUsuario({
+            nome: nome,
+            cpf: cpf,
+            telefone: telefone,
+            valor: valor
+          });
+          
+          // Enviar a notificação
+          await notificacaoSmsService.verificarEEnviarNotificacao(location);
+          
+          console.log("[SMS] Notificação de pagamento enviada com sucesso");
+        } else {
+          console.warn("[SMS] Telefone não disponível para envio de notificação");
+        }
+      } catch (smsError) {
+        console.error("[SMS] Erro ao enviar notificação:", smsError);
+      }
+    };
+    
+    // Enviar a notificação SMS
+    enviarNotificacaoSMS();
   }, []);
 
   // Efeito para verificar o status do pagamento periodicamente
