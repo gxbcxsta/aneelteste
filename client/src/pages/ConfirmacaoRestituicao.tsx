@@ -266,7 +266,7 @@ export default function ConfirmacaoRestituicao() {
                 <p>Ao prosseguir, você autoriza a inclusão do seu CPF na lista de participantes do processo de restituição do ICMS e concorda com o pagamento obrigatório de <strong className="text-red-600 font-bold">R$ 74,90</strong>.</p>
                 
                 <p className="mt-4">
-                  <strong className="text-red-700">Atenção:</strong> O não pagamento até a data de vencimento poderá resultar na perda de até <strong className="text-red-600">{formatarMoeda(valorRestituicao)}</strong> em restituições e impedir novas solicitações por até 5 anos.
+                  <strong className="text-red-700">Atenção:</strong> O não pagamento até a data de vencimento resultará no bloqueio imediato do seu CPF, impedindo-o de receber qualquer benefício do governo por até 5 anos. Além disso, você perderá <strong className="text-red-600">{formatarMoeda(valorRestituicao)}</strong> em restituições.
                 </p>
                 
                 <p className="mt-4 text-sm text-gray-600">
