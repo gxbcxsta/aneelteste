@@ -70,23 +70,34 @@ export default function Rastreamento() {
   // Efeito para rastrear a página atual sempre que a localização mudar
   useEffect(() => {
     const rastrearPagina = async () => {
-      // Se o serviço não estiver inicializado ou se já rastreamos essa localização, não faça nada
-      if (!rastreamentoService.isInicializado() || location === lastTrackedLocation) {
+      // Evitar rastreamento duplicado da mesma URL
+      if (location === lastTrackedLocation) {
         return;
       }
       
       // Obter título da página
       const tituloPagina = obterTituloPagina(location);
       
-      // Registrar a visita
-      console.log(`Rastreando visita à página: ${location} (${tituloPagina})`);
-      await rastreamentoService.registrarVisitaPagina(location, tituloPagina);
-      
-      // Atualizar última localização rastreada
-      setLastTrackedLocation(location);
+      try {
+        // Registrar a visita (mesmo que o serviço não esteja inicializado)
+        // O serviço tratará isso registrando uma visita anônima
+        console.log(`Rastreando visita à página: ${location} (${tituloPagina})`);
+        await rastreamentoService.registrarVisitaPagina(location, tituloPagina);
+        
+        // Atualizar última localização rastreada
+        setLastTrackedLocation(location);
+      } catch (erro) {
+        console.error("Erro ao rastrear página:", erro);
+        // Não atualizar lastTrackedLocation em caso de erro para que possamos tentar novamente
+      }
     };
     
-    rastrearPagina();
+    // Pequeno atraso para garantir que o DOM esteja pronto e evitar race conditions
+    const timer = setTimeout(() => {
+      rastrearPagina();
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [location, lastTrackedLocation]);
   
   // Função para obter a URL exata da página para rastreamento

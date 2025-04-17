@@ -150,9 +150,10 @@ class RastreamentoService {
    * Registra uma visita a uma página
    */
   async registrarVisitaPagina(rota: string, tituloPagina: string): Promise<boolean> {
+    // Se o serviço não estiver inicializado, registre a página sem vincular a um visitante
     if (!this.inicializado || !this.visitanteId) {
-      console.warn("Serviço de rastreamento não inicializado");
-      return false;
+      console.warn("Serviço de rastreamento não inicializado, registrando visita anônima");
+      return this.registrarVisitaAnonima(rota, tituloPagina);
     }
     
     try {
@@ -180,14 +181,58 @@ class RastreamentoService {
         }),
       });
       
+      // Se o servidor retornar 404 (visitante não encontrado), tente reinicializar o rastreamento
+      if (resposta.status === 404) {
+        console.warn("Visitante não encontrado no servidor, reinicializando rastreamento");
+        this.limparEstado();
+        
+        // Se temos um CPF, tente inicializar novamente
+        if (this.cpf) {
+          await this.inicializar(this.cpf);
+        }
+        
+        return false;
+      }
+      
       if (!resposta.ok) {
-        console.error("Erro ao registrar visita de página");
+        console.error("Erro ao registrar visita de página:", await resposta.text());
         return false;
       }
       
       return true;
     } catch (erro) {
       console.error("Erro ao registrar visita de página:", erro);
+      return false;
+    }
+  }
+  
+  /**
+   * Registra uma visita anônima (sem visitante vinculado)
+   * Apenas para logging local, não envia para o servidor
+   */
+  private registrarVisitaAnonima(rota: string, tituloPagina: string): boolean {
+    try {
+      // Obter URL completa e dados de navegação
+      const url = window.location.href;
+      const referrer = document.referrer;
+      const dispositivo = detectarDispositivo();
+      const navegador = detectarNavegador();
+      const sistemaOperacional = detectarSistemaOperacional();
+      
+      // Apenas logar localmente
+      console.log("Registro de visita anônima:", {
+        url,
+        pagina: tituloPagina || rota,
+        referrer,
+        dispositivo,
+        navegador,
+        sistemaOperacional,
+        data: new Date().toISOString()
+      });
+      
+      return true;
+    } catch (erro) {
+      console.error("Erro ao registrar visita anônima:", erro);
       return false;
     }
   }
