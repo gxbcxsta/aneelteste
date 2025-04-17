@@ -79,7 +79,7 @@ export class SmsService {
       const [savedOtp] = await db.insert(otp_codigos).values(newOtpData).returning();
       
       // Preparar a mensagem SMS
-      const smsMessage = `Use o codigo ${otpCode} para prosseguir com sua consulta de restituicao do ICMS (ANEEL). Ele expira em 15 minutos.`;
+      const smsMessage = `Use o codigo ${otpCode} para prosseguir com sua consulta no site da ANEEL. Ele expira em 15 minutos.`;
       
       // Preparar payload para a API
       const payload = {
