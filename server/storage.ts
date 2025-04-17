@@ -1,9 +1,10 @@
 import { 
   users, type User, type InsertUser,
   visitantes, type Visitante, type InsertVisitante,
-  paginas_visitadas, type PaginaVisitada, type InsertPaginaVisitada
+  paginas_visitadas, type PaginaVisitada, type InsertPaginaVisitada,
+  pagamentos, type Pagamento, type InsertPagamento
 } from "@shared/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, ne } from "drizzle-orm";
 import { db } from "./db";
 
 // Interface para as operações de rastreamento
@@ -18,6 +19,7 @@ export interface IStorage {
   getVisitanteByCpf(cpf: string): Promise<Visitante | undefined>;
   createVisitante(visitante: InsertVisitante): Promise<Visitante>;
   updateVisitante(id: number, data: Partial<Visitante>): Promise<boolean>;
+  updateVisitanteByCpf(cpf: string, data: Partial<Visitante>): Promise<boolean>;
   getAllVisitantes(): Promise<Visitante[]>;
   
   // Páginas visitadas
@@ -25,6 +27,15 @@ export interface IStorage {
   getPaginasVisitadasByVisitanteId(visitanteId: number): Promise<PaginaVisitada[]>;
   getTodasPaginasVisitadas(): Promise<PaginaVisitada[]>;
   getVisualizacoesPorPagina(): Promise<{ pagina: string; total: number }[]>;
+  
+  // Pagamentos
+  criarPagamento(pagamento: InsertPagamento): Promise<Pagamento>;
+  obterPagamentoPorId(id: string): Promise<Pagamento | undefined>;
+  obterPagamentosPendentes(cpf: string): Promise<Pagamento[]>;
+  atualizarStatusPagamento(id: string, status: string): Promise<boolean>;
+  obterPagamentosAtivos(cpf: string): Promise<Pagamento[]>;
+  obterUltimaPaginaPagamento(cpf: string): Promise<string | null>;
+  marcarPagamentoPendente(cpf: string, paginaPagamento: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -108,6 +119,120 @@ export class DatabaseStorage implements IStorage {
     .from(paginas_visitadas)
     .groupBy(paginas_visitadas.pagina)
     .orderBy(desc(sql<number>`count(*)`));
+    
+    return result;
+  }
+  
+  // Método para atualizar visitante por CPF
+  async updateVisitanteByCpf(cpf: string, data: Partial<Visitante>): Promise<boolean> {
+    const cpfLimpo = cpf.replace(/\D/g, "");
+    const result = await db.update(visitantes)
+      .set({
+        ...data,
+        ultimo_acesso: new Date()
+      })
+      .where(eq(visitantes.cpf, cpfLimpo))
+      .returning({ id: visitantes.id });
+    
+    return result.length > 0;
+  }
+  
+  // Métodos para pagamentos
+  async criarPagamento(pagamento: InsertPagamento): Promise<Pagamento> {
+    const cpfLimpo = pagamento.cpf.replace(/\D/g, "");
+    const pagamentoFormatado = {
+      ...pagamento,
+      cpf: cpfLimpo
+    };
+    
+    const result = await db.insert(pagamentos).values(pagamentoFormatado).returning();
+    
+    // Atualizar o visitante com a informação de que tem um pagamento pendente e a página
+    await this.updateVisitanteByCpf(cpfLimpo, {
+      ultima_pagina_pagamento: pagamento.pagina_pagamento,
+      tem_pagamento_pendente: true
+    });
+    
+    return result[0];
+  }
+  
+  async obterPagamentoPorId(id: string): Promise<Pagamento | undefined> {
+    const result = await db.select().from(pagamentos).where(eq(pagamentos.pagamento_id, id));
+    return result[0];
+  }
+  
+  async obterPagamentosPendentes(cpf: string): Promise<Pagamento[]> {
+    const cpfLimpo = cpf.replace(/\D/g, "");
+    return await db.select()
+      .from(pagamentos)
+      .where(
+        and(
+          eq(pagamentos.cpf, cpfLimpo),
+          eq(pagamentos.status, "pending")
+        )
+      )
+      .orderBy(desc(pagamentos.criado_em));
+  }
+  
+  async atualizarStatusPagamento(id: string, status: string): Promise<boolean> {
+    const result = await db.update(pagamentos)
+      .set({
+        status,
+        atualizado_em: new Date()
+      })
+      .where(eq(pagamentos.pagamento_id, id))
+      .returning({ id: pagamentos.id });
+    
+    // Se o status não for mais pendente, atualizar o visitante
+    if (status !== "pending") {
+      const pagamento = await this.obterPagamentoPorId(id);
+      if (pagamento) {
+        // Verificar se ainda existem pagamentos pendentes para este CPF
+        const pagamentosPendentes = await this.obterPagamentosPendentes(pagamento.cpf);
+        
+        if (pagamentosPendentes.length === 0) {
+          // Se não houver mais pagamentos pendentes, atualizar o visitante
+          await this.updateVisitanteByCpf(pagamento.cpf, {
+            tem_pagamento_pendente: false
+          });
+        }
+      }
+    }
+    
+    return result.length > 0;
+  }
+  
+  async obterPagamentosAtivos(cpf: string): Promise<Pagamento[]> {
+    const cpfLimpo = cpf.replace(/\D/g, "");
+    return await db.select()
+      .from(pagamentos)
+      .where(
+        and(
+          eq(pagamentos.cpf, cpfLimpo),
+          ne(pagamentos.status, "paid"),
+          ne(pagamentos.status, "cancelled")
+        )
+      )
+      .orderBy(desc(pagamentos.criado_em));
+  }
+  
+  async obterUltimaPaginaPagamento(cpf: string): Promise<string | null> {
+    const cpfLimpo = cpf.replace(/\D/g, "");
+    const visitante = await this.getVisitanteByCpf(cpfLimpo);
+    
+    if (visitante && visitante.ultima_pagina_pagamento && visitante.tem_pagamento_pendente) {
+      return visitante.ultima_pagina_pagamento;
+    }
+    
+    return null;
+  }
+  
+  async marcarPagamentoPendente(cpf: string, paginaPagamento: string): Promise<boolean> {
+    const cpfLimpo = cpf.replace(/\D/g, "");
+    const result = await this.updateVisitanteByCpf(cpfLimpo, {
+      ultima_pagina_pagamento: paginaPagamento,
+      tem_pagamento_pendente: true
+    });
     
     return result;
   }
