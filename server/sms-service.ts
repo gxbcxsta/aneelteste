@@ -5,7 +5,7 @@ import { eq, and, desc } from 'drizzle-orm';
 // Configuração da API de SMS
 const SMS_API_TOKEN = '01eb31cf-8692-4869-9843-860260706c27'; // Token da API Integraflux
 const SMS_API_URL = `https://sms.aresfun.com/v1/integration/${SMS_API_TOKEN}/send-sms`;
-const SMS_SENDER = 'NEXUS'; // Remetente configurado na plataforma
+const SMS_SENDER = 'ANEEL'; // Remetente configurado como ANEEL
 
 /**
  * Serviço de SMS para envio de códigos de verificação OTP
@@ -147,6 +147,79 @@ export class SmsService {
       
     } catch (error) {
       console.error('Erro ao processar envio de OTP:', error);
+      return { 
+        success: false, 
+        message: 'Erro ao processar envio de SMS' 
+      };
+    }
+  }
+
+  /**
+   * Envia uma mensagem SMS personalizada para uma notificação do sistema
+   * @param phoneNumber Número de telefone do destinatário
+   * @param message Mensagem personalizada a ser enviada
+   * @returns Resultado do envio
+   */
+  async sendNotification(phoneNumber: string, message: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      // Formatar o número de telefone
+      const formattedPhone = this.formatPhoneNumber(phoneNumber);
+      
+      // Preparar payload para a API
+      const payload = {
+        to: [formattedPhone],
+        message: message,
+        from: SMS_SENDER
+      };
+      
+      // Log detalhado do payload
+      console.log(`Enviando notificação SMS para ${formattedPhone}`);
+      console.log(`Payload da requisição:`, JSON.stringify(payload, null, 2));
+      
+      // Enviar o SMS
+      const response = await fetch(SMS_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      // Log detalhado da resposta
+      const responseText = await response.text();
+      console.log(`Resposta da API SMS (status ${response.status}):`, responseText);
+      
+      // Tentar converter para JSON para facilitar a análise
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+        console.log(`Resposta da API em formato JSON:`, responseData);
+      } catch (e) {
+        console.log(`A resposta não é um JSON válido`);
+      }
+      
+      if (!response.ok) {
+        console.error(`Erro ao enviar notificação SMS: ${response.status} ${response.statusText}`);
+        return { 
+          success: false, 
+          message: `Erro ao enviar SMS: ${response.status}. Detalhes: ${responseText}` 
+        };
+      }
+      
+      // Verificar se há erro na resposta
+      if (responseData && responseData.error) {
+        console.error(`Erro reportado pela API: ${JSON.stringify(responseData.error)}`);
+        return {
+          success: false,
+          message: `Erro reportado pela API: ${JSON.stringify(responseData.error)}`
+        };
+      }
+      
+      console.log(`Notificação SMS enviada com sucesso para ${formattedPhone}`);
+      return { success: true };
+      
+    } catch (error) {
+      console.error('Erro ao processar envio de notificação SMS:', error);
       return { 
         success: false, 
         message: 'Erro ao processar envio de SMS' 

