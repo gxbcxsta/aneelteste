@@ -315,8 +315,52 @@ export default function PagamentoPix() {
 
   // Efeito para criar o pagamento e disparar evento para Utmify quando a página carregar
   useEffect(() => {
-    // Criar o pagamento PIX
-    criarPagamento();
+    // Verificar se há um pagamento pendente salvo no localStorage
+    try {
+      // Verificar se há dados de pagamento no localStorage (redirecionamento)
+      const dadosPagamentoSalvos = localStorage.getItem('dadosPagamento');
+      
+      if (dadosPagamentoSalvos) {
+        const pagamentoSalvo = JSON.parse(dadosPagamentoSalvos);
+        console.log("[PagamentoPix] Dados de pagamento pendente encontrados:", pagamentoSalvo);
+        
+        // Verificar se temos os dados necessários
+        if (pagamentoSalvo.pagamento_id && pagamentoSalvo.codigo_pix && pagamentoSalvo.qrcode_pix) {
+          // Usar os dados do pagamento pendente
+          setPaymentInfo({
+            id: pagamentoSalvo.pagamento_id,
+            pixCode: pagamentoSalvo.codigo_pix,
+            pixQrCode: pagamentoSalvo.qrcode_pix,
+            expiresAt: pagamentoSalvo.expira_em || new Date(Date.now() + 20 * 60 * 1000).toISOString(),
+            status: pagamentoSalvo.status || 'pending'
+          });
+          setCodigoPix(pagamentoSalvo.codigo_pix);
+          setPaymentStatus(pagamentoSalvo.status || 'pending');
+          
+          // Limpar os dados do localStorage para não usá-los novamente
+          localStorage.removeItem('dadosPagamento');
+          
+          // Exibir toast informativo
+          toast({
+            title: "Pagamento pendente",
+            description: "Seu pagamento está em andamento. Complete-o para prosseguir.",
+            variant: "default"
+          });
+          
+          // Não criar um novo pagamento, mas ainda registramos o evento na Utmify
+        } else {
+          // Se não tiver dados completos, criar um novo pagamento
+          criarPagamento();
+        }
+      } else {
+        // Se não tiver dados de pagamento no localStorage, cria um novo pagamento
+        criarPagamento();
+      }
+    } catch (error) {
+      console.error("[PagamentoPix] Erro ao processar dados de pagamento pendente:", error);
+      // Em caso de erro, criar um novo pagamento de qualquer forma
+      criarPagamento();
+    }
     
     // Disparar evento para Utmify imediatamente quando a página é carregada (status: "waiting_payment")
     const dispararEventoUtmify = async () => {
