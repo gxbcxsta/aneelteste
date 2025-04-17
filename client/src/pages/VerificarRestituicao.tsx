@@ -853,7 +853,7 @@ export default function VerificarRestituicao() {
                               className="text-blue-600 hover:text-blue-800 hover:underline"
                               disabled={showLoading}
                             >
-                              Não recebeu o SMS? Clique aqui para continuar
+                              Reenviar código
                             </button>
                           ) : (
                             <button
