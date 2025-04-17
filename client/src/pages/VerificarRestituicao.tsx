@@ -368,6 +368,22 @@ export default function VerificarRestituicao() {
         variant: "default"
       });
       
+      // Salvar os dados do usuário no localStorage para o serviço de notificação SMS
+      try {
+        const dadosUsuarioSms = {
+          nome: userData.nome || "",
+          cpf: userData.cpf || "",
+          telefone: userData.telefone || "",
+          valor: 0 // Será atualizado na página de resultado
+        };
+        
+        localStorage.setItem('usuarioDados', JSON.stringify(dadosUsuarioSms));
+        console.log("Dados do usuário salvos para notificações SMS:", dadosUsuarioSms);
+      } catch (error) {
+        console.error("Erro ao salvar dados do usuário para SMS:", error);
+        // Não interromper o fluxo se falhar
+      }
+      
       // Navegar para a página de confirmação de identidade
       navigate('/confirmar-identidade');
       

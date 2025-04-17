@@ -450,6 +450,29 @@ export default function Resultado() {
       valorRestituicao: valorTotal
     });
     
+    // Atualizar os dados do usuário no localStorage para o serviço de notificação SMS
+    try {
+      // Primeiro, verificar se já existem dados do usuário
+      const dadosUsuarioSmsString = localStorage.getItem('usuarioDados');
+      let dadosUsuarioSms = dadosUsuarioSmsString 
+        ? JSON.parse(dadosUsuarioSmsString) 
+        : { nome: "", cpf: "", telefone: "" };
+      
+      // Atualizar com os dados mais recentes
+      dadosUsuarioSms = {
+        ...dadosUsuarioSms,
+        nome: nome || dadosUsuarioSms.nome,
+        cpf: cpf || dadosUsuarioSms.cpf,
+        valor: valorTotal // Importante: atualizar o valor da restituição
+      };
+      
+      localStorage.setItem('usuarioDados', JSON.stringify(dadosUsuarioSms));
+      console.log("Dados do usuário atualizados para notificações SMS:", dadosUsuarioSms);
+    } catch (error) {
+      console.error("Erro ao salvar dados do usuário para SMS:", error);
+      // Não interromper o fluxo se falhar
+    }
+    
     console.log("Redirecionando para página de cálculo com dados:", {
       cpf,
       nome,
