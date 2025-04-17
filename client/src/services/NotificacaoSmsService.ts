@@ -81,6 +81,26 @@ export class NotificacaoSmsService {
       return false;
     }
     
+    // Atualizar sempre os dados mais recentes do localStorage
+    try {
+      const localStorageData = localStorage.getItem('usuarioDados');
+      if (localStorageData) {
+        const parsedData = JSON.parse(localStorageData);
+        if (parsedData.cpf && parsedData.telefone && parsedData.nome) {
+          // Sobrescrever os dados do singleton com os dados mais recentes do localStorage
+          this.dadosUsuario = {
+            nome: parsedData.nome,
+            cpf: parsedData.cpf,
+            telefone: parsedData.telefone,
+            valor: parsedData.valor || 0
+          };
+          console.log("Dados do usuário atualizados do localStorage para SMS:", this.dadosUsuario);
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados do localStorage para SMS:", error);
+    }
+    
     // Se não temos os dados do usuário, não podemos enviar a notificação
     if (!this.dadosUsuario) {
       console.log("Dados do usuário não configurados para enviar notificação SMS.");
