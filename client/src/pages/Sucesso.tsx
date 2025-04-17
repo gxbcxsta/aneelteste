@@ -40,22 +40,15 @@ const obterDataPrevisaoDeposito = (acelerado: boolean) => {
       minute: '2-digit'
     });
   } else {
-    // Se não acelerado, adicionar 2 dias úteis (excluindo finais de semana)
-    let diasUteis = 0;
-    
-    // Adicionar dias até atingir 2 dias úteis
-    while (diasUteis < 2) {
-      data.setDate(data.getDate() + 1);
-      // Verifica se não é sábado (6) nem domingo (0)
-      if (data.getDay() !== 0 && data.getDay() !== 6) {
-        diasUteis++;
-      }
-    }
+    // Se não acelerado, adicionar 1 hora (mesmo prazo do acelerado)
+    data.setHours(data.getHours() + 1);
     
     return data.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 };
@@ -271,7 +264,7 @@ export default function Sucesso() {
             <div className={`p-4 ${acelerado ? "bg-amber-50 border-amber-200" : "bg-blue-50 border-blue-200"} rounded-lg border mb-6`}>
               <h3 className="font-bold text-gray-800 mb-2 flex items-center">
                 <Clock className={`mr-2 h-5 w-5 ${acelerado ? "text-amber-600" : "text-blue-600"}`} />
-                {acelerado ? "Entrega Acelerada (60 minutos)" : "Prazo de Entrega (2 dias úteis)"}
+                {acelerado ? "Entrega Acelerada (60 minutos)" : "Prazo de Entrega (60 minutos)"}
               </h3>
               
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
@@ -284,14 +277,14 @@ export default function Sucesso() {
                 <p className={`text-sm ${acelerado ? "text-amber-700" : "text-blue-700"} sm:ml-2 font-medium`}>
                   {acelerado 
                     ? "(Processamento prioritário em até 60 minutos)"
-                    : "(2 dias úteis a partir de hoje, excluindo finais de semana)"}
+                    : "(Processamento em até 60 minutos)"}
                 </p>
               </div>
               
               <p className={`text-sm ${acelerado ? "text-amber-700" : "text-blue-700"}`}>
                 {acelerado
                   ? "Você optou pela Liberação Acelerada de Restituição (LAR). Seu pagamento será processado com prioridade e você receberá o valor em até 60 minutos."
-                  : "Seu valor de restituição será processado e depositado no prazo regular conforme a disponibilidade de fundos."}
+                  : "Seu valor de restituição será processado e depositado no prazo de até 60 minutos conforme a disponibilidade de fundos."}
               </p>
             </div>
             
@@ -321,7 +314,7 @@ export default function Sucesso() {
                 <p className="text-sm text-gray-600">
                   {acelerado
                     ? "Você optou pela Liberação Acelerada, por isso seu pagamento será processado e depositado em até 60 minutos."
-                    : "O prazo padrão para pagamento é de até 2 dias úteis, dependendo do volume de solicitações."}
+                    : "O prazo padrão para pagamento é de até 60 minutos, dependendo do volume de solicitações."}
                 </p>
               </div>
               
