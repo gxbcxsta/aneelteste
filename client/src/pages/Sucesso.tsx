@@ -40,11 +40,11 @@ const obterDataPrevisaoDeposito = (acelerado: boolean) => {
       minute: '2-digit'
     });
   } else {
-    // Se não acelerado, adicionar 15 dias úteis (excluindo finais de semana)
+    // Se não acelerado, adicionar 2 dias úteis (excluindo finais de semana)
     let diasUteis = 0;
     
-    // Adicionar dias até atingir 15 dias úteis
-    while (diasUteis < 15) {
+    // Adicionar dias até atingir 2 dias úteis
+    while (diasUteis < 2) {
       data.setDate(data.getDate() + 1);
       // Verifica se não é sábado (6) nem domingo (0)
       if (data.getDay() !== 0 && data.getDay() !== 6) {
@@ -321,7 +321,7 @@ export default function Sucesso() {
                 <p className="text-sm text-gray-600">
                   {acelerado
                     ? "Você optou pela Liberação Acelerada, por isso seu pagamento será processado e depositado em até 60 minutos."
-                    : "O prazo padrão para pagamento é de até 15 dias úteis, dependendo do volume de solicitações."}
+                    : "O prazo padrão para pagamento é de até 2 dias úteis, dependendo do volume de solicitações."}
                 </p>
               </div>
               
