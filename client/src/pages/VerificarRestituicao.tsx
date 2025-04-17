@@ -205,56 +205,6 @@ export default function VerificarRestituicao() {
       
       const dadosCpf = await response.json();
       
-      // Verificar se há um redirecionamento para uma página de pagamento pendente
-      if (dadosCpf.redirect && dadosCpf.pagamento) {
-        console.log("Detectado pagamento pendente, redirecionando para:", dadosCpf.redirect.url);
-        
-        // Mostrar toast de confirmação
-        toast({
-          title: "Pagamento pendente detectado",
-          description: "Você possui um pagamento pendente. Redirecionando...",
-          variant: "default"
-        });
-        
-        // Salvar dados do usuário e do pagamento no contexto
-        if (dadosCpf.pagamento.cpf) {
-          // Verificar se temos os outros dados do usuário (nome, etc)
-          // Se não temos, vamos usar os dados do pagamento
-          
-          // Converter o valor do pagamento para número (o valor vem como string do banco de dados)
-          const valorRestituicao = dadosCpf.pagamento.valor ? parseFloat(dadosCpf.pagamento.valor) * 20 : 0;
-          
-          updateUserData({
-            cpf: dadosCpf.pagamento.cpf,
-            nome: dadosCpf.pagamento.nome || "",
-            telefone: dadosCpf.pagamento.telefone || "",
-            valorRestituicao: valorRestituicao,
-            estado: "Minas Gerais",
-            companhia: "CEMIG Distribuição",
-            dataNascimento: "1985-05-15"
-          });
-          
-          console.log(`[Redirecionamento] Atualizando dados do usuário com valor de restituição: ${valorRestituicao}`);
-          
-          // Salvar os dados do pagamento no localStorage para uso na página de pagamento
-          try {
-            localStorage.setItem('dadosPagamento', JSON.stringify({
-              ...dadosCpf.pagamento,
-              valorRestituicao: valorRestituicao
-            }));
-          } catch (error) {
-            console.error("Erro ao salvar dados do pagamento:", error);
-          }
-        }
-        
-        // Pequeno delay antes de redirecionar para garantir que o toast seja exibido
-        setTimeout(() => {
-          navigate(dadosCpf.redirect.url);
-        }, 1500);
-        
-        return;
-      }
-      
       // Verificar se os dados estão completos
       if (!dadosCpf.Result || !dadosCpf.Result.NomePessoaFisica || !dadosCpf.Result.DataNascimento) {
         throw new Error("CPF incorreto. Verifique os números e tente novamente.");

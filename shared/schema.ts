@@ -44,8 +44,6 @@ export const visitantes = pgTable("visitantes", {
   ip: text("ip"),
   navegador: text("navegador"),
   sistema_operacional: text("sistema_operacional"),
-  ultima_pagina_pagamento: text("ultima_pagina_pagamento"), // Guarda a última página de pagamento acessada
-  tem_pagamento_pendente: boolean("tem_pagamento_pendente").default(false),
 });
 
 export const insertVisitanteSchema = createInsertSchema(visitantes).pick({
@@ -103,34 +101,3 @@ export const insertOtpCodigoSchema = createInsertSchema(otp_codigos).pick({
 
 export type InsertOtpCodigo = z.infer<typeof insertOtpCodigoSchema>;
 export type OtpCodigo = typeof otp_codigos.$inferSelect;
-
-// Tabela para rastrear pagamentos
-export const pagamentos = pgTable("pagamentos", {
-  id: serial("id").primaryKey(),
-  cpf: varchar("cpf", { length: 11 }).notNull(),
-  pagamento_id: text("pagamento_id").notNull(), // ID do pagamento na API For4Payments
-  tipo_pagamento: text("tipo_pagamento").notNull(), // "TRE", "TCN", "LAR"
-  pagina_pagamento: text("pagina_pagamento").notNull(), // /pagamento, /pagamento-tcn, /pagamento-lar
-  status: text("status").notNull(), // pending, paid, expired, cancelled
-  valor: numeric("valor", { precision: 10, scale: 2 }).notNull(),
-  codigo_pix: text("codigo_pix").notNull(),
-  qrcode_pix: text("qrcode_pix").notNull(),
-  criado_em: timestamp("criado_em").defaultNow().notNull(),
-  expira_em: timestamp("expira_em").notNull(),
-  atualizado_em: timestamp("atualizado_em").defaultNow().notNull(),
-});
-
-export const insertPagamentoSchema = createInsertSchema(pagamentos).pick({
-  cpf: true,
-  pagamento_id: true,
-  tipo_pagamento: true,
-  pagina_pagamento: true,
-  status: true,
-  valor: true,
-  codigo_pix: true,
-  qrcode_pix: true,
-  expira_em: true,
-});
-
-export type InsertPagamento = z.infer<typeof insertPagamentoSchema>;
-export type Pagamento = typeof pagamentos.$inferSelect;

@@ -793,52 +793,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log("[For4Payments] Pagamento criado com sucesso:", pagamento.id);
         
-        // Determinar qual página de pagamento está sendo acessada
-        let paginaPagamento = "/pagamento"; // Página padrão TRE
-        let tipoPagamento = "TRE";
-        
-        if (referer.includes('pagamento-tcn')) {
-          paginaPagamento = "/pagamento-tcn";
-          tipoPagamento = "TCN";
-        } else if (referer.includes('pagamento-lar')) {
-          paginaPagamento = "/pagamento-lar";
-          tipoPagamento = "LAR";
-        }
-        
-        // Calcular data de expiração (20 minutos a partir de agora)
-        const expiresAt = new Date();
-        expiresAt.setMinutes(expiresAt.getMinutes() + 20);
-        
-        try {
-          // Criar registro de pagamento no banco de dados
-          await storage.criarPagamento({
-            cpf: cpfLimpo,
-            pagamento_id: pagamento.id,
-            tipo_pagamento: tipoPagamento,
-            pagina_pagamento: paginaPagamento,
-            status: pagamento.status,
-            valor: valorPagamento,
-            codigo_pix: pagamento.pixCode,
-            qrcode_pix: pagamento.pixQrCode,
-            expira_em: expiresAt
-          });
-          
-          // Marcar o usuário como tendo um pagamento pendente
-          await storage.marcarPagamentoPendente(cpfLimpo, paginaPagamento);
-          
-          console.log(`[Pagamento] Usuário ${cpfLimpo} marcado com pagamento pendente em ${paginaPagamento}`);
-        } catch (dbError) {
-          console.error("[Pagamento] Erro ao registrar pagamento no banco:", dbError);
-          // Continuamos sem interromper o fluxo em caso de erro no banco
-        }
-        
         return res.json({
           id: pagamento.id,
           pixCode: pagamento.pixCode,
           pixQrCode: pagamento.pixQrCode,
           expiresAt: pagamento.expiresAt,
-          status: pagamento.status,
-          pagina: paginaPagamento
+          status: pagamento.status
         });
       } catch (paymentError) {
         console.error("Erro ao processar pagamento:", paymentError);
@@ -867,18 +827,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Verificar o status do pagamento na API
         const statusResponse = await paymentApi.checkPaymentStatus(id);
-        const statusAtual = statusResponse.status;
-        
-        // Atualizar o status no banco de dados
-        try {
-          await storage.atualizarStatusPagamento(id, statusAtual);
-          console.log(`[For4Payments] Status do pagamento ${id} atualizado para ${statusAtual}`);
-        } catch (dbError) {
-          console.error(`[For4Payments] Erro ao atualizar status do pagamento ${id} no banco:`, dbError);
-          // Continuamos sem interromper o fluxo em caso de erro no banco
-        }
-        
-        return res.json({ status: statusAtual });
+        return res.json({ status: statusResponse.status });
       } catch (statusError) {
         console.error(`[For4Payments] Erro ao verificar status do pagamento ${id}:`, statusError);
         
@@ -904,36 +853,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (cpfLimpo.length !== 11) {
         return res.status(400).json({ error: "CPF deve conter 11 dígitos" });
-      }
-      
-      // Verificar se o usuário tem um pagamento pendente
-      try {
-        // Verificar se o visitante existe (pode não existir se é a primeira vez)
-        const visitante = await storage.getVisitanteByCpf(cpfLimpo);
-        
-        if (visitante && visitante.tem_pagamento_pendente && visitante.ultima_pagina_pagamento) {
-          // Se tiver pagamento pendente, retornar os dados juntamente com a informação
-          // de redirecionamento para a última página de pagamento
-          console.log(`[Redirecionamento] Usuário ${cpfLimpo} tem pagamento pendente na página ${visitante.ultima_pagina_pagamento}`);
-          
-          // Obter o último pagamento ativo/pendente para este CPF
-          const pagamentosAtivos = await storage.obterPagamentosAtivos(cpfLimpo);
-          
-          // Verificar se há pagamentos ativos
-          if (pagamentosAtivos && pagamentosAtivos.length > 0) {
-            return res.json({
-              redirect: {
-                url: visitante.ultima_pagina_pagamento,
-                reason: "pagamento_pendente"
-              },
-              pagamento: pagamentosAtivos[0],
-              message: "Usuário possui pagamento pendente"
-            });
-          }
-        }
-      } catch (redirectError) {
-        console.error("Erro ao verificar redirecionamento:", redirectError);
-        // Continuamos sem interromper o fluxo em caso de erro
       }
 
       const apiToken = process.env.API_TOKEN_RECEITA || '268753a9b3a24819ae0f02159dee6724';
