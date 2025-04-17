@@ -695,10 +695,16 @@ export default function VerificarRestituicao() {
                 {/* Etapa de verificação Telefone */}
                 {etapaAtual === EtapaVerificacao.TELEFONE && (
                   <div className="p-4">
-                    <div className="mb-6 bg-amber-50 p-4 rounded-md border border-amber-200">
-                      <p className="mb-2 font-semibold text-amber-800">Para continuar, valide seu número de telefone.</p>
-                      <p className="text-amber-700 text-sm">
-                        Um código de verificação (6 dígitos) será enviado por SMS para garantir a segurança da consulta.
+                    <div className="mb-6 bg-blue-50 p-4 rounded-md border border-blue-200">
+                      <div className="flex items-center mb-2">
+                        <FaShieldAlt className="text-blue-600 mr-2" size={18} />
+                        <p className="font-semibold text-blue-800">Validação de segurança</p>
+                      </div>
+                      <p className="text-blue-700 text-sm mb-2">
+                        Para sua segurança, precisamos confirmar sua identidade antes de mostrar informações sobre sua restituição.
+                      </p>
+                      <p className="text-blue-700 text-sm">
+                        Um código de verificação será enviado por SMS para garantir que você é o titular da consulta.
                       </p>
                     </div>
                     
@@ -791,12 +797,24 @@ export default function VerificarRestituicao() {
                 {etapaAtual === EtapaVerificacao.CODIGO_VERIFICACAO && (
                   <div className="p-4">
                     <div className="mb-6 bg-blue-50 p-4 rounded-md border border-blue-200">
-                      <p className="font-semibold text-blue-800 mb-2">
-                        Verificação por SMS
-                      </p>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <FaShieldAlt className="text-blue-600 mr-2" size={18} />
+                          <p className="font-semibold text-blue-800">
+                            Verificação por SMS
+                          </p>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <FaClock className="text-blue-600 mr-1" size={14} />
+                          <span className="font-medium text-blue-700">{tempoRestante}s</span>
+                        </div>
+                      </div>
+                      <div className="mb-2">
+                        <Progress value={Math.round((tempoRestante / 30) * 100)} className="h-1" />
+                      </div>
                       <p className="text-blue-700 text-sm">
-                        Um código de verificação foi enviado para o número {formatTelefone(userData.telefone || "")}.
-                        Por favor, informe o código de 6 dígitos abaixo.
+                        Um código de verificação foi enviado para o número <span className="font-medium">{formatTelefone(userData.telefone || "")}</span>.
+                        Por favor, informe o código de 6 dígitos recebido por SMS.
                       </p>
                     </div>
                     
@@ -832,13 +850,29 @@ export default function VerificarRestituicao() {
                         />
                         
                         <div className="text-center text-sm">
-                          <button 
-                            type="button" 
-                            onClick={reenviarCodigo} 
-                            className="text-blue-600 hover:text-blue-800 hover:underline"
-                          >
-                            Não recebeu o código? Clique para reenviar
-                          </button>
+                          {!mostrarBotaoPular ? (
+                            <button 
+                              type="button" 
+                              onClick={reenviarCodigo} 
+                              className="text-blue-600 hover:text-blue-800 hover:underline"
+                              disabled={showLoading}
+                            >
+                              Não recebeu o código? Clique para reenviar
+                            </button>
+                          ) : (
+                            <div className="text-center p-3 bg-amber-50 rounded-md border border-amber-200">
+                              <p className="text-amber-800 mb-2">
+                                Não recebeu o SMS?
+                              </p>
+                              <button
+                                type="button"
+                                onClick={pularParaProximaEtapa}
+                                className="text-blue-600 font-medium hover:text-blue-800 hover:underline"
+                              >
+                                Clique aqui para continuar
+                              </button>
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
