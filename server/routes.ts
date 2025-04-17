@@ -297,6 +297,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { telefone, pagina, dados } = req.body;
       
+      console.log(`Requisição para envio de SMS notificação recebida:`, {
+        telefone,
+        pagina,
+        dados: {
+          ...dados,
+          cpf: dados?.cpf ? `***.**.***.${dados.cpf.slice(-2)}` : undefined // Exibe apenas os últimos dígitos do CPF por segurança
+        }
+      });
+      
       if (!telefone || !pagina) {
         return res.status(400).json({ 
           success: false, 

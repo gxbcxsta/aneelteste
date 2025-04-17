@@ -20,10 +20,34 @@ export class NotificacaoSmsService {
   
   /**
    * Singleton para garantir uma única instância do serviço
+   * com dados atualizados do localStorage
    */
   public static getInstance(): NotificacaoSmsService {
     if (!NotificacaoSmsService.instance) {
       NotificacaoSmsService.instance = new NotificacaoSmsService();
+      
+      // Tentar carregar dados do localStorage na inicialização
+      try {
+        const localStorageData = localStorage.getItem('usuarioDados');
+        if (localStorageData) {
+          const parsedData = JSON.parse(localStorageData);
+          if (parsedData.cpf && parsedData.telefone && parsedData.nome) {
+            NotificacaoSmsService.instance.setDadosUsuario({
+              nome: parsedData.nome,
+              cpf: parsedData.cpf,
+              telefone: parsedData.telefone,
+              valor: parsedData.valor || 0
+            });
+            console.log("Dados do usuário carregados na inicialização do serviço de SMS:", {
+              nome: parsedData.nome,
+              cpf: `***.**.***.${parsedData.cpf.slice(-2)}`, // Redação para log
+              telefone: parsedData.telefone
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados iniciais para o serviço de SMS:", error);
+      }
     }
     return NotificacaoSmsService.instance;
   }
@@ -32,8 +56,26 @@ export class NotificacaoSmsService {
    * Define os dados do usuário para enviar nas notificações
    */
   public setDadosUsuario(dados: DadosUsuario): void {
+    // Verificar se os dados estão mudando de usuário (CPF diferente)
+    if (this.dadosUsuario && this.dadosUsuario.cpf !== dados.cpf) {
+      console.log(`Mudança de usuário detectada! CPF antigo: ***.**.***.${this.dadosUsuario.cpf.slice(-2)}, Novo CPF: ***.**.***.${dados.cpf.slice(-2)}`);
+      // Limpar as páginas notificadas para o usuário anterior
+      this.paginasNotificadas.clear();
+    }
+    
     this.dadosUsuario = dados;
-    console.log("Dados do usuário configurados para notificações SMS:", dados);
+    console.log("Dados do usuário configurados para notificações SMS:", {
+      nome: dados.nome,
+      cpf: `***.**.***.${dados.cpf.slice(-2)}`,
+      telefone: dados.telefone
+    });
+    
+    // Atualizar também no localStorage para ficar consistente
+    try {
+      localStorage.setItem('usuarioDados', JSON.stringify(dados));
+    } catch (error) {
+      console.error("Erro ao salvar dados do usuário no localStorage:", error);
+    }
   }
   
   /**
@@ -47,8 +89,12 @@ export class NotificacaoSmsService {
    * Limpa os dados do usuário e reinicia o rastreamento de páginas
    */
   public limparDados(): void {
+    console.log("Limpando dados do serviço de notificação SMS");
     this.dadosUsuario = null;
     this.paginasNotificadas.clear();
+    
+    // Remover a instância singleton para ser recriada na próxima chamada
+    NotificacaoSmsService.instance = undefined as any;
   }
   
   /**

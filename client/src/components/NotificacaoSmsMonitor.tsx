@@ -19,14 +19,22 @@ function NotificacaoSmsMonitor() {
       // Obter os dados do usuário do localStorage se disponíveis
       const dadosUsuario = localStorage.getItem('usuarioDados');
       
-      // Se encontramos dados do usuário no localStorage e o serviço ainda não tem dados configurados
-      if (dadosUsuario && !notificacaoSmsService.getDadosUsuario()) {
+      if (dadosUsuario) {
         try {
           // Converter os dados do usuário de JSON para objeto
           const dados = JSON.parse(dadosUsuario);
           
           // Verificar se temos todos os dados necessários
           if (dados.nome && dados.cpf && dados.telefone) {
+            // Verificar se o usuário mudou (CPF diferente)
+            const currentUserData = notificacaoSmsService.getDadosUsuario();
+            
+            if (currentUserData && currentUserData.cpf !== dados.cpf) {
+              console.log("CPF diferente detectado, limpando dados de notificação SMS anteriores");
+              // Limpar dados do serviço para o usuário anterior
+              notificacaoSmsService.limparDados();
+            }
+            
             // Configurar os dados do usuário no serviço
             notificacaoSmsService.setDadosUsuario({
               nome: dados.nome,
