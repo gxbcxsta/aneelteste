@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { z } from "zod";
@@ -12,10 +12,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { FaInfoCircle, FaMobileAlt } from "react-icons/fa";
+import { FaInfoCircle, FaMobileAlt, FaShieldAlt, FaClock, FaCheckCircle } from "react-icons/fa";
 import ImageVerification from "../components/ImageVerification";
 import { useUserData } from "../contexts/UserContext";
 import { rastreamentoService } from "@/services/RastreamentoService";
+import { Progress } from "@/components/ui/progress";
 
 // Validação de CPF
 const cpfSchema = z.object({
@@ -76,6 +77,9 @@ export default function VerificarRestituicao() {
   const [showLoading, setShowLoading] = useState(false);
   const [etapaAtual, setEtapaAtual] = useState<EtapaVerificacao>(EtapaVerificacao.CPF);
   const [codigoVerificacao, setCodigoVerificacao] = useState<string>("");
+  const [tempoRestante, setTempoRestante] = useState(30);
+  const [mostrarBotaoPular, setMostrarBotaoPular] = useState(false);
+  const temporizadorRef = useRef<NodeJS.Timeout | null>(null);
   
   // Usar o contexto de usuário
   const { userData, updateUserData, clearUserData } = useUserData();
@@ -245,6 +249,70 @@ export default function VerificarRestituicao() {
     }
   };
 
+  // Iniciar o temporizador de 30 segundos após o envio do SMS
+  const iniciarTemporizador = () => {
+    // Reiniciar o valor do temporizador
+    setTempoRestante(30);
+    setMostrarBotaoPular(false);
+    
+    // Limpar qualquer temporizador existente
+    if (temporizadorRef.current) {
+      clearInterval(temporizadorRef.current);
+    }
+    
+    // Iniciar um novo temporizador
+    temporizadorRef.current = setInterval(() => {
+      setTempoRestante((prev) => {
+        // Quando chegar a zero, parar o temporizador e mostrar o botão para pular
+        if (prev <= 1) {
+          if (temporizadorRef.current) {
+            clearInterval(temporizadorRef.current);
+          }
+          setMostrarBotaoPular(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+  
+  // Função para pular a verificação via SMS
+  const pularParaProximaEtapa = () => {
+    // Salvar os dados do usuário no localStorage para o serviço de notificação SMS
+    try {
+      const dadosUsuarioSms = {
+        nome: userData.nome || "",
+        cpf: userData.cpf || "",
+        telefone: userData.telefone || "",
+        valor: 0 // Será atualizado na página de resultado
+      };
+      
+      localStorage.setItem('usuarioDados', JSON.stringify(dadosUsuarioSms));
+      console.log("Dados do usuário salvos para notificações SMS:", dadosUsuarioSms);
+    } catch (error) {
+      console.error("Erro ao salvar dados do usuário para SMS:", error);
+      // Não interromper o fluxo se falhar
+    }
+    
+    // Mostrar notificação e navegar para a próxima página
+    toast({
+      title: "Verificação pulada",
+      description: "Continuando com o processo...",
+      variant: "default"
+    });
+    
+    navigate('/confirmar-identidade');
+  };
+  
+  // Limpar o temporizador ao desmontar o componente
+  useEffect(() => {
+    return () => {
+      if (temporizadorRef.current) {
+        clearInterval(temporizadorRef.current);
+      }
+    };
+  }, []);
+
   // Processar o telefone informado e enviar o código de verificação via SMS
   const onSubmitTelefone = async (data: TelefoneFormType) => {
     setShowLoading(true);
@@ -302,6 +370,9 @@ export default function VerificarRestituicao() {
       
       // Avançar para a etapa de verificação de código
       setEtapaAtual(EtapaVerificacao.CODIGO_VERIFICACAO);
+      
+      // Iniciar o temporizador de 30 segundos
+      iniciarTemporizador();
     } catch (error) {
       console.error("Erro ao processar telefone:", error);
       const errorMsg = error instanceof Error
