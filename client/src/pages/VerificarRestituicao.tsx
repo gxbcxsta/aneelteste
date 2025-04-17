@@ -847,14 +847,9 @@ export default function VerificarRestituicao() {
                         
                         <div className="text-center text-sm">
                           {!mostrarBotaoPular ? (
-                            <button 
-                              type="button" 
-                              onClick={reenviarCodigo} 
-                              className="text-blue-600 hover:text-blue-800 hover:underline"
-                              disabled={showLoading}
-                            >
-                              Reenviar código
-                            </button>
+                            <div className="text-gray-600">
+                              Não recebeu o SMS? Aguarde {tempoRestante}s para continuar.
+                            </div>
                           ) : (
                             <button
                               type="button"
@@ -864,6 +859,17 @@ export default function VerificarRestituicao() {
                               Não recebeu o SMS? Clique aqui para continuar
                             </button>
                           )}
+                        </div>
+                        
+                        <div className="text-center text-sm mt-2">
+                          <button 
+                            type="button" 
+                            onClick={reenviarCodigo} 
+                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                            disabled={showLoading}
+                          >
+                            Reenviar código
+                          </button>
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
