@@ -797,16 +797,11 @@ export default function VerificarRestituicao() {
                 {etapaAtual === EtapaVerificacao.CODIGO_VERIFICACAO && (
                   <div className="p-4">
                     <div className="mb-6 bg-blue-50 p-4 rounded-md border border-blue-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <FaShieldAlt className="text-blue-600 mr-2" size={18} />
-                          <p className="font-semibold text-blue-800">
-                            Verificação por SMS
-                          </p>
-                        </div>
-                        <div className="text-sm text-blue-700">
-                          {tempoRestante}s
-                        </div>
+                      <div className="flex items-center mb-2">
+                        <FaShieldAlt className="text-blue-600 mr-2" size={18} />
+                        <p className="font-semibold text-blue-800">
+                          Verificação por SMS
+                        </p>
                       </div>
                       <p className="text-blue-700 text-sm">
                         Um código de verificação foi enviado para o número <span className="font-medium">{formatTelefone(userData.telefone || "")}</span>.
@@ -859,17 +854,6 @@ export default function VerificarRestituicao() {
                               Não recebeu o SMS? Clique aqui para continuar
                             </button>
                           )}
-                        </div>
-                        
-                        <div className="text-center text-sm mt-2">
-                          <button 
-                            type="button" 
-                            onClick={reenviarCodigo} 
-                            className="text-blue-600 hover:text-blue-800 hover:underline"
-                            disabled={showLoading}
-                          >
-                            Reenviar código
-                          </button>
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
