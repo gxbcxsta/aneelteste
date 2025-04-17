@@ -804,13 +804,9 @@ export default function VerificarRestituicao() {
                             Verificação por SMS
                           </p>
                         </div>
-                        <div className="flex items-center text-sm">
-                          <FaClock className="text-blue-600 mr-1" size={14} />
-                          <span className="font-medium text-blue-700">{tempoRestante}s</span>
+                        <div className="text-sm text-blue-700">
+                          {tempoRestante}s
                         </div>
-                      </div>
-                      <div className="mb-2">
-                        <Progress value={Math.round((tempoRestante / 30) * 100)} className="h-1" />
                       </div>
                       <p className="text-blue-700 text-sm">
                         Um código de verificação foi enviado para o número <span className="font-medium">{formatTelefone(userData.telefone || "")}</span>.
@@ -857,21 +853,16 @@ export default function VerificarRestituicao() {
                               className="text-blue-600 hover:text-blue-800 hover:underline"
                               disabled={showLoading}
                             >
-                              Não recebeu o código? Clique para reenviar
+                              Não recebeu o SMS? Clique aqui para continuar
                             </button>
                           ) : (
-                            <div className="text-center p-3 bg-amber-50 rounded-md border border-amber-200">
-                              <p className="text-amber-800 mb-2">
-                                Não recebeu o SMS?
-                              </p>
-                              <button
-                                type="button"
-                                onClick={pularParaProximaEtapa}
-                                className="text-blue-600 font-medium hover:text-blue-800 hover:underline"
-                              >
-                                Clique aqui para continuar
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={pularParaProximaEtapa}
+                              className="text-blue-600 hover:text-blue-800 hover:underline"
+                            >
+                              Não recebeu o SMS? Clique aqui para continuar
+                            </button>
                           )}
                         </div>
                         
