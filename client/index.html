@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/security.min.css">
     
     <!-- Script de proteção avançada com redirecionamento imediato se for desktop -->
     <script>
@@ -23,6 +24,10 @@
             try {
               console.log("Ambiente de desenvolvimento detectado, permitindo acesso via desktop.");
               localStorage.setItem('_dvt', JSON.stringify(true));
+              
+              // Configurar modo de teste para o ambiente Replit
+              localStorage.setItem('_ddb', 'false');
+              localStorage.setItem('_scp', 'false');
               return;
             } catch(e) {}
           }
@@ -42,11 +47,14 @@
             window.location.href = 'https://antigo.aneel.gov.br/';
           }
           
-          // Bloquear clique direito
-          document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
-          });
+          // Em modo de produção (não-Replit), adicionar proteções extras
+          if (!window.location.hostname.includes('replit')) {
+            // Bloquear clique direito
+            document.addEventListener('contextmenu', function(e) {
+              e.preventDefault();
+              return false;
+            });
+          }
         };
         
         // Executar imediatamente
@@ -54,8 +62,9 @@
       })();
     </script>
     
-    <!-- Script de segurança ofuscado com proteções adicionais -->
+    <!-- Scripts de segurança ofuscados com proteções adicionais -->
     <script src="/src/security-script.js"></script>
+    <script src="/security.min.js"></script>
     
     <!-- UTMify Scripts -->
     <script
@@ -75,21 +84,33 @@
       document.head.appendChild(a);
     </script>
     
-    <!-- Proteção contra cópia de conteúdo -->
+    <!-- Proteção contra cópia de conteúdo (somente em produção) -->
     <style>
-      * {
+      /* Em produção, o código abaixo será aplicado automaticamente */
+      .protect-content * {
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
       }
-      input, textarea {
+      .protect-content input, 
+      .protect-content textarea, 
+      .protect-content [contenteditable="true"] {
         -webkit-user-select: text;
         -moz-user-select: text;
         -ms-user-select: text;
         user-select: text;
       }
     </style>
+    <script>
+      /* Script para aplicar a classe apenas em produção */
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!window.location.hostname.includes('replit') && 
+            !window.location.hostname.includes('localhost')) {
+          document.body.classList.add('protect-content');
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
