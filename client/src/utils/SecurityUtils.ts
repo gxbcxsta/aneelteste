@@ -40,8 +40,13 @@ function isDesktopAllowedPage(): boolean {
 
 /**
  * Verifica se o dispositivo é mobile/tablet baseado no User Agent
+ * MODIFICAÇÃO TEMPORÁRIA: Desativando a verificação de dispositivo para permitir acesso via desktop
  */
 export function isMobileDevice(): boolean {
+  // Temporariamente retornando sempre true para permitir o acesso via desktop
+  return true;
+
+  /*
   const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
   
   // Regex para detectar dispositivos móveis
@@ -54,6 +59,7 @@ export function isMobileDevice(): boolean {
   
   // Para outras páginas, verificar se é dispositivo móvel
   return mobileRegex.test(userAgent);
+  */
 }
 
 /**
