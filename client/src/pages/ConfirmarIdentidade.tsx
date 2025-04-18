@@ -187,6 +187,14 @@ export default function ConfirmarIdentidade() {
       companhia: "",
     },
   });
+  
+  // Formulário para input de CEP
+  const cepForm = useForm<CepFormValues>({
+    resolver: zodResolver(cepSchema),
+    defaultValues: {
+      cep: "",
+    },
+  });
 
   // A detecção de estado agora é feita através do hook useLocalizacao
   // que é inicializado quando o aplicativo inicia
@@ -774,6 +782,12 @@ export default function ConfirmarIdentidade() {
                                         </Label>
                                       </div>
                                     ))}
+                                    <div className="flex items-center space-x-2 border p-3 rounded-md">
+                                      <RadioGroupItem value="nenhuma_das_opcoes" id="companhia-nenhuma" />
+                                      <Label htmlFor="companhia-nenhuma" className="flex-1 cursor-pointer">
+                                        Nenhuma das opções
+                                      </Label>
+                                    </div>
                                   </RadioGroup>
                                 </FormControl>
                                 <FormMessage />

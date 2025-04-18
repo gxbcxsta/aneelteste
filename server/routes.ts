@@ -203,6 +203,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: 'ok', message: 'ANEEL ICMS Restituição API' });
   });
   
+  /**
+   * Endpoint para consultar CEP via API ViaCEP e retornar o estado
+   * @route GET /api/consulta-cep
+   * @param {string} cep - CEP para consulta (formato: 12345678 ou 12345-678)
+   * @returns {Object} { cep, estado, siglaEstado, cidade, bairro, logradouro }
+   */
+  app.get('/api/consulta-cep', async (req: Request, res: Response) => {
+    const cep = req.query.cep as string;
+    
+    if (!cep) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'CEP é obrigatório' 
+      });
+    }
+    
+    // Formatar o CEP removendo caracteres não numéricos
+    const cepFormatado = cep.replace(/\D/g, '');
+    
+    if (cepFormatado.length !== 8) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'CEP deve ter 8 dígitos' 
+      });
+    }
+    
+    try {
+      // Consultar a API ViaCEP
+      const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
+      
+      if (!response.ok) {
+        throw new Error(`Erro ao consultar CEP: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Verificar se o CEP existe
+      if (data.erro) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'CEP não encontrado' 
+        });
+      }
+      
+      // Mapeamento de siglas de estado para nomes completos
+      const siglaParaEstado: Record<string, string> = {
+        'AC': 'Acre',
+        'AL': 'Alagoas',
+        'AP': 'Amapá',
+        'AM': 'Amazonas',
+        'BA': 'Bahia',
+        'CE': 'Ceará',
+        'DF': 'Distrito Federal',
+        'ES': 'Espírito Santo',
+        'GO': 'Goiás',
+        'MA': 'Maranhão',
+        'MT': 'Mato Grosso',
+        'MS': 'Mato Grosso do Sul',
+        'MG': 'Minas Gerais',
+        'PA': 'Pará',
+        'PB': 'Paraíba',
+        'PR': 'Paraná',
+        'PE': 'Pernambuco',
+        'PI': 'Piauí',
+        'RJ': 'Rio de Janeiro',
+        'RN': 'Rio Grande do Norte',
+        'RS': 'Rio Grande do Sul',
+        'RO': 'Rondônia',
+        'RR': 'Roraima',
+        'SC': 'Santa Catarina',
+        'SP': 'São Paulo',
+        'SE': 'Sergipe',
+        'TO': 'Tocantins'
+      };
+      
+      // Obter o nome do estado a partir da sigla
+      const nomeEstado = siglaParaEstado[data.uf] || 'Estado não identificado';
+      
+      return res.json({
+        success: true,
+        cep: data.cep,
+        estado: nomeEstado,
+        siglaEstado: data.uf,
+        cidade: data.localidade,
+        bairro: data.bairro,
+        logradouro: data.logradouro
+      });
+      
+    } catch (error) {
+      console.error('Erro ao consultar o CEP:', error);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Erro ao consultar o CEP. Tente novamente mais tarde.' 
+      });
+    }
+  });
+  
   // API para enviar código OTP por SMS
   app.post("/api/enviar-codigo-otp", async (req: Request, res: Response) => {
     try {
