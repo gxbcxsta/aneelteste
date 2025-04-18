@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Search as SearchIcon } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocalizacao } from "@/components/LocalizacaoDetector";
 import { useUserData } from "../contexts/UserContext";
@@ -840,7 +841,7 @@ export default function ConfirmarIdentidade() {
                                     {...field} 
                                     className="h-12"
                                     maxLength={9}
-                                    onChange={(e) => {
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                       // Formatar o CEP automaticamente (12345-678)
                                       let value = e.target.value.replace(/\D/g, '');
                                       if (value.length > 5) {
