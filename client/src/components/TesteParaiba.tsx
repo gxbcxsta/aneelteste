@@ -3,13 +3,16 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useUserData } from '../contexts/UserContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertCircle, Check } from 'lucide-react';
 
 export default function TesteParaiba() {
   const { userData, updateUserData } = useUserData();
   const [estadoAtual, setEstadoAtual] = useState<string>(userData.estado || '');
+  const [apiResponse, setApiResponse] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
   
-  // Função para simular um usuário da Paraíba
+  // Função para simular um usuário da Paraíba via localStorage e contexto
   const simularUsuarioParaiba = () => {
     // 1. Limpar qualquer localização armazenada no localStorage
     localStorage.removeItem('localizacao');
@@ -42,9 +45,43 @@ export default function TesteParaiba() {
     setEstadoAtual("Paraíba");
   };
   
+  // Função para testar a API diretamente forçando o estado Paraíba
+  const testarApiParaiba = async () => {
+    setIsLoading(true);
+    try {
+      // Chamada à API com parâmetro forceEstado para Paraíba
+      const response = await fetch('/api/detectar-estado?forceEstado=PB');
+      const data = await response.json();
+      setApiResponse(data);
+      
+      toast({
+        title: "API testada com sucesso",
+        description: `Estado detectado: ${data.estado} (${data.detalhes.regionCode})`,
+      });
+    } catch (error) {
+      console.error("Erro ao testar API:", error);
+      toast({
+        title: "Erro no teste",
+        description: "Não foi possível testar a API. Veja o console para detalhes.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   // Carregar opções de companhia para o estado atual
   const opcoesCompanhiaPorEstado: Record<string, string[]> = {
     "Paraíba": ["Energisa Paraíba", "Neoenergia Pernambuco", "Equatorial Alagoas"],
+  };
+  
+  // Regras de validação por estado
+  const validacaoCompanhia = (estado: string, companhia: string): boolean => {
+    if (estado === "Paraíba") {
+      // Na Paraíba, apenas a primeira opção (Energisa Paraíba) é válida
+      return companhia === "Energisa Paraíba";
+    }
+    return false;
   };
   
   const companhiasParaiba = opcoesCompanhiaPorEstado["Paraíba"] || [];

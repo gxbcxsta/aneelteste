@@ -39,6 +39,7 @@ function Router() {
         <Route path="/verificar" component={VerificarRestituicao}/>
         <Route path="/admin" component={Admin}/>
         <Route path="/admin-login" component={AdminLogin}/>
+        <Route path="/teste-paraiba" component={TesteParaibaPage}/>
         
         {/* Rotas protegidas - exigem CPF */}
         <Route path="/confirmar-identidade">
