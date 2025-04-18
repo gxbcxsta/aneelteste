@@ -1,0 +1,99 @@
+ * [new branch]      main -> main
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku run node heroku-db-setup.js
+Running node heroku-db-setup.js on ⬢ appaneel... up, run.4566
+Iniciando configuração do banco de dados para Heroku...
+URL do banco de dados convertida de postgres:// para postgresql://
+URL do banco de dados configurada corretamente.
+Aplicando migrações ao banco de dados via script direto...
+Tabelas criadas ou já existentes no banco de dados!
+Banco de dados migrado com sucesso!
+Configuração do banco de dados concluída.
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>git add server/db.ts heroku-db-setup.js
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>git commit -m "Ajuste de conexão SSL para PostgreSQL no Heroku"
+On branch main
+nothing to commit, working tree clean
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>git push heroku main
+Everything up-to-date
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku open
+
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku logs --tail
+2025-04-18T18:39:50.573323+00:00 app[api]: Release v1 created by user gxbcxsta@gmail.com
+2025-04-18T18:39:50.573323+00:00 app[api]: Initial release by user gxbcxsta@gmail.com
+2025-04-18T18:39:50.767531+00:00 app[api]: Release v2 created by user gxbcxsta@gmail.com
+2025-04-18T18:39:50.767531+00:00 app[api]: Enable Logplex by user gxbcxsta@gmail.com
+2025-04-18T18:40:21.554149+00:00 app[api]: Set NODE_ENV config vars by user gxbcxsta@gmail.com
+2025-04-18T18:40:21.554149+00:00 app[api]: Release v3 created by user gxbcxsta@gmail.com
+2025-04-18T18:40:25.271341+00:00 app[api]: Release v4 created by user gxbcxsta@gmail.com
+2025-04-18T18:40:25.271341+00:00 app[api]: Set FOR4PAYMENTS_SECRET_KEY config vars by user gxbcxsta@gmail.com
+2025-04-18T18:40:27.961374+00:00 app[api]: Release v5 created by user gxbcxsta@gmail.com
+2025-04-18T18:40:27.961374+00:00 app[api]: Set FOR4PAYMENTS_PUBLIC_KEY config vars by user gxbcxsta@gmail.com
+2025-04-18T18:40:30.397305+00:00 app[api]: Set UTMIFY_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-18T18:40:30.397305+00:00 app[api]: Release v6 created by user gxbcxsta@gmail.com
+2025-04-18T18:40:32.471534+00:00 app[api]: Set EXATO_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-18T18:40:32.471534+00:00 app[api]: Release v7 created by user gxbcxsta@gmail.com
+2025-04-18T18:40:34.643668+00:00 app[api]: Release v8 created by user gxbcxsta@gmail.com
+2025-04-18T18:40:34.643668+00:00 app[api]: Set INTEGRAFLUX_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-18T18:41:17.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-18T18:41:45.734851+00:00 app[api]: @ref:postgresql-symmetrical-71962 completed provisioning, setting DATABASE_URL. by user heroku-postgresql@addons.heroku.com
+2025-04-18T18:41:45.734851+00:00 app[api]: Release v9 created by user heroku-postgresql@addons.heroku.com
+2025-04-18T18:41:49.242088+00:00 app[api]: Deploy 7284aebf by user gxbcxsta@gmail.com
+2025-04-18T18:41:49.242088+00:00 app[api]: Release v10 created by user gxbcxsta@gmail.com
+2025-04-18T18:41:49.260237+00:00 app[api]: Scaled to web@1:Basic by user gxbcxsta@gmail.com
+2025-04-18T18:41:53.000000+00:00 app[api]: Build succeeded
+2025-04-18T18:41:55.131063+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-18T18:41:55.875356+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-18T18:41:55.876068+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-18T18:41:55.877154+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-18T18:41:55.877213+00:00 app[web.1]: Diretório base: /app
+2025-04-18T18:41:55.904851+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from /app/dist/index.js
+2025-04-18T18:41:55.904853+00:00 app[web.1]: at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+2025-04-18T18:41:55.904853+00:00 app[web.1]: at packageResolve (node:internal/modules/esm/resolve:768:81)
+2025-04-18T18:41:55.904853+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:854:18)
+2025-04-18T18:41:55.904854+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-18T18:41:55.904854+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-18T18:41:55.904854+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-18T18:41:55.904855+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-18T18:41:55.904855+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-18T18:41:55.904855+00:00 app[web.1]: at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+2025-04-18T18:41:55.904856+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-18T18:41:55.904856+00:00 app[web.1]: }
+2025-04-18T18:41:55.960124+00:00 heroku[web.1]: Process exited with status 1
+2025-04-18T18:41:55.985753+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-18T18:41:55.989291+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-18T18:41:59.725585+00:00 app[api]: Starting process with command `node heroku-db-setup.js` by user gxbcxsta@gmail.com
+2025-04-18T18:42:01.221023+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-18T18:42:02.057624+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-18T18:42:02.057957+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-18T18:42:02.060547+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-18T18:42:02.060548+00:00 app[web.1]: Diretório base: /app
+2025-04-18T18:42:02.087813+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vite' imported from /app/dist/index.js
+2025-04-18T18:42:02.087815+00:00 app[web.1]: at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+2025-04-18T18:42:02.087817+00:00 app[web.1]: at packageResolve (node:internal/modules/esm/resolve:768:81)
+2025-04-18T18:42:02.087817+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:854:18)
+2025-04-18T18:42:02.087817+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-18T18:42:02.087818+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-18T18:42:02.087818+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-18T18:42:02.087818+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-18T18:42:02.087819+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-18T18:42:02.087819+00:00 app[web.1]: at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+2025-04-18T18:42:02.087819+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-18T18:42:02.087820+00:00 app[web.1]: }
+2025-04-18T18:42:02.128787+00:00 heroku[web.1]: Process exited with status 1
+2025-04-18T18:42:02.162381+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-18T18:42:04.997716+00:00 heroku[run.4566]: State changed from starting to up
+2025-04-18T18:42:08.217346+00:00 heroku[run.4566]: Process exited with status 0
+2025-04-18T18:42:08.242035+00:00 heroku[run.4566]: State changed from up to complete
+2025-04-18T18:43:28.047569+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=appaneel-bae9831a9652.herokuapp.com request_id=86b4c199-102f-4606-a110-5e18b7286003 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-18T18:43:29.189004+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=appaneel-bae9831a9652.herokuapp.com request_id=12c61e46-5569-4bd9-aeb6-8e744abbbaad fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+
+
+
+
+
+
+
