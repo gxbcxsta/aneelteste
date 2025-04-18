@@ -9,54 +9,33 @@ const SECURITY_TOKEN_KEY = "anticlone_security_token";
 const ORIGIN_TOKEN_KEY = "origin_validation_token";
 const SESSION_START_KEY = "session_start_timestamp";
 
-// Páginas permitidas para acesso via desktop
-const DESKTOP_ALLOWED_PAGES = [
-  '/admin', 
-  '/admin-login',
-  // Também incluir as versões com o domínio completo para ambiente Replit
-  'https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/admin',
-  'https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/admin-login'
-];
-
 /**
  * Verifica se a página atual está entre as permitidas para desktop
+ * Simplificado para verificar apenas o pathname, independente do domínio
  */
 function isDesktopAllowedPage(): boolean {
   const currentPath = window.location.pathname;
-  const fullUrl = window.location.href;
   
   // Debugging para identificar o caminho atual
   console.log("Verificando permissão de desktop para caminho:", currentPath);
-  console.log("URL completa:", fullUrl);
   
-  // Se a URL terminar com /admin ou /admin-login, permitir acesso de desktop
-  if (fullUrl.endsWith('/admin') || fullUrl.endsWith('/admin-login')) {
-    console.log("Detecção de admin por sufixo de URL ativada");
-    return true;
-  }
+  // Verificar padrões para páginas administrativas
+  const adminPatterns = [
+    '/admin',        // Rota exata
+    '/admin/',       // Rota com barra no final
+    '/admin-login',  // Rota de login exata
+    '/admin-login/', // Rota de login com barra no final
+    '/admin/login',  // Formato alternativo de rota de login
+  ];
   
-  // Verifica primeiro se o caminho é exatamente /admin ou /admin-login
-  // Esta é a verificação mais rápida e comum
-  if (currentPath === '/admin' || currentPath === '/admin-login') {
-    console.log("Detecção direta de admin por pathname");
-    return true;
-  }
+  // Verificação principal: se o caminho começa com algum dos padrões admin
+  const isAdmin = adminPatterns.some(pattern => 
+    currentPath === pattern || 
+    (pattern.endsWith('/') ? false : currentPath.startsWith(pattern + '/'))
+  );
   
-  // Verifica se o caminho atual corresponde exatamente a alguma das páginas permitidas
-  // ou se começa com uma dessas páginas seguida por '/'
-  const isAllowed = DESKTOP_ALLOWED_PAGES.some(page => {
-    // Se a página na lista branca for um caminho (começando com /)
-    if (page.startsWith('/')) {
-      return currentPath === page || currentPath.startsWith(page + '/');
-    }
-    // Se for uma URL completa, verificar com a URL completa atual
-    else {
-      return fullUrl === page || fullUrl.startsWith(page + '/');
-    }
-  });
-  
-  console.log("Resultado da verificação:", isAllowed);
-  return isAllowed;
+  console.log("É página administrativa?", isAdmin);
+  return isAdmin;
 }
 
 /**
@@ -273,9 +252,8 @@ export function setupDevToolsDetection(): void {
     // Permitimos mensagens específicas relacionadas à nossa própria função de segurança
     if (args[0] && typeof args[0] === 'string' && (
       args[0].includes("Verificando permissão") || 
-      args[0].includes("URL completa") || 
-      args[0].includes("Resultado da verificação") ||
-      args[0].includes("Detecção de admin") ||
+      args[0].includes("página administrativa") ||
+      args[0].includes("É página administrativa") ||
       args[0].includes("Inicializando segurança") ||
       args[0].includes("Proteção anti-clone") ||
       args[0].includes("Verificações de ferramentas")
