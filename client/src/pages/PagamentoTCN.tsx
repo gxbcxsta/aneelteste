@@ -209,11 +209,12 @@ export default function PagamentoTCN() {
     }
   };
   
-  // Verificar status do pagamento
+  // Verificar status do pagamento (em background sem alterar UI)
   const verificarStatusPagamento = async () => {
     if (!paymentInfo?.id) return;
     
-    setIsLoading(true);
+    // Removido o setIsLoading para evitar piscar a tela
+    // setIsLoading(true);
     
     try {
       const response = await fetch(`/api/pagamentos/${paymentInfo.id}/status`);
@@ -221,11 +222,11 @@ export default function PagamentoTCN() {
       if (response.ok) {
         const data = await response.json();
         
-        // Se o pagamento foi confirmado, atualiza o status
-        if (data.status === 'completed') {
+        // Se o pagamento foi confirmado, atualiza o status (apenas se for diferente)
+        if (data.status === 'completed' && paymentStatus !== 'completed') {
           setPaymentStatus('completed');
           
-          // Mostrar toast de confirmação
+          // Mostrar toast de confirmação apenas na primeira vez que detectar o pagamento
           toast({
             title: "Pagamento da TCN confirmado!",
             description: "Sua Taxa de Conformidade Nacional foi quitada com sucesso.",
