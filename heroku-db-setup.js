@@ -32,21 +32,87 @@ if (!process.env.DATABASE_URL) {
 
 console.log('URL do banco de dados configurada corretamente.');
 
-// Executar comando para enviar o schema para o banco de dados
-console.log('Aplicando migrações ao banco de dados...');
+// Vamos fazer a migração diretamente via código em vez de usar drizzle-kit push
+console.log('Aplicando migrações ao banco de dados via script direto...');
 
-const migrateProcess = spawn('npm', ['run', 'db:push'], { 
-  stdio: 'inherit',
-  shell: true,
-  env: { ...process.env }
-});
+import pg from 'pg';
+const { Pool } = pg;
 
-migrateProcess.on('close', (code) => {
-  if (code !== 0) {
-    console.error(`Erro durante a migração do banco de dados (código: ${code})`);
-    process.exit(code);
+async function applyMigration() {
+  try {
+    // Conectar ao banco de dados com suporte a SSL
+    const pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false // Necessário para o SSL do Heroku
+      }
+    });
+
+    // Criar as tabelas definidas no schema
+    await pool.query(`
+      -- Tabela de usuários
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+      );
+
+      -- Tabela para armazenar valores de restituição por CPF
+      CREATE TABLE IF NOT EXISTS cpf_restituicoes (
+        id SERIAL PRIMARY KEY,
+        cpf VARCHAR(11) NOT NULL UNIQUE,
+        valor_restituicao NUMERIC(10, 2) NOT NULL,
+        data_criacao TEXT NOT NULL
+      );
+
+      -- Tabela para rastreamento de usuários
+      CREATE TABLE IF NOT EXISTS visitantes (
+        id SERIAL PRIMARY KEY,
+        cpf VARCHAR(11) NOT NULL UNIQUE,
+        nome TEXT,
+        telefone VARCHAR(15),
+        primeiro_acesso TIMESTAMP DEFAULT NOW() NOT NULL,
+        ultimo_acesso TIMESTAMP DEFAULT NOW() NOT NULL,
+        ip TEXT,
+        navegador TEXT,
+        sistema_operacional TEXT
+      );
+
+      -- Tabela para rastreamento de páginas visitadas
+      CREATE TABLE IF NOT EXISTS paginas_visitadas (
+        id SERIAL PRIMARY KEY,
+        visitante_id INTEGER NOT NULL,
+        url TEXT NOT NULL,
+        pagina TEXT NOT NULL,
+        timestamp TIMESTAMP DEFAULT NOW() NOT NULL,
+        tempo_permanencia INTEGER,
+        referrer TEXT,
+        dispositivo TEXT
+      );
+
+      -- Tabela para armazenar códigos OTP para verificação de telefone
+      CREATE TABLE IF NOT EXISTS otp_codigos (
+        id SERIAL PRIMARY KEY,
+        telefone VARCHAR(15) NOT NULL,
+        codigo VARCHAR(6) NOT NULL,
+        criado_em TIMESTAMP DEFAULT NOW() NOT NULL,
+        expira_em TIMESTAMP NOT NULL,
+        usado BOOLEAN DEFAULT FALSE NOT NULL,
+        cpf VARCHAR(11) NOT NULL
+      );
+    `);
+
+    console.log('Tabelas criadas ou já existentes no banco de dados!');
+    
+    // Fechar a conexão com o pool
+    await pool.end();
+    
+    console.log('Banco de dados migrado com sucesso!');
+    console.log('Configuração do banco de dados concluída.');
+  } catch (error) {
+    console.error('Erro durante a migração do banco de dados:', error);
+    process.exit(1);
   }
-  
-  console.log('Banco de dados migrado com sucesso!');
-  console.log('Configuração do banco de dados concluída.');
-});
+}
+
+applyMigration();

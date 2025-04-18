@@ -3,8 +3,21 @@ import postgres from 'postgres';
 import { cpfRestituicoes, CpfRestituicao, InsertCpfRestituicao } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
-// Criar o cliente PostgreSQL padrão
-const client = postgres(process.env.DATABASE_URL!, { max: 1 });
+// Configurar conexão PostgreSQL com SSL para o Heroku
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Configurações de conexão segura para ambiente de produção (Heroku)
+const connectionOptions = isProduction
+  ? {
+      max: 1,
+      ssl: {
+        rejectUnauthorized: false // Necessário para o SSL do Heroku
+      }
+    }
+  : { max: 1 };
+
+// Criar o cliente PostgreSQL com as configurações apropriadas
+const client = postgres(process.env.DATABASE_URL!, connectionOptions);
 
 // Criar a instância Drizzle
 export const db = drizzle(client);
