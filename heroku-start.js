@@ -50,7 +50,7 @@ app.use(express.static(path.join(__dirname, 'dist', 'public')));
 
 // Importar e registrar rotas da API
 try {
-  const { registerRoutes } = await import('./dist/index.js');
+  const { registerRoutes } = await import('./server/routes.js');
   await registerRoutes(app);
   console.log('Rotas da API registradas com sucesso');
 } catch (error) {
