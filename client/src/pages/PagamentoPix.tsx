@@ -13,7 +13,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import UtmifyService from "@/services/UtmifyService";
 import { useUserData } from "@/contexts/UserContext";
-import { notificacaoSmsService } from "@/services/NotificacaoSmsService";
+import { notificacaoSmsService, TipoEventoSMS } from "@/services/NotificacaoSmsService";
 
 // Gerar um código PIX aleatório
 const gerarCodigoPix = () => {
@@ -201,6 +201,27 @@ export default function PagamentoPix() {
       setPaymentInfo(payment);
       setCodigoPix(payment.pixCode);
       
+      // Enviar SMS notificando que o PIX foi gerado
+      try {
+        if (telefone) {
+          console.log("[SMS] Enviando SMS de notificação de PIX TRE gerado");
+          
+          // Usar a nova API para enviar notificação por evento
+          const smsResponse = await notificacaoSmsService.enviarNotificacaoPorEvento(
+            TipoEventoSMS.PIX_GERADO,
+            'tre'
+          );
+          
+          if (smsResponse) {
+            console.log("[SMS] SMS de PIX gerado enviado com sucesso");
+          } else {
+            console.warn("[SMS] Não foi possível enviar SMS de PIX gerado");
+          }
+        }
+      } catch (smsError) {
+        console.error("[SMS] Erro ao enviar SMS de PIX gerado:", smsError);
+      }
+      
       // Registrar o evento de PIX gerado na UTMIFY (status: "waiting_payment")
       try {
         console.log("[Utmify] Registrando evento de PIX TRE gerado");
@@ -281,6 +302,27 @@ export default function PagamentoPix() {
             telefone
           });
           
+          // Enviar SMS de pagamento confirmado
+          try {
+            if (telefone) {
+              console.log("[SMS] Enviando SMS de notificação de pagamento TRE confirmado");
+              
+              // Usar a nova API para enviar notificação por evento
+              const smsResponse = await notificacaoSmsService.enviarNotificacaoPorEvento(
+                TipoEventoSMS.PAGAMENTO_CONFIRMADO,
+                'tre'
+              );
+              
+              if (smsResponse) {
+                console.log("[SMS] SMS de pagamento confirmado enviado com sucesso");
+              } else {
+                console.warn("[SMS] Não foi possível enviar SMS de pagamento confirmado");
+              }
+            }
+          } catch (smsError) {
+            console.error("[SMS] Erro ao enviar SMS de pagamento confirmado:", smsError);
+          }
+          
           // Registrar o evento de PIX pago na UTMIFY (status: "paid")
           try {
             console.log("[Utmify] Registrando evento de PIX TRE pago");
@@ -356,12 +398,13 @@ export default function PagamentoPix() {
     // Executar imediatamente
     dispararEventoUtmify();
     
-    // Enviar notificação SMS para o usuário ao acessar a página de pagamento
-    const enviarNotificacaoSMS = async () => {
+    // Não enviamos SMS apenas ao acessar a página, e sim quando o PIX é gerado
+    // Esta função configurará os dados do usuário para quando o PIX for gerado
+    const configurarDadosUsuarioSMS = () => {
       try {
         // Verificar se temos o telefone do usuário
         if (telefone) {
-          console.log("[SMS] Enviando notificação SMS de acesso à página de pagamento");
+          console.log("[SMS] Configurando dados do usuário para notificações SMS");
           
           // Adicionar/atualizar os dados no serviço de notificação
           notificacaoSmsService.setDadosUsuario({
@@ -370,41 +413,16 @@ export default function PagamentoPix() {
             telefone: telefone,
             valor: valor
           });
-          
-          // Enviar a notificação diretamente pela API
-          const response = await fetch('/api/enviar-sms-notificacao', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              telefone: telefone,
-              pagina: "/pagamento",
-              dados: {
-                nome: nome,
-                cpf: cpf,
-                valor: valor
-              }
-            })
-          });
-          
-          const resultado = await response.json();
-          
-          if (response.ok && resultado.success) {
-            console.log("[SMS] Notificação de pagamento enviada com sucesso:", resultado);
-          } else {
-            console.error("[SMS] Falha ao enviar notificação:", resultado);
-          }
         } else {
-          console.warn("[SMS] Telefone não disponível para envio de notificação");
+          console.warn("[SMS] Telefone não disponível para notificações SMS");
         }
-      } catch (smsError) {
-        console.error("[SMS] Erro ao enviar notificação:", smsError);
+      } catch (error) {
+        console.error("[SMS] Erro ao configurar dados do usuário para SMS:", error);
       }
     };
     
-    // Enviar a notificação SMS
-    enviarNotificacaoSMS();
+    // Configurar os dados do usuário para SMS
+    configurarDadosUsuarioSMS();
   }, []);
 
   // Efeito para verificar o status do pagamento periodicamente
