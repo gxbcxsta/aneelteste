@@ -28,6 +28,7 @@ import PagamentoLAR from "@/pages/PagamentoLAR";
 import DebugDetectorIp from "./debug/DebugDetectorIp";
 import Admin from "@/pages/Admin";
 import AdminLogin from "@/pages/AdminLogin";
+import TesteParaibaPage from "@/pages/TesteParaibaPage";
 
 function Router() {
   return (
