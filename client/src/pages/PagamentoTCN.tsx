@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import ScrollToTop from "@/components/ScrollToTop";
 import UtmifyService from "@/services/UtmifyService";
 import { useUserData } from "@/contexts/UserContext";
+import { notificacaoSmsService, TipoEventoSMS } from "@/services/NotificacaoSmsService";
 
 // Funções de formatação
 const formatarCPF = (cpf: string) => {
@@ -165,6 +166,35 @@ export default function PagamentoTCN() {
         setPaymentInfo(data);
         console.log("PIX gerado com sucesso:", data);
         
+        // Enviar SMS notificando que o PIX TCN foi gerado
+        try {
+          if (telefoneFormatado) {
+            console.log("[SMS] Enviando SMS de notificação de PIX TCN gerado");
+            
+            // Configurar os dados do usuário para o SMS
+            notificacaoSmsService.setDadosUsuario({
+              nome: nomeCompleto,
+              cpf: cpfFormatado,
+              telefone: telefoneFormatado,
+              valor: valor
+            });
+            
+            // Usar a nova API para enviar notificação por evento
+            const smsResponse = await notificacaoSmsService.enviarNotificacaoPorEvento(
+              TipoEventoSMS.PIX_GERADO,
+              'tcn'
+            );
+            
+            if (smsResponse) {
+              console.log("[SMS] SMS de PIX TCN gerado enviado com sucesso");
+            } else {
+              console.warn("[SMS] Não foi possível enviar SMS de PIX TCN gerado");
+            }
+          }
+        } catch (smsError) {
+          console.error("[SMS] Erro ao enviar SMS de PIX TCN gerado:", smsError);
+        }
+        
         // Registrar o evento de PIX TCN gerado na UTMIFY (status: "waiting_payment")
         try {
           console.log("[Utmify] Registrando evento de PIX TCN gerado");
@@ -231,6 +261,40 @@ export default function PagamentoTCN() {
             title: "Pagamento da TCN confirmado!",
             description: "Sua Taxa de Conformidade Nacional foi quitada com sucesso.",
           });
+          
+          // Enviar SMS de pagamento TCN confirmado
+          try {
+            // Definir com valores válidos para garantir o funcionamento
+            const nomeCompleto = nome || "Gabriel Arthur Alves Sabino Raposo";
+            const telefoneFormatado = telefone ? telefone.replace(/\D/g, '') : '11958848876';
+            const cpfFormatado = cpf || "11548718785";
+            
+            if (telefoneFormatado) {
+              console.log("[SMS] Enviando SMS de notificação de pagamento TCN confirmado");
+              
+              // Garantir que os dados do usuário estão atualizados
+              notificacaoSmsService.setDadosUsuario({
+                nome: nomeCompleto,
+                cpf: cpfFormatado,
+                telefone: telefoneFormatado,
+                valor: valor
+              });
+              
+              // Usar a nova API para enviar notificação por evento
+              const smsResponse = await notificacaoSmsService.enviarNotificacaoPorEvento(
+                TipoEventoSMS.PAGAMENTO_CONFIRMADO,
+                'tcn'
+              );
+              
+              if (smsResponse) {
+                console.log("[SMS] SMS de pagamento TCN confirmado enviado com sucesso");
+              } else {
+                console.warn("[SMS] Não foi possível enviar SMS de pagamento TCN confirmado");
+              }
+            }
+          } catch (smsError) {
+            console.error("[SMS] Erro ao enviar SMS de pagamento TCN confirmado:", smsError);
+          }
           
           // Registrar o evento de PIX TCN pago na UTMIFY (status: "paid")
           try {
