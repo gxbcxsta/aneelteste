@@ -28,7 +28,7 @@ function prepareDatabaseUrl() {
   }
 }
 
-// Exportar a função para ser usada no arquivo principal
-module.exports = {
+// Exportar a função para ser usada no arquivo principal (formato ESM)
+export default {
   prepareDatabaseUrl
 };

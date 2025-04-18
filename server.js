@@ -1,12 +1,18 @@
-// Usando CommonJS para compatibilidade com Heroku
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+// Usando ESM para compatibilidade com o package.json
+import { spawn } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Importar configuração do banco de dados Heroku se estiver disponível
+// Obter o diretório atual para uso com ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Importar configuração do banco de dados Heroku dinamicamente
 let dbConfig;
 try {
-  dbConfig = require('./server/heroku-db-config');
+  const dbConfigModule = await import('./server/heroku-db-config.js');
+  dbConfig = dbConfigModule.default;
   if (dbConfig && typeof dbConfig.prepareDatabaseUrl === 'function') {
     dbConfig.prepareDatabaseUrl();
   }
