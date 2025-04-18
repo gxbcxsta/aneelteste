@@ -102,7 +102,7 @@ const opcoesCompanhiaPorEstado: Record<string, string[]> = {
   "Maranhão": ["Equatorial Maranhão", "Enel Distribuição Rio", "Neoenergia Cosern"],
   "Mato Grosso": ["Energisa Mato Grosso", "Neoenergia Coelba", "CPFL Piratininga"],
   "Mato Grosso do Sul": ["Energisa Mato Grosso do Sul", "Equatorial Maranhão", "EDP Espírito Santo"],
-  "Paraíba": ["Energisa Paraíba", "Equatorial Goiás", "CPFL Paulista"],
+  "Paraíba": ["Energisa Paraíba", "Neoenergia Pernambuco", "Equatorial Alagoas"],
   "Paraná": ["Copel Distribuição", "Neoenergia Coelba", "Amazonas Energia"],
   "Pernambuco": ["Neoenergia Pernambuco", "Energisa Mato Grosso", "EDP São Paulo"],
   "Piauí": ["Equatorial Piauí", "CELESC Distribuição", "Neoenergia Brasília"],
