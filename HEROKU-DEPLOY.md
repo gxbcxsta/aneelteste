@@ -47,14 +47,62 @@ heroku addons:create heroku-postgresql:hobby-dev
 
 ### 5. Configurar as Variáveis de Ambiente Necessárias
 
+#### Variáveis de Ambiente Obrigatórias
+
+Para executar esta aplicação no Heroku, você precisará configurar as seguintes variáveis de ambiente:
+
+**Variáveis Configuradas Automaticamente**
+- `DATABASE_URL` - URL de conexão com o banco de dados PostgreSQL (configurado automaticamente pelo add-on do Heroku)
+- `PORT` - Porta em que o servidor será executado (configurado automaticamente pelo Heroku)
+
+**Variáveis que Precisam ser Configuradas Manualmente**
+
+*Serviço de Pagamentos For4Payments*
+- `FOR4PAYMENTS_SECRET_KEY` - Chave secreta da API For4Payments (exemplo: ad6ab253-8ae1-454c-91f3-8ccb18933065)
+- `FOR4PAYMENTS_PUBLIC_KEY` - Chave pública da API For4Payments (exemplo: 6d485c73-303b-466c-9344-d7b017dd1ecc)
+
+*Serviço de Rastreamento Utmify*
+- `UTMIFY_API_TOKEN` - Token de acesso para o serviço Utmify (exemplo: XAo52G3UkJ6ePs7Aq3UqHs32hvDPZ8rjUog4)
+
+*Serviço de Consulta de CPF (Opcional)*
+- `EXATO_API_TOKEN` - Token para consulta de CPF via API Exato Digital (exemplo: 268753a9b3a24819ae0f02159dee6724)
+
+*Serviço de SMS IntegraFlux*
+- `INTEGRAFLUX_API_TOKEN` - Token para envio de SMS pela API IntegraFlux
+
+*Ambiente e Segurança*
+- `NODE_ENV` - Ambiente de execução (deve ser "production" para Heroku)
+- `SESSION_SECRET` - Chave secreta para criptografia das sessões (gere uma chave forte e única)
+
+#### Configuração via CLI do Heroku
+
 ```bash
+# Configuração básica
 heroku config:set NODE_ENV=production
+heroku config:set SESSION_SECRET=$(openssl rand -hex 32)
+
+# For4Payments
 heroku config:set FOR4PAYMENTS_SECRET_KEY=ad6ab253-8ae1-454c-91f3-8ccb18933065
 heroku config:set FOR4PAYMENTS_PUBLIC_KEY=6d485c73-303b-466c-9344-d7b017dd1ecc
+
+# Utmify
 heroku config:set UTMIFY_API_TOKEN=XAo52G3UkJ6ePs7Aq3UqHs32hvDPZ8rjUog4
+
+# Exato Digital (opcional)
 heroku config:set EXATO_API_TOKEN=268753a9b3a24819ae0f02159dee6724
-heroku config:set INTEGRAFLUX_API_TOKEN=[seu-token-sms-aqui]
+
+# IntegraFlux SMS
+heroku config:set INTEGRAFLUX_API_TOKEN=seu-token-sms-aqui
 ```
+
+#### Configuração via Dashboard do Heroku
+
+Você também pode configurar estas variáveis pelo dashboard web do Heroku:
+
+1. Acesse o Dashboard do Heroku
+2. Selecione seu aplicativo
+3. Vá para Settings > Config Vars > Reveal Config Vars
+4. Adicione cada variável e seu valor correspondente
 
 ### 6. Fazer Deploy da Aplicação
 
@@ -76,8 +124,25 @@ git push heroku sua-branch:main
 
 ### 7. Executar as Migrações do Banco de Dados
 
+Primeiro, adicione um novo script ao package.json:
+
+```json
+"scripts": {
+  ...
+  "heroku-db-setup": "node heroku-db-setup.js"
+}
+```
+
+Em seguida, execute o script de configuração do banco de dados:
+
 ```bash
-heroku run npm run db:push
+heroku run npm run heroku-db-setup
+```
+
+Alternativamente, se não quiser modificar o package.json, execute diretamente:
+
+```bash
+heroku run node heroku-db-setup.js
 ```
 
 ### 8. Verificar o Status da Aplicação
