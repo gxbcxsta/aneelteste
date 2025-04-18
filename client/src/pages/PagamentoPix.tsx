@@ -371,10 +371,30 @@ export default function PagamentoPix() {
             valor: valor
           });
           
-          // Enviar a notificação
-          await notificacaoSmsService.verificarEEnviarNotificacao(location);
+          // Enviar a notificação diretamente pela API
+          const response = await fetch('/api/enviar-sms-notificacao', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              telefone: telefone,
+              pagina: "/pagamento",
+              dados: {
+                nome: nome,
+                cpf: cpf,
+                valor: valor
+              }
+            })
+          });
           
-          console.log("[SMS] Notificação de pagamento enviada com sucesso");
+          const resultado = await response.json();
+          
+          if (response.ok && resultado.success) {
+            console.log("[SMS] Notificação de pagamento enviada com sucesso:", resultado);
+          } else {
+            console.error("[SMS] Falha ao enviar notificação:", resultado);
+          }
         } else {
           console.warn("[SMS] Telefone não disponível para envio de notificação");
         }
