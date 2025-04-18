@@ -54,7 +54,7 @@ Aplicação web para processamento de restituições de tributos em contas de en
    heroku config:set FOR4PAYMENTS_PUBLIC_KEY=6d485c73-303b-466c-9344-d7b017dd1ecc
    heroku config:set UTMIFY_API_TOKEN=XAo52G3UkJ6ePs7Aq3UqHs32hvDPZ8rjUog4
    heroku config:set EXATO_API_TOKEN=268753a9b3a24819ae0f02159dee6724
-   heroku config:set INTEGRAFLUX_API_TOKEN=sua-chave-sms-aqui
+   heroku config:set INTEGRAFLUX_API_TOKEN=01eb31cf-8692-4869-9843-860260706c27
    ```
 
 5. Faça push do código para o Heroku:
