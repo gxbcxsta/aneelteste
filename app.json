@@ -38,7 +38,7 @@
   },
   "addons": [
     {
-      "plan": "heroku-postgresql:hobby-dev",
+      "plan": "heroku-postgresql:essential-0",
       "as": "DATABASE"
     }
   ],
