@@ -917,16 +917,7 @@ export default function PagamentoPix() {
                   )}
                 </Button>
 
-                {/* Botão para avançar para testes */}
-                <Button 
-                  className="mt-3 bg-blue-600 hover:bg-blue-700 text-white w-full py-3 transition-colors duration-300 flex items-center justify-center"
-                  onClick={() => navigate('/taxa-complementar')}
-                >
-                  <div className="flex items-center justify-center">
-                    <ArrowRight className="h-5 w-5 mr-2" />
-                    AVANÇAR PARA TESTE
-                  </div>
-                </Button>
+
                 
                 <div className="bg-red-600 p-4 rounded-lg text-white shadow-sm">
                   <div className="flex items-center mb-2">
