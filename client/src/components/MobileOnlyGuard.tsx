@@ -74,12 +74,20 @@ export default function MobileOnlyGuard() {
   
   // Verificar se estamos em ambiente de desenvolvimento
   const isDevelopment = (): boolean => {
-    // Desabilitado para garantir que a verificação de desktop sempre funcione
-    return false;
+    const isReplit = window.location.hostname.includes('replit');
+    console.log("Verificação React de ambiente:", isReplit ? "REPLIT/DESENVOLVIMENTO" : "PRODUÇÃO");
+    return isReplit; // Permite acesso desktop no ambiente Replit para testes
   };
 
   useEffect(() => {
     console.log("Verificando dispositivo para rota:", location);
+    
+    // Verificar desenvolvimento primeiro
+    if (isDevelopment()) {
+      console.log("Acesso em ambiente de desenvolvimento, permitindo desktop para testes");
+      setChecking(false);
+      return;
+    }
     
     // Sempre permite acesso a área administrativa pelo desktop
     if (isAdminPage()) {
@@ -90,9 +98,9 @@ export default function MobileOnlyGuard() {
     
     // Para as demais páginas, verificar o dispositivo
     if (!isMobileDevice()) {
-      console.log("Acesso via desktop detectado. Redirecionando para ANEEL...");
-      // Redirecionamento imediato para o site da ANEEL
-      console.log("REDIRECIONANDO PARA ANEEL!");
+      console.log("Acesso via desktop detectado. Redirecionando para site do governo...");
+      // Redirecionamento imediato para o site do Brasil
+      console.log("REDIRECIONANDO PARA SITE DO GOVERNO!");
       window.location.replace(REDIRECT_URL);
     } else {
       console.log("Acesso via mobile permitido.");

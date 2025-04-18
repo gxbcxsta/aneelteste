@@ -24,10 +24,11 @@
           }
 
           // Verifica se é desenvolvimento (ignora a verificação)
-          var isDev = false; 
-          // comentado para garantir que sempre faça a verificação
-
+          var isDev = window.location.hostname.includes('replit');
+          console.log("Verificação de ambiente:", isDev ? "DESENVOLVIMENTO" : "PRODUÇÃO");
+          
           if (isDev) {
+            console.log("Ambiente Replit detectado, permitindo acesso via desktop para testes");
             return true;
           }
 
