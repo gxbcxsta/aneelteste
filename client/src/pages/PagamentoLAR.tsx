@@ -505,11 +505,11 @@ export default function PagamentoLAR() {
           ) : (
             <>
               <div className="mb-6">
-                <div className="bg-amber-600 text-white py-3 px-4 rounded-md font-semibold text-sm flex items-center mb-3">
-                  <div className="bg-white/20 p-1.5 rounded-md mr-2">
+                <div className="bg-amber-600 text-white py-3 px-4 rounded-md font-semibold text-sm flex items-center justify-center text-center mb-3">
+                  <div className="bg-white/20 p-1.5 rounded-md mr-2 flex-shrink-0">
                     <Zap className="h-4 w-4" />
                   </div>
-                  <span>RECEBA SUA RESTITUIÇÃO EM ATÉ 60 MINUTOS!</span>
+                  <span className="break-normal">RECEBA SUA RESTITUIÇÃO EM ATÉ 60 MINUTOS!</span>
                 </div>
                 
                 <div className="border border-amber-200 rounded-md p-5 bg-amber-50 shadow-sm mb-4">

@@ -237,18 +237,22 @@ export default function SucessoPadrao() {
             </div>
             
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6">
-              <div className="flex items-start">
-                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 mr-2" />
-                <div>
-                  <h3 className="font-bold text-amber-800 mb-1">Nota importante:</h3>
-                  <p className="text-sm text-amber-700">
-                    Seu processo entrou na fila padrão de reembolso. Caso você mude de ideia e 
-                    queira receber sua restituição em até 60 minutos, clique no botão abaixo para 
-                    prosseguir com o pagamento da taxa LAR.
-                  </p>
+              <div className="flex flex-col">
+                <div className="flex items-start mb-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-bold text-amber-800 mb-1">Nota importante:</h3>
+                    <p className="text-sm text-amber-700">
+                      Seu processo entrou na fila padrão de reembolso. Caso você mude de ideia e 
+                      queira receber sua restituição em até 60 minutos, clique no botão abaixo para 
+                      prosseguir com o pagamento da taxa LAR.
+                    </p>
+                  </div>
+                </div>
+                <div className="w-full max-w-md mx-auto">
                   <Button 
                     onClick={() => setLocation('/pagamento-lar')}
-                    className="w-full mt-3 font-medium bg-amber-600 hover:bg-amber-700 text-white"
+                    className="w-full px-2 py-2 mt-2 font-medium bg-amber-600 hover:bg-amber-700 text-white text-sm whitespace-normal h-auto"
                   >
                     Quero receber minha restituição em 60 minutos
                   </Button>
