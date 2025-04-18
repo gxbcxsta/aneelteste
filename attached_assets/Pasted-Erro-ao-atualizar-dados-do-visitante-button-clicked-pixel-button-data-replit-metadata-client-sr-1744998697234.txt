@@ -1,0 +1,36 @@
+Erro ao atualizar dados do visitante
+button clicked pixel 
+<button data-replit-metadata="client/src/pages/VerificarRestituicao.tsx:753:26" data-component-name="Button" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 px-4 py-2 bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex-1" type="submit" id="266782c8-848b-3c02-1423-86154417d24e">…</button>
+check can iniate checkout:  Enviar código SMS
+check can send lead:  Enviar código SMS
+check can send add to cart:  Enviar código SMS
+submitButton 
+<button data-replit-metadata="client/src/pages/VerificarRestituicao.tsx:753:26" data-component-name="Button" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 px-4 py-2 bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex-1" type="submit" id="266782c8-848b-3c02-1423-86154417d24e">…</button>
+check can iniate checkout:  Enviar código SMS
+check is checkout link:  https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/verificar?utm_source=organic&utm_campaign=&utm_medium=&utm_content=&utm_term=&xcod=jLj68006f0300bb8b9be06f2f02hQwK21wXxRhQwK21wXxRhQwK21wXxRhQwK21wXxR&sck=jLj68006f0300bb8b9be06f2f02hQwK21wXxRhQwK21wXxRhQwK21wXxRhQwK21wXxR
+check can send lead:  Enviar código SMS
+check can send add to cart:  Enviar código SMS
+Dados do usuário atualizados: 
+Object {cpf: "***.**.***.85", nome: "GABRIEL ***", dataNascimento: "13/06/2001", estado: "Minas Gerais", companhia: "", …}
+Erro ao atualizar dados do visitante
+Enviando código OTP via API para o telefone: 11988760544
+buttons 
+(4) [HTMLButtonElement, HTMLButtonElement, HTMLButtonElement, HTMLButtonElement]
+Erro ao atualizar dados do visitante
+at t.value (https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+Erro ao processar telefone: 
+Error {}
+
+at t.value (https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://e615a1c5-01a3-4fc3-9dd3-0625cb9f9b31-00-20vkx7yyeskzb.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+buttons 
+(5) [HTMLButtonElement, HTMLButtonElement, HTMLButtonElement, HTMLButtonElement, HTMLButtonElement]
+buttons 
+(4) [HTMLButtonElement, HTMLButtonElement, HTMLButtonElement, HTMLButtonElement]
+Inicializando segurança...
+Verificações de ferramentas de desenvolvedor desativadas para permitir acesso por desktop.
