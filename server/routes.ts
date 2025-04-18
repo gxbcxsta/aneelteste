@@ -392,33 +392,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para detectar localização por IP
   app.get('/api/detectar-estado', async (req: Request, res: Response) => {
     try {
-      // Verificar se temos um IP de teste específico para fins de desenvolvimento
-      const testeIP = req.query.testeIP;
-      const forceParaiba = req.query.forceParaiba === 'true';
-      
-      // Hardcoded para testes - IPs conhecidos da Paraíba
-      const paraiba_ips = [
-        "191.252.101.54",
-        "191.252.101.55",
-        "177.22.109.10",
-        "177.135.206.25",
-        "177.73.70.30",
-        "191.178.43.11"
+      // Mapeamento de siglas para nomes completos de estados
+      const siglaParaEstado: Record<string, string> = {
+        'AC': 'Acre',
+        'AL': 'Alagoas',
+        'AP': 'Amapá',
+        'AM': 'Amazonas',
+        'BA': 'Bahia',
+        'CE': 'Ceará',
+        'DF': 'Distrito Federal',
+        'ES': 'Espírito Santo',
+        'GO': 'Goiás',
+        'MA': 'Maranhão',
+        'MT': 'Mato Grosso',
+        'MS': 'Mato Grosso do Sul',
+        'MG': 'Minas Gerais',
+        'PA': 'Pará',
+        'PB': 'Paraíba',
+        'PR': 'Paraná',
+        'PE': 'Pernambuco',
+        'PI': 'Piauí',
+        'RJ': 'Rio de Janeiro',
+        'RN': 'Rio Grande do Norte',
+        'RS': 'Rio Grande do Sul',
+        'RO': 'Rondônia',
+        'RR': 'Roraima',
+        'SC': 'Santa Catarina',
+        'SP': 'São Paulo',
+        'SE': 'Sergipe',
+        'TO': 'Tocantins'
+      };
+
+      // Lista de estados brasileiros por ordem de população (para fallback determinístico)
+      const estadosPorPopulacao = [
+        "São Paulo", "Minas Gerais", "Rio de Janeiro", "Bahia", "Rio Grande do Sul",
+        "Paraná", "Pernambuco", "Ceará", "Pará", "Santa Catarina",
+        "Maranhão", "Goiás", "Amazonas", "Espírito Santo", "Paraíba",
+        "Mato Grosso", "Rio Grande do Norte", "Alagoas", "Piauí", "Distrito Federal",
+        "Mato Grosso do Sul", "Sergipe", "Rondônia", "Tocantins", "Acre",
+        "Amapá", "Roraima"
       ];
+
+      // Verificar se temos um IP de teste específico para fins de desenvolvimento
+      const testeIP = req.query.testeIP as string;
+      const forceEstado = req.query.forceEstado as string;
+      const noCache = req.query.noCache === 'true';
       
       // Obter o IP real do cliente, considerando proxies ou o IP de teste
-      const ip = testeIP ? testeIP : (req.headers['x-forwarded-for'] || req.socket.remoteAddress);
+      const ipOriginal = testeIP || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
       console.log("Recebida solicitação de detecção de estado");
       
       if (testeIP) {
         console.log(`Usando IP de teste para desenvolvimento: ${testeIP}`);
       }
       
-      // Forçar o estado da Paraíba para testes específicos
-      if (forceParaiba || paraiba_ips.includes(ip as string)) {
-        console.log("Forçando estado para Paraíba com base no IP ou flag");
+      // Forçar um estado específico via parâmetro (para testes ou override)
+      if (forceEstado) {
+        const sigla = forceEstado.toUpperCase();
+        const estadoNome = siglaParaEstado[sigla] || forceEstado;
+        
+        console.log(`Forçando estado para ${estadoNome} (${sigla}) via parâmetro`);
         return res.json({
-          ip: ip || "desconhecido",
+          ip: ipOriginal || "desconhecido",
+          estado: estadoNome,
+          detalhes: {
+            countryCode: "BR",
+            regionName: estadoNome,
+            regionCode: sigla
+          }
+        });
+      }
+      
+      // Limpar o IP para obter apenas o endereço principal (sem portas ou IPs adicionais)
+      const ipLimpo = typeof ipOriginal === 'string' ? ipOriginal.split(',')[0].trim() : "";
+      
+      // Verificar IPs conhecidos da Paraíba que são incorretamente detectados
+      const isParaibaIP = ipLimpo === "191.252.101.54" || 
+                          ipLimpo.startsWith("191.252.101") || 
+                          ipLimpo.startsWith("177.22.109") || 
+                          ipLimpo.startsWith("177.135.206") || 
+                          ipLimpo.startsWith("177.73.70") || 
+                          ipLimpo.startsWith("191.178.43");
+      
+      if (isParaibaIP) {
+        console.log(`IP ${ipLimpo} conhecido como da Paraíba, ignorando consulta à API`);
+        return res.json({
+          ip: ipLimpo,
           estado: "Paraíba",
           detalhes: {
             countryCode: "BR",
@@ -428,140 +487,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Limpar o IP para obter apenas o endereço principal (sem portas ou IPs adicionais)
-      let ipLimpo = "";
-      if (typeof ip === 'string') {
-        ipLimpo = ip.split(',')[0].trim();
-      }
+      // Verificar se o IP é localhost/interno/privado
+      const isPrivateIp = (
+        ipLimpo === "127.0.0.1" ||
+        ipLimpo === "::1" ||
+        ipLimpo.startsWith("10.") ||
+        (ipLimpo.startsWith("172.") && parseInt(ipLimpo.split('.')[1], 10) >= 16 && parseInt(ipLimpo.split('.')[1], 10) <= 31) ||
+        ipLimpo.startsWith("192.168.")
+      );
       
-      // Verificar se há um parâmetro para forçar o estado (apenas para fins de teste específicos)
-      const forceDetection = req.query.forceDetection === 'true';
-      
-      // Para testes, podemos modificar este comportamento para simular diferentes estados
-      // mas por padrão vamos deixar o fluxo normal de detecção continuar mesmo com forceDetection
-      if (forceDetection) {
-        console.log("Teste de detecção solicitado via parâmetro, continuando com detecção normal");
-        // Não retornamos mais um valor fixo, deixamos a detecção real acontecer
-      }
+      // Adicionar timestamp para evitar cache do navegador
+      const timestamp = Date.now();
       
       try {
-        // Verificar se o IP é localhost/interno/privado
-        const isPrivateIp = (
-          ipLimpo === "127.0.0.1" ||
-          ipLimpo === "::1" ||
-          ipLimpo.startsWith("10.") ||
-          ipLimpo.startsWith("172.16.") ||
-          ipLimpo.startsWith("172.17.") ||
-          ipLimpo.startsWith("172.18.") ||
-          ipLimpo.startsWith("172.19.") ||
-          ipLimpo.startsWith("172.20.") ||
-          ipLimpo.startsWith("172.21.") ||
-          ipLimpo.startsWith("172.22.") ||
-          ipLimpo.startsWith("172.23.") ||
-          ipLimpo.startsWith("172.24.") ||
-          ipLimpo.startsWith("172.25.") ||
-          ipLimpo.startsWith("172.26.") ||
-          ipLimpo.startsWith("172.27.") ||
-          ipLimpo.startsWith("172.28.") ||
-          ipLimpo.startsWith("172.29.") ||
-          ipLimpo.startsWith("172.30.") ||
-          ipLimpo.startsWith("172.31.") ||
-          ipLimpo.startsWith("192.168.")
-        );
+        // 1. Primeira tentativa: API ipapi.co
+        console.log(`Consultando primeira API (ipapi.co) ${isPrivateIp ? 'para IP público do servidor' : 'para o IP ' + ipLimpo}`);
         
-        // Para IP local/interno, usar a API ipapi.co que funciona sem precisar de token
+        // Para IP local/interno, usar API sem especificar IP para obter o IP externo
         const apiUrl = isPrivateIp 
-          ? "https://ipapi.co/json/" // API para IP externo do servidor
-          : `https://ipapi.co/${ipLimpo}/json/`;
-        
-        console.log(`Consultando API: ${isPrivateIp ? 'IP público do servidor' : 'IP do usuário'}`);
+          ? `https://ipapi.co/json/?_=${timestamp}` 
+          : `https://ipapi.co/${ipLimpo}/json/?_=${timestamp}`;
         
         const response = await fetch(apiUrl, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Accept': 'application/json',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache, no-store'
           }
         });
         
+        // Se a primeira API retornar erro, vai para o catch e tenta a API alternativa
         if (!response.ok) {
           throw new Error(`Erro ao consultar API de geolocalização: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log("Dados da API de geolocalização:", data);
+        console.log("Dados da primeira API:", data);
         
-        // Se não for Brasil ou não tiver região definida
+        // Verificar se os dados são válidos para um IP brasileiro
         if (!data.country_code || data.country_code !== 'BR' || !data.region_code) {
-          throw new Error("IP não é do Brasil ou região não detectada");
+          throw new Error("IP não é do Brasil ou região não detectada pela primeira API");
         }
         
-        // Log mais detalhado do estado detectado para debug
-        console.log(`Estado detectado pelo IP - Código: ${data.region_code}, Nome: ${data.region}`);
-                
-        // Mapear o código da região para o nome completo do estado
-        const siglaParaEstado: Record<string, string> = {
-          'AC': 'Acre',
-          'AL': 'Alagoas',
-          'AP': 'Amapá',
-          'AM': 'Amazonas',
-          'BA': 'Bahia',
-          'CE': 'Ceará',
-          'DF': 'Distrito Federal',
-          'ES': 'Espírito Santo',
-          'GO': 'Goiás',
-          'MA': 'Maranhão',
-          'MT': 'Mato Grosso',
-          'MS': 'Mato Grosso do Sul',
-          'MG': 'Minas Gerais',
-          'PA': 'Pará',
-          'PB': 'Paraíba',
-          'PR': 'Paraná',
-          'PE': 'Pernambuco',
-          'PI': 'Piauí',
-          'RJ': 'Rio de Janeiro',
-          'RN': 'Rio Grande do Norte',
-          'RS': 'Rio Grande do Sul',
-          'RO': 'Rondônia',
-          'RR': 'Roraima',
-          'SC': 'Santa Catarina',
-          'SP': 'São Paulo',
-          'SE': 'Sergipe',
-          'TO': 'Tocantins'
-        };
-        
-        // Verificar se é um IP da Paraíba que foi incorretamente identificado
-        console.log(`Verificando se o IP ${ipLimpo} pertence à Paraíba...`);
-        
-        const isParaibaIP = 
-          ipLimpo === "191.252.101.54" || 
-          (ipLimpo.startsWith("191.252.101")) || 
-          (ipLimpo.startsWith("177.22.109")) || 
-          (ipLimpo.startsWith("177.135.206")) || 
-          (ipLimpo.startsWith("177.73.70")) || 
-          (ipLimpo.startsWith("191.178.43"));
-          
-        console.log(`O IP ${ipLimpo} pertence à Paraíba? ${isParaibaIP}`);
-        
-        if (isParaibaIP) {
-          console.log(`IP ${ipLimpo} reconhecido como da Paraíba, sobrescrevendo detecção da API (${data.region_code})`);
-          return res.json({
-            ip: ipLimpo,
-            estado: "Paraíba",
-            detalhes: {
-              countryCode: "BR",
-              regionName: "Paraíba",
-              regionCode: "PB"
-            }
-          });
-        }
-        
+        // Obter o nome do estado a partir da sigla
         const estado = siglaParaEstado[data.region_code] || "São Paulo";
-        
-        console.log(`Estado detectado: ${estado} (${data.region_code})`);
+        console.log(`Estado detectado pela primeira API: ${estado} (${data.region_code})`);
         
         return res.json({
-          ip: ipLimpo,
+          ip: ipLimpo || data.ip,
           estado: estado,
           detalhes: {
             countryCode: data.country_code,
@@ -570,19 +543,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         });
         
-      } catch (apiError) {
-        console.error("Erro ao consultar primeira API de geolocalização:", apiError);
+      } catch (primeiraApiError) {
+        // Se a primeira API falhar, tentar a segunda
+        console.error("Erro na primeira API:", primeiraApiError);
         
         try {
-          // Tentar com API alternativa (ipinfo.io) como fallback
+          // 2. Segunda tentativa: API ipinfo.io como fallback
           console.log("Tentando API alternativa (ipinfo.io)...");
           
-          // Se for IP interno, usar sem especificar IP para pegar o IP externo do servidor
-          const ipApiUrl = ipLimpo && !ipLimpo.startsWith("127.") && !ipLimpo.startsWith("192.168.") 
-            ? `https://ipinfo.io/${ipLimpo}/json` 
-            : "https://ipinfo.io/json";
-            
-          const fallbackResponse = await fetch(ipApiUrl);
+          // Para IP local/interno, usar API sem especificar IP para obter o IP externo
+          const ipInfoUrl = isPrivateIp 
+            ? `https://ipinfo.io/json?_=${timestamp}` 
+            : `https://ipinfo.io/${ipLimpo}/json?_=${timestamp}`;
+          
+          const fallbackResponse = await fetch(ipInfoUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache, no-store'
+            }
+          });
           
           if (!fallbackResponse.ok) {
             throw new Error(`Erro na API alternativa: ${fallbackResponse.status}`);
@@ -591,66 +571,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const fallbackData = await fallbackResponse.json();
           console.log("Dados da API alternativa:", fallbackData);
           
-          // Se não for Brasil, ou não tiver região definida
+          // Verificar se os dados são válidos para um IP brasileiro
           if (fallbackData.country !== 'BR' || !fallbackData.region) {
-            throw new Error("IP não é do Brasil ou região não detectada");
+            throw new Error("IP não é do Brasil ou região não detectada pela API alternativa");
           }
           
-          // Mapear o código da região para o nome completo do estado
-          const siglaParaEstado: Record<string, string> = {
-            'AC': 'Acre',
-            'AL': 'Alagoas',
-            'AP': 'Amapá',
-            'AM': 'Amazonas',
-            'BA': 'Bahia',
-            'CE': 'Ceará',
-            'DF': 'Distrito Federal',
-            'ES': 'Espírito Santo',
-            'GO': 'Goiás',
-            'MA': 'Maranhão',
-            'MT': 'Mato Grosso',
-            'MS': 'Mato Grosso do Sul',
-            'MG': 'Minas Gerais',
-            'PA': 'Pará',
-            'PB': 'Paraíba',
-            'PR': 'Paraná',
-            'PE': 'Pernambuco',
-            'PI': 'Piauí',
-            'RJ': 'Rio de Janeiro',
-            'RN': 'Rio Grande do Norte',
-            'RS': 'Rio Grande do Sul',
-            'RO': 'Rondônia',
-            'RR': 'Roraima',
-            'SC': 'Santa Catarina',
-            'SP': 'São Paulo',
-            'SE': 'Sergipe',
-            'TO': 'Tocantins'
-          };
-          
-          // Verificar se é um IP da Paraíba que foi incorretamente identificado
-          if (
-            ipLimpo === "191.252.101.54" || 
-            ipLimpo.startsWith("191.252.101") || 
-            ipLimpo.startsWith("177.22.109") || 
-            ipLimpo.startsWith("177.135.206") || 
-            ipLimpo.startsWith("177.73.70") || 
-            ipLimpo.startsWith("191.178.43")
-          ) {
-            console.log(`IP ${ipLimpo} reconhecido como da Paraíba, sobrescrevendo detecção da API alternativa (${fallbackData.region})`);
-            return res.json({
-              ip: ipLimpo,
-              estado: "Paraíba",
-              detalhes: {
-                countryCode: "BR",
-                regionName: "Paraíba",
-                regionCode: "PB"
-              }
-            });
-          }
-          
+          // Obter o nome do estado a partir da sigla
           const estado = siglaParaEstado[fallbackData.region] || "São Paulo";
-          
-          console.log(`Estado detectado via API alternativa: ${estado} (${fallbackData.region})`);
+          console.log(`Estado detectado pela API alternativa: ${estado} (${fallbackData.region})`);
           
           return res.json({
             ip: ipLimpo || fallbackData.ip,
@@ -662,47 +590,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           });
           
-        } catch (fallbackError) {
-          console.error("Erro também na API alternativa:", fallbackError);
+        } catch (segundaApiError) {
+          // Se ambas as APIs falharem, usar detecção determinística
+          console.error("Erro também na API alternativa:", segundaApiError);
+          console.log("Ambas as APIs falharam, usando detecção determinística baseada no hash do IP...");
           
-          // Se ambas as APIs falharem, usar detecção determinística baseada no IP
-          console.log("Ambas as APIs falharam, usando detecção determinística...");
-          
-          // Lista de estados brasileiros por ordem de população
-          const estados = [
-            "São Paulo", "Minas Gerais", "Rio de Janeiro", "Bahia", "Rio Grande do Sul",
-            "Paraná", "Pernambuco", "Ceará", "Pará", "Santa Catarina",
-            "Maranhão", "Goiás", "Amazonas", "Espírito Santo", "Paraíba",
-            "Mato Grosso", "Rio Grande do Norte", "Alagoas", "Piauí", "Distrito Federal",
-            "Mato Grosso do Sul", "Sergipe", "Rondônia", "Tocantins", "Acre",
-            "Amapá", "Roraima"
-          ];
-          
+          // 3. Fallback: Detecção determinística baseada no hash do IP
           let estadoIndex = 0; // São Paulo como default
           
-          // Verificar se é o IP específico da Paraíba mencionado pelo usuário
-          // Precisamos colocar este código antes do cálculo do hash
-          if (
-            ipLimpo === "191.252.101.54" || 
-            ipLimpo.startsWith("191.252.101") || 
-            ipLimpo.startsWith("177.22.109") || 
-            ipLimpo.startsWith("177.135.206") || 
-            ipLimpo.startsWith("177.73.70") || 
-            ipLimpo.startsWith("191.178.43")
-          ) {
-            // IP da Paraíba (cenário específico relatado pelo usuário)
-            console.log("IP identificado como da Paraíba, forçando estado correto");
-            return res.json({
-              ip: ipLimpo || "desconhecido",
-              estado: "Paraíba",
-              detalhes: {
-                countryCode: "BR",
-                regionName: "Paraíba",
-                regionCode: "PB"
-              }
-            });
-          } 
-          else if (ipLimpo) {
+          if (ipLimpo) {
             // Gerar um hash do IP para obter um índice consistente para cada IP
             let hash = 0;
             for (let i = 0; i < ipLimpo.length; i++) {
@@ -711,11 +607,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             hash = Math.abs(hash);
-            estadoIndex = hash % estados.length;
+            estadoIndex = hash % estadosPorPopulacao.length;
           }
           
-          const estadoDetectado = estados[estadoIndex];
-          console.log(`Usando detecção determinística: ${estadoDetectado}`);
+          const estadoDetectado = estadosPorPopulacao[estadoIndex];
+          const siglaEstado = Object.keys(siglaParaEstado).find(
+            key => siglaParaEstado[key] === estadoDetectado
+          ) || "SP";
+          
+          console.log(`Usando detecção determinística: ${estadoDetectado} (${siglaEstado})`);
           
           return res.json({
             ip: ipLimpo || "desconhecido",
@@ -723,25 +623,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             detalhes: {
               countryCode: "BR",
               regionName: estadoDetectado,
-              regionCode: obterSiglaEstado(estadoDetectado)
+              regionCode: siglaEstado
             }
           });
         }
       }
-      
     } catch (error) {
+      // Tratamento de erro geral - sempre retornar uma resposta válida
       console.error("Erro geral ao processar estado:", error);
       
-      // Em caso de erro geral, garantir que sempre retornamos algo válido
-      // Por padrão, usamos São Paulo
-      const currentIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-      let ipAjustado = "";
-      if (typeof currentIp === 'string') {
-        ipAjustado = currentIp.split(',')[0].trim();
-      }
-
+      // Em caso de erro geral, garantir que sempre retornamos São Paulo como fallback final
       return res.status(200).json({
-        ip: ipAjustado || "desconhecido",
+        ip: "desconhecido",
         estado: "São Paulo",
         detalhes: {
           countryCode: "BR",
