@@ -79,6 +79,7 @@ function generateSecurityToken(): string {
 
 /**
  * Inicializa ou verifica os tokens de segurança anti-clonagem
+ * MODIFICAÇÃO TEMPORÁRIA: Desativando redirecionamentos de segurança
  */
 function initAntiCloneProtection(): void {
   // Verifica se está em uma página permitida para desktop
@@ -106,18 +107,26 @@ function initAntiCloneProtection(): void {
     return;
   }
   
-  // Verificar se o dispositivo é móvel - se não for e não for uma página admin, redirecionar
+  // MODIFICAÇÃO TEMPORÁRIA: Comentando verificação de dispositivo móvel para permitir acesso desktop
+  /*
   if (!isMobileDevice()) {
     console.log("Tentativa de acesso via desktop detectada, redirecionando...");
     window.location.href = ANEEL_REDIRECT_URL;
     return;
   }
+  */
+  console.log("Verificação de dispositivo temporariamente desativada para testes.");
 }
 
 /**
  * Proteção contra manipulação de DOM (anti-scraping e anti-clonagem)
+ * MODIFICAÇÃO TEMPORÁRIA: Desativando proteção do DOM
  */
 function setupDomProtection(): void {
+  console.log("Proteção do DOM DESATIVADA para permitir acesso via desktop e ferramentas de desenvolvimento.");
+  
+  // Original comentado abaixo
+  /*
   // Adicionar atributos de segurança a elementos sensíveis
   const protectElements = () => {
     const sensitiveElements = document.querySelectorAll('form, button[type="submit"], input, [data-sensitive="true"]');
@@ -173,23 +182,31 @@ function setupDomProtection(): void {
     childList: true, 
     subtree: true 
   });
+  */
 }
 
 /**
  * Detecta tentativas de inspeção e ferramentas de desenvolvedor com métodos avançados
+ * MODIFICAÇÃO TEMPORÁRIA: Desativando todas as verificações de ferramentas de desenvolvedor
  */
 export function setupDevToolsDetection(): void {
+  console.log("Verificações de ferramentas de desenvolvedor DESATIVADAS para todos os dispositivos.");
+  
+  // Preservando a função original de redirecionamento, mas não a utilizando
+  const redirectToAneel = () => {
+    // Comentado para permitir acesso via desktop
+    // window.location.href = ANEEL_REDIRECT_URL;
+    console.log("Redirecionamento de segurança desativado temporariamente.");
+  };
+
+  // Original comentado abaixo
+  /*
   // Verifica se está em uma página permitida para desktop
   if (isDesktopAllowedPage()) {
     console.log("Verificações de ferramentas de desenvolvedor desativadas para páginas de admin.");
     return;
   }
   
-  // Função para redirecionar
-  const redirectToAneel = () => {
-    window.location.href = ANEEL_REDIRECT_URL;
-  };
-
   // Detectar DevTools por alteração de dimensões da janela (para Chrome/Firefox)
   let devToolsTimeout: any;
   
@@ -344,12 +361,18 @@ export function setupDevToolsDetection(): void {
   
   // Verificar periodicamente por debugger
   setInterval(checkDebugger, 1000);
+  */
 }
 
 /**
  * Proteção contra scripts ou ferramentas de automação/scraping
+ * MODIFICAÇÃO TEMPORÁRIA: Desativando proteção anti-automação
  */
 function setupAntiAutomationProtection(): void {
+  console.log("Verificações anti-automação DESATIVADAS para permitir acesso via desktop.");
+  
+  // Original comentado abaixo
+  /*
   // Verifica se está em uma página permitida para desktop
   if (isDesktopAllowedPage()) {
     console.log("Verificações anti-automação desativadas para páginas de admin.");
@@ -407,8 +430,7 @@ function setupAntiAutomationProtection(): void {
       }, 30000);
     }
   }, 5000);
-  
-  // Código de proteção contra iframe foi removido para permitir acesso em desktop
+  */
 }
 
 /**
