@@ -231,11 +231,12 @@ export default function PagamentoPix() {
     }
   };
 
-  // Verificar status do pagamento
+  // Verificar status do pagamento (em background sem alterar UI)
   const verificarStatusPagamento = async () => {
     if (!paymentInfo?.id) return;
     
-    setIsLoading(true);
+    // Não mostramos indicador de loading para verificações em segundo plano
+    // setIsLoading(true); <- removido para evitar piscar a tela
     console.log("[VerificaçãoPIX] Verificando status do pagamento:", paymentInfo.id);
     
     try {
@@ -245,18 +246,27 @@ export default function PagamentoPix() {
         const data = await response.json();
         console.log("[VerificaçãoPIX] Status recebido da API:", data.status);
         
-        // Atualizar o estado com o status atual
-        setPaymentStatus(data.status);
+        // Atualizar o estado com o status atual (não causa refresh visual)
+        if (paymentStatus !== data.status) {
+          setPaymentStatus(data.status);
+        }
         
         // Somente redirecionar se o status for realmente 'completed'
         if (data.status === 'completed' || data.status === 'COMPLETED' || data.status === 'PAID' || data.status === 'paid') {
           console.log("[VerificaçãoPIX] Pagamento CONFIRMADO. Preparando redirecionamento...");
           
-          toast({
-            title: "Pagamento confirmado!",
-            description: "Seu pagamento foi processado com sucesso. Redirecionando...",
-            variant: "default"
-          });
+          // Mostrar toast apenas uma vez quando detectar pagamento
+          if (paymentStatus !== 'completed' && 
+              paymentStatus !== 'COMPLETED' && 
+              paymentStatus !== 'PAID' && 
+              paymentStatus !== 'paid') {
+            
+            toast({
+              title: "Pagamento confirmado!",
+              description: "Seu pagamento foi processado com sucesso. Redirecionando...",
+              variant: "default"
+            });
+          }
           
           // Atualizar o contexto com os dados do pagamento
           updateUserData({
