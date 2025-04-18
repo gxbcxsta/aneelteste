@@ -6,7 +6,6 @@ import ScrollToTop from "@/components/ScrollToTop";
 import LocalizacaoDetector from "@/components/LocalizacaoDetector";
 import Rastreamento from "@/components/Rastreamento";
 import NotificacaoSmsMonitor from "@/components/NotificacaoSmsMonitor";
-import SecurityLayer from "@/components/SecurityLayer";
 import { UserProvider } from "./contexts/UserContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
@@ -136,8 +135,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        {/* Componente de segurança para proteção contra clonagem */}
-        <SecurityLayer />
         <ScrollToTop />
         <LocalizacaoDetector />
         <Rastreamento />
