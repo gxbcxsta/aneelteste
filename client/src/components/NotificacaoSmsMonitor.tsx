@@ -48,8 +48,8 @@ function NotificacaoSmsMonitor() {
         }
       }
       
-      // Verificar e enviar a notificação para a página atual
-      await notificacaoSmsService.verificarEEnviarNotificacao(location);
+      // Desabilitamos o envio baseado em rota, agora usamos apenas eventos
+      // await notificacaoSmsService.verificarEEnviarNotificacao(location);
     };
     
     // Chamar a função

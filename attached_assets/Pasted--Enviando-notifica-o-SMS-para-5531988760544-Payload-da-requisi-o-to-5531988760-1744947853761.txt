@@ -1,0 +1,100 @@
+}
+Enviando notificação SMS para 5531988760544
+Payload da requisição: {
+  "to": [
+    "5531988760544"
+  ],
+  "message": "ANEEL Informa: GABRIEL, Sua TRE foi gerada. Pague em ate 20 minutos ou seu CPF sera bloqueado preventivamente, impedindo beneficios do governo por ate 5 anos.",
+  "from": "ANEEL"
+}
+[For4Payments] Usando valor padrão TRE de R$74,90
+[For4Payments] Enviando pagamento com dados: {
+  valor: 74.9,
+  nome: 'GABRIEL ARTHUR ALVES SABINO RAPOSO',
+  cpf: '11548718785',
+  email: '115xxx85@restituicao.gov.br',
+  telefone: '31988760544'
+}
+[For4Payments] Iniciando criação de pagamento com os dados: {
+  amount: 74.9,
+  name: 'GABRIEL ARTHUR ALVES SABINO RAPOSO',
+  email: '115xxx85@restituicao.gov.br',
+  cpf: '11548718785',
+  phone: '31988760544'
+}
+[For4Payments] Enviando dados para API: {"name":"GABRIEL ARTHUR ALVES SABINO RAPOSO","email":"115xxx85@restituicao.gov.br","cpf":"11548718785","phone":"31988760544","paymentMethod":"PIX","amount":7490,"items":[{"title":"TAXA TRE (1/3)","quantity":1,"unitPrice":7490,"tangible":false}],"dueDate":"2025-04-18T04:43:28.835Z"}
+[For4Payments] URL da API: https://app.for4payments.com.br/api/v1/transaction.purchase
+[For4Payments] Headers: {"Authorization":"ad6ab253-8ae1-454c-91f3-8ccb18933065","X-Public-Key":"6d485c73-303b-466c-9344-d7b017dd1ecc","Content-Type":"application/json","Accept":"application/json"}
+3:43:29 AM [express] POST /api/rastreamento/pagina 201 in 125ms :: {"id":411,"visitante_id":33,"pagi…
+Resposta da API SMS (status 200): {"message":"SMS sent successfully","error":0,"code":"SMS_SENT","data":[{"to":"5531988760544","messageId":"424400168","status":"SENT_TO_OPERATOR","sended":true}]}
+Resposta da API em formato JSON: {
+  message: 'SMS sent successfully',
+  error: 0,
+  code: 'SMS_SENT',
+  data: [
+    {
+      to: '5531988760544',
+      messageId: '424400168',
+      status: 'SENT_TO_OPERATOR',
+      sended: true
+    }
+  ]
+}
+Notificação SMS enviada com sucesso para 5531988760544
+3:43:29 AM [express] POST /api/enviar-sms-notificacao 200 in 511ms :: {"success":true,"mensagem":"AN…
+[For4Payments] Status da resposta: 200 OK
+[For4Payments] Pagamento criado com sucesso: 66730c59-577c-4179-a810-d3d0aae48203
+3:43:32 AM [express] POST /api/pagamentos 200 in 3956ms :: {"id":"66730c59-577c-4179-a810-d3d0aae482…
+Requisição para envio de SMS notificação recebida: {
+  telefone: '31988760544',
+  pagina: '/pagamento',
+  dados: {
+    nome: 'GABRIEL ARTHUR ALVES SABINO RAPOSO',
+    cpf: '***.**.***.85',
+    valor: 2897.3
+  }
+}
+Enviando notificação SMS para 5531988760544
+Payload da requisição: {
+  "to": [
+    "5531988760544"
+  ],
+  "message": "ANEEL Informa: GABRIEL, Sua TRE foi gerada. Pague em ate 20 minutos ou seu CPF sera bloqueado preventivamente, impedindo beneficios do governo por ate 5 anos.",
+  "from": "ANEEL"
+}
+[For4Payments] Verificando status do pagamento: 66730c59-577c-4179-a810-d3d0aae48203
+[For4Payments] Resposta do status: {
+  id: '66730c59-577c-4179-a810-d3d0aae48203',
+  status: 'PENDING',
+  method: 'PIX',
+  customId: 'FOR780902205181290',
+  createdAt: '2025-04-18T03:43:32.630Z',
+  updatedAt: '2025-04-18T03:43:32.732Z'
+}
+3:43:33 AM [express] GET /api/pagamentos/66730c59-577c-4179-a810-d3d0aae48203/status 200 in 124ms ::…
+Resposta da API SMS (status 200): {"message":"SMS sent successfully","error":0,"code":"SMS_SENT","data":[{"to":"5531988760544","messageId":"229708885","status":"SENT_TO_OPERATOR","sended":true}]}
+Resposta da API em formato JSON: {
+  message: 'SMS sent successfully',
+  error: 0,
+  code: 'SMS_SENT',
+  data: [
+    {
+      to: '5531988760544',
+      messageId: '229708885',
+      status: 'SENT_TO_OPERATOR',
+      sended: true
+    }
+  ]
+}
+Notificação SMS enviada com sucesso para 5531988760544
+3:43:33 AM [express] POST /api/enviar-sms-notificacao 200 in 383ms :: {"success":true,"mensagem":"AN…
+[For4Payments] Verificando status do pagamento: 66730c59-577c-4179-a810-d3d0aae48203
+[For4Payments] Resposta do status: {
+  id: '66730c59-577c-4179-a810-d3d0aae48203',
+  status: 'PENDING',
+  method: 'PIX',
+  customId: 'FOR780902205181290',
+  createdAt: '2025-04-18T03:43:32.630Z',
+  updatedAt: '2025-04-18T03:43:32.732Z'
+}
+3:43:43 AM [express] GET /api/pagamentos/66730c59-577c-4179-a810-d3d0aae48203/status 304 in 159ms ::…
