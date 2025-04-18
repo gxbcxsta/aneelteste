@@ -1,0 +1,102 @@
+C:\Users\GabrielPC\Documents\GChub\OP\aneel>heroku logs --tail --app aneel-restituicao
+2025-04-18T19:00:20.064013+00:00 app[api]: Release v2 created by user gxbcxsta@gmail.com
+2025-04-18T19:00:20.064013+00:00 app[api]: Enable Logplex by user gxbcxsta@gmail.com
+2025-04-18T19:01:48.254243+00:00 app[api]: @ref:postgresql-trapezoidal-50317 completed provisioning, setting DATABASE_URL. by user heroku-postgresql@addons.heroku.com
+2025-04-18T19:01:48.254243+00:00 app[api]: Release v3 created by user heroku-postgresql@addons.heroku.com
+2025-04-18T19:04:18.985379+00:00 app[api]: Release v4 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:18.985379+00:00 app[api]: Set NODE_ENV config vars by user gxbcxsta@gmail.com
+2025-04-18T19:04:21.769572+00:00 app[api]: Set SESSION_SECRET config vars by user gxbcxsta@gmail.com
+2025-04-18T19:04:21.769572+00:00 app[api]: Release v5 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:23.768281+00:00 app[api]: Release v6 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:23.768281+00:00 app[api]: Set FOR4PAYMENTS_SECRET_KEY config vars by user gxbcxsta@gmail.com
+2025-04-18T19:04:25.814151+00:00 app[api]: Release v7 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:25.814151+00:00 app[api]: Set FOR4PAYMENTS_PUBLIC_KEY config vars by user gxbcxsta@gmail.com
+2025-04-18T19:04:28.315571+00:00 app[api]: Set UTMIFY_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-18T19:04:28.315571+00:00 app[api]: Release v8 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:30.454193+00:00 app[api]: Set EXATO_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-18T19:04:30.454193+00:00 app[api]: Release v9 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:32.814911+00:00 app[api]: Release v10 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:32.814911+00:00 app[api]: Set INTEGRAFLUX_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-18T19:04:34.857516+00:00 app[api]: Release v11 created by user gxbcxsta@gmail.com
+2025-04-18T19:04:34.857516+00:00 app[api]: Set NPM_CONFIG_PRODUCTION config vars by user gxbcxsta@gmail.com
+2025-04-18T19:05:49.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-18T19:06:25.297913+00:00 app[api]: Deploy f5214a58 by user gxbcxsta@gmail.com
+2025-04-18T19:06:25.297913+00:00 app[api]: Release v12 created by user gxbcxsta@gmail.com
+2025-04-18T19:06:25.314252+00:00 app[api]: Scaled to web@1:Basic by user gxbcxsta@gmail.com
+2025-04-18T19:06:29.000000+00:00 app[api]: Build succeeded
+2025-04-18T19:06:31.890530+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-18T19:06:32.499606+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-18T19:06:32.500095+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-18T19:06:32.501265+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-18T19:06:32.501317+00:00 app[web.1]: Diretório base: /app
+2025-04-18T19:06:32.504610+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-18T19:06:32.504611+00:00 app[web.1]: at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+2025-04-18T19:06:32.504611+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:860:10)
+2025-04-18T19:06:32.504611+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-18T19:06:32.504612+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-18T19:06:32.504612+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-18T19:06:32.504612+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-18T19:06:32.504612+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-18T19:06:32.504613+00:00 app[web.1]: at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:577:36)
+2025-04-18T19:06:32.504613+00:00 app[web.1]: at TracingChannel.tracePromise (node:diagnostics_channel:344:14)
+2025-04-18T19:06:32.504613+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:576:21) {
+2025-04-18T19:06:32.504613+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND',
+2025-04-18T19:06:32.504614+00:00 app[web.1]: url: 'file:///app/server/routes.js'
+2025-04-18T19:06:32.504614+00:00 app[web.1]: }
+2025-04-18T19:06:32.545893+00:00 heroku[web.1]: Process exited with status 1
+2025-04-18T19:06:32.573374+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-18T19:06:32.577447+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-18T19:06:39.360761+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-18T19:06:40.029467+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-18T19:06:40.029831+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-18T19:06:40.030682+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-18T19:06:40.030714+00:00 app[web.1]: Diretório base: /app
+2025-04-18T19:06:40.033142+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-18T19:06:40.033143+00:00 app[web.1]: at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+2025-04-18T19:06:40.033143+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:860:10)
+2025-04-18T19:06:40.033144+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-18T19:06:40.033144+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-18T19:06:40.033145+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-18T19:06:40.033145+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-18T19:06:40.033146+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-18T19:06:40.033146+00:00 app[web.1]: at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:577:36)
+2025-04-18T19:06:40.033146+00:00 app[web.1]: at TracingChannel.tracePromise (node:diagnostics_channel:344:14)
+2025-04-18T19:06:40.033147+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:576:21) {
+2025-04-18T19:06:40.033147+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND',
+2025-04-18T19:06:40.033148+00:00 app[web.1]: url: 'file:///app/server/routes.js'
+2025-04-18T19:06:40.033148+00:00 app[web.1]: }
+2025-04-18T19:06:40.080103+00:00 heroku[web.1]: Process exited with status 1
+2025-04-18T19:06:40.105505+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-18T19:06:47.739328+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=aneel-restituicao-c22394d45076.herokuapp.com request_id=ce99b2d5-20be-4cca-8e73-b83f14cd72c8 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-18T19:06:48.376537+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=aneel-restituicao-c22394d45076.herokuapp.com request_id=60e38080-727e-45d8-a5d0-69adfd5a261c fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-18T19:07:24.787874+00:00 app[api]: Starting process with command `node heroku-db-setup.js` by user gxbcxsta@gmail.com
+2025-04-18T19:07:32.232305+00:00 heroku[run.8520]: State changed from starting to up
+2025-04-18T19:07:35.623302+00:00 heroku[run.8520]: Process exited with status 0
+2025-04-18T19:07:35.655012+00:00 heroku[run.8520]: State changed from up to complete
+2025-04-18T19:07:43.033472+00:00 app[api]: Starting process with command `node build-heroku.js` by user gxbcxsta@gmail.com
+2025-04-18T19:07:50.136256+00:00 heroku[run.1230]: State changed from starting to up
+2025-04-18T19:07:57.591686+00:00 heroku[run.1230]: Process exited with status 0
+2025-04-18T19:07:57.616143+00:00 heroku[run.1230]: State changed from up to complete
+2025-04-18T19:09:01.840298+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-18T19:09:08.684801+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-18T19:09:09.281770+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-18T19:09:09.282197+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-18T19:09:09.283141+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-18T19:09:09.283172+00:00 app[web.1]: Diretório base: /app
+2025-04-18T19:09:09.285579+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-18T19:09:09.285579+00:00 app[web.1]: at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+2025-04-18T19:09:09.285580+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:860:10)
+2025-04-18T19:09:09.285580+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-18T19:09:09.285580+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-18T19:09:09.285580+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-18T19:09:09.285581+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-18T19:09:09.285581+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-18T19:09:09.285582+00:00 app[web.1]: at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:577:36)
+2025-04-18T19:09:09.285582+00:00 app[web.1]: at TracingChannel.tracePromise (node:diagnostics_channel:344:14)
+2025-04-18T19:09:09.285582+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:576:21) {
+2025-04-18T19:09:09.285582+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND',
+2025-04-18T19:09:09.285583+00:00 app[web.1]: url: 'file:///app/server/routes.js'
+2025-04-18T19:09:09.285583+00:00 app[web.1]: }
+2025-04-18T19:09:09.336540+00:00 heroku[web.1]: Process exited with status 1
+2025-04-18T19:09:09.361369+00:00 heroku[web.1]: State changed from starting to crashed
+
