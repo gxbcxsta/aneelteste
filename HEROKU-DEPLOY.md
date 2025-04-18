@@ -92,7 +92,7 @@ heroku config:set UTMIFY_API_TOKEN=XAo52G3UkJ6ePs7Aq3UqHs32hvDPZ8rjUog4
 heroku config:set EXATO_API_TOKEN=268753a9b3a24819ae0f02159dee6724
 
 # IntegraFlux SMS
-heroku config:set INTEGRAFLUX_API_TOKEN=seu-token-sms-aqui
+heroku config:set INTEGRAFLUX_API_TOKEN=01eb31cf-8692-4869-9843-860260706c27
 ```
 
 #### Configuração via Dashboard do Heroku

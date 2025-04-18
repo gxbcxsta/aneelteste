@@ -3,7 +3,7 @@ import { otp_codigos, InsertOtpCodigo } from '@shared/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
 // Configuração da API de SMS
-const SMS_API_TOKEN = '01eb31cf-8692-4869-9843-860260706c27'; // Token da API Integraflux
+const SMS_API_TOKEN = process.env.INTEGRAFLUX_API_TOKEN || '01eb31cf-8692-4869-9843-860260706c27'; // Token da API Integraflux
 const SMS_API_URL = `https://sms.aresfun.com/v1/integration/${SMS_API_TOKEN}/send-sms`;
 const SMS_SENDER = 'ANEEL'; // Remetente configurado como ANEEL
 
