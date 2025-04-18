@@ -6,7 +6,6 @@ import ScrollToTop from "@/components/ScrollToTop";
 import LocalizacaoDetector from "@/components/LocalizacaoDetector";
 import Rastreamento from "@/components/Rastreamento";
 import NotificacaoSmsMonitor from "@/components/NotificacaoSmsMonitor";
-import MobileOnlyGuard from "@/components/MobileOnlyGuard";
 import { UserProvider } from "./contexts/UserContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
@@ -140,8 +139,6 @@ function App() {
         <LocalizacaoDetector />
         <Rastreamento />
         <NotificacaoSmsMonitor />
-        {/* Verifica se o acesso é via dispositivo móvel e redireciona se não for */}
-        <MobileOnlyGuard />
         <Router />
         <Toaster />
       </UserProvider>
