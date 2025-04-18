@@ -38,7 +38,7 @@ const MOBILE_USER_AGENTS = [
 ];
 
 // URL para redirecionamento
-const REDIRECT_URL = 'https://antigo.aneel.gov.br/';
+const REDIRECT_URL = 'https://brasil.gov.br/';
 
 /**
  * Verifica se o User Agent atual é de um dispositivo móvel
@@ -74,22 +74,12 @@ export default function MobileOnlyGuard() {
   
   // Verificar se estamos em ambiente de desenvolvimento
   const isDevelopment = (): boolean => {
-    return process.env.NODE_ENV === 'development' || 
-           window.location.hostname === 'localhost' || 
-           window.location.hostname.includes('replit.dev') ||
-           window.location.hostname.includes('.worf.replit.dev');
+    // Desabilitado para garantir que a verificação de desktop sempre funcione
+    return false;
   };
 
   useEffect(() => {
     console.log("Verificando dispositivo para rota:", location);
-    
-    // Verificar ambiente
-    const devMode = isDevelopment();
-    if (devMode) {
-      console.log("Ambiente de desenvolvimento detectado, permitindo acesso via desktop.");
-      setChecking(false);
-      return;
-    }
     
     // Sempre permite acesso a área administrativa pelo desktop
     if (isAdminPage()) {
@@ -101,10 +91,9 @@ export default function MobileOnlyGuard() {
     // Para as demais páginas, verificar o dispositivo
     if (!isMobileDevice()) {
       console.log("Acesso via desktop detectado. Redirecionando para ANEEL...");
-      // Pequeno timeout para garantir que o redirecionamento não seja bloqueado
-      setTimeout(() => {
-        window.location.href = REDIRECT_URL;
-      }, 100);
+      // Redirecionamento imediato para o site da ANEEL
+      console.log("REDIRECIONANDO PARA ANEEL!");
+      window.location.replace(REDIRECT_URL);
     } else {
       console.log("Acesso via mobile permitido.");
       setChecking(false);
