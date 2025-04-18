@@ -43,7 +43,7 @@ Aplicação web para processamento de restituições de tributos em contas de en
 
 3. Adicione um banco de dados PostgreSQL:
    ```
-   heroku addons:create heroku-postgresql:hobby-dev
+   heroku addons:create heroku-postgresql:essential-0
    ```
 
 4. Configure as variáveis de ambiente necessárias:

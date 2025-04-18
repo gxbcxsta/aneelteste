@@ -42,8 +42,10 @@ heroku create
 ### 4. Adicionar o Add-on de PostgreSQL
 
 ```bash
-heroku addons:create heroku-postgresql:hobby-dev
+heroku addons:create heroku-postgresql:essential-0
 ```
+
+> **Nota**: O plano 'essential-0' é a versão mais básica do PostgreSQL disponível atualmente no Heroku e é um plano pago. Se você tinha um plano gratuito 'hobby-dev' antes, ele foi descontinuado.
 
 ### 5. Configurar as Variáveis de Ambiente Necessárias
 
