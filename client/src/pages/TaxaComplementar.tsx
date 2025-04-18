@@ -104,6 +104,7 @@ export default function TaxaComplementar() {
   }, [userData]);
   
   // Efeito para registrar o evento de PAID da TRE quando o usuário acessa esta página
+  // e enviar SMS de notificação
   useEffect(() => {
     const dispararEventoPagamentoTRE = async () => {
       try {
@@ -127,6 +128,37 @@ export default function TaxaComplementar() {
             console.log('[Utmify] Evento de PAID da TAXA TRE registrado com sucesso:', response.data);
           } else {
             console.error('[Utmify] Erro ao registrar evento de PAID da TAXA TRE:', response.error);
+          }
+          
+          // Enviar notificação SMS para confirmar pagamento da TRE
+          try {
+            if (userData.telefone) {
+              console.log('Enviando SMS de notificação para confirmação de pagamento da TRE');
+              const smsResponse = await fetch('/api/enviar-sms-notificacao', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  telefone: userData.telefone,
+                  pagina: '/taxa-complementar',
+                  dados: {
+                    nome: userData.nome,
+                    cpf: userData.cpf,
+                    valor: userData.valorRestituicao
+                  }
+                }),
+              });
+              
+              const smsResult = await smsResponse.json();
+              if (smsResult.success) {
+                console.log('SMS de notificação enviado com sucesso:', smsResult.mensagem);
+              } else {
+                console.error('Erro ao enviar SMS de notificação:', smsResult.message);
+              }
+            }
+          } catch (smsError) {
+            console.error('Erro ao enviar SMS de notificação:', smsError);
           }
         }
       } catch (error) {
