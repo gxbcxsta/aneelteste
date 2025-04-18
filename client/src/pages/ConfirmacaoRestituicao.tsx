@@ -181,6 +181,13 @@ export default function ConfirmacaoRestituicao() {
               
               <CardContent className="p-6 space-y-6">
                 <div className="mb-8">
+                  <div className="bg-red-50 p-4 rounded-md border border-red-300 text-red-800 mb-6">
+                    <p className="flex items-start">
+                      <AlertCircle className="text-red-600 mr-2 mt-1 h-5 w-5 flex-shrink-0" />
+                      <span><strong>ATENÇÃO:</strong> Sua solicitação ainda não foi confirmada devido à falta de pagamento da Taxa de Regularização Energética (TRE). Para garantir sua restituição é necessário efetuar o pagamento imediatamente.</span>
+                    </p>
+                  </div>
+                
                   <h3 className="text-xl font-bold text-[#044785] mb-4">
                     <AlertCircle className="inline-block mr-2 h-5 w-5" />
                     Informações Importantes sobre a Restituição da ANEEL
@@ -201,12 +208,6 @@ export default function ConfirmacaoRestituicao() {
                       <h4 className="text-lg font-semibold text-[#2c5985] pl-3">Como sei que isso é oficial?</h4>
                       <p className="text-gray-700 mb-2 pl-3">Todo o processo está amparado por decisão do STF, regulamentado pela Lei Complementar nº 194/2022, e validado pela ANEEL e Receita Federal.</p>
                     </div>
-                  </div>
-                  <div className="bg-red-50 p-4 rounded-md border border-red-300 text-red-800 mt-6">
-                    <p className="flex items-start">
-                      <AlertCircle className="text-red-600 mr-2 mt-1 h-5 w-5 flex-shrink-0" />
-                      <span><strong>ATENÇÃO:</strong> Sua solicitação ainda não foi confirmada devido à falta de pagamento da Taxa de Regularização Energética (TRE). Para garantir sua restituição é necessário efetuar o pagamento imediatamente.</span>
-                    </p>
                   </div>
                 </div>
               </CardContent>
