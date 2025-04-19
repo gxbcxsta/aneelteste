@@ -4,7 +4,7 @@ services:
     env: node
     buildCommand: npm run build
     startCommand: npm start
-    plan: starter
+    plan: free
     envVars:
       - key: NODE_ENV
         value: production
@@ -25,5 +25,5 @@ services:
 
 databases:
   - name: icms-restituicao-db
-    plan: starter
+    plan: free
     postgresMajorVersion: 15
