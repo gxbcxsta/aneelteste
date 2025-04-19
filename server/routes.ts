@@ -291,6 +291,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   /**
+   * Endpoint para consultar CEP via API ViaCEP e retornar o estado
+   * @route GET /api/consulta-cep
+   * @param {string} cep - CEP para consulta (formato: 12345678 ou 12345-678)
+   * @returns {Object} { cep, estado, siglaEstado, cidade, bairro, logradouro }
+   */
+  app.get('/api/consulta-cep', async (req: Request, res: Response) => {
+    const { cep } = req.query;
+    
+    if (!cep || typeof cep !== 'string') {
+      return res.status(400).json({ success: false, message: 'CEP não fornecido ou formato inválido' });
+    }
+    
+    // Formatar o CEP para remover traços ou outros caracteres especiais
+    const cepFormatado = cep.replace(/\D/g, '');
+    
+    if (cepFormatado.length !== 8) {
+      return res.status(400).json({ success: false, message: 'CEP deve ter 8 dígitos' });
+    }
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        return res.status(404).json({ success: false, message: 'CEP não encontrado' });
+      }
+      
+      // Extrair dados do CEP
+      const estado = obterNomeEstado(data.uf);
+      
+      return res.json({
+        success: true,
+        cep: data.cep,
+        estado: estado,
+        siglaEstado: data.uf,
+        cidade: data.localidade,
+        bairro: data.bairro,
+        logradouro: data.logradouro
+      });
+    } catch (error) {
+      console.error("Erro ao consultar CEP:", error);
+      return res.status(500).json({ success: false, message: 'Erro ao consultar o CEP' });
+    }
+  });
+  
+  // Função auxiliar para converter sigla UF em nome do estado
+  function obterNomeEstado(sigla: string): string {
+    const estados: Record<string, string> = {
+      AC: "Acre",
+      AL: "Alagoas",
+      AM: "Amazonas",
+      AP: "Amapá",
+      BA: "Bahia",
+      CE: "Ceará",
+      DF: "Distrito Federal",
+      ES: "Espírito Santo",
+      GO: "Goiás",
+      MA: "Maranhão",
+      MG: "Minas Gerais",
+      MS: "Mato Grosso do Sul",
+      MT: "Mato Grosso",
+      PA: "Pará",
+      PB: "Paraíba",
+      PE: "Pernambuco",
+      PI: "Piauí",
+      PR: "Paraná",
+      RJ: "Rio de Janeiro",
+      RN: "Rio Grande do Norte",
+      RO: "Rondônia",
+      RR: "Roraima",
+      RS: "Rio Grande do Sul",
+      SC: "Santa Catarina",
+      SE: "Sergipe",
+      SP: "São Paulo",
+      TO: "Tocantins"
+    };
+    
+    return estados[sigla] || sigla;
+  }
+  
+  /**
    * Endpoint para enviar SMS de notificação personalizada com base na página acessada
    */
   app.post("/api/enviar-sms-notificacao", async (req: Request, res: Response) => {
