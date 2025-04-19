@@ -1,0 +1,93 @@
+C:\Users\GabrielPC\Desktop\app>heroku ps --app novoappaneel
+=== web (Basic): node heroku-start.js (1)
+
+web.1: crashed 2025/04/19 00:19:33 -0300 (~ 3m ago)
+
+
+C:\Users\GabrielPC\Desktop\app>heroku open --app novoappaneel
+
+C:\Users\GabrielPC\Desktop\app>heroku logs --tail
+2025-04-19T03:10:42.098249+00:00 app[api]: Release v1 created by user gxbcxsta@gmail.com
+2025-04-19T03:10:42.098249+00:00 app[api]: Initial release by user gxbcxsta@gmail.com
+2025-04-19T03:10:42.620303+00:00 app[api]: Enable Logplex by user gxbcxsta@gmail.com
+2025-04-19T03:10:42.620303+00:00 app[api]: Release v2 created by user gxbcxsta@gmail.com
+2025-04-19T03:12:22.086225+00:00 app[api]: @ref:postgresql-clear-63448 completed provisioning, setting DATABASE_URL. by user heroku-postgresql@addons.heroku.com
+2025-04-19T03:12:22.086225+00:00 app[api]: Release v3 created by user heroku-postgresql@addons.heroku.com
+2025-04-19T03:12:48.672205+00:00 app[api]: Set NODE_ENV config vars by user gxbcxsta@gmail.com
+2025-04-19T03:12:48.672205+00:00 app[api]: Release v4 created by user gxbcxsta@gmail.com
+2025-04-19T03:12:54.113061+00:00 app[api]: Release v5 created by user gxbcxsta@gmail.com
+2025-04-19T03:12:54.113061+00:00 app[api]: Set SESSION_SECRET config vars by user gxbcxsta@gmail.com
+2025-04-19T03:12:57.579442+00:00 app[api]: Release v6 created by user gxbcxsta@gmail.com
+2025-04-19T03:12:57.579442+00:00 app[api]: Set FOR4PAYMENTS_SECRET_KEY config vars by user gxbcxsta@gmail.com
+2025-04-19T03:13:02.120915+00:00 app[api]: Set FOR4PAYMENTS_PUBLIC_KEY config vars by user gxbcxsta@gmail.com
+2025-04-19T03:13:02.120915+00:00 app[api]: Release v7 created by user gxbcxsta@gmail.com
+2025-04-19T03:13:14.416668+00:00 app[api]: Set UTMIFY config vars by user gxbcxsta@gmail.com
+2025-04-19T03:13:14.416668+00:00 app[api]: Release v8 created by user gxbcxsta@gmail.com
+2025-04-19T03:13:20.567650+00:00 app[api]: Release v9 created by user gxbcxsta@gmail.com
+2025-04-19T03:13:20.567650+00:00 app[api]: Set EXATO_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-19T03:13:25.500027+00:00 app[api]: Release v10 created by user gxbcxsta@gmail.com
+2025-04-19T03:13:25.500027+00:00 app[api]: Set INTEGRAFLUX_API_TOKEN config vars by user gxbcxsta@gmail.com
+2025-04-19T03:13:34.140826+00:00 app[api]: Release v11 created by user gxbcxsta@gmail.com
+2025-04-19T03:13:34.140826+00:00 app[api]: Set ADMIN_USERNAME config vars by user gxbcxsta@gmail.com
+2025-04-19T03:13:37.058149+00:00 app[api]: Set ADMIN_PASSWORD config vars by user gxbcxsta@gmail.com
+2025-04-19T03:13:37.058149+00:00 app[api]: Release v12 created by user gxbcxsta@gmail.com
+2025-04-19T03:13:40.804588+00:00 app[api]: Release v13 created by user gxbcxsta@gmail.com
+2025-04-19T03:13:40.804588+00:00 app[api]: Set ADMIN_KEY config vars by user gxbcxsta@gmail.com
+2025-04-19T03:18:47.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-19T03:19:22.241378+00:00 app[api]: Deploy 9a21b744 by user gxbcxsta@gmail.com
+2025-04-19T03:19:22.241378+00:00 app[api]: Release v14 created by user gxbcxsta@gmail.com
+2025-04-19T03:19:22.254357+00:00 app[api]: Scaled to web@1:Basic by user gxbcxsta@gmail.com
+2025-04-19T03:19:26.000000+00:00 app[api]: Build succeeded
+2025-04-19T03:19:26.906854+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-19T03:19:27.579072+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-19T03:19:27.579649+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-19T03:19:27.580755+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-19T03:19:27.580793+00:00 app[web.1]: Diretório base: /app
+2025-04-19T03:19:27.586729+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-19T03:19:27.586730+00:00 app[web.1]: at new NodeError (node:internal/errors:405:5)
+2025-04-19T03:19:27.586730+00:00 app[web.1]: at finalizeResolution (node:internal/modules/esm/resolve:327:11)
+2025-04-19T03:19:27.586730+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:980:10)
+2025-04-19T03:19:27.586730+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:1206:11)
+2025-04-19T03:19:27.586730+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:404:12)
+2025-04-19T03:19:27.586731+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:373:25)
+2025-04-19T03:19:27.586731+00:00 app[web.1]: at ModuleLoader.getModuleJob (node:internal/modules/esm/loader:250:38)
+2025-04-19T03:19:27.586731+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:336:34)
+2025-04-19T03:19:27.586731+00:00 app[web.1]: at importModuleDynamically (node:internal/modules/esm/translators:143:35)
+2025-04-19T03:19:27.586733+00:00 app[web.1]: at importModuleDynamicallyCallback (node:internal/modules/esm/utils:176:14) {
+2025-04-19T03:19:27.586733+00:00 app[web.1]: url: 'file:///app/server/routes.js',
+2025-04-19T03:19:27.586733+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-19T03:19:27.586734+00:00 app[web.1]: }
+2025-04-19T03:19:27.650526+00:00 heroku[web.1]: Process exited with status 1
+2025-04-19T03:19:27.678350+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-19T03:19:27.682600+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-19T03:19:32.490073+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-19T03:19:33.159989+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-19T03:19:33.160441+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-19T03:19:33.161273+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-19T03:19:33.161295+00:00 app[web.1]: Diretório base: /app
+2025-04-19T03:19:33.165873+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-19T03:19:33.165874+00:00 app[web.1]: at new NodeError (node:internal/errors:405:5)
+2025-04-19T03:19:33.165874+00:00 app[web.1]: at finalizeResolution (node:internal/modules/esm/resolve:327:11)
+2025-04-19T03:19:33.165874+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:980:10)
+2025-04-19T03:19:33.165875+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:1206:11)
+2025-04-19T03:19:33.165875+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:404:12)
+2025-04-19T03:19:33.165875+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:373:25)
+2025-04-19T03:19:33.165875+00:00 app[web.1]: at ModuleLoader.getModuleJob (node:internal/modules/esm/loader:250:38)
+2025-04-19T03:19:33.165876+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:336:34)
+2025-04-19T03:19:33.165876+00:00 app[web.1]: at importModuleDynamically (node:internal/modules/esm/translators:143:35)
+2025-04-19T03:19:33.165876+00:00 app[web.1]: at importModuleDynamicallyCallback (node:internal/modules/esm/utils:176:14) {
+2025-04-19T03:19:33.165876+00:00 app[web.1]: url: 'file:///app/server/routes.js',
+2025-04-19T03:19:33.165877+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-19T03:19:33.165877+00:00 app[web.1]: }
+2025-04-19T03:19:33.204731+00:00 heroku[web.1]: Process exited with status 1
+2025-04-19T03:19:33.227994+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-19T03:19:52.373433+00:00 app[api]: Starting process with command `node heroku-db-setup.js` by user gxbcxsta@gmail.com
+2025-04-19T03:19:57.306351+00:00 heroku[run.8028]: State changed from starting to up
+2025-04-19T03:20:00.558757+00:00 heroku[run.8028]: Process exited with status 0
+2025-04-19T03:20:00.584002+00:00 heroku[run.8028]: State changed from up to complete
+2025-04-19T03:22:36.016484+00:00 app[api]: Starting process with command `node heroku-db-setup.js` by user gxbcxsta@gmail.com
+2025-04-19T03:22:42.658501+00:00 heroku[run.5302]: State changed from starting to up
+2025-04-19T03:22:45.972161+00:00 heroku[run.5302]: Process exited with status 0
+2025-04-19T03:22:45.997384+00:00 heroku[run.5302]: State changed from up to complete
+2025-04-19T03:23:17.619185+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=410c02d5-0672-4439-9d5a-f8d44283e4b3 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-19T03:23:18.230826+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=9938eb78-194b-4b11-a8e9-a908aa2c39a4 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https

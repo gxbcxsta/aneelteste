@@ -1,0 +1,98 @@
+C:\Users\GabrielPC\Desktop\app>git push heroku main
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 2.45 KiB | 2.45 MiB/s, done.
+Total 4 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Updated 240 paths from 4e3d051
+remote: Compressing source files... done.
+remote: Building source:
+remote:
+remote: -----> Building on the Heroku-24 stack
+remote: -----> Using buildpack: heroku/nodejs
+remote: -----> Node.js app detected
+remote:
+remote: -----> Creating runtime environment
+remote:
+remote:        NPM_CONFIG_LOGLEVEL=error
+remote:        NODE_VERBOSE=false
+remote:        NODE_ENV=production
+remote:        NODE_MODULES_CACHE=true
+remote:
+remote: -----> Installing binaries
+remote:        engines.node (package.json):   18.x
+remote:        engines.npm (package.json):    9.x
+remote:
+remote:        Resolving node version 18.x...
+remote:        Downloading and installing node 18.20.8...
+remote:        Bootstrapping npm 9.x (replacing 10.8.2)...
+remote:        npm 9.9.4 installed
+remote:
+remote: -----> Restoring cache
+remote:        - npm cache
+remote:
+remote: -----> Installing dependencies
+remote:        Installing node modules
+remote:        npm ERR! code EUSAGE
+remote:        npm ERR!
+remote:        npm ERR! `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+remote:        npm ERR!
+remote:        npm ERR! Missing: ts-node@10.9.2 from lock file
+remote:        npm ERR! Missing: @cspotcode/source-map-support@0.8.1 from lock file
+remote:        npm ERR! Missing: @tsconfig/node10@1.0.11 from lock file
+remote:        npm ERR! Missing: @tsconfig/node12@1.0.11 from lock file
+remote:        npm ERR! Missing: @tsconfig/node14@1.0.3 from lock file
+remote:        npm ERR! Missing: @tsconfig/node16@1.0.4 from lock file
+remote:        npm ERR! Missing: acorn@8.14.1 from lock file
+remote:        npm ERR! Missing: acorn-walk@8.3.4 from lock file
+remote:        npm ERR! Missing: arg@4.1.3 from lock file
+remote:        npm ERR! Missing: create-require@1.1.1 from lock file
+remote:        npm ERR! Missing: diff@4.0.2 from lock file
+remote:        npm ERR! Missing: make-error@1.3.6 from lock file
+remote:        npm ERR! Missing: v8-compile-cache-lib@3.0.1 from lock file
+remote:        npm ERR! Missing: yn@3.1.1 from lock file
+remote:        npm ERR! Missing: @jridgewell/trace-mapping@0.3.9 from lock file
+remote:        npm ERR!
+remote:        npm ERR! Clean install a project
+remote:        npm ERR!
+remote:        npm ERR! Usage:
+remote:        npm ERR! npm ci
+remote:        npm ERR!
+remote:        npm ERR! Options:
+remote:        npm ERR! [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+remote:        npm ERR! [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+remote:        npm ERR! [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+remote:        npm ERR! [--no-bin-links] [--no-fund] [--dry-run]
+remote:        npm ERR! [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+remote:        npm ERR! [-ws|--workspaces] [--include-workspace-root] [--install-links]
+remote:        npm ERR!
+remote:        npm ERR! aliases: clean-install, ic, install-clean, isntall-clean
+remote:        npm ERR!
+remote:        npm ERR! Run "npm help ci" for more info
+remote:
+remote:        npm ERR! A complete log of this run can be found in: /tmp/npmcache.Ko6fw/_logs/2025-04-19T03_33_37_341Z-debug-0.log
+remote:
+remote: -----> Build failed
+remote:
+remote:        We're sorry this build is failing! You can troubleshoot common issues here:
+remote:        https://devcenter.heroku.com/articles/troubleshooting-node-deploys
+remote:
+remote:        If you're stuck, please submit a ticket so we can help:
+remote:        https://help.heroku.com/
+remote:
+remote:        Love,
+remote:        Heroku
+remote:
+remote:  !     Push rejected, failed to compile Node.js app.
+remote:
+remote:  !     Push failed
+remote: Verifying deploy...
+remote:
+remote: !       Push rejected to novoappaneel.
+remote:
+To https://git.heroku.com/novoappaneel.git
+ ! [remote rejected] main -> main (pre-receive hook declined)
+error: failed to push some refs to 'https://git.heroku.com/novoappaneel.git'
+
+C:\Users\GabrielPC\Desktop\app>

@@ -1,0 +1,105 @@
+C:\Users\GabrielPC\Desktop\app>heroku logs --tail
+2025-04-19T03:19:33.165876+00:00 app[web.1]: at importModuleDynamicallyCallback (node:internal/modules/esm/utils:176:14) {
+2025-04-19T03:19:33.165876+00:00 app[web.1]: url: 'file:///app/server/routes.js',
+2025-04-19T03:19:33.165877+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-19T03:19:33.165877+00:00 app[web.1]: }
+2025-04-19T03:19:33.204731+00:00 heroku[web.1]: Process exited with status 1
+2025-04-19T03:19:33.227994+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-19T03:19:52.373433+00:00 app[api]: Starting process with command `node heroku-db-setup.js` by user gxbcxsta@gmail.com
+2025-04-19T03:19:57.306351+00:00 heroku[run.8028]: State changed from starting to up
+2025-04-19T03:20:00.558757+00:00 heroku[run.8028]: Process exited with status 0
+2025-04-19T03:20:00.584002+00:00 heroku[run.8028]: State changed from up to complete
+2025-04-19T03:22:36.016484+00:00 app[api]: Starting process with command `node heroku-db-setup.js` by user gxbcxsta@gmail.com
+2025-04-19T03:22:42.658501+00:00 heroku[run.5302]: State changed from starting to up
+2025-04-19T03:22:45.972161+00:00 heroku[run.5302]: Process exited with status 0
+2025-04-19T03:22:45.997384+00:00 heroku[run.5302]: State changed from up to complete
+2025-04-19T03:23:17.619185+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=410c02d5-0672-4439-9d5a-f8d44283e4b3 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-19T03:23:18.230826+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=9938eb78-194b-4b11-a8e9-a908aa2c39a4 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-19T03:25:06.283690+00:00 app[api]: Starting process with command `run ls serverheroku run ls` by user gxbcxsta@gmail.com
+2025-04-19T03:25:11.451750+00:00 heroku[run.4740]: State changed from starting to up
+2025-04-19T03:25:14.436324+00:00 heroku[run.4740]: Process exited with status 127
+2025-04-19T03:25:14.460812+00:00 heroku[run.4740]: State changed from up to complete
+2025-04-19T03:25:22.828322+00:00 app[api]: Starting process with command `ls` by user gxbcxsta@gmail.com
+2025-04-19T03:25:28.224914+00:00 heroku[run.9148]: State changed from starting to up
+2025-04-19T03:25:31.225951+00:00 heroku[run.9148]: Process exited with status 0
+2025-04-19T03:25:31.255402+00:00 heroku[run.9148]: State changed from up to complete
+2025-04-19T03:33:20.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-19T03:33:39.000000+00:00 app[api]: Build failed -- check your build output: https://dashboard.heroku.com/apps/44fe1293-c0d0-4e4d-8635-244810d5fbf1/activity/builds/37a91b07-056b-47f6-ab82-ff57383e9e91
+2025-04-19T03:41:11.251642+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-19T03:41:15.932887+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-19T03:41:16.563799+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-19T03:41:16.564205+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-19T03:41:16.564996+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-19T03:41:16.565024+00:00 app[web.1]: Diretório base: /app
+2025-04-19T03:41:16.569409+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-19T03:41:16.569409+00:00 app[web.1]: at new NodeError (node:internal/errors:405:5)
+2025-04-19T03:41:16.569409+00:00 app[web.1]: at finalizeResolution (node:internal/modules/esm/resolve:327:11)
+2025-04-19T03:41:16.569409+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:980:10)
+2025-04-19T03:41:16.569410+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:1206:11)
+2025-04-19T03:41:16.569410+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:404:12)
+2025-04-19T03:41:16.569410+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:373:25)
+2025-04-19T03:41:16.569411+00:00 app[web.1]: at ModuleLoader.getModuleJob (node:internal/modules/esm/loader:250:38)
+2025-04-19T03:41:16.569411+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:336:34)
+2025-04-19T03:41:16.569411+00:00 app[web.1]: at importModuleDynamically (node:internal/modules/esm/translators:143:35)
+2025-04-19T03:41:16.569412+00:00 app[web.1]: at importModuleDynamicallyCallback (node:internal/modules/esm/utils:176:14) {
+2025-04-19T03:41:16.569412+00:00 app[web.1]: url: 'file:///app/server/routes.js',
+2025-04-19T03:41:16.569412+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND'
+2025-04-19T03:41:16.569413+00:00 app[web.1]: }
+2025-04-19T03:41:16.621083+00:00 heroku[web.1]: Process exited with status 1
+2025-04-19T03:41:16.642004+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-19T03:43:03.000000+00:00 app[api]: Build started by user gxbcxsta@gmail.com
+2025-04-19T03:43:39.516785+00:00 app[api]: Release v15 created by user gxbcxsta@gmail.com
+2025-04-19T03:43:39.516785+00:00 app[api]: Deploy 5463806a by user gxbcxsta@gmail.com
+2025-04-19T03:43:39.840338+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-19T03:43:43.000000+00:00 app[api]: Build succeeded
+2025-04-19T03:43:44.670444+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-19T03:43:45.645427+00:00 app[web.1]: Suporte ao TypeScript configurado com sucesso
+2025-04-19T03:43:45.646895+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-19T03:43:45.647037+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-19T03:43:45.647765+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-19T03:43:45.647793+00:00 app[web.1]: Diretório base: /app
+2025-04-19T03:43:45.647932+00:00 app[web.1]: Arquivos na pasta server: db-alternative.ts, db.ts, heroku-db-config.js, index.ts, routes.backup.ts, routes.ts, sms-service.ts, storage.ts, vite.ts
+2025-04-19T03:43:45.650216+00:00 app[web.1]: Tentando importar routes.ts diretamente...
+2025-04-19T03:43:45.650934+00:00 app[web.1]: Erro ao importar routes.ts diretamente: Unknown file extension ".ts" for /app/server/routes.ts
+2025-04-19T03:43:45.650982+00:00 app[web.1]: Tentando importar routes.js...
+2025-04-19T03:43:45.651361+00:00 app[web.1]: Erro ao importar routes.js: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-19T03:43:45.651391+00:00 app[web.1]: Tentando importar usando require...
+2025-04-19T03:43:45.668710+00:00 app[web.1]: Todas as tentativas de importar routes falharam: Must use import to load ES Module: /app/server/routes.ts
+2025-04-19T03:43:45.668711+00:00 app[web.1]: require() of ES modules is not supported.
+2025-04-19T03:43:45.668721+00:00 app[web.1]: require() of /app/server/routes.ts from /app/heroku-start.js is an ES module file as it is a .ts file whose nearest parent package.json contains "type": "module" which defines all .ts files in that package scope as ES modules.
+2025-04-19T03:43:45.668721+00:00 app[web.1]: Instead change the requiring code to use import(), or remove "type": "module" from /app/package.json.
+2025-04-19T03:43:45.668722+00:00 app[web.1]:
+2025-04-19T03:43:45.668750+00:00 app[web.1]: Configurando rotas de fallback básicas...
+2025-04-19T03:43:45.672516+00:00 app[web.1]: Servidor rodando na porta 35295
+2025-04-19T03:43:45.877528+00:00 heroku[web.1]: State changed from starting to up
+2025-04-19T03:47:23.216177+00:00 heroku[router]: at=info method=GET path="/" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=4e677355-3cbb-47de-84c4-3751eac6ddc6 fwd="201.80.15.81" dyno=web.1 connect=0ms service=9ms status=200 bytes=3036 protocol=https
+2025-04-19T03:47:23.387377+00:00 heroku[router]: at=info method=GET path="/assets/index-CeprnKlr.css" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=82f1c983-0a7a-4402-9b1f-7e2295d7cd9a fwd="201.80.15.81" dyno=web.1 connect=0ms service=3ms status=200 bytes=84202 protocol=https
+2025-04-19T03:47:23.389376+00:00 heroku[router]: at=info method=GET path="/assets/index-BmbOLCEd.js" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=38fc0b27-625c-42c9-9b3c-7419cd32789b fwd="201.80.15.81" dyno=web.1 connect=0ms service=7ms status=200 bytes=734011 protocol=https
+2025-04-19T03:47:24.507996+00:00 heroku[router]: at=info method=GET path="/api/detectar-estado?_nocache=1745034444844" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=098a72e7-3546-4f55-9eb8-38448a68bc11 fwd="201.80.15.81" dyno=web.1 connect=0ms service=3ms status=200 bytes=3036 protocol=https
+2025-04-19T03:47:24.509981+00:00 heroku[router]: at=info method=GET path="/assets/govbr-B9sTV8pj.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=ba2229ac-3e88-4001-8eae-ec3c118f0c60 fwd="201.80.15.81" dyno=web.1 connect=0ms service=1ms status=200 bytes=16152 protocol=https
+2025-04-19T03:47:24.666801+00:00 heroku[router]: at=info method=GET path="/favicon.ico" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=3237c9ac-2e39-453f-8f5e-c54b58b8388c fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=https
+2025-04-19T03:47:43.301342+00:00 heroku[router]: at=info method=GET path="/api/detectar-estado?_nocache=1745034463627" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=8ba2505c-955f-4b00-910f-df755a24a2cc fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=https
+2025-04-19T03:47:44.236626+00:00 heroku[router]: at=info method=GET path="/assets/img/imagem-4.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=c9be8b55-719c-4fe8-bfd0-104da511255a fwd="201.80.15.81" dyno=web.1 connect=0ms service=1ms status=200 bytes=1469 protocol=https
+2025-04-19T03:47:44.246100+00:00 heroku[router]: at=info method=GET path="/assets/img/imagem-5.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=b9bc484f-5306-465a-9739-79b991149f9a fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=200 bytes=1580 protocol=https
+2025-04-19T03:47:44.386843+00:00 heroku[router]: at=info method=GET path="/favicon.ico" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=3db6c8e5-e6df-4a70-b1e3-7173c201871d fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=304 bytes=237 protocol=https
+2025-04-19T03:47:44.404933+00:00 heroku[router]: at=info method=GET path="/assets/img/imagem-1.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=7a93d5d3-9d2c-425e-a14a-576d3177d0ec fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=200 bytes=1952 protocol=https
+2025-04-19T03:47:44.535320+00:00 heroku[router]: at=info method=GET path="/assets/img/imagem-3.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=ad938fc5-1785-4853-9186-30628d4e8c8a fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=200 bytes=1566 protocol=https
+2025-04-19T03:47:44.541237+00:00 heroku[router]: at=info method=GET path="/assets/img/tesoura.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=7def6d69-672c-412d-ac72-d55e966c7002 fwd="201.80.15.81" dyno=web.1 connect=0ms service=1ms status=200 bytes=1981 protocol=https
+2025-04-19T03:47:47.100987+00:00 heroku[router]: at=info method=GET path="/robots.txt" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=02a59748-720b-4da4-8bd8-d5723e4212bc fwd="69.171.231.116" dyno=web.1 connect=0ms service=1ms status=200 bytes=3036 protocol=http
+2025-04-19T03:47:47.379572+00:00 heroku[router]: at=info method=GET path="/" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=c36fbf13-0d96-4114-969a-1c61aeef960e fwd="69.171.231.8" dyno=web.1 connect=0ms service=1ms status=200 bytes=3036 protocol=http
+2025-04-19T03:47:47.609922+00:00 heroku[router]: at=info method=GET path="/" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=5df1b582-a9fe-4eef-8216-e4ab96fd86da fwd="69.171.231.2" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=http
+2025-04-19T03:47:48.983958+00:00 heroku[router]: at=info method=GET path="/?fbclid=IwZXh0bgNhZW0CMTEAAR54fFzkhA8yriudx79tNfwBYxdClbl9z_fgMrSWjmsPs1BYQJMEyzrHWspAHA_aem_XBdnBm624cNZU2vo7jpKmQ" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=fc25802e-a524-4a66-9a40-c1df6fc7cf9b fwd="66.220.149.112" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=http
+2025-04-19T03:47:49.544751+00:00 heroku[router]: at=info method=POST path="/api/rastreamento/visitante" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=53d9ab91-5e12-4c45-90d7-5a305c455fda fwd="201.80.15.81" dyno=web.1 connect=0ms service=8ms status=404 bytes=410 protocol=https
+2025-04-19T03:47:49.546225+00:00 heroku[router]: at=info method=GET path="/api/consulta-cpf?cpf=11548718785" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=4641c0c1-1e9f-471c-ba32-030c369f7440 fwd="201.80.15.81" dyno=web.1 connect=0ms service=8ms status=200 bytes=3036 protocol=https
+2025-04-19T03:47:50.156323+00:00 heroku[router]: at=info method=GET path="/assets/index-BmbOLCEd.js" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=955c5b73-0cc0-4129-8a6b-4d6658304b65 fwd="66.220.149.16" dyno=web.1 connect=0ms service=4ms status=200 bytes=734011 protocol=http
+2025-04-19T03:47:50.337144+00:00 heroku[router]: at=info method=GET path="/assets/index-CeprnKlr.css" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=674594f0-8c24-4760-812f-77e26742b4a0 fwd="66.220.149.16" dyno=web.1 connect=0ms service=2ms status=200 bytes=84202 protocol=http
+2025-04-19T03:47:51.276536+00:00 heroku[router]: at=info method=GET path="/assets/govbr-B9sTV8pj.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=cce8e9d3-8a6b-4871-9706-3a29634bbd57 fwd="66.220.149.2" dyno=web.1 connect=0ms service=2ms status=200 bytes=16152 protocol=http
+2025-04-19T03:47:51.286389+00:00 heroku[router]: at=info method=GET path="/api/detectar-estado?_nocache=1745034471070" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=f0686b3d-b88c-41b4-9292-ba349c76e3ce fwd="66.220.149.113" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=http
+2025-04-19T03:47:51.531110+00:00 heroku[router]: at=info method=GET path="/favicon.ico" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=5d1e90fa-4b78-4b05-af47-84efe40ad27d fwd="66.220.149.2" dyno=web.1 connect=0ms service=1ms status=200 bytes=3036 protocol=http
+2025-04-19T03:48:10.615998+00:00 heroku[router]: at=info method=GET path="/api/detectar-estado?_nocache=1745034489672" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=1ee5c735-2bbb-4a9d-a84a-88cd0342d274 fwd="66.220.149.27" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=http
+2025-04-19T03:48:25.125051+00:00 heroku[router]: at=info method=GET path="/assets/govbr-B9sTV8pj.png" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=8fcda9aa-e106-40b9-9ebb-4e14ab9298ed fwd="69.171.234.7" dyno=web.1 connect=0ms service=2ms status=200 bytes=16152 protocol=http
+2025-04-19T03:48:25.321056+00:00 heroku[router]: at=info method=GET path="/api/detectar-estado?_nocache=1745034505645" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=bf1a79b4-8980-41d9-9e57-63accc15aaa2 fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=https
+2025-04-19T03:48:56.473041+00:00 heroku[router]: at=info method=GET path="/api/detectar-estado?_nocache=1745034536797" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=98ab0b22-cf26-4784-bf88-cf839db7656a fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=200 bytes=3036 protocol=https
+2025-04-19T03:48:58.085438+00:00 heroku[router]: at=info method=GET path="/api/consulta-cpf?cpf=11548718785" host=novoappaneel-cc943c10f94d.herokuapp.com request_id=a064b06f-974b-4a9d-b3e9-99e4a8079109 fwd="201.80.15.81" dyno=web.1 connect=0ms service=2ms status=304 bytes=237 protocol=https
+
+
