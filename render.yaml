@@ -2,7 +2,7 @@ services:
   - type: web
     name: icms-restituicao
     env: node
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: ./render-build.sh
     startCommand: npm start
     plan: free
     envVars:
