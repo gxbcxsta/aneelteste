@@ -28,7 +28,6 @@ import PagamentoLAR from "@/pages/PagamentoLAR";
 import DebugDetectorIp from "./debug/DebugDetectorIp";
 import Admin from "@/pages/Admin";
 import AdminLogin from "@/pages/AdminLogin";
-import TesteParaibaPage from "@/pages/TesteParaibaPage";
 
 function Router() {
   return (
@@ -39,7 +38,6 @@ function Router() {
         <Route path="/verificar" component={VerificarRestituicao}/>
         <Route path="/admin" component={Admin}/>
         <Route path="/admin-login" component={AdminLogin}/>
-        <Route path="/teste-paraiba" component={TesteParaibaPage}/>
         
         {/* Rotas protegidas - exigem CPF */}
         <Route path="/confirmar-identidade">

