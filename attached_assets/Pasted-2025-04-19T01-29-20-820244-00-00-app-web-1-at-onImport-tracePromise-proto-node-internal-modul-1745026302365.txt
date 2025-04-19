@@ -1,0 +1,36 @@
+2025-04-19T01:29:20.820244+00:00 app[web.1]: at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:577:36)
+2025-04-19T01:29:20.820244+00:00 app[web.1]: at TracingChannel.tracePromise (node:diagnostics_channel:344:14)
+2025-04-19T01:29:20.820244+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:576:21) {
+2025-04-19T01:29:20.820245+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND',
+2025-04-19T01:29:20.820245+00:00 app[web.1]: url: 'file:///app/server/routes.js'
+2025-04-19T01:29:20.820245+00:00 app[web.1]: }
+2025-04-19T01:29:20.861348+00:00 heroku[web.1]: Process exited with status 1
+2025-04-19T01:29:20.886100+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-19T01:29:58.268751+00:00 app[api]: Starting process with command `node heroku-db-setup.js` by user gxbcxsta@gmail.com
+2025-04-19T01:30:05.399410+00:00 heroku[run.7307]: State changed from starting to up
+2025-04-19T01:30:08.611918+00:00 heroku[run.7307]: Process exited with status 0
+2025-04-19T01:30:08.637980+00:00 heroku[run.7307]: State changed from up to complete
+2025-04-19T01:31:09.526656+00:00 heroku[web.1]: State changed from crashed to starting
+2025-04-19T01:31:16.532296+00:00 heroku[web.1]: Starting process with command `node heroku-start.js`
+2025-04-19T01:31:17.309033+00:00 app[web.1]: Configurando URL do banco de dados para o Heroku...
+2025-04-19T01:31:17.309403+00:00 app[web.1]: URL do banco de dados convertida de postgres:// para postgresql://
+2025-04-19T01:31:17.310483+00:00 app[web.1]: Iniciando servidor em modo: PRODUÇÃO
+2025-04-19T01:31:17.310516+00:00 app[web.1]: Diretório base: /app
+2025-04-19T01:31:17.313572+00:00 app[web.1]: Erro ao registrar rotas da API: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/server/routes.js' imported from /app/heroku-start.js
+2025-04-19T01:31:17.313573+00:00 app[web.1]: at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+2025-04-19T01:31:17.313573+00:00 app[web.1]: at moduleResolve (node:internal/modules/esm/resolve:860:10)
+2025-04-19T01:31:17.313573+00:00 app[web.1]: at defaultResolve (node:internal/modules/esm/resolve:984:11)
+2025-04-19T01:31:17.313574+00:00 app[web.1]: at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+2025-04-19T01:31:17.313574+00:00 app[web.1]: at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+2025-04-19T01:31:17.313574+00:00 app[web.1]: at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+2025-04-19T01:31:17.313576+00:00 app[web.1]: at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+2025-04-19T01:31:17.313576+00:00 app[web.1]: at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:577:36)
+2025-04-19T01:31:17.313576+00:00 app[web.1]: at TracingChannel.tracePromise (node:diagnostics_channel:344:14)
+2025-04-19T01:31:17.313576+00:00 app[web.1]: at ModuleLoader.import (node:internal/modules/esm/loader:576:21) {
+2025-04-19T01:31:17.313576+00:00 app[web.1]: code: 'ERR_MODULE_NOT_FOUND',
+2025-04-19T01:31:17.313577+00:00 app[web.1]: url: 'file:///app/server/routes.js'
+2025-04-19T01:31:17.313577+00:00 app[web.1]: }
+2025-04-19T01:31:17.370484+00:00 heroku[web.1]: Process exited with status 1
+2025-04-19T01:31:17.396963+00:00 heroku[web.1]: State changed from starting to crashed
+2025-04-19T01:31:23.991062+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=aneel-30cdf843c474.herokuapp.com request_id=19dcb6c5-3bd3-4515-a0e6-050109a0fea4 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https
+2025-04-19T01:31:24.593504+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/favicon.ico" host=aneel-30cdf843c474.herokuapp.com request_id=3fde2d8a-90a9-4418-9809-a419eb0e54c0 fwd="201.80.15.81" dyno= connect= service= status=503 bytes= protocol=https

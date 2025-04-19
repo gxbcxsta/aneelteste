@@ -1,0 +1,441 @@
+Microsoft Windows [versão 10.0.19045.5737]
+(c) Microsoft Corporation. Todos os direitos reservados.
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku create aneelconsumidor
+Creating ⬢ aneelconsumidor... done
+https://aneelconsumidor-cc857140fe6e.herokuapp.com/ | https://git.heroku.com/aneelconsumidor.git
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku dyno:type essential-0 -a aneelconsumidor
+    Error: No process types on aneelconsumidor.
+    Upload a Procfile to add process types.
+    https://devcenter.heroku.com/articles/procfile
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku addons:create heroku-postgresql:mini -a aneelconsumidor
+Creating heroku-postgresql:mini on ⬢ aneelconsumidor... !
+ »   Error: We tried to create heroku-postgresql:mini, but received an error from the add-on provider. Try the request
+ »   again, or log a support ticket and include this message: The mini plan has reached end-of-life. You can try again
+ »   with a valid plan. See the available plans with: heroku addons:plans heroku-postgresql.
+ »
+ »   Error ID: addon_error
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku addons:plans heroku-postgresql
+         Slug                           Name         Price         Max price
+ ─────── ────────────────────────────── ──────────── ───────────── ────────────
+ default heroku-postgresql:essential-0  Essential 0  ~$0.007/hour  $5/month
+         heroku-postgresql:essential-1  Essential 1  ~$0.013/hour  $9/month
+         heroku-postgresql:essential-2  Essential 2  ~$0.028/hour  $20/month
+         heroku-postgresql:standard-0   Standard 0   ~$0.069/hour  $50/month
+         heroku-postgresql:premium-0    Premium 0    ~$0.278/hour  $200/month
+         heroku-postgresql:standard-2   Standard 2   ~$0.278/hour  $200/month
+         heroku-postgresql:private-0    Private 0    ~$0.417/hour  $300/month
+         heroku-postgresql:premium-2    Premium 2    ~$0.486/hour  $350/month
+         heroku-postgresql:shield-0     Shield 0     ~$0.486/hour  $350/month
+         heroku-postgresql:standard-3   Standard 3   ~$0.556/hour  $400/month
+         heroku-postgresql:private-2    Private 2    ~$0.833/hour  $600/month
+         heroku-postgresql:premium-3    Premium 3    ~$1.042/hour  $750/month
+         heroku-postgresql:shield-2     Shield 2     ~$1.042/hour  $750/month
+         heroku-postgresql:standard-4   Standard 4   ~$1.042/hour  $750/month
+         heroku-postgresql:private-3    Private 3    ~$1.389/hour  $1000/month
+         heroku-postgresql:premium-4    Premium 4    ~$1.667/hour  $1200/month
+         heroku-postgresql:shield-3     Shield 3     ~$1.667/hour  $1200/month
+         heroku-postgresql:standard-5   Standard 5   ~$1.944/hour  $1400/month
+         heroku-postgresql:private-4    Private 4    ~$2.083/hour  $1500/month
+         heroku-postgresql:shield-4     Shield 4     ~$2.500/hour  $1800/month
+         heroku-postgresql:standard-6   Standard 6   ~$2.778/hour  $2000/month
+         heroku-postgresql:premium-5    Premium 5    ~$3.472/hour  $2500/month
+         heroku-postgresql:private-5    Private 5    ~$3.889/hour  $2800/month
+         heroku-postgresql:shield-5     Shield 5     ~$4.722/hour  $3400/month
+         heroku-postgresql:premium-6    Premium 6    ~$4.861/hour  $3500/month
+         heroku-postgresql:standard-7   Standard 7   ~$4.861/hour  $3500/month
+         heroku-postgresql:private-6    Private 6    ~$5.000/hour  $3600/month
+         heroku-postgresql:shield-6     Shield 6     ~$6.111/hour  $4400/month
+         heroku-postgresql:standard-8   Standard 8   ~$6.250/hour  $4500/month
+         heroku-postgresql:premium-l-6  Premium L 6  ~$6.597/hour  $4750/month
+         heroku-postgresql:private-l-6  Private L 6  ~$7.361/hour  $5300/month
+         heroku-postgresql:standard-9   Standard 9   ~$8.056/hour  $5800/month
+         heroku-postgresql:premium-7    Premium 7    ~$8.333/hour  $6000/month
+         heroku-postgresql:premium-xl-6 Premium XL 6 ~$8.333/hour  $6000/month
+         heroku-postgresql:shield-l-6   Shield L 6   ~$8.889/hour  $6400/month
+         heroku-postgresql:private-xl-6 Private XL 6 ~$9.444/hour  $6800/month
+         heroku-postgresql:private-7    Private 7    ~$9.722/hour  $7000/month
+         heroku-postgresql:shield-7     Shield 7     ~$11.667/hour $8400/month
+         heroku-postgresql:shield-xl-6  Shield XL 6  ~$11.667/hour $8400/month
+         heroku-postgresql:premium-8    Premium 8    ~$11.806/hour $8500/month
+         heroku-postgresql:private-8    Private 8    ~$13.889/hour $10000/month
+         heroku-postgresql:premium-9    Premium 9    ~$15.278/hour $11000/month
+         heroku-postgresql:standard-10  Standard 10  ~$16.667/hour $12000/month
+         heroku-postgresql:shield-8     Shield 8     ~$17.014/hour $12250/month
+         heroku-postgresql:premium-l-9  Premium L 9  ~$17.361/hour $12500/month
+         heroku-postgresql:private-9    Private 9    ~$18.056/hour $13000/month
+         heroku-postgresql:premium-xl-9 Premium XL 9 ~$19.444/hour $14000/month
+         heroku-postgresql:private-l-9  Private L 9  ~$20.833/hour $15000/month
+         heroku-postgresql:shield-9     Shield 9     ~$22.222/hour $16000/month
+         heroku-postgresql:private-xl-9 Private XL 9 ~$23.611/hour $17000/month
+         heroku-postgresql:shield-l-9   Shield L 9   ~$25.694/hour $18500/month
+         heroku-postgresql:shield-xl-9  Shield XL 9  ~$29.167/hour $21000/month
+         heroku-postgresql:premium-10   Premium 10   ~$33.333/hour $24000/month
+         heroku-postgresql:private-10   Private 10   ~$38.889/hour $28000/month
+         heroku-postgresql:shield-10    Shield 10    ~$47.222/hour $34000/month
+
+Creating heroku-postgresql:essential-1 on ⬢ aneelconsumidor... ~$0.013/hour (max $9/month)
+Database should be available soon
+postgresql-clear-69091 is being created in the background. The app will restart when complete...
+Use heroku addons:info postgresql-clear-69091 to check creation progress
+Use heroku addons:docs heroku-postgresql to view documentation
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku addons:create heroku-postgresql:basic -a aneelconsumidor
+Creating heroku-postgresql:basic on ⬢ aneelconsumidor... !
+ »   Error: We tried to create heroku-postgresql:basic, but received an error from the add-on provider. Try the request
+ »    again, or log a support ticket and include this message: The basic plan has reached end-of-life. You can try
+ »   again with a valid plan. See the available plans with: heroku addons:plans heroku-postgresql.
+ »
+ »   Error ID: addon_error
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku dyno:type essential-1 -a aneelconsumidor
+    Error: No process types on aneelconsumidor.
+    Upload a Procfile to add process types.
+    https://devcenter.heroku.com/articles/procfile
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>git init
+Reinitialized existing Git repository in C:/Users/GabrielPC/Documents/GChub/OP/replit/.git/
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>git add .
+warning: in the working copy of '.env.example', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.replit', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DOC-FOR4PAYMENTS-INTEGRACAO-PIX.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'HEROKU-DEPLOY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-mb-8-h3-class-text-xl-font-bold-text-044785-mb-4--1744330047633.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-p-4-p-class-mb-4-Para-efetuar-sua-inscri-o-informe-os-dados-ab-1744312346210.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-p-6-relative-bg-gray-50-div-class-flex-justify-between-items-center-mb-4-b-1744336880435.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted--div-class-p-6-relative-bg-gray-50-div-class-flex-justify-between-items-center-mb-4-b-1744336889145.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Aqui-est-um-texto-explicando-de-forma-clara-t-cnica-e-pr-tica-para-o-Replit-o-prop-sito-da-API-da--1744502978215.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Aqui-est-um-texto-explicando-de-forma-clara-t-cnica-e-pr-tica-para-o-Replit-o-prop-sito-da-API-da--1744502981115.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Aqui-est-um-texto-explicando-de-forma-clara-t-cnica-e-pr-tica-para-o-Replit-o-prop-sito-da-API-da--1744502989284.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-IP-do-ACRE-Mostre-as-alternativas-Energisa-Acre-correta-Amazonas-Energia-Equatorial-1744383723866.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-IP-do-ACRE-Mostre-as-alternativas-Energisa-Acre-correta-Amazonas-Energia-Equatorial-1744387825752.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-IP-do-ACRE-Mostre-as-alternativas-Energisa-Acre-correta-Amazonas-Energia-Equatorial-1744393202890.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Olha-essa-vai-ser-a-ltima-vez-que-eu-vou-tentar-isso-com-voc-Se-voc-n-o-conseguir-eu-nunca-mai-1744398257578.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Preciso-de-fazer-algumas-altera-es-simples-porem-bem-importantes-1-ALTERA-O-Na-pagina-resulta--1744250056966.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Preciso-de-fazer-algumas-altera-es-simples-porem-bem-importantes-1-ALTERA-O-Na-pagina-resulta--1744250060923.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Tenho-algumas-altera-es-para-serem-feitas-1-Na-pagina-verificar-quando-a-pessoa-digita-seu-CPF-1744311688754.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-Tenho-algumas-altera-es-para-serem-feitas-1-Na-pagina-verificar-quando-a-pessoa-digita-seu-CPF-1744311705559.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-Express-NextFunction-Request-Response-from-express-import-Server-createServer--1744489597600.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-Express-NextFunction-Request-Response-from-express-import-Server-createServer--1744489600356.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-useState-useEffect-from-react-import-useLocation-from-wouter-import-Card-Ca-1744489029453.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-import-useState-useEffect-from-react-import-useLocation-from-wouter-import-Card-Ca-1744489614083.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421898378.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421921522.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421922711.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421922973.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421923407.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421923870.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744421924868.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Pasted-ntegra-o-com-For4Payments-class-For4PaymentsAPI-private-API-URL-https-app-for4payments-com-1744422144650.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/Sistema-Deteccao-Localizacao-Companhias.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'attached_assets/integraflux-api (1).yaml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'build-heroku.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/App.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ContatoSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/FaqSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Footer.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/GovHeader.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Header.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/HeroSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ImageVerification.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Impostometro.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/InfoSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/LoadingPopup.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/LocalizacaoDetector.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/NotificacaoSmsMonitor.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/NotificationSound.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ProtectedRoute.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/Rastreamento.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ScrollToTop.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/SimuladorICMS.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/SimuladorRestituicao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/TesteParaiba.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/VerificacaoIdentidade.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/accordion.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/alert-dialog.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/alert.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/aspect-ratio.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/avatar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/badge.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/breadcrumb.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/button.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/calendar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/card.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/carousel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/chart.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/checkbox.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/collapsible.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/command.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/context-menu.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/dialog.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/drawer.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/dropdown-menu.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/form.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/hover-card.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/input-otp.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/input.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/label.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/menubar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/navigation-menu.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/pagination.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/popover.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/progress.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/radio-group.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/resizable.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/scroll-area.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/select.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/separator.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/sheet.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/skeleton.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/slider.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/switch.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/table.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/tabs.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/textarea.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toast.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toaster.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toggle-group.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/toggle.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/components/ui/tooltip.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/contexts/UserContext.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/debug/DebugDetectorIp.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/hooks/use-mobile.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/hooks/use-toast.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/index.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/lib/for4payments.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/lib/queryClient.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/lib/utils.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/main.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Admin.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/AdminLogin.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Calculo.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Confirmacao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ConfirmacaoRestituicao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ConfirmarIdentidade.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Home.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/PagamentoLAR.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/PagamentoPix.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/PagamentoTCN.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Resultado.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ResultadoCalculo.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/SimuladorICMS.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/Sucesso.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/SucessoPadrao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/TaxaComplementar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/TaxaFinal.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/TaxaLAR.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/TesteParaibaPage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/VerificarRestituicao.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/not-found.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/services/NotificacaoSmsService.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/services/RastreamentoService.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/services/UtmifyService.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/utils/SecurityUtils.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'drizzle.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'engines.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'heroku-build.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'heroku-db-setup.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'heroku-start.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'migrations/0000_aspiring_husk.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'migrations/meta/0000_snapshot.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'migrations/meta/_journal.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'postcss.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/footprint.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/globe.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/lightning.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/lock.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/assets/img/search.svg', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'replit.nix', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/db-alternative.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/db.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/heroku-db-config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/routes.backup.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/routes.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/sms-service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/storage.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server/vite.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'shared/schema.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tailwind.config.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test-paraiba-companhias.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test-paraiba.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'theme.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tsconfig.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'vite.config.ts', LF will be replaced by CRLF the next time Git touches it
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>git commit -m "Versão inicial para deploy"
+[main c5cfb12] Versão inicial para deploy
+ 1 file changed, 36 insertions(+)
+ create mode 100644 attached_assets/Pasted-2025-04-19T01-29-20-820244-00-00-app-web-1-at-onImport-tracePromise-proto-node-internal-modul-1745026302365.txt
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku git:remote -a aneelconsumidor
+set git remote heroku to https://git.heroku.com/aneelconsumidor.git
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>
+C:\Users\GabrielPC\Documents\GChub\OP\replit>git push heroku main
+Enumerating objects: 3234, done.
+Counting objects: 100% (3234/3234), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (3186/3186), done.
+Writing objects: 100% (3234/3234), 3.65 MiB | 1.29 MiB/s, done.
+Total 3234 (delta 2580), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2580/2580), done.
+remote: Updated 246 paths from 437db58
+remote: Compressing source files... done.
+remote: Building source:
+remote:
+remote: -----> Building on the Heroku-24 stack
+remote: -----> Determining which buildpack to use for this app
+remote: -----> Node.js app detected
+remote:
+remote: -----> Creating runtime environment
+remote:
+remote:        NPM_CONFIG_LOGLEVEL=error
+remote:        NODE_VERBOSE=false
+remote:        NODE_ENV=production
+remote:        NODE_MODULES_CACHE=true
+remote:
+remote: -----> Installing binaries
+remote:        engines.node (package.json):   unspecified
+remote:        engines.npm (package.json):    unspecified (use default)
+remote:
+remote:        Resolving node version 22.x...
+remote:        Downloading and installing node 22.14.0...
+remote:        Using default npm version: 10.9.2
+remote:
+remote: -----> Installing dependencies
+remote:        Installing node modules
+remote:
+remote:        added 487 packages, and audited 488 packages in 6s
+remote:
+remote:        64 packages are looking for funding
+remote:          run `npm fund` for details
+remote:
+remote:        8 moderate severity vulnerabilities
+remote:
+remote:        To address issues that do not require attention, run:
+remote:          npm audit fix
+remote:
+remote:        To address all issues (including breaking changes), run:
+remote:          npm audit fix --force
+remote:
+remote:        Run `npm audit` for details.
+remote:        npm notice
+remote:        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+remote:        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+remote:        npm notice To update run: npm install -g npm@11.3.0
+remote:        npm notice
+remote:
+remote: -----> Build
+remote:        Running build
+remote:
+remote:        > rest-express@1.0.0 build
+remote:        > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+remote:
+remote:        vite v5.4.14 building for production...
+remote:        transforming...
+remote: Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+remote:   npx update-browserslist-db@latest
+remote:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+remote:        ✓ 1780 modules transformed.
+remote:        rendering chunks...
+remote:        computing gzip size...
+remote:        ../dist/public/index.html                   2.73 kB │ gzip:   1.13 kB
+remote:        ../dist/public/assets/govbr-B9sTV8pj.png   15.88 kB
+remote:        ../dist/public/assets/index-CtXHwBMi.css   84.14 kB │ gzip:  14.21 kB
+remote:        ../dist/public/assets/index-N7L5vKbX.js   736.74 kB │ gzip: 201.19 kB
+remote:
+remote: (!) Some chunks are larger than 500 kB after minification. Consider:
+remote: - Using dynamic import() to code-split the application
+remote: - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+remote: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+remote:        ✓ built in 3.58s
+remote:
+remote:   dist/index.js  55.3kb
+remote:
+remote: ⚡ Done in 5ms
+remote:
+remote: -----> Caching build
+remote:        - npm cache
+remote:
+remote: -----> Pruning devDependencies
+remote:
+remote:        up to date, audited 394 packages in 801ms
+remote:
+remote:        55 packages are looking for funding
+remote:          run `npm fund` for details
+remote:
+remote:        1 moderate severity vulnerability
+remote:
+remote:        To address all issues, run:
+remote:          npm audit fix
+remote:
+remote:        Run `npm audit` for details.
+remote:        npm notice
+remote:        npm notice New major version of npm available! 10.9.2 -> 11.3.0
+remote:        npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.3.0
+remote:        npm notice To update run: npm install -g npm@11.3.0
+remote:        npm notice
+remote:
+remote: -----> Build succeeded!
+remote: -----> Discovering process types
+remote:        Procfile declares types -> web
+remote:
+remote: -----> Compressing...
+remote:        Done: 99.6M
+remote: -----> Launching...
+remote:        Released v4
+remote:        https://aneelconsumidor-cc857140fe6e.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy... done.
+To https://git.heroku.com/aneelconsumidor.git
+ * [new branch]      main -> main
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku dyno:type basic -a aneelconsumidor
+Scaling dynos on aneelconsumidor... done
+=== Process Types
+
+ Type Size  Qty Cost/hour Max cost/month
+ ──── ───── ─── ───────── ──────────────
+ web  Basic 1   ~$0.010   $7
+
+=== Dyno Totals
+
+ Type  Total
+ ───── ─────
+ Basic 1
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku addons:create heroku-postgresql:essential-1 -a aneelconsumidor
+Creating heroku-postgresql:essential-1 on ⬢ aneelconsumidor... ~$0.013/hour (max $9/month)
+Database should be available soon
+postgresql-silhouetted-96439 is being created in the background. The app will restart when complete...
+Use heroku addons:info postgresql-silhouetted-96439 to check creation progress
+Use heroku addons:docs heroku-postgresql to view documentation
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>heroku run node heroku-db-setup.js -a aneelconsumidor
+Running node heroku-db-setup.js on ⬢ aneelconsumidor... up, run.2795
+
+Iniciando configuração do banco de dados para Heroku...
+URL do banco de dados convertida de postgres:// para postgresql://
+URL do banco de dados configurada corretamente.
+Aplicando migrações ao banco de dados via script direto...
+Tabelas criadas ou já existentes no banco de dados!
+Banco de dados migrado com sucesso!
+Configuração do banco de dados concluída.
+
+C:\Users\GabrielPC\Documents\GChub\OP\replit>
