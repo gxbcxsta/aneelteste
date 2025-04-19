@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: icms-restituicao
+    env: node
+    buildCommand: npm run build
+    startCommand: npm start
+    plan: starter
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: icms-restituicao-db
+          property: connectionString
+      - key: FOR4PAYMENTS_PUBLIC_KEY
+        sync: false
+      - key: FOR4PAYMENTS_SECRET_KEY
+        sync: false
+      - key: EXATO_API_TOKEN
+        sync: false
+      - key: INTEGRAFLUX_API_TOKEN
+        sync: false
+      - key: UTMIFY_API_TOKEN
+        sync: false
+
+databases:
+  - name: icms-restituicao-db
+    plan: starter
+    postgresMajorVersion: 15
