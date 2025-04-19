@@ -1,0 +1,235 @@
+Alterações para Funcionalidade de CEP Alternativo
+O que foi feito:
+Adicionei uma opção "Nenhuma das opções" na seleção de companhia elétrica e um fluxo para permitir o usuário inserir seu CEP quando não encontra sua companhia na lista. A partir do CEP informado, o sistema detecta o estado e apresenta as companhias elétricas daquele estado específico.
+
+Alterações específicas:
+No arquivo client/src/pages/ConfirmarIdentidade.tsx:
+
+Adicionei uma nova etapa no enum EtapaVerificacao:
+
+enum EtapaVerificacao {
+  NOME = 0,
+  ANO_NASCIMENTO = 1,
+  COMPANHIA_ELETRICA = 2,
+  CEP_ALTERNATIVO = 3,
+}
+Criei um schema de validação para o CEP:
+
+const cepSchema = z.object({
+  cep: z.string()
+    .min(8, "CEP deve ter pelo menos 8 dígitos")
+    .max(9, "CEP não deve ter mais de 9 caracteres")
+    .regex(/^\d{5}-?\d{3}$/, "CEP deve estar no formato 12345-678 ou 12345678"),
+});
+type CepFormValues = z.infer<typeof cepSchema>;
+Adicionei o formulário para input de CEP:
+
+const cepForm = useForm<CepFormValues>({
+  resolver: zodResolver(cepSchema),
+  defaultValues: {
+    cep: "",
+  },
+});
+Implementei a função de submit do CEP que consulta a API:
+
+const onSubmitCep = async (values: CepFormValues) => {
+  try {
+    setIsLoading(true);
+    
+    // Formatar o CEP para remover qualquer caractere não numérico
+    const cepFormatado = values.cep.replace(/\D/g, '');
+    
+    // Consultar a API de CEP
+    const response = await fetch(`/api/consulta-cep?cep=${cepFormatado}`);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Erro ao consultar o CEP");
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.message || "CEP não encontrado");
+    }
+    
+    // Obter o estado do CEP e gerar as opções de companhia
+    const estadoDoCep = data.estado;
+    console.log(`Estado detectado pelo CEP: ${estadoDoCep}`);
+    
+    // Atualizar o estado selecionado
+    setEstado(estadoDoCep);
+    
+    // Verificar se temos opções de companhia para o estado
+    if (!opcoesCompanhiaPorEstado[estadoDoCep]) {
+      throw new Error(`Não foram encontradas companhias elétricas para o estado ${estadoDoCep}`);
+    }
+    
+    // Gerar as opções de companhia com base no estado do CEP
+    gerarOpcoesCompanhia(estadoDoCep);
+    
+    // Voltar para a etapa de seleção de companhia
+    setEtapaAtual(EtapaVerificacao.COMPANHIA_ELETRICA);
+    
+    toast({
+      title: "CEP localizado",
+      description: `Estado identificado: ${estadoDoCep}. Por favor, selecione sua companhia elétrica.`,
+    });
+    
+  } catch (error: any) {
+    console.error("Erro ao consultar CEP:", error);
+    toast({
+      title: "Erro ao consultar CEP",
+      description: error.message || "Não foi possível localizar o CEP informado. Verifique e tente novamente.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+Modifiquei a função onSubmitCompanhia para verificar "Nenhuma das opções":
+
+const onSubmitCompanhia = (values: CompanhiaFormValues) => {
+  const companhiaEscolhida = values.companhia;
+  
+  // Verificar se o usuário selecionou "Nenhuma das opções"
+  if (companhiaEscolhida === "nenhuma_das_opcoes") {
+    // Avançar para etapa de CEP
+    setEtapaAtual(EtapaVerificacao.CEP_ALTERNATIVO);
+    return;
+  }
+  
+  // restante do código...
+};
+Adicionei o componente de interface para a etapa de CEP:
+
+{etapaAtual === EtapaVerificacao.CEP_ALTERNATIVO && (
+  <Form {...cepForm}>
+    <form onSubmit={cepForm.handleSubmit(onSubmitCep)} className="space-y-6">
+      <FormField
+        control={cepForm.control}
+        name="cep"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Digite seu CEP</FormLabel>
+            <FormControl>
+              <Input
+                placeholder="12345-678"
+                {...field}
+                onChange={(e) => {
+                  // Formatar o CEP enquanto digita (opcional)
+                  let value = e.target.value.replace(/\D/g, '');
+                  if (value.length > 5) {
+                    value = value.substring(0, 5) + '-' + value.substring(5, 8);
+                  }
+                  field.onChange(value);
+                }}
+                maxLength={9}
+              />
+            </FormControl>
+            <FormDescription>
+              Insira seu CEP para que possamos localizar sua companhia elétrica.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <Button type="submit" disabled={isLoading} className="w-full">
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Consultando...
+          </>
+        ) : (
+          <>
+            Consultar CEP
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </>
+        )}
+      </Button>
+    </form>
+  </Form>
+)}
+No arquivo server/routes.ts:
+
+Adicionei o endpoint para consulta de CEP:
+/**
+ * Endpoint para consultar CEP via API ViaCEP e retornar o estado
+ * @route GET /api/consulta-cep
+ * @param {string} cep - CEP para consulta (formato: 12345678 ou 12345-678)
+ * @returns {Object} { cep, estado, siglaEstado, cidade, bairro, logradouro }
+ */
+app.get('/api/consulta-cep', async (req: Request, res: Response) => {
+  const { cep } = req.query;
+  
+  if (!cep || typeof cep !== 'string') {
+    return res.status(400).json({ success: false, message: 'CEP não fornecido ou formato inválido' });
+  }
+  
+  // Formatar o CEP para remover traços ou outros caracteres especiais
+  const cepFormatado = cep.replace(/\D/g, '');
+  
+  if (cepFormatado.length !== 8) {
+    return res.status(400).json({ success: false, message: 'CEP deve ter 8 dígitos' });
+  }
+  
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
+    const data = await response.json();
+    
+    if (data.erro) {
+      return res.status(404).json({ success: false, message: 'CEP não encontrado' });
+    }
+    
+    // Extrair dados do CEP
+    const estado = obterNomeEstado(data.uf);
+    
+    return res.json({
+      success: true,
+      cep: data.cep,
+      estado: estado,
+      siglaEstado: data.uf,
+      cidade: data.localidade,
+      bairro: data.bairro,
+      logradouro: data.logradouro
+    });
+  } catch (error) {
+    console.error("Erro ao consultar CEP:", error);
+    return res.status(500).json({ success: false, message: 'Erro ao consultar o CEP' });
+  }
+});
+// Função auxiliar para converter sigla UF em nome do estado
+function obterNomeEstado(sigla: string): string {
+  const estados: Record<string, string> = {
+    AC: "Acre",
+    AL: "Alagoas",
+    AM: "Amazonas",
+    AP: "Amapá",
+    BA: "Bahia",
+    CE: "Ceará",
+    DF: "Distrito Federal",
+    ES: "Espírito Santo",
+    GO: "Goiás",
+    MA: "Maranhão",
+    MG: "Minas Gerais",
+    MS: "Mato Grosso do Sul",
+    MT: "Mato Grosso",
+    PA: "Pará",
+    PB: "Paraíba",
+    PE: "Pernambuco",
+    PI: "Piauí",
+    PR: "Paraná",
+    RJ: "Rio de Janeiro",
+    RN: "Rio Grande do Norte",
+    RO: "Rondônia",
+    RR: "Roraima",
+    RS: "Rio Grande do Sul",
+    SC: "Santa Catarina",
+    SE: "Sergipe",
+    SP: "São Paulo",
+    TO: "Tocantins"
+  };
+  
+  return estados[sigla] || sigla;
+}
+Esta implementação permite que usuários que não conseguem identificar sua companhia entre as opções disponíveis possam inserir seu CEP para obter uma lista mais precisa, baseada na localização real.

@@ -21,6 +21,7 @@ enum EtapaVerificacao {
   NOME = 0,
   ANO_NASCIMENTO = 1,
   COMPANHIA_ELETRICA = 2,
+  CEP_ALTERNATIVO = 3,
 }
 
 // Definir o esquema de validação para o formulário
@@ -36,9 +37,17 @@ const companhiaSchema = z.object({
   companhia: z.string().min(1, "Selecione uma opção"),
 });
 
+const cepSchema = z.object({
+  cep: z.string()
+    .min(8, "CEP deve ter pelo menos 8 dígitos")
+    .max(9, "CEP não deve ter mais de 9 caracteres")
+    .regex(/^\d{5}-?\d{3}$/, "CEP deve estar no formato 12345-678 ou 12345678"),
+});
+
 type NomeFormValues = z.infer<typeof nomeSchema>;
 type AnoFormValues = z.infer<typeof anoSchema>;
 type CompanhiaFormValues = z.infer<typeof companhiaSchema>;
+type CepFormValues = z.infer<typeof cepSchema>;
 
 // Lista de companhias elétricas por estado (atualizada para 2025)
 const companhiasEletricas: Record<string, string[]> = {
@@ -176,6 +185,14 @@ export default function ConfirmarIdentidade() {
     resolver: zodResolver(companhiaSchema),
     defaultValues: {
       companhia: "",
+    },
+  });
+  
+  // Formulário para input de CEP
+  const cepForm = useForm<CepFormValues>({
+    resolver: zodResolver(cepSchema),
+    defaultValues: {
+      cep: "",
     },
   });
 
@@ -765,6 +782,13 @@ export default function ConfirmarIdentidade() {
                                         </Label>
                                       </div>
                                     ))}
+                                    {/* Opção "Nenhuma das opções" */}
+                                    <div className="flex items-center space-x-2 border p-3 rounded-md bg-gray-50">
+                                      <RadioGroupItem value="nenhuma_das_opcoes" id="companhia-nenhuma" />
+                                      <Label htmlFor="companhia-nenhuma" className="flex-1 cursor-pointer font-medium">
+                                        Nenhuma das opções
+                                      </Label>
+                                    </div>
                                   </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
